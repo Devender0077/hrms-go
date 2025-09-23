@@ -49,7 +49,6 @@ import Settings from "./pages/settings";
 import Profile from "./pages/profile";
 import Roles from "./pages/roles";
 import Calendar from "./pages/calendar";
-import CalendarTest from "./pages/calendar-test";
 import Tasks from "./pages/tasks";
 import Recruitment from "./pages/recruitment";
 import LeaveManagement from "./pages/leave-management";
