@@ -36,14 +36,21 @@ interface CalendarEvent {
   description?: string;
   location?: string;
   attendees?: string[];
+  visibility: 'all' | 'departments' | 'specific';
+  visibleTo?: string[];
+  departments?: string[];
+  createdBy: string;
+  createdByRole: string;
 }
 
 export default function CalendarPage() {
   const { user } = useAuth();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen: isEventPopupOpen, onOpen: onEventPopupOpen, onOpenChange: onEventPopupOpenChange } = useDisclosure();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [selectedDayEvents, setSelectedDayEvents] = useState<CalendarEvent[]>([]);
   const [newEvent, setNewEvent] = useState({
     title: "",
     date: "",
@@ -51,7 +58,10 @@ export default function CalendarPage() {
     type: "meeting",
     description: "",
     location: "",
-    attendees: ""
+    attendees: "",
+    visibility: "all" as 'all' | 'departments' | 'specific',
+    visibleTo: [] as string[],
+    departments: [] as string[]
   });
   const [isLoading, setIsLoading] = useState(false);
 
@@ -65,7 +75,10 @@ export default function CalendarPage() {
       type: "meeting",
       color: "primary",
       description: "Weekly team standup meeting",
-      location: "Conference Room A"
+      location: "Conference Room A",
+      visibility: "all",
+      createdBy: "John Doe",
+      createdByRole: "super_admin"
     },
     {
       id: "2",
@@ -74,7 +87,11 @@ export default function CalendarPage() {
       time: "5:00 PM",
       type: "deadline",
       color: "danger",
-      description: "Q1 project deliverables due"
+      description: "Q1 project deliverables due",
+      visibility: "departments",
+      departments: ["Engineering", "Product"],
+      createdBy: "Jane Smith",
+      createdByRole: "company_admin"
     },
     {
       id: "3",
@@ -84,7 +101,11 @@ export default function CalendarPage() {
       type: "review",
       color: "warning",
       description: "Annual performance review",
-      location: "HR Office"
+      location: "HR Office",
+      visibility: "specific",
+      visibleTo: ["hr@company.com", "manager@company.com"],
+      createdBy: "HR Manager",
+      createdByRole: "hr_manager"
     },
     {
       id: "4",
@@ -94,7 +115,38 @@ export default function CalendarPage() {
       type: "event",
       color: "success",
       description: "Annual company picnic",
-      location: "Central Park"
+      location: "Central Park",
+      visibility: "all",
+      createdBy: "Admin",
+      createdByRole: "super_admin"
+    },
+    {
+      id: "5",
+      title: "Department Meeting",
+      date: "2025-01-15",
+      time: "3:00 PM",
+      type: "meeting",
+      color: "primary",
+      description: "Monthly department review",
+      location: "Meeting Room B",
+      visibility: "departments",
+      departments: ["Engineering"],
+      createdBy: "Tech Lead",
+      createdByRole: "company_admin"
+    },
+    {
+      id: "6",
+      title: "Training Session",
+      date: "2025-01-15",
+      time: "4:00 PM",
+      type: "event",
+      color: "success",
+      description: "New employee training",
+      location: "Training Room",
+      visibility: "specific",
+      visibleTo: ["newemployee@company.com"],
+      createdBy: "HR Team",
+      createdByRole: "hr_manager"
     }
   ];
 
@@ -124,9 +176,19 @@ export default function CalendarPage() {
     if (newEvent.title && newEvent.date && newEvent.time) {
       const event: CalendarEvent = {
         id: `local-${Date.now()}`,
-        ...newEvent,
+        title: newEvent.title,
+        date: newEvent.date,
+        time: newEvent.time,
+        type: newEvent.type,
         color: eventTypes.find(t => t.key === newEvent.type)?.color || "primary",
-        attendees: newEvent.attendees ? newEvent.attendees.split(',').map(email => email.trim()) : []
+        description: newEvent.description,
+        location: newEvent.location,
+        attendees: newEvent.attendees ? newEvent.attendees.split(',').map(email => email.trim()) : [],
+        visibility: newEvent.visibility,
+        visibleTo: newEvent.visibleTo,
+        departments: newEvent.departments,
+        createdBy: user?.name || "Unknown",
+        createdByRole: user?.role || "employee"
       };
       setEvents([...events, event]);
       setNewEvent({
@@ -136,7 +198,10 @@ export default function CalendarPage() {
         type: "meeting",
         description: "",
         location: "",
-        attendees: ""
+        attendees: "",
+        visibility: "all",
+        visibleTo: [],
+        departments: []
       });
       onOpenChange();
     }
@@ -146,7 +211,7 @@ export default function CalendarPage() {
     setEvents(events.filter(event => event.id !== eventId));
   };
 
-  const upcomingEvents = events
+  const upcomingEvents = filterEventsForUser(events)
     .filter(event => {
       const eventDate = new Date(event.date);
       return eventDate && !isNaN(eventDate.getTime()) && eventDate >= new Date();
@@ -166,6 +231,37 @@ export default function CalendarPage() {
     return eventTypes.find(t => t.key === type)?.color || "primary";
   };
 
+  const filterEventsForUser = (events: CalendarEvent[]) => {
+    if (!user) return [];
+    
+    // Super admin can see all events
+    if (user.role === 'super_admin') {
+      return events;
+    }
+    
+    return events.filter(event => {
+      switch (event.visibility) {
+        case 'all':
+          return true;
+        case 'departments':
+          // Check if user's department is in the event's departments
+          return event.departments?.includes(user.department || '') || false;
+        case 'specific':
+          // Check if user's email is in the visibleTo list
+          return event.visibleTo?.includes(user.email || '') || false;
+        default:
+          return false;
+      }
+    });
+  };
+
+  const handleShowMoreEvents = (date: Date) => {
+    const dayEvents = getEventsForDate(date);
+    const filteredEvents = filterEventsForUser(dayEvents);
+    setSelectedDayEvents(filteredEvents);
+    onEventPopupOpen();
+  };
+
   const renderCalendarView = () => {
     const today = new Date();
     const currentMonth = selectedDate.getMonth();
@@ -180,7 +276,8 @@ export default function CalendarPage() {
     const currentDate = new Date(startDate);
     
     for (let i = 0; i < 42; i++) {
-      const dayEvents = getEventsForDate(currentDate);
+      const allDayEvents = getEventsForDate(currentDate);
+      const dayEvents = filterEventsForUser(allDayEvents);
       const isCurrentMonth = currentDate.getMonth() === currentMonth;
       const isToday = currentDate.toDateString() === today.toDateString();
       
@@ -201,7 +298,7 @@ export default function CalendarPage() {
             {currentDate.getDate()}
           </div>
           <div className="space-y-1">
-            {dayEvents.slice(0, 3).map((event) => (
+            {dayEvents.slice(0, 2).map((event) => (
               <div
                 key={event.id}
                 className={`text-xs p-1 rounded cursor-pointer ${
@@ -219,9 +316,15 @@ export default function CalendarPage() {
                 </div>
               </div>
             ))}
-            {dayEvents.length > 3 && (
-              <div className="text-xs text-gray-500">
-                +{dayEvents.length - 3} more
+            {dayEvents.length > 2 && (
+              <div 
+                className="text-xs text-blue-600 cursor-pointer hover:text-blue-800 font-medium"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleShowMoreEvents(currentDate);
+                }}
+              >
+                +{dayEvents.length - 2} more
               </div>
             )}
           </div>
@@ -243,7 +346,8 @@ export default function CalendarPage() {
     const currentDate = new Date(startOfWeek);
     
     for (let i = 0; i < 7; i++) {
-      const dayEvents = getEventsForDate(currentDate);
+      const allDayEvents = getEventsForDate(currentDate);
+      const dayEvents = filterEventsForUser(allDayEvents);
       const isToday = currentDate.toDateString() === today.toDateString();
       
       days.push(
@@ -300,7 +404,8 @@ export default function CalendarPage() {
   const renderDayView = () => {
     const today = new Date();
     const isToday = selectedDate.toDateString() === today.toDateString();
-    const dayEvents = getEventsForDate(selectedDate);
+    const allDayEvents = getEventsForDate(selectedDate);
+    const dayEvents = filterEventsForUser(allDayEvents);
     
     // Sort events by time
     const sortedEvents = dayEvents.sort((a, b) => {
@@ -713,8 +818,11 @@ export default function CalendarPage() {
                     <Select
                       label="Event Type"
                       placeholder="Select event type"
-                      selectedKeys={[newEvent.type]}
-                      onSelectionChange={(keys) => setNewEvent({...newEvent, type: Array.from(keys)[0] as string})}
+                      selectedKeys={newEvent.type ? [newEvent.type] : []}
+                      onSelectionChange={(keys) => {
+                        const selectedKey = Array.from(keys)[0] as string;
+                        setNewEvent({...newEvent, type: selectedKey});
+                      }}
                     >
                       {eventTypes.map((type) => (
                         <SelectItem key={type.key} value={type.key}>
@@ -747,6 +855,53 @@ export default function CalendarPage() {
                       onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
                       minRows={3}
                     />
+                    
+                    <Select
+                      label="Event Visibility"
+                      placeholder="Select who can see this event"
+                      selectedKeys={newEvent.visibility ? [newEvent.visibility] : []}
+                      onSelectionChange={(keys) => {
+                        const selectedKey = Array.from(keys)[0] as string;
+                        setNewEvent({...newEvent, visibility: selectedKey as 'all' | 'departments' | 'specific'});
+                      }}
+                    >
+                      <SelectItem key="all" value="all">
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:globe" className="w-4 h-4" />
+                          <span>Everyone</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem key="departments" value="departments">
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:building" className="w-4 h-4" />
+                          <span>Specific Departments</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem key="specific" value="specific">
+                        <div className="flex items-center gap-2">
+                          <Icon icon="lucide:users" className="w-4 h-4" />
+                          <span>Specific People</span>
+                        </div>
+                      </SelectItem>
+                    </Select>
+                    
+                    {newEvent.visibility === 'departments' && (
+                      <Input
+                        label="Departments"
+                        placeholder="Enter department names (comma separated)"
+                        value={newEvent.departments.join(', ')}
+                        onChange={(e) => setNewEvent({...newEvent, departments: e.target.value.split(',').map(dept => dept.trim()).filter(dept => dept)})}
+                      />
+                    )}
+                    
+                    {newEvent.visibility === 'specific' && (
+                      <Input
+                        label="Visible To"
+                        placeholder="Enter email addresses (comma separated)"
+                        value={newEvent.visibleTo.join(', ')}
+                        onChange={(e) => setNewEvent({...newEvent, visibleTo: e.target.value.split(',').map(email => email.trim()).filter(email => email)})}
+                      />
+                    )}
                   </div>
                 </ModalBody>
                 <ModalFooter>
@@ -755,6 +910,98 @@ export default function CalendarPage() {
                   </Button>
                   <Button color="primary" onPress={handleAddEvent}>
                     Add Event
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+
+        {/* Event Popup Modal */}
+        <Modal isOpen={isEventPopupOpen} onOpenChange={onEventPopupOpenChange} size="2xl">
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  <div className="flex items-center gap-3">
+                    <Icon icon="lucide:calendar-days" className="text-blue-600 text-xl" />
+                    <div>
+                      <h3 className="text-lg font-semibold">Events for {selectedDayEvents.length > 0 ? new Date(selectedDayEvents[0].date).toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        month: 'long', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      }) : 'Selected Date'}</h3>
+                      <p className="text-sm text-gray-500">{selectedDayEvents.length} event(s) scheduled</p>
+                    </div>
+                  </div>
+                </ModalHeader>
+                <ModalBody>
+                  <div className="space-y-4">
+                    {selectedDayEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className={`p-4 rounded-lg border-l-4 ${
+                          event.color === 'primary' ? 'border-blue-500 bg-blue-50' :
+                          event.color === 'danger' ? 'border-red-500 bg-red-50' :
+                          event.color === 'warning' ? 'border-yellow-500 bg-yellow-50' :
+                          event.color === 'success' ? 'border-green-500 bg-green-50' :
+                          'border-gray-500 bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Icon icon={getEventIcon(event.type)} className="w-4 h-4" />
+                              <h3 className="font-semibold text-gray-900">{event.title}</h3>
+                              <Chip 
+                                size="sm" 
+                                color={getEventColor(event.type) as any}
+                                variant="flat"
+                              >
+                                {event.type}
+                              </Chip>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-2">{event.time}</p>
+                            {event.description && (
+                              <p className="text-sm text-gray-700 mb-2">{event.description}</p>
+                            )}
+                            {event.location && (
+                              <p className="text-sm text-gray-600 flex items-center gap-1">
+                                <Icon icon="lucide:map-pin" className="w-3 h-3" />
+                                {event.location}
+                              </p>
+                            )}
+                            {event.attendees && event.attendees.length > 0 && (
+                              <p className="text-sm text-gray-600 flex items-center gap-1 mt-2">
+                                <Icon icon="lucide:users" className="w-3 h-3" />
+                                {event.attendees.join(', ')}
+                              </p>
+                            )}
+                            <div className="mt-2 text-xs text-gray-500">
+                              Created by: {event.createdBy} ({event.createdByRole})
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="flat"
+                            color="danger"
+                            startContent={<Icon icon="lucide:trash-2" />}
+                            onPress={() => {
+                              handleDeleteEvent(event.id);
+                              onClose();
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="primary" variant="flat" onPress={onClose}>
+                    Close
                   </Button>
                 </ModalFooter>
               </>
