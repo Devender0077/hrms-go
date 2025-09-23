@@ -43,10 +43,93 @@ interface CalendarEvent {
   createdByRole: string;
 }
 
+// Sample local events - defined outside component to avoid re-creation
+const localEvents: CalendarEvent[] = [
+  {
+    id: "1",
+    title: "Team Meeting",
+    date: "2025-01-15",
+    time: "10:00 AM",
+    type: "meeting",
+    color: "primary",
+    description: "Weekly team standup meeting",
+    location: "Conference Room A",
+    visibility: "all",
+    createdBy: "John Doe",
+    createdByRole: "super_admin"
+  },
+  {
+    id: "2",
+    title: "Project Deadline",
+    date: "2025-01-20",
+    time: "5:00 PM",
+    type: "deadline",
+    color: "danger",
+    description: "Q1 project deliverables due",
+    visibility: "departments",
+    departments: ["Engineering", "Product"],
+    createdBy: "Jane Smith",
+    createdByRole: "company_admin"
+  },
+  {
+    id: "3",
+    title: "Performance Review",
+    date: "2025-01-25",
+    time: "2:00 PM",
+    type: "review",
+    color: "warning",
+    description: "Annual performance review",
+    location: "HR Office",
+    visibility: "specific",
+    visibleTo: ["hr@company.com", "manager@company.com"],
+    createdBy: "HR Manager",
+    createdByRole: "hr_manager"
+  },
+  {
+    id: "4",
+    title: "Company Picnic",
+    date: "2025-01-30",
+    time: "12:00 PM",
+    type: "event",
+    color: "success",
+    description: "Annual company picnic",
+    location: "Central Park",
+    visibility: "all",
+    createdBy: "Admin",
+    createdByRole: "super_admin"
+  },
+  {
+    id: "5",
+    title: "Department Meeting",
+    date: "2025-01-15",
+    time: "3:00 PM",
+    type: "meeting",
+    color: "primary",
+    description: "Monthly department review",
+    location: "Meeting Room B",
+    visibility: "departments",
+    departments: ["Engineering"],
+    createdBy: "Tech Lead",
+    createdByRole: "company_admin"
+  },
+  {
+    id: "6",
+    title: "Training Session",
+    date: "2025-01-15",
+    time: "4:00 PM",
+    type: "event",
+    color: "success",
+    description: "New employee training",
+    location: "Training Room",
+    visibility: "specific",
+    visibleTo: ["newemployee@company.com"],
+    createdBy: "HR Team",
+    createdByRole: "hr_manager"
+  }
+];
+
 export default function CalendarPage() {
-  console.log('CalendarPage: Component rendering');
   const { user, loading: authLoading } = useAuth();
-  console.log('CalendarPage: Auth state', { user, authLoading });
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { isOpen: isEventPopupOpen, onOpen: onEventPopupOpen, onOpenChange: onEventPopupOpenChange } = useDisclosure();
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -92,90 +175,6 @@ export default function CalendarPage() {
     );
   }
 
-  // Sample local events
-  const localEvents: CalendarEvent[] = [
-    {
-      id: "1",
-      title: "Team Meeting",
-      date: "2025-01-15",
-      time: "10:00 AM",
-      type: "meeting",
-      color: "primary",
-      description: "Weekly team standup meeting",
-      location: "Conference Room A",
-      visibility: "all",
-      createdBy: "John Doe",
-      createdByRole: "super_admin"
-    },
-    {
-      id: "2",
-      title: "Project Deadline",
-      date: "2025-01-20",
-      time: "5:00 PM",
-      type: "deadline",
-      color: "danger",
-      description: "Q1 project deliverables due",
-      visibility: "departments",
-      departments: ["Engineering", "Product"],
-      createdBy: "Jane Smith",
-      createdByRole: "company_admin"
-    },
-    {
-      id: "3",
-      title: "Performance Review",
-      date: "2025-01-25",
-      time: "2:00 PM",
-      type: "review",
-      color: "warning",
-      description: "Annual performance review",
-      location: "HR Office",
-      visibility: "specific",
-      visibleTo: ["hr@company.com", "manager@company.com"],
-      createdBy: "HR Manager",
-      createdByRole: "hr_manager"
-    },
-    {
-      id: "4",
-      title: "Company Picnic",
-      date: "2025-01-30",
-      time: "12:00 PM",
-      type: "event",
-      color: "success",
-      description: "Annual company picnic",
-      location: "Central Park",
-      visibility: "all",
-      createdBy: "Admin",
-      createdByRole: "super_admin"
-    },
-    {
-      id: "5",
-      title: "Department Meeting",
-      date: "2025-01-15",
-      time: "3:00 PM",
-      type: "meeting",
-      color: "primary",
-      description: "Monthly department review",
-      location: "Meeting Room B",
-      visibility: "departments",
-      departments: ["Engineering"],
-      createdBy: "Tech Lead",
-      createdByRole: "company_admin"
-    },
-    {
-      id: "6",
-      title: "Training Session",
-      date: "2025-01-15",
-      time: "4:00 PM",
-      type: "event",
-      color: "success",
-      description: "New employee training",
-      location: "Training Room",
-      visibility: "specific",
-      visibleTo: ["newemployee@company.com"],
-      createdBy: "HR Team",
-      createdByRole: "hr_manager"
-    }
-  ];
 
   const eventTypes = [
     { key: "meeting", label: "Meeting", color: "primary", icon: "lucide:users" },
@@ -187,10 +186,8 @@ export default function CalendarPage() {
   ];
 
   useEffect(() => {
-    console.log('CalendarPage: useEffect running');
     try {
       // Load local events
-      console.log('CalendarPage: Setting events', localEvents);
       setEvents(localEvents);
     } catch (error) {
       console.error('Error loading calendar events:', error);
@@ -546,7 +543,6 @@ export default function CalendarPage() {
     );
   };
 
-  console.log('CalendarPage: About to render main content');
   return (
     <div className="min-h-screen bg-gray-50/50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
