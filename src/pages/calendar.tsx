@@ -16,7 +16,6 @@ import {
   Textarea,
   Select,
   SelectItem,
-  Switch,
   Divider,
   Tabs,
   Tab,
@@ -37,15 +36,6 @@ interface CalendarEvent {
   description?: string;
   location?: string;
   attendees?: string[];
-  source: 'local' | 'google';
-  googleEventId?: string;
-}
-
-interface GoogleCalendarSettings {
-  enabled: boolean;
-  clientId: string;
-  accessToken?: string;
-  calendars: string[];
 }
 
 export default function CalendarPage() {
@@ -54,11 +44,6 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
   const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [googleSettings, setGoogleSettings] = useState<GoogleCalendarSettings>({
-    enabled: false,
-    clientId: '',
-    calendars: []
-  });
   const [newEvent, setNewEvent] = useState({
     title: "",
     date: "",
@@ -80,8 +65,7 @@ export default function CalendarPage() {
       type: "meeting",
       color: "primary",
       description: "Weekly team standup meeting",
-      location: "Conference Room A",
-      source: 'local'
+      location: "Conference Room A"
     },
     {
       id: "2",
@@ -90,8 +74,7 @@ export default function CalendarPage() {
       time: "5:00 PM",
       type: "deadline",
       color: "danger",
-      description: "Q1 project deliverables due",
-      source: 'local'
+      description: "Q1 project deliverables due"
     },
     {
       id: "3",
@@ -101,8 +84,7 @@ export default function CalendarPage() {
       type: "review",
       color: "warning",
       description: "Annual performance review",
-      location: "HR Office",
-      source: 'local'
+      location: "HR Office"
     },
     {
       id: "4",
@@ -112,8 +94,7 @@ export default function CalendarPage() {
       type: "event",
       color: "success",
       description: "Annual company picnic",
-      location: "Central Park",
-      source: 'local'
+      location: "Central Park"
     }
   ];
 
@@ -127,71 +108,9 @@ export default function CalendarPage() {
   ];
 
   useEffect(() => {
-    // Load Google Calendar settings from localStorage or API
-    const savedSettings = localStorage.getItem('googleCalendarSettings');
-    if (savedSettings) {
-      setGoogleSettings(JSON.parse(savedSettings));
-    }
-    
     // Load local events
     setEvents(localEvents);
-    
-    // Load Google Calendar events if enabled
-    if (googleSettings.enabled && googleSettings.accessToken) {
-      loadGoogleCalendarEvents();
-    }
   }, []);
-
-  const loadGoogleCalendarEvents = async () => {
-    if (!googleSettings.accessToken) return;
-    
-    setIsLoading(true);
-    try {
-      // This would be a real API call to Google Calendar
-      // For now, we'll simulate it with sample data
-      const googleEvents: CalendarEvent[] = [
-        {
-          id: "google-1",
-          title: "Google Calendar Event",
-          date: "2025-01-18",
-          time: "3:00 PM",
-          type: "meeting",
-          color: "primary",
-          description: "Event from Google Calendar",
-          source: 'google',
-          googleEventId: 'google-event-1'
-        }
-      ];
-      
-      setEvents(prev => [...prev, ...googleEvents]);
-    } catch (error) {
-      console.error('Error loading Google Calendar events:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleCalendarToggle = (enabled: boolean) => {
-    const newSettings = { ...googleSettings, enabled };
-    setGoogleSettings(newSettings);
-    localStorage.setItem('googleCalendarSettings', JSON.stringify(newSettings));
-    
-    if (enabled) {
-      // Initialize Google Calendar integration
-      initializeGoogleCalendar();
-    }
-  };
-
-  const initializeGoogleCalendar = () => {
-    // This would initialize the Google Calendar API
-    // For demo purposes, we'll show a modal to enter client ID
-    const clientId = prompt('Enter Google Calendar Client ID:');
-    if (clientId) {
-      const newSettings = { ...googleSettings, clientId };
-      setGoogleSettings(newSettings);
-      localStorage.setItem('googleCalendarSettings', JSON.stringify(newSettings));
-    }
-  };
 
   const getEventsForDate = (date: Date) => {
     if (!date || isNaN(date.getTime())) {
@@ -207,7 +126,6 @@ export default function CalendarPage() {
         id: `local-${Date.now()}`,
         ...newEvent,
         color: eventTypes.find(t => t.key === newEvent.type)?.color || "primary",
-        source: 'local',
         attendees: newEvent.attendees ? newEvent.attendees.split(',').map(email => email.trim()) : []
       };
       setEvents([...events, event]);
@@ -269,9 +187,13 @@ export default function CalendarPage() {
       days.push(
         <div
           key={i}
-          className={`min-h-[120px] p-2 border border-gray-200 ${
+          className={`min-h-[120px] p-2 border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
             isCurrentMonth ? 'bg-white' : 'bg-gray-50'
           } ${isToday ? 'bg-blue-50 border-blue-300' : ''}`}
+          onClick={() => {
+            setNewEvent(prev => ({ ...prev, date: currentDate.toISOString().split('T')[0] }));
+            onOpen();
+          }}
         >
           <div className={`text-sm font-medium mb-1 ${
             isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
@@ -294,9 +216,6 @@ export default function CalendarPage() {
                 <div className="flex items-center gap-1">
                   <Icon icon={getEventIcon(event.type)} className="w-3 h-3" />
                   <span className="truncate">{event.title}</span>
-                  {event.source === 'google' && (
-                    <Icon icon="lucide:external-link" className="w-2 h-2" />
-                  )}
                 </div>
               </div>
             ))}
@@ -339,52 +258,24 @@ export default function CalendarPage() {
             >
               Add Event
             </Button>
-            <Button 
-              color="secondary" 
-              variant="flat"
-              startContent={<Icon icon="lucide:settings" />}
-              className="font-medium"
-            >
-              Settings
-            </Button>
           </div>
         </div>
 
-        {/* Google Calendar Integration */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-3">
+        {/* Google Calendar Integration Notice */}
+        <Card className="border-0 shadow-sm bg-blue-50/50">
+          <CardBody className="py-4">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:calendar-plus" className="text-blue-600 text-xl" />
+              <Icon icon="lucide:info" className="text-blue-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Google Calendar Integration</h3>
-                <p className="text-gray-500 text-sm">Sync with your Google Calendar</p>
-              </div>
-            </div>
-          </CardHeader>
-          <CardBody className="pt-0">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable Google Calendar Sync</span>
-                <span className="text-xs text-gray-500">Import events from your Google Calendar</span>
-              </div>
-              <Switch
-                isSelected={googleSettings.enabled}
-                onValueChange={handleGoogleCalendarToggle}
-              />
-            </div>
-            {googleSettings.enabled && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon icon="lucide:info" className="text-blue-600" />
-                  <span className="text-sm font-medium text-blue-900">Google Calendar Connected</span>
-                </div>
-                <p className="text-sm text-blue-700">
-                  Events from your Google Calendar will be displayed alongside your local events.
+                <h3 className="text-sm font-medium text-blue-900">Google Calendar Integration</h3>
+                <p className="text-xs text-blue-700 mt-1">
+                  Google Calendar integration is available in Settings. Configure it there to sync external events with your calendar.
                 </p>
               </div>
-            )}
+            </div>
           </CardBody>
         </Card>
+
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Calendar View */}
@@ -397,11 +288,42 @@ export default function CalendarPage() {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">Calendar View</h3>
                       <p className="text-gray-500 text-sm">
-                        {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Click on any date to add an event
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="default"
+                      startContent={<Icon icon="lucide:chevron-left" />}
+                      onPress={() => {
+                        const newDate = new Date(selectedDate);
+                        newDate.setMonth(newDate.getMonth() - 1);
+                        setSelectedDate(newDate);
+                      }}
+                    />
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="default"
+                      onPress={() => setSelectedDate(new Date())}
+                    >
+                      Today
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="flat"
+                      color="default"
+                      endContent={<Icon icon="lucide:chevron-right" />}
+                      onPress={() => {
+                        const newDate = new Date(selectedDate);
+                        newDate.setMonth(newDate.getMonth() + 1);
+                        setSelectedDate(newDate);
+                      }}
+                    />
+                    <Divider orientation="vertical" className="h-6" />
                     <Button
                       size="sm"
                       variant={view === 'month' ? 'solid' : 'flat'}
@@ -491,9 +413,6 @@ export default function CalendarPage() {
                           >
                             {event.type}
                           </Chip>
-                          {event.source === 'google' && (
-                            <Icon icon="lucide:external-link" className="w-3 h-3 text-blue-500" />
-                          )}
                         </div>
                       </div>
                     </div>
