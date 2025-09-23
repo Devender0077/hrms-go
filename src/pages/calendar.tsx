@@ -242,18 +242,6 @@ export default function CalendarPage() {
     setEvents(events.filter(event => event.id !== eventId));
   };
 
-  const upcomingEvents = filterEventsForUser(events)
-    .filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate && !isNaN(eventDate.getTime()) && eventDate >= new Date();
-    })
-    .sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
-      return dateA.getTime() - dateB.getTime();
-    })
-    .slice(0, 5);
-
   const getEventIcon = (type: string) => {
     return eventTypes.find(t => t.key === type)?.icon || "lucide:calendar";
   };
@@ -292,6 +280,18 @@ export default function CalendarPage() {
     setSelectedDayEvents(filteredEvents);
     onEventPopupOpen();
   };
+
+  const upcomingEvents = filterEventsForUser(events)
+    .filter(event => {
+      const eventDate = new Date(event.date);
+      return eventDate && !isNaN(eventDate.getTime()) && eventDate >= new Date();
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    })
+    .slice(0, 5);
 
   const renderCalendarView = () => {
     const today = new Date();
