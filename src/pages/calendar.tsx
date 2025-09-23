@@ -234,6 +234,179 @@ export default function CalendarPage() {
     return days;
   };
 
+  const renderWeekView = () => {
+    const today = new Date();
+    const startOfWeek = new Date(selectedDate);
+    startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
+    
+    const days = [];
+    const currentDate = new Date(startOfWeek);
+    
+    for (let i = 0; i < 7; i++) {
+      const dayEvents = getEventsForDate(currentDate);
+      const isToday = currentDate.toDateString() === today.toDateString();
+      
+      days.push(
+        <div
+          key={i}
+          className={`min-h-[200px] p-3 border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
+            isToday ? 'bg-blue-50 border-blue-300' : 'bg-white'
+          }`}
+          onClick={() => {
+            setNewEvent(prev => ({ ...prev, date: currentDate.toISOString().split('T')[0] }));
+            onOpen();
+          }}
+        >
+          <div className={`text-sm font-medium mb-2 ${
+            isToday ? 'text-blue-600' : 'text-gray-900'
+          }`}>
+            {currentDate.toLocaleDateString('en-US', { weekday: 'short' })}
+          </div>
+          <div className={`text-lg font-semibold mb-3 ${
+            isToday ? 'text-blue-600' : 'text-gray-900'
+          }`}>
+            {currentDate.getDate()}
+          </div>
+          <div className="space-y-2">
+            {dayEvents.map((event) => (
+              <div
+                key={event.id}
+                className={`text-xs p-2 rounded cursor-pointer ${
+                  event.color === 'primary' ? 'bg-blue-100 text-blue-800' :
+                  event.color === 'danger' ? 'bg-red-100 text-red-800' :
+                  event.color === 'warning' ? 'bg-yellow-100 text-yellow-800' :
+                  event.color === 'success' ? 'bg-green-100 text-green-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}
+                title={`${event.title} - ${event.time}`}
+              >
+                <div className="flex items-center gap-1">
+                  <Icon icon={getEventIcon(event.type)} className="w-3 h-3" />
+                  <span className="truncate">{event.title}</span>
+                </div>
+                <div className="text-xs opacity-75 mt-1">{event.time}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+      
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    
+    return days;
+  };
+
+  const renderDayView = () => {
+    const today = new Date();
+    const isToday = selectedDate.toDateString() === today.toDateString();
+    const dayEvents = getEventsForDate(selectedDate);
+    
+    // Sort events by time
+    const sortedEvents = dayEvents.sort((a, b) => {
+      const timeA = a.time.toLowerCase().includes('am') ? 
+        parseInt(a.time.split(':')[0]) + (a.time.includes('12') ? 0 : 0) :
+        parseInt(a.time.split(':')[0]) + 12;
+      const timeB = b.time.toLowerCase().includes('am') ? 
+        parseInt(b.time.split(':')[0]) + (b.time.includes('12') ? 0 : 0) :
+        parseInt(b.time.split(':')[0]) + 12;
+      return timeA - timeB;
+    });
+
+    return (
+      <div className="p-4">
+        <div className="text-center mb-6">
+          <h2 className={`text-2xl font-bold ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
+            {selectedDate.toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </h2>
+          {isToday && (
+            <p className="text-blue-600 text-sm mt-1">Today</p>
+          )}
+        </div>
+        
+        <div className="space-y-4">
+          {sortedEvents.length > 0 ? (
+            sortedEvents.map((event) => (
+              <div
+                key={event.id}
+                className={`p-4 rounded-lg border-l-4 ${
+                  event.color === 'primary' ? 'border-blue-500 bg-blue-50' :
+                  event.color === 'danger' ? 'border-red-500 bg-red-50' :
+                  event.color === 'warning' ? 'border-yellow-500 bg-yellow-50' :
+                  event.color === 'success' ? 'border-green-500 bg-green-50' :
+                  'border-gray-500 bg-gray-50'
+                }`}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon icon={getEventIcon(event.type)} className="w-4 h-4" />
+                      <h3 className="font-semibold text-gray-900">{event.title}</h3>
+                      <Chip 
+                        size="sm" 
+                        color={getEventColor(event.type) as any}
+                        variant="flat"
+                      >
+                        {event.type}
+                      </Chip>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{event.time}</p>
+                    {event.description && (
+                      <p className="text-sm text-gray-700 mb-2">{event.description}</p>
+                    )}
+                    {event.location && (
+                      <p className="text-sm text-gray-600 flex items-center gap-1">
+                        <Icon icon="lucide:map-pin" className="w-3 h-3" />
+                        {event.location}
+                      </p>
+                    )}
+                    {event.attendees && event.attendees.length > 0 && (
+                      <p className="text-sm text-gray-600 flex items-center gap-1 mt-2">
+                        <Icon icon="lucide:users" className="w-3 h-3" />
+                        {event.attendees.join(', ')}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="flat"
+                    color="danger"
+                    startContent={<Icon icon="lucide:trash-2" />}
+                    onPress={() => handleDeleteEvent(event.id)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="text-center py-12">
+              <Icon icon="lucide:calendar-x" className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No events scheduled</h3>
+              <p className="text-gray-500 mb-4">This day is free of events</p>
+              <Button
+                color="primary"
+                variant="flat"
+                startContent={<Icon icon="lucide:plus" />}
+                onPress={() => {
+                  setNewEvent(prev => ({ ...prev, date: selectedDate.toISOString().split('T')[0] }));
+                  onOpen();
+                }}
+              >
+                Add Event
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50/50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -288,7 +461,16 @@ export default function CalendarPage() {
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">Calendar View</h3>
                       <p className="text-gray-500 text-sm">
-                        {selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })} • Click on any date to add an event
+                        {view === 'month' && selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                        {view === 'week' && (() => {
+                          const startOfWeek = new Date(selectedDate);
+                          startOfWeek.setDate(selectedDate.getDate() - selectedDate.getDay());
+                          const endOfWeek = new Date(startOfWeek);
+                          endOfWeek.setDate(startOfWeek.getDate() + 6);
+                          return `${startOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - ${endOfWeek.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`;
+                        })()}
+                        {view === 'day' && selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                        {' • Click on any date to add an event'}
                       </p>
                     </div>
                   </div>
@@ -300,7 +482,13 @@ export default function CalendarPage() {
                       startContent={<Icon icon="lucide:chevron-left" />}
                       onPress={() => {
                         const newDate = new Date(selectedDate);
-                        newDate.setMonth(newDate.getMonth() - 1);
+                        if (view === 'month') {
+                          newDate.setMonth(newDate.getMonth() - 1);
+                        } else if (view === 'week') {
+                          newDate.setDate(newDate.getDate() - 7);
+                        } else if (view === 'day') {
+                          newDate.setDate(newDate.getDate() - 1);
+                        }
                         setSelectedDate(newDate);
                       }}
                     />
@@ -319,7 +507,13 @@ export default function CalendarPage() {
                       endContent={<Icon icon="lucide:chevron-right" />}
                       onPress={() => {
                         const newDate = new Date(selectedDate);
-                        newDate.setMonth(newDate.getMonth() + 1);
+                        if (view === 'month') {
+                          newDate.setMonth(newDate.getMonth() + 1);
+                        } else if (view === 'week') {
+                          newDate.setDate(newDate.getDate() + 7);
+                        } else if (view === 'day') {
+                          newDate.setDate(newDate.getDate() + 1);
+                        }
                         setSelectedDate(newDate);
                       }}
                     />
@@ -366,6 +560,29 @@ export default function CalendarPage() {
                     <div className="grid grid-cols-7 gap-0">
                       {renderCalendarView()}
                     </div>
+                  </div>
+                )}
+                
+                {view === 'week' && (
+                  <div>
+                    {/* Week Header */}
+                    <div className="grid grid-cols-7 gap-0 border-b border-gray-200">
+                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                        <div key={day} className="p-3 text-center text-sm font-medium text-gray-500 bg-gray-50">
+                          {day}
+                        </div>
+                      ))}
+                    </div>
+                    {/* Week Grid */}
+                    <div className="grid grid-cols-7 gap-0">
+                      {renderWeekView()}
+                    </div>
+                  </div>
+                )}
+                
+                {view === 'day' && (
+                  <div>
+                    {renderDayView()}
                   </div>
                 )}
               </CardBody>
