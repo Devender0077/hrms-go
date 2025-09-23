@@ -897,19 +897,19 @@
     );
 
     -- Enhanced Users Table (for user management page)
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS username VARCHAR(100) UNIQUE;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS first_name VARCHAR(100);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS last_name VARCHAR(100);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS department VARCHAR(100);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS position VARCHAR(100);
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS is_email_verified BOOLEAN DEFAULT FALSE;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS is_phone_verified BOOLEAN DEFAULT FALSE;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS two_factor_enabled BOOLEAN DEFAULT FALSE;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS login_attempts INT DEFAULT 0;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until DATETIME NULL;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login DATETIME NULL;
-    ALTER TABLE users ADD COLUMN IF NOT EXISTS permissions JSON;
+    ALTER TABLE users ADD COLUMN username VARCHAR(100) UNIQUE;
+    ALTER TABLE users ADD COLUMN first_name VARCHAR(100);
+    ALTER TABLE users ADD COLUMN last_name VARCHAR(100);
+    ALTER TABLE users ADD COLUMN phone VARCHAR(20);
+    ALTER TABLE users ADD COLUMN department VARCHAR(100);
+    ALTER TABLE users ADD COLUMN position VARCHAR(100);
+    ALTER TABLE users ADD COLUMN is_email_verified BOOLEAN DEFAULT FALSE;
+    ALTER TABLE users ADD COLUMN is_phone_verified BOOLEAN DEFAULT FALSE;
+    ALTER TABLE users ADD COLUMN two_factor_enabled BOOLEAN DEFAULT FALSE;
+    ALTER TABLE users ADD COLUMN login_attempts INT DEFAULT 0;
+    ALTER TABLE users ADD COLUMN locked_until DATETIME NULL;
+    ALTER TABLE users ADD COLUMN last_login DATETIME NULL;
+    ALTER TABLE users ADD COLUMN permissions JSON;
 
     -- User Permissions Table
     CREATE TABLE user_permissions (
@@ -924,161 +924,161 @@
     );
 
     -- Enhanced Assets Table (for asset management)
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS asset_id VARCHAR(50) UNIQUE;
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS category VARCHAR(100);
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS type VARCHAR(100);
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS brand VARCHAR(100);
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS model VARCHAR(100);
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS serial_number VARCHAR(100);
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS purchase_date DATE;
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS purchase_price DECIMAL(10,2);
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS current_value DECIMAL(10,2);
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS warranty_expiry DATE;
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS maintenance_schedule VARCHAR(100);
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS last_maintenance DATE;
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS next_maintenance DATE;
-    ALTER TABLE assets ADD COLUMN IF NOT EXISTS condition ENUM('excellent', 'good', 'fair', 'poor') DEFAULT 'good';
+    ALTER TABLE assets ADD COLUMN asset_id VARCHAR(50) UNIQUE;
+    ALTER TABLE assets ADD COLUMN category VARCHAR(100);
+    ALTER TABLE assets ADD COLUMN type VARCHAR(100);
+    ALTER TABLE assets ADD COLUMN brand VARCHAR(100);
+    ALTER TABLE assets ADD COLUMN model VARCHAR(100);
+    ALTER TABLE assets ADD COLUMN serial_number VARCHAR(100);
+    ALTER TABLE assets ADD COLUMN purchase_date DATE;
+    ALTER TABLE assets ADD COLUMN purchase_price DECIMAL(10,2);
+    ALTER TABLE assets ADD COLUMN current_value DECIMAL(10,2);
+    ALTER TABLE assets ADD COLUMN warranty_expiry DATE;
+    ALTER TABLE assets ADD COLUMN maintenance_schedule VARCHAR(100);
+    ALTER TABLE assets ADD COLUMN last_maintenance DATE;
+    ALTER TABLE assets ADD COLUMN next_maintenance DATE;
+    ALTER TABLE assets ADD COLUMN `condition` ENUM('excellent', 'good', 'fair', 'poor') DEFAULT 'good';
 
     -- Enhanced Asset Assignments Table
-    ALTER TABLE asset_assignments ADD COLUMN IF NOT EXISTS assignment_id VARCHAR(50) UNIQUE;
-    ALTER TABLE asset_assignments ADD COLUMN IF NOT EXISTS return_date DATE;
-    ALTER TABLE asset_assignments ADD COLUMN IF NOT EXISTS return_notes TEXT;
-    ALTER TABLE asset_assignments ADD COLUMN IF NOT EXISTS condition ENUM('excellent', 'good', 'fair', 'poor') DEFAULT 'excellent';
+    ALTER TABLE asset_assignments ADD COLUMN  assignment_id VARCHAR(50) UNIQUE;
+    ALTER TABLE asset_assignments ADD COLUMN  return_date DATE;
+    ALTER TABLE asset_assignments ADD COLUMN  return_notes TEXT;
+    ALTER TABLE asset_assignments ADD COLUMN  condition ENUM('excellent', 'good', 'fair', 'poor') DEFAULT 'excellent';
 
     -- Enhanced Performance Reviews Table
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS review_id VARCHAR(50) UNIQUE;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS reviewer_id INT;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS reviewer_name VARCHAR(255);
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS review_period VARCHAR(100);
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS review_type ENUM('annual', 'quarterly', 'probation', 'promotion') DEFAULT 'quarterly';
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS overall_rating DECIMAL(3,1);
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS goals_rating DECIMAL(3,1);
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS skills_rating DECIMAL(3,1);
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS behavior_rating DECIMAL(3,1);
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS attendance_rating DECIMAL(3,1);
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS scheduled_date DATE;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS completed_date DATE;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS due_date DATE;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS goals JSON;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS achievements JSON;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS areas_for_improvement JSON;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS employee_comments TEXT;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS manager_comments TEXT;
-    ALTER TABLE performance_reviews ADD COLUMN IF NOT EXISTS next_review_date DATE;
+    ALTER TABLE performance_reviews ADD COLUMN  review_id VARCHAR(50) UNIQUE;
+    ALTER TABLE performance_reviews ADD COLUMN  reviewer_id INT;
+    ALTER TABLE performance_reviews ADD COLUMN  reviewer_name VARCHAR(255);
+    ALTER TABLE performance_reviews ADD COLUMN  review_period VARCHAR(100);
+    ALTER TABLE performance_reviews ADD COLUMN  review_type ENUM('annual', 'quarterly', 'probation', 'promotion') DEFAULT 'quarterly';
+    ALTER TABLE performance_reviews ADD COLUMN  overall_rating DECIMAL(3,1);
+    ALTER TABLE performance_reviews ADD COLUMN  goals_rating DECIMAL(3,1);
+    ALTER TABLE performance_reviews ADD COLUMN  skills_rating DECIMAL(3,1);
+    ALTER TABLE performance_reviews ADD COLUMN  behavior_rating DECIMAL(3,1);
+    ALTER TABLE performance_reviews ADD COLUMN  attendance_rating DECIMAL(3,1);
+    ALTER TABLE performance_reviews ADD COLUMN  scheduled_date DATE;
+    ALTER TABLE performance_reviews ADD COLUMN  completed_date DATE;
+    ALTER TABLE performance_reviews ADD COLUMN  due_date DATE;
+    ALTER TABLE performance_reviews ADD COLUMN  goals JSON;
+    ALTER TABLE performance_reviews ADD COLUMN  achievements JSON;
+    ALTER TABLE performance_reviews ADD COLUMN  areas_for_improvement JSON;
+    ALTER TABLE performance_reviews ADD COLUMN  employee_comments TEXT;
+    ALTER TABLE performance_reviews ADD COLUMN  manager_comments TEXT;
+    ALTER TABLE performance_reviews ADD COLUMN  next_review_date DATE;
     ALTER TABLE performance_reviews ADD FOREIGN KEY (reviewer_id) REFERENCES users(id) ON DELETE SET NULL;
 
     -- Enhanced Audit Logs Table
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS log_id VARCHAR(50) UNIQUE;
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS user_name VARCHAR(255);
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS user_email VARCHAR(255);
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS resource VARCHAR(100);
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS resource_id VARCHAR(100);
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS details TEXT;
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS ip_address VARCHAR(45);
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS user_agent TEXT;
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS severity ENUM('low', 'medium', 'high', 'critical') DEFAULT 'low';
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS department VARCHAR(100);
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS location VARCHAR(100);
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS session_id VARCHAR(100);
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS changes JSON;
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS old_values JSON;
-    ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS new_values JSON;
+    ALTER TABLE audit_logs ADD COLUMN  log_id VARCHAR(50) UNIQUE;
+    ALTER TABLE audit_logs ADD COLUMN  user_name VARCHAR(255);
+    ALTER TABLE audit_logs ADD COLUMN  user_email VARCHAR(255);
+    ALTER TABLE audit_logs ADD COLUMN  resource VARCHAR(100);
+    ALTER TABLE audit_logs ADD COLUMN  resource_id VARCHAR(100);
+    ALTER TABLE audit_logs ADD COLUMN  details TEXT;
+    ALTER TABLE audit_logs ADD COLUMN  ip_address VARCHAR(45);
+    ALTER TABLE audit_logs ADD COLUMN  user_agent TEXT;
+    ALTER TABLE audit_logs ADD COLUMN  severity ENUM('low', 'medium', 'high', 'critical') DEFAULT 'low';
+    ALTER TABLE audit_logs ADD COLUMN  department VARCHAR(100);
+    ALTER TABLE audit_logs ADD COLUMN  location VARCHAR(100);
+    ALTER TABLE audit_logs ADD COLUMN  session_id VARCHAR(100);
+    ALTER TABLE audit_logs ADD COLUMN  changes JSON;
+    ALTER TABLE audit_logs ADD COLUMN  old_values JSON;
+    ALTER TABLE audit_logs ADD COLUMN  new_values JSON;
 
     -- Enhanced Tasks Table (for task management)
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS task_id VARCHAR(50) UNIQUE;
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS assignee_id VARCHAR(100);
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS assignee_name VARCHAR(255);
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium';
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS progress INT DEFAULT 0;
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS tags JSON;
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS estimated_hours INT;
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS actual_hours INT;
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS project VARCHAR(255);
-    ALTER TABLE tasks ADD COLUMN IF NOT EXISTS department VARCHAR(100);
+    ALTER TABLE tasks ADD COLUMN  task_id VARCHAR(50) UNIQUE;
+    ALTER TABLE tasks ADD COLUMN  assignee_id VARCHAR(100);
+    ALTER TABLE tasks ADD COLUMN  assignee_name VARCHAR(255);
+    ALTER TABLE tasks ADD COLUMN  priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium';
+    ALTER TABLE tasks ADD COLUMN  progress INT DEFAULT 0;
+    ALTER TABLE tasks ADD COLUMN  tags JSON;
+    ALTER TABLE tasks ADD COLUMN  estimated_hours INT;
+    ALTER TABLE tasks ADD COLUMN  actual_hours INT;
+    ALTER TABLE tasks ADD COLUMN  project VARCHAR(255);
+    ALTER TABLE tasks ADD COLUMN  department VARCHAR(100);
 
     -- Enhanced Calendar Events Table
-    ALTER TABLE calendar_events ADD COLUMN IF NOT EXISTS event_id VARCHAR(50) UNIQUE;
-    ALTER TABLE calendar_events ADD COLUMN IF NOT EXISTS color VARCHAR(7);
-    ALTER TABLE calendar_events ADD COLUMN IF NOT EXISTS is_recurring BOOLEAN DEFAULT FALSE;
-    ALTER TABLE calendar_events ADD COLUMN IF NOT EXISTS recurrence_pattern JSON;
-    ALTER TABLE calendar_events ADD COLUMN IF NOT EXISTS reminder_minutes INT;
+    ALTER TABLE calendar_events ADD COLUMN  event_id VARCHAR(50) UNIQUE;
+    ALTER TABLE calendar_events ADD COLUMN  color VARCHAR(7);
+    ALTER TABLE calendar_events ADD COLUMN  is_recurring BOOLEAN DEFAULT FALSE;
+    ALTER TABLE calendar_events ADD COLUMN  recurrence_pattern JSON;
+    ALTER TABLE calendar_events ADD COLUMN  reminder_minutes INT;
 
     -- Enhanced Attendance Table
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS attendance_id VARCHAR(50) UNIQUE;
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS check_in_location VARCHAR(255);
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS check_out_location VARCHAR(255);
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS check_in_ip VARCHAR(45);
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS check_out_ip VARCHAR(45);
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS check_in_device VARCHAR(255);
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS check_out_device VARCHAR(255);
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS total_hours DECIMAL(4,2);
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS overtime_hours DECIMAL(4,2);
-    ALTER TABLE attendance ADD COLUMN IF NOT EXISTS status ENUM('present', 'absent', 'late', 'half_day', 'holiday') DEFAULT 'present';
+    ALTER TABLE attendance ADD COLUMN  attendance_id VARCHAR(50) UNIQUE;
+    ALTER TABLE attendance ADD COLUMN  check_in_location VARCHAR(255);
+    ALTER TABLE attendance ADD COLUMN  check_out_location VARCHAR(255);
+    ALTER TABLE attendance ADD COLUMN  check_in_ip VARCHAR(45);
+    ALTER TABLE attendance ADD COLUMN  check_out_ip VARCHAR(45);
+    ALTER TABLE attendance ADD COLUMN  check_in_device VARCHAR(255);
+    ALTER TABLE attendance ADD COLUMN  check_out_device VARCHAR(255);
+    ALTER TABLE attendance ADD COLUMN  total_hours DECIMAL(4,2);
+    ALTER TABLE attendance ADD COLUMN  overtime_hours DECIMAL(4,2);
+    ALTER TABLE attendance ADD COLUMN  status ENUM('present', 'absent', 'late', 'half_day', 'holiday') DEFAULT 'present';
 
     -- Enhanced Leave Applications Table
-    ALTER TABLE leave_applications ADD COLUMN IF NOT EXISTS leave_id VARCHAR(50) UNIQUE;
-    ALTER TABLE leave_applications ADD COLUMN IF NOT EXISTS days INT;
-    ALTER TABLE leave_applications ADD COLUMN IF NOT EXISTS emergency_contact VARCHAR(255);
-    ALTER TABLE leave_applications ADD COLUMN IF NOT EXISTS attachment VARCHAR(500);
-    ALTER TABLE leave_applications ADD COLUMN IF NOT EXISTS approved_by INT;
-    ALTER TABLE leave_applications ADD COLUMN IF NOT EXISTS approved_at DATETIME;
-    ALTER TABLE leave_applications ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+    ALTER TABLE leave_applications ADD COLUMN  leave_id VARCHAR(50) UNIQUE;
+    ALTER TABLE leave_applications ADD COLUMN  days INT;
+    ALTER TABLE leave_applications ADD COLUMN  emergency_contact VARCHAR(255);
+    ALTER TABLE leave_applications ADD COLUMN  attachment VARCHAR(500);
+    ALTER TABLE leave_applications ADD COLUMN  approved_by INT;
+    ALTER TABLE leave_applications ADD COLUMN  approved_at DATETIME;
+    ALTER TABLE leave_applications ADD COLUMN  rejection_reason TEXT;
     ALTER TABLE leave_applications ADD FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL;
 
     -- Enhanced Job Applications Table
-    ALTER TABLE job_applications ADD COLUMN IF NOT EXISTS application_id VARCHAR(50) UNIQUE;
-    ALTER TABLE job_applications ADD COLUMN IF NOT EXISTS resume_path VARCHAR(500);
-    ALTER TABLE job_applications ADD COLUMN IF NOT EXISTS cover_letter TEXT;
-    ALTER TABLE job_applications ADD COLUMN IF NOT EXISTS expected_salary DECIMAL(10,2);
-    ALTER TABLE job_applications ADD COLUMN IF NOT EXISTS availability_date DATE;
-    ALTER TABLE job_applications ADD COLUMN IF NOT EXISTS source VARCHAR(100);
-    ALTER TABLE job_applications ADD COLUMN IF NOT EXISTS referral_name VARCHAR(255);
-    ALTER TABLE job_applications ADD COLUMN IF NOT EXISTS notes TEXT;
+    ALTER TABLE job_applications ADD COLUMN  application_id VARCHAR(50) UNIQUE;
+    ALTER TABLE job_applications ADD COLUMN  resume_path VARCHAR(500);
+    ALTER TABLE job_applications ADD COLUMN  cover_letter TEXT;
+    ALTER TABLE job_applications ADD COLUMN  expected_salary DECIMAL(10,2);
+    ALTER TABLE job_applications ADD COLUMN  availability_date DATE;
+    ALTER TABLE job_applications ADD COLUMN  source VARCHAR(100);
+    ALTER TABLE job_applications ADD COLUMN  referral_name VARCHAR(255);
+    ALTER TABLE job_applications ADD COLUMN  notes TEXT;
 
     -- Enhanced Interviews Table
-    ALTER TABLE interviews ADD COLUMN IF NOT EXISTS interview_id VARCHAR(50) UNIQUE;
-    ALTER TABLE interviews ADD COLUMN IF NOT EXISTS interview_type ENUM('phone', 'video', 'in_person', 'panel') DEFAULT 'in_person';
-    ALTER TABLE interviews ADD COLUMN IF NOT EXISTS duration_minutes INT;
-    ALTER TABLE interviews ADD COLUMN IF NOT EXISTS meeting_link VARCHAR(500);
-    ALTER TABLE interviews ADD COLUMN IF NOT EXISTS feedback TEXT;
-    ALTER TABLE interviews ADD COLUMN IF NOT EXISTS rating INT;
-    ALTER TABLE interviews ADD COLUMN IF NOT EXISTS recommendation ENUM('hire', 'no_hire', 'maybe') DEFAULT 'maybe';
+    ALTER TABLE interviews ADD COLUMN  interview_id VARCHAR(50) UNIQUE;
+    ALTER TABLE interviews ADD COLUMN  interview_type ENUM('phone', 'video', 'in_person', 'panel') DEFAULT 'in_person';
+    ALTER TABLE interviews ADD COLUMN  duration_minutes INT;
+    ALTER TABLE interviews ADD COLUMN  meeting_link VARCHAR(500);
+    ALTER TABLE interviews ADD COLUMN  feedback TEXT;
+    ALTER TABLE interviews ADD COLUMN  rating INT;
+    ALTER TABLE interviews ADD COLUMN  recommendation ENUM('hire', 'no_hire', 'maybe') DEFAULT 'maybe';
 
     -- Enhanced Goals Table
-    ALTER TABLE goals ADD COLUMN IF NOT EXISTS goal_id VARCHAR(50) UNIQUE;
-    ALTER TABLE goals ADD COLUMN IF NOT EXISTS category VARCHAR(100);
-    ALTER TABLE goals ADD COLUMN IF NOT EXISTS priority ENUM('low', 'medium', 'high', 'critical') DEFAULT 'medium';
-    ALTER TABLE goals ADD COLUMN IF NOT EXISTS progress INT DEFAULT 0;
-    ALTER TABLE goals ADD COLUMN IF NOT EXISTS milestones JSON;
-    ALTER TABLE goals ADD COLUMN IF NOT EXISTS success_criteria TEXT;
-    ALTER TABLE goals ADD COLUMN IF NOT EXISTS resources_needed TEXT;
-    ALTER TABLE goals ADD COLUMN IF NOT EXISTS potential_obstacles TEXT;
+    ALTER TABLE goals ADD COLUMN  goal_id VARCHAR(50) UNIQUE;
+    ALTER TABLE goals ADD COLUMN  category VARCHAR(100);
+    ALTER TABLE goals ADD COLUMN  priority ENUM('low', 'medium', 'high', 'critical') DEFAULT 'medium';
+    ALTER TABLE goals ADD COLUMN  progress INT DEFAULT 0;
+    ALTER TABLE goals ADD COLUMN  milestones JSON;
+    ALTER TABLE goals ADD COLUMN  success_criteria TEXT;
+    ALTER TABLE goals ADD COLUMN  resources_needed TEXT;
+    ALTER TABLE goals ADD COLUMN  potential_obstacles TEXT;
 
     -- Enhanced Expenses Table
-    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS expense_id VARCHAR(50) UNIQUE;
-    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS project VARCHAR(255);
-    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS vendor VARCHAR(255);
-    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS payment_method ENUM('cash', 'card', 'bank_transfer', 'check') DEFAULT 'card';
-    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS receipt_path VARCHAR(500);
-    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS approved_by INT;
-    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS approved_at DATETIME;
-    ALTER TABLE expenses ADD COLUMN IF NOT EXISTS rejection_reason TEXT;
+    ALTER TABLE expenses ADD COLUMN  expense_id VARCHAR(50) UNIQUE;
+    ALTER TABLE expenses ADD COLUMN  project VARCHAR(255);
+    ALTER TABLE expenses ADD COLUMN  vendor VARCHAR(255);
+    ALTER TABLE expenses ADD COLUMN  payment_method ENUM('cash', 'card', 'bank_transfer', 'check') DEFAULT 'card';
+    ALTER TABLE expenses ADD COLUMN  receipt_path VARCHAR(500);
+    ALTER TABLE expenses ADD COLUMN  approved_by INT;
+    ALTER TABLE expenses ADD COLUMN  approved_at DATETIME;
+    ALTER TABLE expenses ADD COLUMN  rejection_reason TEXT;
     ALTER TABLE expenses ADD FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL;
 
     -- Enhanced Payslips Table
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS payslip_id VARCHAR(50) UNIQUE;
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS bank_name VARCHAR(255);
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS account_number VARCHAR(50);
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS ifsc_code VARCHAR(20);
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS payment_method ENUM('bank_transfer', 'check', 'cash') DEFAULT 'bank_transfer';
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS overtime_hours DECIMAL(4,2);
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS bonus DECIMAL(10,2);
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS tax DECIMAL(10,2);
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS provident_fund DECIMAL(10,2);
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS health_insurance DECIMAL(10,2);
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS net_salary DECIMAL(10,2);
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS payment_status ENUM('pending', 'paid', 'failed') DEFAULT 'pending';
-    ALTER TABLE payslips ADD COLUMN IF NOT EXISTS paid_at DATETIME;
+    ALTER TABLE payslips ADD COLUMN  payslip_id VARCHAR(50) UNIQUE;
+    ALTER TABLE payslips ADD COLUMN  bank_name VARCHAR(255);
+    ALTER TABLE payslips ADD COLUMN  account_number VARCHAR(50);
+    ALTER TABLE payslips ADD COLUMN  ifsc_code VARCHAR(20);
+    ALTER TABLE payslips ADD COLUMN  payment_method ENUM('bank_transfer', 'check', 'cash') DEFAULT 'bank_transfer';
+    ALTER TABLE payslips ADD COLUMN  overtime_hours DECIMAL(4,2);
+    ALTER TABLE payslips ADD COLUMN  bonus DECIMAL(10,2);
+    ALTER TABLE payslips ADD COLUMN  tax DECIMAL(10,2);
+    ALTER TABLE payslips ADD COLUMN  provident_fund DECIMAL(10,2);
+    ALTER TABLE payslips ADD COLUMN  health_insurance DECIMAL(10,2);
+    ALTER TABLE payslips ADD COLUMN  net_salary DECIMAL(10,2);
+    ALTER TABLE payslips ADD COLUMN  payment_status ENUM('pending', 'paid', 'failed') DEFAULT 'pending';
+    ALTER TABLE payslips ADD COLUMN  paid_at DATETIME;
 
     -- Additional HRMS Tables
 
