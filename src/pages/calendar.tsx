@@ -44,7 +44,7 @@ interface CalendarEvent {
 }
 
 export default function CalendarPage() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { isOpen: isEventPopupOpen, onOpen: onEventPopupOpen, onOpenChange: onEventPopupOpenChange } = useDisclosure();
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -64,6 +64,31 @@ export default function CalendarPage() {
     departments: [] as string[]
   });
   const [isLoading, setIsLoading] = useState(false);
+
+  // Show loading state while auth is loading
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading calendar...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show message if no user (shouldn't happen with protected routes, but just in case)
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+        <div className="text-center">
+          <Icon icon="lucide:calendar-x" className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-gray-600">Please log in to view the calendar.</p>
+        </div>
+      </div>
+    );
+  }
 
   // Sample local events
   const localEvents: CalendarEvent[] = [
@@ -160,8 +185,13 @@ export default function CalendarPage() {
   ];
 
   useEffect(() => {
-    // Load local events
-    setEvents(localEvents);
+    try {
+      // Load local events
+      setEvents(localEvents);
+    } catch (error) {
+      console.error('Error loading calendar events:', error);
+      setEvents([]);
+    }
   }, []);
 
   const getEventsForDate = (date: Date) => {
@@ -187,7 +217,7 @@ export default function CalendarPage() {
         visibility: newEvent.visibility,
         visibleTo: newEvent.visibleTo,
         departments: newEvent.departments,
-        createdBy: user?.name || "Unknown",
+        createdBy: user?.name || user?.email || "Unknown",
         createdByRole: user?.role || "employee"
       };
       setEvents([...events, event]);
@@ -232,7 +262,7 @@ export default function CalendarPage() {
   };
 
   const filterEventsForUser = (events: CalendarEvent[]) => {
-    if (!user) return [];
+    if (!user) return events; // Show all events if no user context
     
     // Super admin can see all events
     if (user.role === 'super_admin') {
