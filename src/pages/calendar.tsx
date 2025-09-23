@@ -44,7 +44,9 @@ interface CalendarEvent {
 }
 
 export default function CalendarPage() {
+  console.log('CalendarPage: Component rendering');
   const { user, loading: authLoading } = useAuth();
+  console.log('CalendarPage: Auth state', { user, authLoading });
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { isOpen: isEventPopupOpen, onOpen: onEventPopupOpen, onOpenChange: onEventPopupOpenChange } = useDisclosure();
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -185,8 +187,10 @@ export default function CalendarPage() {
   ];
 
   useEffect(() => {
+    console.log('CalendarPage: useEffect running');
     try {
       // Load local events
+      console.log('CalendarPage: Setting events', localEvents);
       setEvents(localEvents);
     } catch (error) {
       console.error('Error loading calendar events:', error);
@@ -542,6 +546,7 @@ export default function CalendarPage() {
     );
   };
 
+  console.log('CalendarPage: About to render main content');
   return (
     <div className="min-h-screen bg-gray-50/50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">

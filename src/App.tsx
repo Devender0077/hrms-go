@@ -119,7 +119,7 @@ export default function App() {
           element={
             <ProtectedRoute>
               <DashboardLayout>
-                <CalendarTest />
+                <Calendar />
               </DashboardLayout>
             </ProtectedRoute>
           }
