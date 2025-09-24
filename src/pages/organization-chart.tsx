@@ -14,164 +14,11 @@ import {
   useDisclosure,
   Badge,
   Divider,
-  addToast
+  Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
-
-// Organization structure interface
-interface Employee {
-  id: string;
-  name: string;
-  position: string;
-  department: string;
-  email: string;
-  phone: string;
-  avatar: string;
-  reportsTo?: string;
-  directReports?: string[];
-  status: "active" | "inactive";
-  joinDate: string;
-}
-
-// Sample organization data
-const organizationData: Employee[] = [
-  {
-    id: "CEO001",
-    name: "John Smith",
-    position: "Chief Executive Officer",
-    department: "Executive",
-    email: "john.smith@company.com",
-    phone: "+1 (555) 123-4567",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=1",
-    directReports: ["CTO001", "CFO001", "CHRO001"],
-    status: "active",
-    joinDate: "2020-01-15"
-  },
-  {
-    id: "CTO001",
-    name: "Sarah Johnson",
-    position: "Chief Technology Officer",
-    department: "Technology",
-    email: "sarah.johnson@company.com",
-    phone: "+1 (555) 123-4568",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=2",
-    reportsTo: "CEO001",
-    directReports: ["DEV001", "QA001", "IT001"],
-    status: "active",
-    joinDate: "2020-03-20"
-  },
-  {
-    id: "CFO001",
-    name: "Michael Brown",
-    position: "Chief Financial Officer",
-    department: "Finance",
-    email: "michael.brown@company.com",
-    phone: "+1 (555) 123-4569",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=3",
-    reportsTo: "CEO001",
-    directReports: ["ACC001", "FIN001"],
-    status: "active",
-    joinDate: "2020-02-10"
-  },
-  {
-    id: "CHRO001",
-    name: "Emily Davis",
-    position: "Chief Human Resources Officer",
-    department: "Human Resources",
-    email: "emily.davis@company.com",
-    phone: "+1 (555) 123-4570",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=4",
-    reportsTo: "CEO001",
-    directReports: ["HR001", "REC001"],
-    status: "active",
-    joinDate: "2020-04-05"
-  },
-  {
-    id: "DEV001",
-    name: "David Wilson",
-    position: "Senior Software Engineer",
-    department: "Technology",
-    email: "david.wilson@company.com",
-    phone: "+1 (555) 123-4571",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=5",
-    reportsTo: "CTO001",
-    status: "active",
-    joinDate: "2021-01-15"
-  },
-  {
-    id: "QA001",
-    name: "Lisa Anderson",
-    position: "QA Manager",
-    department: "Technology",
-    email: "lisa.anderson@company.com",
-    phone: "+1 (555) 123-4572",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=6",
-    reportsTo: "CTO001",
-    status: "active",
-    joinDate: "2021-03-10"
-  },
-  {
-    id: "IT001",
-    name: "Robert Taylor",
-    position: "IT Manager",
-    department: "Technology",
-    email: "robert.taylor@company.com",
-    phone: "+1 (555) 123-4573",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=7",
-    reportsTo: "CTO001",
-    status: "active",
-    joinDate: "2021-02-20"
-  },
-  {
-    id: "ACC001",
-    name: "Jennifer Martinez",
-    position: "Senior Accountant",
-    department: "Finance",
-    email: "jennifer.martinez@company.com",
-    phone: "+1 (555) 123-4574",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=8",
-    reportsTo: "CFO001",
-    status: "active",
-    joinDate: "2021-05-15"
-  },
-  {
-    id: "FIN001",
-    name: "Christopher Lee",
-    position: "Financial Analyst",
-    department: "Finance",
-    email: "christopher.lee@company.com",
-    phone: "+1 (555) 123-4575",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=9",
-    reportsTo: "CFO001",
-    status: "active",
-    joinDate: "2021-07-20"
-  },
-  {
-    id: "HR001",
-    name: "Amanda White",
-    position: "HR Manager",
-    department: "Human Resources",
-    email: "amanda.white@company.com",
-    phone: "+1 (555) 123-4576",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=10",
-    reportsTo: "CHRO001",
-    status: "active",
-    joinDate: "2021-06-10"
-  },
-  {
-    id: "REC001",
-    name: "Kevin Garcia",
-    position: "Recruitment Specialist",
-    department: "Human Resources",
-    email: "kevin.garcia@company.com",
-    phone: "+1 (555) 123-4577",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=11",
-    reportsTo: "CHRO001",
-    status: "active",
-    joinDate: "2021-08-15"
-  }
-];
+import { useOrganizationChart, Employee } from "../hooks/useOrganizationChart";
 
 export default function OrganizationChart() {
   const [selectedEmployee, setSelectedEmployee] = React.useState<Employee | null>(null);
@@ -184,35 +31,25 @@ export default function OrganizationChart() {
   const [dragStart, setDragStart] = React.useState({ x: 0, y: 0 });
   
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  
+  // Use the organization chart hook
+  const {
+    employees,
+    loading,
+    error,
+    getEmployee,
+    getDirectReports,
+    getManager,
+    getAllEmployees,
+    getDepartments,
+    filterEmployeesByDepartment
+  } = useOrganizationChart();
 
   // Get departments
-  const departments = React.useMemo(() => {
-    const deptSet = new Set(organizationData.map(emp => emp.department));
-    return Array.from(deptSet);
-  }, []);
+  const departments = getDepartments();
 
   // Filter employees by department
-  const filteredEmployees = React.useMemo(() => {
-    if (selectedDepartment === "all") return organizationData;
-    return organizationData.filter(emp => emp.department === selectedDepartment);
-  }, [selectedDepartment]);
-
-  // Get employee by ID
-  const getEmployee = (id: string) => organizationData.find(emp => emp.id === id);
-
-  // Get direct reports
-  const getDirectReports = (employeeId: string) => {
-    return organizationData.filter(emp => emp.reportsTo === employeeId);
-  };
-
-  // Get manager
-  const getManager = (employeeId: string) => {
-    const employee = organizationData.find(emp => emp.id === employeeId);
-    if (employee?.reportsTo) {
-      return organizationData.find(emp => emp.id === employee.reportsTo);
-    }
-    return null;
-  };
+  const filteredEmployees = filterEmployeesByDepartment(selectedDepartment);
 
   // Handle employee click
   const handleEmployeeClick = (employee: Employee) => {
@@ -255,14 +92,17 @@ export default function OrganizationChart() {
   };
 
   const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -10 : 10;
-    setZoomLevel(prev => Math.max(50, Math.min(300, prev + delta)));
+    // Only prevent default if we're actually zooming
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -10 : 10;
+      setZoomLevel(prev => Math.max(50, Math.min(300, prev + delta)));
+    }
   };
 
   // Render organization chart node with proper tree alignment
   const renderOrgNode = (employee: Employee, level: number = 0) => {
-    const directReports = getDirectReports(employee.id);
+    const directReports = employee.directReports || [];
     
     return (
       <div key={employee.id} className="flex flex-col items-center">
@@ -338,7 +178,35 @@ export default function OrganizationChart() {
   };
 
   // Get root employees (those who don't report to anyone)
-  const rootEmployees = organizationData.filter(emp => !emp.reportsTo);
+  const rootEmployees = employees;
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+        <div className="text-center">
+          <Spinner size="lg" color="primary" />
+          <p className="mt-4 text-gray-600">Loading organization chart...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+        <div className="text-center">
+          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Organization Chart</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Button color="primary" onPress={() => window.location.reload()}>
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -395,7 +263,7 @@ export default function OrganizationChart() {
               </div>
               <div className="flex items-end">
                 <div className="text-sm text-gray-600">
-                  Showing {filteredEmployees.length} of {organizationData.length} employees
+                  Showing {filteredEmployees.length} of {getAllEmployees().length} employees
                 </div>
               </div>
             </div>
@@ -525,7 +393,7 @@ export default function OrganizationChart() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredEmployees.map(employee => {
                 const manager = getManager(employee.id);
-                const directReports = getDirectReports(employee.id);
+                const directReports = employee.directReports || [];
                 
                 return (
                   <motion.div
@@ -629,7 +497,7 @@ export default function OrganizationChart() {
                         <div>
                           <p className="text-sm text-gray-500">Join Date</p>
                           <p className="font-medium">
-                            {new Date(selectedEmployee.joinDate).toLocaleDateString()}
+                            {selectedEmployee.joinDate ? new Date(selectedEmployee.joinDate).toLocaleDateString() : 'N/A'}
                           </p>
                         </div>
                       </div>
@@ -662,13 +530,13 @@ export default function OrganizationChart() {
                         )}
 
                         {/* Direct Reports */}
-                        {getDirectReports(selectedEmployee.id).length > 0 && (
+                        {(selectedEmployee.directReports || []).length > 0 && (
                           <div>
                             <p className="text-sm text-gray-500">
-                              Direct Reports ({getDirectReports(selectedEmployee.id).length})
+                              Direct Reports ({(selectedEmployee.directReports || []).length})
                             </p>
                             <div className="mt-2 space-y-2">
-                              {getDirectReports(selectedEmployee.id).map(report => (
+                              {(selectedEmployee.directReports || []).map(report => (
                                 <div key={report.id} className="flex items-center space-x-2">
                                   <Avatar
                                     src={report.avatar}

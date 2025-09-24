@@ -210,7 +210,7 @@ const managers = [
   { id: "EMP003", name: "Jane Doe", department: "Marketing" },
   { id: "EMP004", name: "William Smith", department: "Finance" },
   { id: "EMP005", name: "Emma Wilson", department: "HR" },
-];
+    ];
     
     const statusColorMap = {
       active: "success",
@@ -531,8 +531,8 @@ const managers = [
               className="font-medium"
             >
               Export
-            </Button>
-          </div>
+              </Button>
+            </div>
           </div>
           
           {/* Stats Cards */}

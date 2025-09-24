@@ -19,16 +19,28 @@
     const app = express();
     
     // Middleware
-    app.use(cors());
-    app.use(helmet());
+    app.use(cors({
+      origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:3000'],
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+    }));
+    app.use(helmet({
+      crossOriginResourcePolicy: { policy: "cross-origin" }
+    }));
     app.use(compression());
     app.use(morgan('dev'));
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     
+    // Serve static files from uploads directory
+    app.use('/uploads', express.static('uploads'));
+    app.use('/uploads/profiles', express.static('uploads/profiles'));
+    
     // Database connection pool
     const pool = mysql.createPool({
       host: process.env.DB_HOST || 'localhost',
+      port: process.env.DB_PORT || 3306,
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
       database: process.env.DB_NAME || 'hrmgo',
@@ -63,6 +75,29 @@
           cb(null, true);
         } else {
           cb(new Error('Invalid file type. Only images, PDFs, Word, and Excel files are allowed.'));
+        }
+      }
+    });
+
+    // Profile photo upload configuration
+    const profileStorage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, 'uploads/profiles/');
+      },
+      filename: (req, file, cb) => {
+        cb(null, `${Date.now()}-${file.originalname}`);
+      }
+    });
+
+    const profileUpload = multer({ 
+      storage: profileStorage,
+      limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit for profile photos
+      fileFilter: (req, file, cb) => {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (allowedTypes.includes(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(new Error('Only image files are allowed for profile photos'), false);
         }
       }
     });
@@ -532,6 +567,49 @@
         res.status(500).json({ message: 'Server error' });
       }
     });
+
+    // Upload employee profile photo
+    app.post('/api/v1/employees/upload-photo', authenticateToken, profileUpload.single('file'), async (req, res) => {
+      try {
+        if (!req.file) {
+          return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        const { employee_id } = req.body;
+        
+        if (!employee_id) {
+          return res.status(400).json({ message: 'Employee ID is required' });
+        }
+
+        // Verify employee exists and user has permission
+        const [employees] = await pool.query('SELECT * FROM employees WHERE id = ?', [employee_id]);
+        if (employees.length === 0) {
+          return res.status(404).json({ message: 'Employee not found' });
+        }
+
+        const employee = employees[0];
+        
+        // Check if user can update this employee (own profile or admin)
+        if (req.user.role !== 'super_admin' && req.user.role !== 'company_admin' && req.user.id !== employee.user_id) {
+          return res.status(403).json({ message: 'Permission denied' });
+        }
+
+        // Update employee profile photo
+        await pool.query(
+          'UPDATE employees SET profile_photo = ? WHERE id = ?',
+          [req.file.filename, employee_id]
+        );
+
+        res.json({
+          message: 'Profile photo uploaded successfully',
+          filename: req.file.filename,
+          url: `${req.protocol}://${req.get('host')}/uploads/profiles/${req.file.filename}`
+        });
+      } catch (error) {
+        console.error('Upload photo error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
     
     // Document routes
     app.post('/api/v1/documents', authenticateToken, upload.single('file'), async (req, res) => {
@@ -703,7 +781,7 @@
       try {
         const [branches] = await pool.query(
           'SELECT * FROM branches WHERE company_id = ? ORDER BY name',
-          [req.user.company_id]
+          [1] // Default company ID
         );
         
         res.json({ data: branches });
@@ -722,7 +800,7 @@
            LEFT JOIN branches b ON d.branch_id = b.id
            WHERE d.company_id = ?
            ORDER BY d.name`,
-          [req.user.company_id]
+          [1] // Default company ID
         );
         
         res.json({ data: departments });
@@ -741,7 +819,7 @@
            LEFT JOIN departments dept ON d.department_id = dept.id
            WHERE d.company_id = ?
            ORDER BY d.name`,
-          [req.user.company_id]
+          [1] // Default company ID
         );
         
         res.json({ data: designations });
@@ -751,22 +829,34 @@
       }
     });
     
+    // Helper function to get default avatar based on gender
+    const getDefaultAvatar = (gender, id) => {
+      const seed = `employee-${id}`;
+      
+      if (gender === 'female') {
+        return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&hairColor=auburn,black,blonde,brown,pastelPink,red,strawberryBlonde&skinColor=edb98a,fdbcb4,fd9841,ffd5dc&gender=female`;
+      } else if (gender === 'male') {
+        return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&hairColor=auburn,black,blonde,brown,red,strawberryBlonde&skinColor=edb98a,fdbcb4,fd9841,ffd5dc&gender=male`;
+      } else {
+        return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&hairColor=auburn,black,blonde,brown,pastelPink,red,strawberryBlonde&skinColor=edb98a,fdbcb4,fd9841,ffd5dc`;
+      }
+    };
+
     // Get organization chart
     app.get('/api/v1/organization/chart', authenticateToken, async (req, res) => {
       try {
         // Get all employees with their managers
         const [employees] = await pool.query(
-          `SELECT e.id, e.first_name, e.last_name, e.email, e.employee_id,
+          `SELECT e.id, e.first_name, e.last_name, e.email, e.employee_id, e.phone, e.joining_date,
                   d.name as department, ds.name as designation, 
-                  e.profile_photo as avatar,
-                  m.id as manager_id, CONCAT(m.first_name, ' ', m.last_name) as manager_name
+                  e.status, e.profile_photo, e.gender,
+                  m.id as reports_to, CONCAT(m.first_name, ' ', m.last_name) as manager_name
            FROM employees e
            LEFT JOIN departments d ON e.department_id = d.id
            LEFT JOIN designations ds ON e.designation_id = ds.id
-           LEFT JOIN employees m ON e.manager_id = m.id
-           WHERE e.company_id = ? AND e.status = 'active'
-           ORDER BY e.id`,
-          [req.user.company_id]
+           LEFT JOIN employees m ON e.reports_to = m.id
+           WHERE e.company_id = 1 AND e.status = 'active'
+           ORDER BY e.id`
         );
         
         // Build organization chart hierarchy
@@ -775,30 +865,31 @@
           employeeMap[emp.id] = {
             id: emp.id,
             name: `${emp.first_name} ${emp.last_name}`,
-            title: emp.designation || '',
+            position: emp.designation || '',
             department: emp.department || '',
             email: emp.email,
-            avatar: emp.avatar ? `${req.protocol}://${req.get('host')}/${emp.avatar}` : null,
+            phone: emp.phone || '',
+            avatar: emp.profile_photo ? `${req.protocol}://${req.get('host')}/uploads/profiles/${emp.profile_photo}` : getDefaultAvatar(emp.gender, emp.id),
             employeeId: emp.employee_id,
-            managerId: emp.manager_id,
-            children: []
+            reportsTo: emp.reports_to,
+            status: emp.status,
+            joinDate: emp.joining_date,
+            directReports: []
           };
         });
         
         // Build tree structure
-        let root = null;
+        const roots = [];
         Object.values(employeeMap).forEach(emp => {
-          if (emp.managerId && employeeMap[emp.managerId]) {
-            employeeMap[emp.managerId].children.push(emp);
+          if (emp.reportsTo && employeeMap[emp.reportsTo]) {
+            employeeMap[emp.reportsTo].directReports.push(emp);
           } else {
             // No manager or manager not found, this is a root node
-            if (!root) {
-              root = emp;
-            }
+            roots.push(emp);
           }
         });
         
-        res.json({ data: root || {} });
+        res.json({ data: roots });
       } catch (error) {
         console.error('Get org chart error:', error);
         res.status(500).json({ message: 'Server error' });
@@ -1087,6 +1178,542 @@
         });
       } catch (error) {
         console.error('Check-out error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    // Get attendance records
+    app.get('/api/v1/attendance', authenticateToken, async (req, res) => {
+      try {
+        const { page = 1, limit = 10, employee_id = '', from_date = '', to_date = '', status = '' } = req.query;
+        const offset = (page - 1) * limit;
+        
+        let query = `
+          SELECT a.*, e.first_name, e.last_name, e.email, e.employee_id as emp_id,
+                 d.name as department_name, des.name as designation_name
+          FROM attendance a
+          LEFT JOIN employees e ON a.employee_id = e.id
+          LEFT JOIN departments d ON e.department_id = d.id
+          LEFT JOIN designations des ON e.designation_id = des.id
+          WHERE 1=1
+        `;
+        const params = [];
+        
+        if (employee_id) {
+          query += ' AND a.employee_id = ?';
+          params.push(employee_id);
+        }
+        
+        if (from_date) {
+          query += ' AND a.date >= ?';
+          params.push(from_date);
+        }
+        
+        if (to_date) {
+          query += ' AND a.date <= ?';
+          params.push(to_date);
+        }
+        
+        if (status) {
+          query += ' AND a.status = ?';
+          params.push(status);
+        }
+        
+        query += ' ORDER BY a.date DESC, a.check_in DESC LIMIT ? OFFSET ?';
+        params.push(parseInt(limit), offset);
+        
+        const [attendance] = await pool.query(query, params);
+        
+        // Get total count
+        let countQuery = `
+          SELECT COUNT(*) as total 
+          FROM attendance a
+          LEFT JOIN employees e ON a.employee_id = e.id
+          WHERE 1=1
+        `;
+        const countParams = [];
+        
+        if (employee_id) {
+          countQuery += ' AND a.employee_id = ?';
+          countParams.push(employee_id);
+        }
+        
+        if (from_date) {
+          countQuery += ' AND a.date >= ?';
+          countParams.push(from_date);
+        }
+        
+        if (to_date) {
+          countQuery += ' AND a.date <= ?';
+          countParams.push(to_date);
+        }
+        
+        if (status) {
+          countQuery += ' AND a.status = ?';
+          countParams.push(status);
+        }
+        
+        const [countResult] = await pool.query(countQuery, countParams);
+        const total = countResult[0].total;
+        
+        res.json({
+          data: attendance,
+          pagination: {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            total,
+            pages: Math.ceil(total / limit)
+          }
+        });
+      } catch (error) {
+        console.error('Get attendance error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    // Tasks API endpoints
+    app.get('/api/v1/tasks', authenticateToken, async (req, res) => {
+      try {
+        const { page = 1, limit = 10, status = '', assignee = '', priority = '' } = req.query;
+        const offset = (page - 1) * limit;
+        
+        let query = `
+          SELECT t.*, e.first_name, e.last_name, e.email as assignee_email,
+                 CONCAT(e.first_name, ' ', e.last_name) as assignee_name
+          FROM tasks t
+          LEFT JOIN employees e ON t.assigned_to = e.id
+          WHERE 1=1
+        `;
+        const params = [];
+        
+        if (status) {
+          query += ' AND t.status = ?';
+          params.push(status);
+        }
+        
+        if (assignee) {
+          query += ' AND t.assigned_to = ?';
+          params.push(assignee);
+        }
+        
+        if (priority) {
+          query += ' AND t.priority = ?';
+          params.push(priority);
+        }
+        
+        query += ' ORDER BY t.created_at DESC LIMIT ? OFFSET ?';
+        params.push(parseInt(limit), offset);
+        
+        const [tasks] = await pool.query(query, params);
+        
+        // Get total count
+        let countQuery = 'SELECT COUNT(*) as total FROM tasks WHERE 1=1';
+        const countParams = [];
+        
+        if (status) {
+          countQuery += ' AND status = ?';
+          countParams.push(status);
+        }
+        
+        if (assignee) {
+          countQuery += ' AND assigned_to = ?';
+          countParams.push(assignee);
+        }
+        
+        if (priority) {
+          countQuery += ' AND priority = ?';
+          countParams.push(priority);
+        }
+        
+        const [countResult] = await pool.query(countQuery, countParams);
+        const total = countResult[0].total;
+        
+        res.json({
+          data: tasks,
+          pagination: {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            total,
+            pages: Math.ceil(total / limit)
+          }
+        });
+      } catch (error) {
+        console.error('Get tasks error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.post('/api/v1/tasks', authenticateToken, async (req, res) => {
+      try {
+        const {
+          title,
+          description,
+          priority = 'medium',
+          status = 'pending',
+          assigned_to,
+          due_date,
+          progress = 0,
+          tags,
+          estimated_hours,
+          actual_hours,
+          project,
+          department
+        } = req.body;
+
+        const userId = req.user.id;
+        const companyId = 1; // Default company ID for now
+
+        // Generate a unique task_id
+        const taskId = `TASK-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        
+        const [result] = await pool.query(
+          `INSERT INTO tasks (
+            company_id, title, description, priority, status, assigned_to, assigned_by, due_date, 
+            progress, tags, estimated_hours, actual_hours, project, department, task_id, assignee_id, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+          [
+            companyId, title, description, priority, status, assigned_to, userId, due_date,
+            progress || 0, tags || null, estimated_hours || null, actual_hours || null, 
+            project || null, department || null, taskId, assigned_to
+          ]
+        );
+
+        res.status(201).json({
+          message: 'Task created successfully',
+          task: { id: result.insertId, ...req.body }
+        });
+      } catch (error) {
+        console.error('Create task error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.put('/api/v1/tasks/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        const {
+          title,
+          description,
+          priority,
+          status,
+          assigned_to,
+          due_date,
+          progress,
+          tags,
+          estimated_hours,
+          actual_hours,
+          project,
+          department
+        } = req.body;
+
+        // Build dynamic update query with only provided fields
+        const updateFields = [];
+        const updateValues = [];
+        
+        if (title !== undefined) {
+          updateFields.push('title = ?');
+          updateValues.push(title);
+        }
+        if (description !== undefined) {
+          updateFields.push('description = ?');
+          updateValues.push(description);
+        }
+        if (priority !== undefined) {
+          updateFields.push('priority = ?');
+          updateValues.push(priority);
+        }
+        if (status !== undefined) {
+          updateFields.push('status = ?');
+          updateValues.push(status);
+          
+          // Set completed_at when status is changed to 'completed'
+          if (status === 'completed') {
+            updateFields.push('completed_at = NOW()');
+          }
+        }
+        if (assigned_to !== undefined) {
+          updateFields.push('assigned_to = ?');
+          updateValues.push(assigned_to);
+          
+          // Also update assignee_id when assigned_to changes
+          updateFields.push('assignee_id = ?');
+          updateValues.push(assigned_to);
+        }
+        if (due_date !== undefined) {
+          updateFields.push('due_date = ?');
+          updateValues.push(due_date);
+        }
+        if (progress !== undefined) {
+          updateFields.push('progress = ?');
+          updateValues.push(progress);
+        }
+        if (tags !== undefined) {
+          updateFields.push('tags = ?');
+          updateValues.push(tags ? JSON.stringify(tags) : null);
+        }
+        if (estimated_hours !== undefined) {
+          updateFields.push('estimated_hours = ?');
+          updateValues.push(estimated_hours);
+        }
+        if (actual_hours !== undefined) {
+          updateFields.push('actual_hours = ?');
+          updateValues.push(actual_hours);
+        }
+        if (project !== undefined) {
+          updateFields.push('project = ?');
+          updateValues.push(project);
+        }
+        if (department !== undefined) {
+          updateFields.push('department = ?');
+          updateValues.push(department);
+        }
+        
+        // Always update the updated_at field
+        updateFields.push('updated_at = NOW()');
+        updateValues.push(id);
+
+        const [result] = await pool.query(
+          `UPDATE tasks SET ${updateFields.join(', ')} WHERE id = ?`,
+          updateValues
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'Task not found' });
+        }
+
+        res.json({ message: 'Task updated successfully' });
+      } catch (error) {
+        console.error('Update task error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.delete('/api/v1/tasks/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        
+        const [result] = await pool.query('DELETE FROM tasks WHERE id = ?', [id]);
+        
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'Task not found' });
+        }
+        
+        res.json({ message: 'Task deleted successfully' });
+      } catch (error) {
+        console.error('Delete task error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    // Calendar Events API endpoints
+    app.get('/api/v1/calendar/events', authenticateToken, async (req, res) => {
+      try {
+        const { page = 1, limit = 50, from_date = '', to_date = '', type = '' } = req.query;
+        const offset = (page - 1) * limit;
+        
+        let query = `
+          SELECT ce.*, u.name as created_by_name, u.role as created_by_role
+          FROM calendar_events ce
+          LEFT JOIN users u ON ce.created_by = u.id
+          WHERE 1=1
+        `;
+        const params = [];
+        
+        if (from_date) {
+          query += ' AND DATE(ce.start_date) >= ?';
+          params.push(from_date);
+        }
+        
+        if (to_date) {
+          query += ' AND DATE(ce.start_date) <= ?';
+          params.push(to_date);
+        }
+        
+        if (type) {
+          query += ' AND ce.event_type = ?';
+          params.push(type);
+        }
+        
+        query += ' ORDER BY ce.start_date ASC LIMIT ? OFFSET ?';
+        params.push(parseInt(limit), offset);
+        
+        const [events] = await pool.query(query, params);
+        
+        res.json({
+          data: events,
+          pagination: {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            total: events.length,
+            pages: Math.ceil(events.length / limit)
+          }
+        });
+      } catch (error) {
+        console.error('Get calendar events error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.post('/api/v1/calendar/events', authenticateToken, async (req, res) => {
+      try {
+        const {
+          title,
+          date,
+          time,
+          type = 'other',
+          color = '#3b82f6',
+          description,
+          location,
+          visibility = 'all',
+          visible_to,
+          departments,
+          is_recurring = false,
+          recurrence_pattern,
+          reminder_minutes,
+          is_all_day = false
+        } = req.body;
+
+        const userId = req.user.id;
+        const companyId = 1; // Default company ID for now
+
+        // Generate a unique event_id
+        const eventId = `EVT-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        
+        // Convert date and time to datetime format
+        const startDateTime = `${date} ${time}:00`;
+        const endDateTime = `${date} ${time}:00`; // Same as start for now
+
+        const [result] = await pool.query(
+          `INSERT INTO calendar_events (
+            company_id, title, description, start_date, end_date, event_type, 
+            location, attendees, created_by, color, is_recurring, recurrence_pattern, 
+            reminder_minutes, event_id, is_all_day, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+          [
+            companyId, title, description, startDateTime, endDateTime, type,
+            location,
+            visible_to ? JSON.stringify(visible_to) : null,
+            userId, color, is_recurring,
+            recurrence_pattern ? JSON.stringify(recurrence_pattern) : null,
+            reminder_minutes, eventId, is_all_day || false
+          ]
+        );
+
+        res.status(201).json({
+          message: 'Event created successfully',
+          event: { id: result.insertId, ...req.body }
+        });
+      } catch (error) {
+        console.error('Create calendar event error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.put('/api/v1/calendar/events/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        const {
+          title,
+          date,
+          time,
+          type,
+          color,
+          description,
+          location,
+          visibility,
+          visible_to,
+          departments,
+          is_recurring,
+          recurrence_pattern,
+          reminder_minutes,
+          is_all_day
+        } = req.body;
+
+        // Build dynamic update query with only provided fields
+        const updateFields = [];
+        const updateValues = [];
+        
+        if (title !== undefined) {
+          updateFields.push('title = ?');
+          updateValues.push(title);
+        }
+        if (description !== undefined) {
+          updateFields.push('description = ?');
+          updateValues.push(description);
+        }
+        if (date !== undefined && time !== undefined) {
+          const startDateTime = `${date} ${time}:00`;
+          const endDateTime = `${date} ${time}:00`;
+          updateFields.push('start_date = ?');
+          updateFields.push('end_date = ?');
+          updateValues.push(startDateTime, endDateTime);
+        }
+        if (type !== undefined) {
+          updateFields.push('event_type = ?');
+          updateValues.push(type);
+        }
+        if (color !== undefined) {
+          updateFields.push('color = ?');
+          updateValues.push(color);
+        }
+        if (location !== undefined) {
+          updateFields.push('location = ?');
+          updateValues.push(location);
+        }
+        if (visible_to !== undefined) {
+          updateFields.push('attendees = ?');
+          updateValues.push(visible_to ? JSON.stringify(visible_to) : null);
+        }
+        if (is_recurring !== undefined) {
+          updateFields.push('is_recurring = ?');
+          updateValues.push(is_recurring);
+        }
+        if (recurrence_pattern !== undefined) {
+          updateFields.push('recurrence_pattern = ?');
+          updateValues.push(recurrence_pattern ? JSON.stringify(recurrence_pattern) : null);
+        }
+        if (reminder_minutes !== undefined) {
+          updateFields.push('reminder_minutes = ?');
+          updateValues.push(reminder_minutes);
+        }
+        if (is_all_day !== undefined) {
+          updateFields.push('is_all_day = ?');
+          updateValues.push(is_all_day);
+        }
+        
+        // Always update the updated_at field
+        updateFields.push('updated_at = NOW()');
+        updateValues.push(id);
+
+        const [result] = await pool.query(
+          `UPDATE calendar_events SET ${updateFields.join(', ')} WHERE id = ?`,
+          updateValues
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'Event not found' });
+        }
+
+        res.json({ message: 'Event updated successfully' });
+      } catch (error) {
+        console.error('Update calendar event error:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.delete('/api/v1/calendar/events/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        
+        const [result] = await pool.query('DELETE FROM calendar_events WHERE id = ?', [id]);
+        
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'Event not found' });
+        }
+        
+        res.json({ message: 'Event deleted successfully' });
+      } catch (error) {
+        console.error('Delete calendar event error:', error);
         res.status(500).json({ message: 'Server error' });
       }
     });

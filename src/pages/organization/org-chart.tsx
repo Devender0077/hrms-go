@@ -511,7 +511,7 @@ const OrgNode = ({ node, isRoot = false, onEdit, onView, zoomLevel = 100 }) => {
                 </DropdownItem>
               </DropdownMenu>
             </Dropdown>
-          </div>
+            </div>
           </div>
           
         {/* Controls */}

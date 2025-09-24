@@ -14,9 +14,9 @@ const handleResponse = async (response) => {
 };
 
 // Helper function to make API requests with authentication
-const apiRequest = async (endpoint, options = {}) => {
-  // Get auth token from localStorage
-  const token = localStorage.getItem("authToken");
+export const apiRequest = async (endpoint, options = {}) => {
+  // Get auth token from localStorage or sessionStorage
+  const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
 
   const defaultOptions = {
     headers: {
@@ -270,6 +270,54 @@ export const leaveAPI = {
   getLeaveTypes: () => apiRequest("/leave-types"),
 };
 
+// Task API
+export const taskAPI = {
+  getAll: (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return apiRequest(`/tasks?${queryParams}`);
+  },
+
+  getById: (id) => apiRequest(`/tasks/${id}`),
+
+  create: (taskData) =>
+    apiRequest("/tasks", {
+      method: "POST",
+      body: JSON.stringify(taskData),
+    }),
+
+  update: (id, taskData) =>
+    apiRequest(`/tasks/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(taskData),
+    }),
+
+  delete: (id) => apiRequest(`/tasks/${id}`, { method: "DELETE" }),
+};
+
+// Calendar API
+export const calendarAPI = {
+  getEvents: (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return apiRequest(`/calendar/events?${queryParams}`);
+  },
+
+  getEventById: (id) => apiRequest(`/calendar/events/${id}`),
+
+  createEvent: (eventData) =>
+    apiRequest("/calendar/events", {
+      method: "POST",
+      body: JSON.stringify(eventData),
+    }),
+
+  updateEvent: (id, eventData) =>
+    apiRequest(`/calendar/events/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(eventData),
+    }),
+
+  deleteEvent: (id) => apiRequest(`/calendar/events/${id}`, { method: "DELETE" }),
+};
+
 // Export all APIs
 export default {
   auth: authAPI,
@@ -278,4 +326,6 @@ export default {
   documents: documentAPI,
   attendance: attendanceAPI,
   leave: leaveAPI,
+  tasks: taskAPI,
+  calendar: calendarAPI,
 };

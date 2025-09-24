@@ -4,10 +4,11 @@ import api from "./api-service";
 
 // JWT token interface
 interface JwtToken {
-  sub: string;
+  id: number;
   email: string;
   role: string;
-  permissions: string[];
+  permissions?: string[];
+  name?: string;
   exp: number;
   iat: number;
 }
@@ -45,78 +46,18 @@ const AuthService = {
   // Login with email and password
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
-      // For development/demo purposes - allow direct login with default credentials
-      if (
-        true && // Always use mock in development
-        credentials.email === "admin@hrmgo.com" &&
-        credentials.password === "admin123"
-      ) {
-        console.log("Using mock login for development");
+      // Always use real API login
+      const response = await api.auth.login(credentials);
+      const { token, user } = response;
 
-        // Create a mock token
-        const mockToken = "mock-jwt-token";
-
-        // Store token based on rememberMe preference
-        if (credentials.rememberMe) {
-          localStorage.setItem("authToken", mockToken);
-        } else {
-          sessionStorage.setItem("authToken", mockToken);
-        }
-
-        // Return mock user
-        return {
-          id: "1",
-          name: "Admin User",
-          email: "admin@hrmgo.com",
-          role: "super_admin",
-          permissions: ["*"],
-        };
+      // Store token in localStorage or sessionStorage based on rememberMe
+      if (credentials.rememberMe) {
+        localStorage.setItem("authToken", token);
+      } else {
+        sessionStorage.setItem("authToken", token);
       }
 
-      // Regular API login
-      try {
-        const response = await api.auth.login(credentials);
-        const { token, user } = response;
-
-        // Store token in localStorage or sessionStorage based on rememberMe
-        if (credentials.rememberMe) {
-          localStorage.setItem("authToken", token);
-        } else {
-          sessionStorage.setItem("authToken", token);
-        }
-
-        return user;
-      } catch (apiError) {
-        console.error("API login error:", apiError);
-
-        // If API fails but we're using default credentials, fall back to mock login
-        if (
-          credentials.email === "admin@hrmgo.com" &&
-          credentials.password === "admin123"
-        ) {
-          console.warn(
-            "API login failed, using mock login for default credentials"
-          );
-
-          const mockToken = "mock-jwt-token";
-
-          if (credentials.rememberMe) {
-            localStorage.setItem("authToken", mockToken);
-          } else {
-            sessionStorage.setItem("authToken", mockToken);
-          }
-
-          return {
-            id: "1",
-            name: "Admin User",
-            email: "admin@hrmgo.com",
-            role: "super_admin",
-            permissions: ["*"],
-          };
-        }
-
-        throw apiError;
-      }
+      return user;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -159,10 +100,9 @@ const AuthService = {
     localStorage.removeItem("authToken");
     sessionStorage.removeItem("authToken");
 
-    // Only call logout API if token exists and it's not a mock token
-    if (token && token !== "mock-jwt-token") {
-      // Call logout API to invalidate token on server, but don't wait for it
-      // Use a try-catch to prevent errors from bubbling up
+    // Call logout API to invalidate token on server, but don't wait for it
+    // Use a try-catch to prevent errors from bubbling up
+    if (token) {
       try {
         api.auth.logout().catch((error) => {
           // Log error but don't throw it - we still want to complete the local logout
@@ -186,26 +126,11 @@ const AuthService = {
         return null;
       }
 
-      // Check if token is a valid JWT format before decoding, or if it's a mock token
-      if (
-        token !== "mock-jwt-token" &&
-        !token.match(/^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/)
-      ) {
+      // Check if token is a valid JWT format before decoding
+      if (!token.match(/^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/)) {
         console.warn("Invalid token format");
         AuthService.logout();
         return null;
-      }
-
-      // Handle mock token first
-      if (token === "mock-jwt-token") {
-        console.log("Using mock user for development");
-        return {
-          id: "1",
-          email: "admin@hrmgo.com",
-          role: "super_admin",
-          permissions: ["*"],
-          name: "Admin User",
-        };
       }
 
       try {
@@ -213,7 +138,7 @@ const AuthService = {
         const decoded = jwtDecode<JwtToken>(token);
 
         // Validate decoded token has required fields
-        if (!decoded || !decoded.sub || !decoded.email || !decoded.role) {
+        if (!decoded || !decoded.id || !decoded.email || !decoded.role) {
           console.warn("Token missing required fields");
           AuthService.logout();
           return null;
@@ -228,10 +153,11 @@ const AuthService = {
         }
 
         return {
-          id: decoded.sub,
+          id: decoded.id.toString(),
           email: decoded.email,
           role: decoded.role,
           permissions: decoded.permissions || [],
+          name: decoded.name,
         };
       } catch (decodeError) {
         console.error("JWT decode error:", decodeError);

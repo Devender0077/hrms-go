@@ -30,6 +30,7 @@ import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/auth-context";
 import { useTaskContext } from "../contexts/task-context";
+import Papa from "papaparse";
 
 interface Task {
   id: number;
@@ -48,6 +49,17 @@ interface Task {
   actualHours?: number;
   project?: string;
   department?: string;
+  // Additional database fields
+  company_id?: number;
+  assigned_to?: number;
+  assigned_by?: number;
+  task_id?: string;
+  assignee_id?: string;
+  assignee_name?: string;
+  assignee_email?: string;
+  first_name?: string;
+  last_name?: string;
+  completed_at?: string;
 }
 
 export default function TasksPage() {
@@ -60,6 +72,7 @@ export default function TasksPage() {
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [assigneeFilter, setAssigneeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -68,6 +81,7 @@ export default function TasksPage() {
     dueDate: "",
     tags: "",
     estimatedHours: "",
+    actualHours: "",
     project: "",
     department: ""
   });
@@ -148,6 +162,7 @@ export default function TasksPage() {
         progress: 0,
         tags: newTask.tags ? newTask.tags.split(',').map(tag => tag.trim()) : [],
         estimatedHours: newTask.estimatedHours ? parseInt(newTask.estimatedHours) : undefined,
+        actualHours: newTask.actualHours ? parseInt(newTask.actualHours) : undefined,
         project: newTask.project,
         department: newTask.department
       };
@@ -162,6 +177,59 @@ export default function TasksPage() {
         dueDate: "",
         tags: "",
         estimatedHours: "",
+        actualHours: "",
+        project: "",
+        department: ""
+      });
+      onOpenChange();
+    }
+  };
+
+  const handleEditTask = (task: Task) => {
+    setEditingTask(task);
+    setNewTask({
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      assignee: task.assigneeId,
+      dueDate: task.dueDate,
+      tags: task.tags.join(', '),
+      estimatedHours: task.estimatedHours?.toString() || "",
+      actualHours: task.actualHours?.toString() || "",
+      project: task.project || "",
+      department: task.department || ""
+    });
+    onOpen();
+  };
+
+  const handleUpdateTask = () => {
+    if (editingTask && newTask.title && newTask.assignee && newTask.dueDate) {
+      const taskData = {
+        title: newTask.title,
+        description: newTask.description,
+        priority: newTask.priority as Task['priority'],
+        assignee: assignees.find(a => a.key === newTask.assignee)?.label || newTask.assignee,
+        assigneeId: newTask.assignee,
+        dueDate: newTask.dueDate,
+        tags: newTask.tags ? newTask.tags.split(',').map(tag => tag.trim()) : [],
+        estimatedHours: newTask.estimatedHours ? parseInt(newTask.estimatedHours) : undefined,
+        actualHours: newTask.actualHours ? parseInt(newTask.actualHours) : undefined,
+        project: newTask.project,
+        department: newTask.department
+      };
+
+      updateTask(editingTask.id, taskData);
+      
+      setEditingTask(null);
+      setNewTask({
+        title: "",
+        description: "",
+        priority: "medium",
+        assignee: "",
+        dueDate: "",
+        tags: "",
+        estimatedHours: "",
+        actualHours: "",
         project: "",
         department: ""
       });
@@ -200,6 +268,36 @@ export default function TasksPage() {
     }
   };
 
+  const handleExportTasks = () => {
+    const exportData = filteredTasks.map(task => ({
+      'Task ID': task.id,
+      'Title': task.title,
+      'Description': task.description,
+      'Priority': task.priority,
+      'Status': task.status,
+      'Assignee': task.assignee,
+      'Due Date': task.dueDate,
+      'Progress': `${task.progress}%`,
+      'Tags': task.tags.join(', '),
+      'Estimated Hours': task.estimatedHours || '',
+      'Actual Hours': task.actualHours || '',
+      'Project': task.project || '',
+      'Department': task.department || '',
+      'Created At': new Date(task.createdAt).toLocaleDateString(),
+      'Updated At': new Date(task.updatedAt).toLocaleDateString()
+    }));
+
+    const csv = Papa.unparse(exportData);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `tasks_export_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50/50 p-6">
@@ -230,6 +328,7 @@ export default function TasksPage() {
               variant="flat"
               startContent={<Icon icon="lucide:download" />}
               className="font-medium"
+              onPress={handleExportTasks}
             >
               Export
             </Button>
@@ -298,15 +397,17 @@ export default function TasksPage() {
                 tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
                 cursor: "w-full bg-primary",
                 tab: "max-w-fit px-6 h-12",
-                tabContent: "group-data-[selected=true]:text-primary"
+                tabContent: "group-data-[selected=true]:text-white text-gray-800 font-medium"
               }}
             >
               <Tab
                 key="all"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span>All Tasks</span>
-                    <Badge content={taskCounts.all} color="primary" size="sm">{taskCounts.all}</Badge>
+                    <span className="text-gray-800 font-medium">All Tasks</span>
+                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                      {taskCounts.all}
+                    </span>
                   </div>
                 }
               />
@@ -314,8 +415,10 @@ export default function TasksPage() {
                 key="pending"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span>Pending</span>
-                    <Badge content={taskCounts.pending} color="default" size="sm">{taskCounts.pending}</Badge>
+                    <span className="text-gray-800 font-medium">Pending</span>
+                    <span className="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded-full">
+                      {taskCounts.pending}
+                    </span>
                   </div>
                 }
               />
@@ -323,8 +426,10 @@ export default function TasksPage() {
                 key="in_progress"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span>In Progress</span>
-                    <Badge content={taskCounts.in_progress} color="primary" size="sm">{taskCounts.in_progress}</Badge>
+                    <span className="text-gray-800 font-medium">In Progress</span>
+                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                      {taskCounts.in_progress}
+                    </span>
                   </div>
                 }
               />
@@ -332,8 +437,10 @@ export default function TasksPage() {
                 key="completed"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span>Completed</span>
-                    <Badge content={taskCounts.completed} color="success" size="sm">{taskCounts.completed}</Badge>
+                    <span className="text-gray-800 font-medium">Completed</span>
+                    <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                      {taskCounts.completed}
+                    </span>
                   </div>
                 }
               />
@@ -341,8 +448,10 @@ export default function TasksPage() {
                 key="cancelled"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span>Cancelled</span>
-                    <Badge content={taskCounts.cancelled} color="danger" size="sm">{taskCounts.cancelled}</Badge>
+                    <span className="text-gray-800 font-medium">Cancelled</span>
+                    <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
+                      {taskCounts.cancelled}
+                    </span>
                   </div>
                 }
               />
@@ -392,6 +501,7 @@ export default function TasksPage() {
                         <DropdownItem
                           key="edit"
                           startContent={<Icon icon="lucide:edit" />}
+                          onPress={() => handleEditTask(task)}
                         >
                           Edit
                         </DropdownItem>
@@ -490,10 +600,10 @@ export default function TasksPage() {
               <>
                 <ModalHeader className="flex flex-col gap-1">
                   <div className="flex items-center gap-3">
-                    <Icon icon="lucide:plus" className="text-blue-600 text-xl" />
+                    <Icon icon={editingTask ? "lucide:edit" : "lucide:plus"} className="text-blue-600 text-xl" />
                     <div>
-                      <h3 className="text-lg font-semibold">Add New Task</h3>
-                      <p className="text-sm text-gray-500">Create a new task for your team</p>
+                      <h3 className="text-lg font-semibold">{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
+                      <p className="text-sm text-gray-500">{editingTask ? 'Update task details' : 'Create a new task for your team'}</p>
                     </div>
                   </div>
                 </ModalHeader>
@@ -560,6 +670,14 @@ export default function TasksPage() {
                         value={newTask.estimatedHours}
                         onChange={(e) => setNewTask({...newTask, estimatedHours: e.target.value})}
                       />
+                      
+                      <Input
+                        label="Actual Hours"
+                        type="number"
+                        placeholder="Enter actual hours"
+                        value={newTask.actualHours}
+                        onChange={(e) => setNewTask({...newTask, actualHours: e.target.value})}
+                      />
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
@@ -590,8 +708,11 @@ export default function TasksPage() {
                   <Button color="danger" variant="flat" onPress={onClose}>
                     Cancel
                   </Button>
-                  <Button color="primary" onPress={handleAddTask}>
-                    Add Task
+                  <Button 
+                    color="primary" 
+                    onPress={editingTask ? handleUpdateTask : handleAddTask}
+                  >
+                    {editingTask ? 'Update Task' : 'Add Task'}
                   </Button>
                 </ModalFooter>
               </>

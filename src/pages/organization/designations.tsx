@@ -346,7 +346,7 @@ const levels = [
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-  };
+      };
       
       return (
     <div className="min-h-screen bg-gray-50/50 p-6">
@@ -380,8 +380,8 @@ const levels = [
               className="font-medium"
             >
               Export
-            </Button>
-          </div>
+              </Button>
+            </div>
           </div>
           
           {/* Stats Cards */}
