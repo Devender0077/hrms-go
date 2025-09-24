@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
     import { 
       Navbar, 
       NavbarBrand, 
@@ -18,6 +18,8 @@ import React from "react";
     import { useNavigate } from "react-router-dom";
     import { useTheme } from "@heroui/use-theme";
     import { useAuth } from "../contexts/auth-context";
+    import { employeeAPI } from "../services/api-service";
+    import { getDefaultAvatar } from "../utils/avatarUtils";
     import Sidebar from "../components/sidebar";
     import MobileSidebar from "../components/mobile-sidebar";
     
@@ -27,6 +29,8 @@ import React from "react";
     
     export default function DashboardLayout({ children }: DashboardLayoutProps) {
       const [isSidebarOpen, setIsSidebarOpen] = React.useState(true);
+      const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
+      const [userGender, setUserGender] = useState<string>('male');
       const { isOpen, onOpen, onClose } = useDisclosure();
       const { theme, setTheme } = useTheme();
       const { user, logout } = useAuth();
@@ -44,6 +48,26 @@ import React from "react";
         logout();
         navigate("/login");
       };
+
+      // Fetch user profile photo
+      useEffect(() => {
+        const fetchUserProfile = async () => {
+          if (user?.id) {
+            try {
+              const userId = parseInt(user.id);
+              const profile = await employeeAPI.getById(userId);
+              if (profile) {
+                setProfilePhoto(profile.profile_photo);
+                setUserGender(profile.gender || 'male');
+              }
+            } catch (error) {
+              console.error('Error fetching user profile:', error);
+            }
+          }
+        };
+
+        fetchUserProfile();
+      }, [user?.id]);
       
       return (
         <div className="flex h-screen bg-background">
@@ -141,7 +165,7 @@ import React from "react";
                       color="primary"
                       name={user?.name || "User"}
                       size="sm"
-                      src="https://img.heroui.chat/image/avatar?w=150&h=150&u=1"
+                      src={profilePhoto ? `http://localhost:8000/uploads/profiles/${profilePhoto}` : getDefaultAvatar(userGender, parseInt(user?.id || '1'))}
                     />
                   </DropdownTrigger>
                   <DropdownMenu aria-label="Profile Actions" variant="flat">

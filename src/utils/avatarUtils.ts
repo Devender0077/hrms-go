@@ -1,6 +1,19 @@
 // Avatar utility functions for generating default avatars
 
 export const getDefaultAvatar = (gender: string | null, id: number): string => {
+  // Use local avatar files
+  if (gender === 'female') {
+    return '/src/assets/avatars/female_avatar.svg';
+  } else if (gender === 'male') {
+    return '/src/assets/avatars/male_avatar.svg';
+  } else {
+    // Default to male avatar for 'other' gender
+    return '/src/assets/avatars/male_avatar.svg';
+  }
+};
+
+// Fallback function for when local avatar files are not available
+export const getFallbackAvatar = (gender: string | null, id: number): string => {
   if (gender === 'female') {
     return generateFemaleAvatar(id);
   } else if (gender === 'male') {

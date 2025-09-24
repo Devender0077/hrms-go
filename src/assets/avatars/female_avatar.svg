@@ -1,0 +1,44 @@
+<svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-female" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B9D;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#FF6B9D;stop-opacity:0.3" />
+    </linearGradient>
+    <linearGradient id="hair-female" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A0522D;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="75" cy="75" r="75" fill="url(#bg-female)"/>
+  
+  <!-- Face -->
+  <ellipse cx="75" cy="85" rx="35" ry="40" fill="#FDBCB4"/>
+  
+  <!-- Hair -->
+  <path d="M 40 60 Q 75 35 110 60 Q 110 45 75 25 Q 40 45 40 60 Z" fill="url(#hair-female)"/>
+  
+  <!-- Eyes -->
+  <circle cx="65" cy="75" r="4" fill="#2C3E50"/>
+  <circle cx="85" cy="75" r="4" fill="#2C3E50"/>
+  <circle cx="65" cy="73" r="1.5" fill="#FFFFFF"/>
+  <circle cx="85" cy="73" r="1.5" fill="#FFFFFF"/>
+  
+  <!-- Eyebrows -->
+  <path d="M 58 68 Q 65 65 72 68" stroke="#8B4513" stroke-width="2" fill="none"/>
+  <path d="M 78 68 Q 85 65 92 68" stroke="#8B4513" stroke-width="2" fill="none"/>
+  
+  <!-- Nose -->
+  <ellipse cx="75" cy="85" rx="2" ry="3" fill="#E8A87C"/>
+  
+  <!-- Mouth -->
+  <path d="M 70 95 Q 75 100 80 95" stroke="#E74C3C" stroke-width="2" fill="none"/>
+  
+  <!-- Earrings -->
+  <circle cx="50" cy="85" r="3" fill="#FFD700"/>
+  <circle cx="100" cy="85" r="3" fill="#FFD700"/>
+  
+  <!-- Necklace -->
+  <circle cx="75" cy="120" r="2" fill="#FFD700"/>
+</svg>

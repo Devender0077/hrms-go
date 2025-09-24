@@ -1,0 +1,43 @@
+<svg width="150" height="150" viewBox="0 0 150 150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-male" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3498DB;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#3498DB;stop-opacity:0.3" />
+    </linearGradient>
+    <linearGradient id="hair-male" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2C3E50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#34495E;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="75" cy="75" r="75" fill="url(#bg-male)"/>
+  
+  <!-- Face -->
+  <ellipse cx="75" cy="85" rx="35" ry="40" fill="#FDBCB4"/>
+  
+  <!-- Hair -->
+  <path d="M 40 55 Q 75 20 110 55 Q 110 40 75 15 Q 40 40 40 55 Z" fill="url(#hair-male)"/>
+  
+  <!-- Eyes -->
+  <circle cx="65" cy="75" r="4" fill="#2C3E50"/>
+  <circle cx="85" cy="75" r="4" fill="#2C3E50"/>
+  <circle cx="65" cy="73" r="1.5" fill="#FFFFFF"/>
+  <circle cx="85" cy="73" r="1.5" fill="#FFFFFF"/>
+  
+  <!-- Eyebrows -->
+  <path d="M 58 68 Q 65 65 72 68" stroke="#2C3E50" stroke-width="2" fill="none"/>
+  <path d="M 78 68 Q 85 65 92 68" stroke="#2C3E50" stroke-width="2" fill="none"/>
+  
+  <!-- Nose -->
+  <ellipse cx="75" cy="85" rx="2" ry="3" fill="#E8A87C"/>
+  
+  <!-- Mouth -->
+  <path d="M 70 95 Q 75 100 80 95" stroke="#E74C3C" stroke-width="2" fill="none"/>
+  
+  <!-- Mustache -->
+  <path d="M 68 90 Q 75 88 82 90" stroke="#2C3E50" stroke-width="2" fill="none"/>
+  
+  <!-- Beard -->
+  <path d="M 65 100 Q 75 110 85 100 Q 85 115 75 120 Q 65 115 65 100 Z" fill="url(#hair-male)"/>
+</svg>
