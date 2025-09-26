@@ -10,6 +10,7 @@ import {
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/auth-context";
+import ThemeToggle from "./theme-toggle";
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -216,10 +217,11 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   return (
     <Drawer isOpen={isOpen} onClose={onClose} placement="left">
       <DrawerContent>
-        <DrawerHeader className="flex items-center justify-center border-b border-default-100">
+        <DrawerHeader className="flex items-center justify-between border-b border-default-100 px-4">
           <h1 className="text-xl font-bold">
             HRM<span className="text-primary">GO</span>
           </h1>
+          <ThemeToggle />
         </DrawerHeader>
         <DrawerBody className="p-0">
           <nav className="py-4">

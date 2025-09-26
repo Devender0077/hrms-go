@@ -8,7 +8,7 @@ interface PageLayoutProps {
 
 export const PageLayout: React.FC<PageLayoutProps> = ({ children, className = "" }) => {
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 p-6 ${className}`}>
+    <div className={`min-h-screen bg-content2/50 p-6 ${className}`}>
       <div className="max-w-7xl mx-auto space-y-6">
         {children}
       </div>
@@ -40,8 +40,8 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           </div>
         )}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{title}</h1>
-          <p className="text-gray-600 dark:text-gray-300 mt-1">{description}</p>
+          <h1 className="text-3xl font-bold text-foreground">{title}</h1>
+          <p className="text-default-500 mt-1">{description}</p>
         </div>
       </div>
       {actions && (

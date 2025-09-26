@@ -8,9 +8,7 @@ import {
 import { Spinner } from "@heroui/react";
 import { motion } from "framer-motion";
 import { useAuth } from "./contexts/auth-context";
-import { DarkModeProvider } from "./contexts/DarkModeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import "./styles/dark-mode.css";
 
 // Auth Pages
 import Login from "./pages/auth/login";
@@ -113,9 +111,8 @@ export default function App() {
   }
 
   return (
-    <DarkModeProvider>
-      <Router>
-        <Routes>
+    <Router>
+      <Routes>
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -761,8 +758,7 @@ export default function App() {
         {/* Default Route */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </Router>
-    </DarkModeProvider>
+      </Routes>
+    </Router>
   );
 }

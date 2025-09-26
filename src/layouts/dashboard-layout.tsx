@@ -21,6 +21,7 @@ import React, { useState, useEffect } from "react";
     import { getDefaultAvatar } from "../utils/avatarUtils";
     import Sidebar from "../components/sidebar";
     import MobileSidebar from "../components/mobile-sidebar";
+    import ThemeToggle from "../components/theme-toggle";
     
     interface DashboardLayoutProps {
       children: React.ReactNode;
@@ -65,7 +66,7 @@ import React, { useState, useEffect } from "react";
       }, [user?.id]);
       
       return (
-        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="flex h-screen bg-background">
           {/* Desktop Sidebar */}
           <div className={`hidden md:block transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
             <Sidebar isOpen={isSidebarOpen} />
@@ -77,7 +78,7 @@ import React, { useState, useEffect } from "react";
           {/* Main Content */}
           <div className="flex flex-col flex-1 overflow-hidden">
             {/* Top Navbar */}
-            <Navbar maxWidth="full" className="shadow-sm border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <Navbar maxWidth="full" className="shadow-sm border-b border-divider">
               <NavbarContent className="sm:flex gap-4" justify="start">
                 <Button 
                   isIconOnly 
@@ -100,6 +101,9 @@ import React, { useState, useEffect } from "react";
               </NavbarContent>
               
               <NavbarContent justify="end">
+                <NavbarItem>
+                  <ThemeToggle />
+                </NavbarItem>
                 
                 <NavbarItem>
                   <Dropdown placement="bottom-end">
@@ -194,7 +198,7 @@ import React, { useState, useEffect } from "react";
             
             {/* Page Content */}
             <motion.main 
-              className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900"
+              className="flex-1 overflow-y-auto bg-background"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -203,14 +207,14 @@ import React, { useState, useEffect } from "react";
             </motion.main>
             
             {/* Footer */}
-            <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 px-6">
-              <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600 dark:text-gray-300">
+            <footer className="bg-content1 border-t border-divider py-4 px-6">
+              <div className="flex flex-col md:flex-row justify-between items-center text-sm text-default-500">
                 <div className="flex items-center space-x-4 mb-2 md:mb-0">
                   <span>© 2024 HRMS GO. All rights reserved.</span>
                 </div>
                 <div className="flex items-center space-x-4">
                   <span>Developed with ❤️ by</span>
-                  <span className="font-semibold text-blue-600">HRMS Development Team</span>
+                  <span className="font-semibold text-primary">HRMS Development Team</span>
                 </div>
               </div>
             </footer>
