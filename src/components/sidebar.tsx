@@ -1,11 +1,12 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Button, Tooltip } from "@heroui/react";
+import { Button, Tooltip, Switch } from "@heroui/react";
 import { motion } from "framer-motion";
 import { Icon } from "@iconify/react";
 import { useAuth } from "../contexts/auth-context";
 import { useTaskContext } from "../contexts/task-context";
 import { usePermissions } from "../hooks/usePermissions";
+import { useDarkMode } from "../contexts/DarkModeContext";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const location = useLocation();
   const { user } = useAuth();
   const { taskCounts } = useTaskContext();
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const { hasAnyPermission, loading: permissionsLoading } = usePermissions();
 
   const navSections: NavSection[] = [
@@ -374,10 +376,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
   if (permissionsLoading) {
     return (
-      <div className="h-full bg-white border-r border-gray-200 flex items-center justify-center">
+      <div className="h-full bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex items-center justify-center">
         <div className="text-center">
           <Icon icon="lucide:loader-2" className="w-6 h-6 animate-spin text-blue-500 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">Loading...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading...</p>
         </div>
       </div>
     );
@@ -385,14 +387,14 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
   return (
     <aside 
-      className={`bg-white shadow-md border-r border-gray-200 transition-all duration-300 flex flex-col h-full ${
+      className={`bg-white dark:bg-gray-800 shadow-md border-r border-gray-200 dark:border-gray-700 transition-all duration-300 flex flex-col h-full ${
         isOpen ? "w-64" : "w-20"
       }`}
     >
       {/* Logo */}
-      <div className="p-4 flex items-center justify-center h-16 border-b border-gray-200">
+      <div className="p-4 flex items-center justify-center h-16 border-b border-gray-200 dark:border-gray-700">
         {isOpen ? (
-          <h1 className="text-xl font-bold text-gray-800">HRM<span className="text-blue-600">GO</span></h1>
+          <h1 className="text-xl font-bold text-gray-800 dark:text-white">HRM<span className="text-blue-600">GO</span></h1>
         ) : (
           <h1 className="text-xl font-bold text-blue-600">HR</h1>
         )}
@@ -403,7 +405,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         {filteredNavSections.map((section, idx) => (
           <div key={idx} className="mb-6">
             {isOpen && (
-              <p className="px-4 text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              <p className="px-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                 {section.title}
               </p>
             )}
@@ -468,18 +470,58 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         ))}
       </nav>
 
+      {/* Dark Mode Toggle */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+            <Icon icon={isDarkMode ? "lucide:sun" : "lucide:moon"} className="text-gray-600 dark:text-gray-300 text-sm" />
+          </div>
+          {isOpen && (
+            <div className="flex-1 min-w-0 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  {isDarkMode ? "Dark Mode" : "Light Mode"}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  Theme
+                </p>
+              </div>
+              <Switch
+                isSelected={isDarkMode}
+                onValueChange={toggleDarkMode}
+                size="sm"
+                color="primary"
+              />
+            </div>
+          )}
+          {!isOpen && (
+            <Tooltip content={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"} placement="right">
+              <Button
+                isIconOnly
+                variant="light"
+                size="sm"
+                onClick={toggleDarkMode}
+                className="ml-2"
+              >
+                <Icon icon={isDarkMode ? "lucide:sun" : "lucide:moon"} className="text-gray-600 dark:text-gray-300" />
+              </Button>
+            </Tooltip>
+          )}
+        </div>
+      </div>
+
       {/* System Status & Version */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
             <Icon icon="lucide:activity" className="text-white text-sm" />
           </div>
           {isOpen && (
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
+              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                 System Online
               </p>
-              <p className="text-xs text-gray-500 truncate">
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                 v1.0.0
               </p>
             </div>

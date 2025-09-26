@@ -65,7 +65,7 @@ import React, { useState, useEffect } from "react";
       }, [user?.id]);
       
       return (
-        <div className="flex h-screen bg-background">
+        <div className="flex h-screen bg-background dark:bg-gray-900">
           {/* Desktop Sidebar */}
           <div className={`hidden md:block transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
             <Sidebar isOpen={isSidebarOpen} />
@@ -194,7 +194,7 @@ import React, { useState, useEffect } from "react";
             
             {/* Page Content */}
             <motion.main 
-              className="flex-1 overflow-y-auto bg-background"
+              className="flex-1 overflow-y-auto bg-background dark:bg-gray-900"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -203,8 +203,8 @@ import React, { useState, useEffect } from "react";
             </motion.main>
             
             {/* Footer */}
-            <footer className="bg-white border-t border-gray-200 py-4 px-6">
-              <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
+            <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-4 px-6">
+              <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600 dark:text-gray-300">
                 <div className="flex items-center space-x-4 mb-2 md:mb-0">
                   <span>© 2024 HRMS GO. All rights reserved.</span>
                 </div>

@@ -1,0 +1,134 @@
+/* Dark mode specific styles */
+.dark {
+  color-scheme: dark;
+}
+
+/* Ensure smooth transitions for dark mode */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Dark mode table styles */
+.dark .table-container {
+  background: #1f2937;
+  border: 1px solid #374151;
+}
+
+.dark .table-container th {
+  background: #111827;
+  color: #f9fafb;
+  border-bottom: 1px solid #374151;
+}
+
+.dark .table-container td {
+  color: #e5e7eb;
+  border-bottom: 1px solid #374151;
+}
+
+.dark .table-container tr:hover {
+  background: #374151;
+}
+
+/* Dark mode card styles */
+.dark .card {
+  background: #1f2937;
+  border: 1px solid #374151;
+}
+
+.dark .card-header {
+  background: #111827;
+  border-bottom: 1px solid #374151;
+}
+
+/* Dark mode form styles */
+.dark .form-input {
+  background: #1f2937;
+  border: 1px solid #374151;
+  color: #f9fafb;
+}
+
+.dark .form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Dark mode button styles */
+.dark .btn-secondary {
+  background: #374151;
+  color: #f9fafb;
+  border: 1px solid #4b5563;
+}
+
+.dark .btn-secondary:hover {
+  background: #4b5563;
+}
+
+/* Dark mode modal styles */
+.dark .modal-content {
+  background: #1f2937;
+  border: 1px solid #374151;
+}
+
+.dark .modal-header {
+  background: #111827;
+  border-bottom: 1px solid #374151;
+}
+
+/* Dark mode dropdown styles */
+.dark .dropdown-content {
+  background: #1f2937;
+  border: 1px solid #374151;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.dark .dropdown-item {
+  color: #e5e7eb;
+}
+
+.dark .dropdown-item:hover {
+  background: #374151;
+}
+
+/* Dark mode badge styles */
+.dark .badge {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.dark .badge-primary {
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+.dark .badge-success {
+  background: #059669;
+  color: #ffffff;
+}
+
+.dark .badge-warning {
+  background: #d97706;
+  color: #ffffff;
+}
+
+.dark .badge-danger {
+  background: #dc2626;
+  color: #ffffff;
+}
