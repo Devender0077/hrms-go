@@ -16,7 +16,6 @@ import React, { useState, useEffect } from "react";
     import { Icon } from "@iconify/react";
     import { motion } from "framer-motion";
     import { useNavigate } from "react-router-dom";
-    import { useTheme } from "@heroui/use-theme";
     import { useAuth } from "../contexts/auth-context";
     import { employeeAPI } from "../services/api-service";
     import { getDefaultAvatar } from "../utils/avatarUtils";
@@ -32,7 +31,6 @@ import React, { useState, useEffect } from "react";
       const [profilePhoto, setProfilePhoto] = useState<string | null>(null);
       const [userGender, setUserGender] = useState<string>('male');
       const { isOpen, onOpen, onClose } = useDisclosure();
-      const { theme, setTheme } = useTheme();
       const { user, logout } = useAuth();
       const navigate = useNavigate();
       
@@ -40,9 +38,6 @@ import React, { useState, useEffect } from "react";
         setIsSidebarOpen(!isSidebarOpen);
       };
       
-      const toggleTheme = () => {
-        setTheme(theme === "light" ? "dark" : "light");
-      };
       
       const handleLogout = () => {
         logout();
@@ -105,20 +100,6 @@ import React, { useState, useEffect } from "react";
               </NavbarContent>
               
               <NavbarContent justify="end">
-                <NavbarItem>
-                  <Button 
-                    isIconOnly 
-                    variant="light" 
-                    onPress={toggleTheme}
-                    aria-label="Toggle theme"
-                    className="rounded-lg"
-                  >
-                    <Icon 
-                      icon={theme === "light" ? "lucide:moon" : "lucide:sun"} 
-                      className="text-xl" 
-                    />
-                  </Button>
-                </NavbarItem>
                 
                 <NavbarItem>
                   <Dropdown placement="bottom-end">
@@ -220,6 +201,19 @@ import React, { useState, useEffect } from "react";
             >
               {children}
             </motion.main>
+            
+            {/* Footer */}
+            <footer className="bg-white border-t border-gray-200 py-4 px-6">
+              <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
+                <div className="flex items-center space-x-4 mb-2 md:mb-0">
+                  <span>© 2024 HRMS GO. All rights reserved.</span>
+                </div>
+                <div className="flex items-center space-x-4">
+                  <span>Developed with ❤️ by</span>
+                  <span className="font-semibold text-blue-600">HRMS Development Team</span>
+                </div>
+              </div>
+            </footer>
           </div>
         </div>
       );

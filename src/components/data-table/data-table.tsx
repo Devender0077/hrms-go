@@ -266,7 +266,7 @@ import React from "react";
                           // Show dropdown if more than 3 actions
                           <Dropdown>
                             <DropdownTrigger>
-                              <Button isIconOnly size="sm" variant="light">
+                              <Button isIconOnly size="sm" variant="light" aria-label="Row actions">
                                 <Icon icon="lucide:more-horizontal" />
                               </Button>
                             </DropdownTrigger>

@@ -10,7 +10,23 @@ const handleResponse = async (response) => {
     const errorData = await response.json();
     throw new Error(errorData.message || "API request failed");
   }
-  return response.json();
+  
+  // Handle 304 Not Modified responses (cached responses)
+  if (response.status === 304) {
+    // For 304 responses, we don't have a body, so we need to handle this differently
+    // We'll return a success response with empty data
+    return { success: true, data: null, message: "Data not modified (cached)" };
+  }
+  
+  // For other successful responses, parse the JSON
+  const data = await response.json();
+  
+  // Add success field if it doesn't exist (for consistency with frontend expectations)
+  if (data && typeof data === 'object' && !data.hasOwnProperty('success')) {
+    data.success = true;
+  }
+  
+  return data;
 };
 
 // Helper function to make API requests with authentication
@@ -35,6 +51,15 @@ export const apiRequest = async (endpoint, options = {}) => {
     },
   };
 
+  // Handle body serialization for POST/PUT requests
+  if (options.body && (options.method === 'POST' || options.method === 'PUT' || options.method === 'PATCH')) {
+    if (typeof options.body === 'object') {
+      requestOptions.body = JSON.stringify(options.body);
+    } else {
+      requestOptions.body = options.body;
+    }
+  }
+
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, requestOptions);
     return handleResponse(response);
@@ -44,57 +69,79 @@ export const apiRequest = async (endpoint, options = {}) => {
   }
 };
 
-import { httpClient } from "./http-client";
-import { API_ENDPOINTS } from "../config/api-config";
-
 // Authentication API
 export const authAPI = {
   login: (credentials) =>
-    httpClient.post(API_ENDPOINTS.AUTH.LOGIN, credentials),
+    apiRequest("/auth/login", {
+      method: "POST",
+      body: credentials,
+    }),
 
   loginWithFace: (faceData) =>
-    httpClient.post(API_ENDPOINTS.AUTH.FACE_LOGIN, faceData),
+    apiRequest("/auth/face-login", {
+      method: "POST",
+      body: faceData,
+    }),
 
   register: (userData) =>
-    httpClient.post(API_ENDPOINTS.AUTH.REGISTER, userData),
+    apiRequest("/auth/register", {
+      method: "POST",
+      body: userData,
+    }),
 
   forgotPassword: (email) =>
-    httpClient.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, { email }),
+    apiRequest("/auth/forgot-password", {
+      method: "POST",
+      body: { email },
+    }),
 
   resetPassword: (token, password) =>
-    httpClient.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, { token, password }),
+    apiRequest("/auth/reset-password", {
+      method: "POST",
+      body: { token, password },
+    }),
 
   verifyEmail: (token) =>
-    httpClient.get(`${API_ENDPOINTS.AUTH.VERIFY_EMAIL}/${token}`),
+    apiRequest(`/auth/verify-email/${token}`),
 
-  logout: () => httpClient.post(API_ENDPOINTS.AUTH.LOGOUT),
+  logout: () => apiRequest("/auth/logout", { method: "POST" }),
 };
 
 // Employee API
 export const employeeAPI = {
   getAll: (params = {}) => {
     const queryParams = new URLSearchParams(params).toString();
-    return httpClient.get(`${API_ENDPOINTS.EMPLOYEES.BASE}?${queryParams}`);
+    return apiRequest(`/employees?${queryParams}`);
   },
 
-  getById: (id) => httpClient.get(`${API_ENDPOINTS.EMPLOYEES.BASE}/${id}`),
+  getById: (id) => apiRequest(`/employees/${id}`),
 
   create: (employeeData) =>
-    httpClient.post(API_ENDPOINTS.EMPLOYEES.BASE, employeeData),
+    apiRequest("/employees", {
+      method: "POST",
+      body: employeeData,
+    }),
 
   update: (id, employeeData) =>
-    httpClient.put(`${API_ENDPOINTS.EMPLOYEES.BASE}/${id}`, employeeData),
+    apiRequest(`/employees/${id}`, {
+      method: "PUT",
+      body: employeeData,
+    }),
 
-  delete: (id) => httpClient.delete(`${API_ENDPOINTS.EMPLOYEES.BASE}/${id}`),
+  delete: (id) => apiRequest(`/employees/${id}`, { method: "DELETE" }),
 
   bulkImport: (formData) =>
-    httpClient.upload(API_ENDPOINTS.EMPLOYEES.IMPORT, formData),
+    apiRequest("/employees/import", {
+      method: "POST",
+      headers: {
+        // Don't set Content-Type when sending FormData
+        "Content-Type": undefined,
+      },
+      body: formData,
+    }),
 
   export: (format = "csv") =>
-    httpClient.download(
-      `${API_ENDPOINTS.EMPLOYEES.EXPORT}?format=${format}`,
-      `employees.${format}`
-    ),
+    apiRequest(`/employees/export?format=${format}`),
 };
 
 // Organization API
@@ -105,12 +152,12 @@ export const organizationAPI = {
   createBranch: (data) =>
     apiRequest("/organization/branches", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data,
     }),
   updateBranch: (id, data) =>
     apiRequest(`/organization/branches/${id}`, {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: data,
     }),
   deleteBranch: (id) =>
     apiRequest(`/organization/branches/${id}`, { method: "DELETE" }),
@@ -121,12 +168,12 @@ export const organizationAPI = {
   createDepartment: (data) =>
     apiRequest("/organization/departments", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data,
     }),
   updateDepartment: (id, data) =>
     apiRequest(`/organization/departments/${id}`, {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: data,
     }),
   deleteDepartment: (id) =>
     apiRequest(`/organization/departments/${id}`, { method: "DELETE" }),
@@ -137,12 +184,12 @@ export const organizationAPI = {
   createDesignation: (data) =>
     apiRequest("/organization/designations", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data,
     }),
   updateDesignation: (id, data) =>
     apiRequest(`/organization/designations/${id}`, {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: data,
     }),
   deleteDesignation: (id) =>
     apiRequest(`/organization/designations/${id}`, { method: "DELETE" }),
@@ -200,13 +247,13 @@ export const attendanceAPI = {
   checkIn: (data) =>
     apiRequest("/attendance/check-in", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data,
     }),
 
   checkOut: (data) =>
     apiRequest("/attendance/check-out", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data,
     }),
 
   getEmployeeAttendance: (employeeId, params = {}) => {
@@ -242,13 +289,13 @@ export const leaveAPI = {
   apply: (data) =>
     apiRequest("/leaves", {
       method: "POST",
-      body: JSON.stringify(data),
+      body: data,
     }),
 
   update: (id, data) =>
     apiRequest(`/leaves/${id}`, {
       method: "PUT",
-      body: JSON.stringify(data),
+      body: data,
     }),
 
   approve: (id) => apiRequest(`/leaves/${id}/approve`, { method: "POST" }),
@@ -256,7 +303,7 @@ export const leaveAPI = {
   reject: (id, reason) =>
     apiRequest(`/leaves/${id}/reject`, {
       method: "POST",
-      body: JSON.stringify({ reason }),
+      body: { reason },
     }),
 
   cancel: (id) => apiRequest(`/leaves/${id}/cancel`, { method: "POST" }),
@@ -282,13 +329,13 @@ export const taskAPI = {
   create: (taskData) =>
     apiRequest("/tasks", {
       method: "POST",
-      body: JSON.stringify(taskData),
+      body: taskData,
     }),
 
   update: (id, taskData) =>
     apiRequest(`/tasks/${id}`, {
       method: "PUT",
-      body: JSON.stringify(taskData),
+      body: taskData,
     }),
 
   delete: (id) => apiRequest(`/tasks/${id}`, { method: "DELETE" }),
@@ -306,16 +353,88 @@ export const calendarAPI = {
   createEvent: (eventData) =>
     apiRequest("/calendar/events", {
       method: "POST",
-      body: JSON.stringify(eventData),
+      body: eventData,
     }),
 
   updateEvent: (id, eventData) =>
     apiRequest(`/calendar/events/${id}`, {
       method: "PUT",
-      body: JSON.stringify(eventData),
+      body: eventData,
     }),
 
   deleteEvent: (id) => apiRequest(`/calendar/events/${id}`, { method: "DELETE" }),
+};
+
+// Jobs API
+export const jobsAPI = {
+  getAll: (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return apiRequest(`/jobs?${queryParams}`);
+  },
+
+  getById: (id) => apiRequest(`/jobs/${id}`),
+
+  create: (jobData) =>
+    apiRequest("/jobs", {
+      method: "POST",
+      body: jobData,
+    }),
+
+  update: (id, jobData) =>
+    apiRequest(`/jobs/${id}`, {
+      method: "PUT",
+      body: jobData,
+    }),
+
+  delete: (id) => apiRequest(`/jobs/${id}`, { method: "DELETE" }),
+};
+
+// Candidates API
+export const candidatesAPI = {
+  getAll: (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return apiRequest(`/candidates?${queryParams}`);
+  },
+
+  getById: (id) => apiRequest(`/candidates/${id}`),
+
+  create: (candidateData) =>
+    apiRequest("/candidates", {
+      method: "POST",
+      body: candidateData,
+    }),
+
+  update: (id, candidateData) =>
+    apiRequest(`/candidates/${id}`, {
+      method: "PUT",
+      body: candidateData,
+    }),
+
+  delete: (id) => apiRequest(`/candidates/${id}`, { method: "DELETE" }),
+};
+
+// Assets API
+export const assetsAPI = {
+  getAll: (params = {}) => {
+    const queryParams = new URLSearchParams(params).toString();
+    return apiRequest(`/assets?${queryParams}`);
+  },
+
+  getById: (id) => apiRequest(`/assets/${id}`),
+
+  create: (assetData) =>
+    apiRequest("/assets", {
+      method: "POST",
+      body: assetData,
+    }),
+
+  update: (id, assetData) =>
+    apiRequest(`/assets/${id}`, {
+      method: "PUT",
+      body: assetData,
+    }),
+
+  delete: (id) => apiRequest(`/assets/${id}`, { method: "DELETE" }),
 };
 
 // Export all APIs
@@ -328,4 +447,7 @@ export default {
   leave: leaveAPI,
   tasks: taskAPI,
   calendar: calendarAPI,
+  jobs: jobsAPI,
+  candidates: candidatesAPI,
+  assets: assetsAPI,
 };

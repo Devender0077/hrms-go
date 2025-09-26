@@ -5,7 +5,6 @@ interface CookieConsentSettingsProps {
   settings: {
     enabled: boolean;
     position: string;
-    theme: string;
     message: string;
     acceptButtonText: string;
     declineButtonText: string;
@@ -39,11 +38,6 @@ export default function CookieConsentSettings({ settings, onSettingsChange }: Co
     { label: "Top Right", value: "top-right" }
   ];
 
-  const themeOptions = [
-    { label: "Light", value: "light" },
-    { label: "Dark", value: "dark" },
-    { label: "Auto", value: "auto" }
-  ];
 
   const cookieTypes = [
     { key: "required", label: "Required Cookies", description: "Essential for website functionality" },
@@ -75,18 +69,6 @@ export default function CookieConsentSettings({ settings, onSettingsChange }: Co
               onChange={(e) => onSettingsChange("position", e.target.value)}
             >
               {positionOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </Select>
-            <Select
-              label="Theme"
-              placeholder="Select theme"
-              selectedKeys={[settings.theme]}
-              onChange={(e) => onSettingsChange("theme", e.target.value)}
-            >
-              {themeOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>

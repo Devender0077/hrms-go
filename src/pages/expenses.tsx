@@ -716,7 +716,7 @@ export default function Expenses() {
                     <TableCell>
                       <Dropdown>
                         <DropdownTrigger>
-                          <Button isIconOnly size="sm" variant="light">
+                          <Button isIconOnly size="sm" variant="light" aria-label="Expense actions">
                             <Icon icon="lucide:more-vertical" className="w-4 h-4" />
                           </Button>
                         </DropdownTrigger>

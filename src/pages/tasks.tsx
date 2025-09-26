@@ -28,6 +28,7 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
+import { PageLayout, PageHeader } from "../components/layout/PageLayout";
 import { useAuth } from "../contexts/auth-context";
 import { useTaskContext } from "../contexts/task-context";
 import Papa from "papaparse";
@@ -300,40 +301,31 @@ export default function TasksPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl">
-              <Icon icon="lucide:check-square" className="text-white text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
-              <p className="text-gray-600 mt-1">Manage and track your tasks</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
+    <PageLayout>
+      <PageHeader
+        title="Tasks"
+        description="Manage and track your tasks"
+        icon="lucide:check-square"
+        iconColor="from-green-500 to-blue-600"
+        actions={
+          <>
             <Button 
-              color="primary" 
-              variant="flat"
+              color="primary"
               startContent={<Icon icon="lucide:plus" />}
               onPress={onOpen}
-              className="font-medium"
             >
               Add Task
             </Button>
             <Button 
-              color="secondary" 
-              variant="flat"
+              color="secondary"
               startContent={<Icon icon="lucide:download" />}
-              className="font-medium"
               onPress={handleExportTasks}
             >
               Export
             </Button>
-          </div>
-        </div>
+          </>
+        }
+      />
 
         {/* Filters */}
         <Card className="border-0 shadow-sm">
@@ -493,7 +485,7 @@ export default function TasksPage() {
                     </div>
                     <Dropdown>
                       <DropdownTrigger>
-                        <Button isIconOnly size="sm" variant="light">
+                        <Button isIconOnly size="sm" variant="light" aria-label="Task actions">
                           <Icon icon="lucide:more-vertical" className="w-4 h-4" />
                         </Button>
                       </DropdownTrigger>
@@ -719,7 +711,6 @@ export default function TasksPage() {
             )}
           </ModalContent>
         </Modal>
-      </div>
-    </div>
+    </PageLayout>
   );
 }

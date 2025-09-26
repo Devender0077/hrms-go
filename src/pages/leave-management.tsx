@@ -408,7 +408,7 @@ import React from "react";
                               </Button>
                             </>
                           )}
-                          <Button isIconOnly size="sm" variant="light">
+                          <Button isIconOnly size="sm" variant="light" aria-label="View leave details">
                             <Icon icon="lucide:eye" className="text-default-500" />
                           </Button>
                         </div>

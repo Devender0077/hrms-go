@@ -8,6 +8,7 @@ import {
 import { Spinner } from "@heroui/react";
 import { motion } from "framer-motion";
 import { useAuth } from "./contexts/auth-context";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Auth Pages
 import Login from "./pages/auth/login";
@@ -24,8 +25,24 @@ import Employees from "./pages/employees";
 import Departments from "./pages/organization/departments";
 import Designations from "./pages/organization/designations";
 import Branches from "./pages/organization/branches";
-import Attendance from "./pages/attendance";
 import Leave from "./pages/leave";
+
+// User Management Pages
+import RolesPage from "./pages/users/roles";
+import PermissionsPage from "./pages/users/permissions";
+
+// Employee Management Pages
+import EmployeeDocumentsPage from "./pages/employees/documents";
+import EmployeeSalariesPage from "./pages/employees/salaries";
+import EmployeeContractsPage from "./pages/employees/contracts";
+
+// Timekeeping Pages
+import TimekeepingAttendance from "./pages/timekeeping/attendance";
+import Shifts from "./pages/timekeeping/shifts";
+import Policies from "./pages/timekeeping/policies";
+import Records from "./pages/timekeeping/records";
+import Regulations from "./pages/timekeeping/regulations";
+import Regularization from "./pages/timekeeping/regularization";
 import Expenses from "./pages/expenses";
 import Payroll from "./pages/payroll";
 // Individual Report Pages
@@ -44,7 +61,7 @@ import Assets from "./pages/assets";
 import AssetAssignments from "./pages/asset-assignments";
 import Users from "./pages/users";
 import AuditLogs from "./pages/audit-logs";
-import OrganizationChart from "./pages/organization-chart";
+import OrganizationChart from "./pages/organization/org-chart";
 import Settings from "./pages/settings";
 import Profile from "./pages/profile";
 import Roles from "./pages/roles";
@@ -52,14 +69,18 @@ import Calendar from "./pages/calendar";
 import Tasks from "./pages/tasks";
 import Recruitment from "./pages/recruitment";
 import LeaveManagement from "./pages/leave-management";
+import LeaveApplications from "./pages/leave/applications";
+import LeaveTypes from "./pages/leave/types";
+import LeaveBalances from "./pages/leave/balances";
+import LeavePolicies from "./pages/leave/policies";
+import Holidays from "./pages/leave/holidays";
+import LeaveReports from "./pages/leave/reports";
 import HRSystemSetup from "./pages/hr-system-setup";
 import Documents from "./pages/document-management/documents";
 
 // Layout Components
 import DashboardLayout from "./layouts/dashboard-layout";
 
-// Protected Route Component
-import ProtectedRoute from "./components/auth/protected-route";
 
 export default function App() {
   const { loading } = useAuth();
@@ -104,7 +125,7 @@ export default function App() {
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermissions={["dashboard.view"]}>
               <DashboardLayout>
               <Dashboard />
               </DashboardLayout>
@@ -116,7 +137,7 @@ export default function App() {
         <Route
           path="/dashboard/calendar"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermissions={["calendar.view"]}>
               <DashboardLayout>
                 <Calendar />
               </DashboardLayout>
@@ -128,7 +149,7 @@ export default function App() {
         <Route
           path="/dashboard/tasks"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermissions={["tasks.view"]}>
               <DashboardLayout>
                 <Tasks />
               </DashboardLayout>
@@ -149,6 +170,44 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/employees/documents"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+                <EmployeeDocumentsPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/employees/salaries"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+                <EmployeeSalariesPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/employees/contracts"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+                <EmployeeContractsPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+
         {/* <Route
           path="/dashboard/employees/:id"
           element={
@@ -200,13 +259,109 @@ export default function App() {
           }
         />
 
-        {/* Attendance Routes */}
+        {/* User Management Routes */}
+        <Route
+          path="/dashboard/users/roles"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin"]}
+            >
+              <DashboardLayout>
+                <RolesPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/users/permissions"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin"]}
+            >
+              <DashboardLayout>
+                <PermissionsPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Timekeeping Routes */}
         <Route
           path="/dashboard/attendance"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermissions={["attendance.view"]}>
               <DashboardLayout>
-              <Attendance />
+                <TimekeepingAttendance />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/timekeeping/attendance"
+          element={
+            <ProtectedRoute requiredPermissions={["attendance.view"]}>
+              <DashboardLayout>
+                <TimekeepingAttendance />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/timekeeping/shifts"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+                <Shifts />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/timekeeping/policies"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+                <Policies />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/timekeeping/records"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+                <Records />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/timekeeping/regulations"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+                <Regulations />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/timekeeping/regularization"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager", "employee"]}
+            >
+              <DashboardLayout>
+                <Regularization />
               </DashboardLayout>
             </ProtectedRoute>
           }
@@ -216,7 +371,7 @@ export default function App() {
         <Route
           path="/dashboard/leave"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermissions={["leave.view"]}>
               <DashboardLayout>
               <Leave />
               </DashboardLayout>
@@ -228,7 +383,7 @@ export default function App() {
         <Route
           path="/dashboard/expenses"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermissions={["expenses.view"]}>
               <DashboardLayout>
                 <Expenses />
               </DashboardLayout>
@@ -454,7 +609,7 @@ export default function App() {
         <Route
           path="/dashboard/organization-chart"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermissions={["organization.view"]}>
               <DashboardLayout>
                 <OrganizationChart />
               </DashboardLayout>
@@ -490,7 +645,7 @@ export default function App() {
         <Route
           path="/dashboard/profile"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermissions={["profile.view"]}>
               <DashboardLayout>
               <Profile />
               </DashboardLayout>
@@ -514,13 +669,61 @@ export default function App() {
 
         {/* Leave Management Routes */}
         <Route
-          path="/dashboard/leave-management"
+          path="/dashboard/leave/applications"
           element={
-            <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
-            >
+            <ProtectedRoute requiredPermissions={["leave.view"]}>
               <DashboardLayout>
-                <LeaveManagement />
+                <LeaveApplications />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/leave/types"
+          element={
+            <ProtectedRoute requiredPermissions={["leave.types.manage"]}>
+              <DashboardLayout>
+                <LeaveTypes />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/leave/balances"
+          element={
+            <ProtectedRoute requiredPermissions={["leave.balances.view"]}>
+              <DashboardLayout>
+                <LeaveBalances />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/leave/policies"
+          element={
+            <ProtectedRoute requiredPermissions={["leave.policies.manage"]}>
+              <DashboardLayout>
+                <LeavePolicies />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/leave/holidays"
+          element={
+            <ProtectedRoute requiredPermissions={["leave.holidays.manage"]}>
+              <DashboardLayout>
+                <Holidays />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/leave/reports"
+          element={
+            <ProtectedRoute requiredPermissions={["leave.reports"]}>
+              <DashboardLayout>
+                <LeaveReports />
               </DashboardLayout>
             </ProtectedRoute>
           }
@@ -544,7 +747,7 @@ export default function App() {
         <Route
           path="/dashboard/documents"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute requiredPermissions={["documents.view"]}>
               <DashboardLayout>
                 <Documents />
               </DashboardLayout>

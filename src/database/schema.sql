@@ -629,7 +629,7 @@
       company_id INT NOT NULL,
       enabled BOOLEAN DEFAULT TRUE,
       position ENUM('bottom', 'top', 'bottom-left', 'bottom-right', 'top-left', 'top-right') DEFAULT 'bottom',
-      theme ENUM('light', 'dark', 'auto') DEFAULT 'light',
+      theme ENUM('light') DEFAULT 'light',
       message TEXT,
       accept_button_text VARCHAR(100) DEFAULT 'Accept All',
       decline_button_text VARCHAR(100) DEFAULT 'Decline',

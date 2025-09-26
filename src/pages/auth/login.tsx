@@ -20,7 +20,6 @@ import {
   addToast,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { useTheme } from "@heroui/use-theme";
 import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/auth-context";
 import FaceRecognitionService from "../../services/face-recognition-service";
@@ -275,7 +274,6 @@ const handleFaceVerificationError = () => {
 
 export default function Login() {
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [rememberMe, setRememberMe] = React.useState(false);
@@ -608,25 +606,10 @@ export default function Login() {
     }
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-background to-default-50 p-4">
       <div className="absolute top-4 right-4">
-        <Button
-          isIconOnly
-          variant="light"
-          onPress={toggleTheme}
-          aria-label="Toggle theme"
-          className="rounded-lg"
-        >
-          <Icon
-            icon={theme === "light" ? "lucide:moon" : "lucide:sun"}
-            className="text-xl"
-          />
-        </Button>
       </div>
 
       <motion.div

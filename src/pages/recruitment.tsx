@@ -491,13 +491,13 @@ import React from "react";
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button isIconOnly size="sm" variant="light">
+                            <Button isIconOnly size="sm" variant="light" aria-label="View candidate">
                               <Icon icon="lucide:eye" className="text-default-500" />
                             </Button>
-                            <Button isIconOnly size="sm" variant="light">
+                            <Button isIconOnly size="sm" variant="light" aria-label="Edit candidate">
                               <Icon icon="lucide:edit" className="text-default-500" />
                             </Button>
-                            <Button isIconOnly size="sm" variant="light">
+                            <Button isIconOnly size="sm" variant="light" aria-label="Delete candidate">
                               <Icon icon="lucide:trash" className="text-danger" />
                             </Button>
                           </div>
@@ -580,7 +580,7 @@ import React from "react";
                                 <DropdownItem key="rejected" className="text-danger">Rejected</DropdownItem>
                               </DropdownMenu>
                             </Dropdown>
-                            <Button isIconOnly size="sm" variant="light">
+                            <Button isIconOnly size="sm" variant="light" aria-label="View job details">
                               <Icon icon="lucide:eye" className="text-default-500" />
                             </Button>
                           </div>

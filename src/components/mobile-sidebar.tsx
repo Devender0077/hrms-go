@@ -79,7 +79,13 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
         {
           title: "Attendance",
           icon: "lucide:clock",
-          path: "/dashboard/attendance",
+          path: "/dashboard/timekeeping/attendance",
+        },
+        {
+          title: "Shifts",
+          icon: "lucide:calendar-days",
+          path: "/dashboard/timekeeping/shifts",
+          roles: ["super_admin", "company_admin", "hr_manager"],
         },
         {
           title: "Leave",

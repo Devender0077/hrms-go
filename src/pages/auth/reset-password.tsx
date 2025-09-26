@@ -10,13 +10,11 @@ import {
   addToast,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { useTheme } from "@heroui/use-theme";
 import { motion } from "framer-motion";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, setTheme } = useTheme();
   const [password, setPassword] = React.useState("");
   const [confirmPassword, setConfirmPassword] = React.useState("");
   const [isLoading, setIsLoading] = React.useState(false);
@@ -72,9 +70,6 @@ export default function ResetPassword() {
     }, 1500);
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
 
   // Redirect to login if no token is provided
   React.useEffect(() => {
@@ -86,18 +81,6 @@ export default function ResetPassword() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
       <div className="absolute top-4 right-4">
-        <Button
-          isIconOnly
-          variant="light"
-          onPress={toggleTheme}
-          aria-label="Toggle theme"
-          className="rounded-lg"
-        >
-          <Icon
-            icon={theme === "light" ? "lucide:moon" : "lucide:sun"}
-            className="text-xl"
-          />
-        </Button>
       </div>
 
       <motion.div

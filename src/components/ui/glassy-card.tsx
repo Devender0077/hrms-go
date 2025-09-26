@@ -18,7 +18,7 @@ import React from "react";
     }: GlassyCardProps) {
       return (
         <motion.div
-          className={`relative overflow-hidden rounded-xl border border-white/20 bg-white/10 p-6 backdrop-blur-md dark:border-white/10 dark:bg-black/20 ${className}`}
+          className={`relative overflow-hidden rounded-xl border border-white/20 bg-card/10 p-6 backdrop-blur-md ${className}`}
           initial={{ opacity: 0.9 }}
           animate={{ opacity: 1 }}
           whileHover={hoverEffect ? { scale: 1.02, y: -5 } : {}}

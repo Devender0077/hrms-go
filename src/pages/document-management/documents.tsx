@@ -871,7 +871,7 @@
                             Send expiry reminders
                           </Checkbox>
                           <Tooltip content="Reminders will be sent 30, 15, and 5 days before expiry">
-                            <Button isIconOnly size="sm" variant="light">
+                            <Button isIconOnly size="sm" variant="light" aria-label="Document info">
                               <Icon icon="lucide:info" className="text-default-400" />
                             </Button>
                           </Tooltip>

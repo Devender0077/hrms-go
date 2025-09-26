@@ -72,7 +72,15 @@ export const useTasks = () => {
             assigneeId: task.assigned_to,
             dueDate: task.due_date,
             progress: task.progress,
-            tags: task.tags ? JSON.parse(task.tags) : [],
+            tags: task.tags ? (() => {
+              try {
+                // Try to parse as JSON first
+                return JSON.parse(task.tags);
+              } catch {
+                // If JSON parsing fails, treat as comma-separated string
+                return task.tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+              }
+            })() : [],
             createdAt: task.created_at,
             updatedAt: task.updated_at,
             estimatedHours: task.estimated_hours,

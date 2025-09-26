@@ -161,7 +161,7 @@ src/
 ## 🎨 UI/UX Features
 
 - **Responsive Design** - Works on desktop, tablet, and mobile
-- **Dark/Light Theme** - Theme switching capability
+- **Light Theme** - Clean, professional light theme
 - **Modern UI** - Clean, professional interface
 - **Interactive Charts** - Data visualization with Recharts
 - **Smooth Animations** - Framer Motion animations

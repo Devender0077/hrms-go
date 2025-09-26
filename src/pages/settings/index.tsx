@@ -71,7 +71,6 @@ import ChatGPTSettings from "../../components/settings/ChatGPTSettings";
         favicon: "",
         primaryColor: "#6366f1",
         secondaryColor: "#8b5cf6",
-        themeMode: "system",
     rtlEnabled: false,
     maintenanceMode: false,
     debugMode: false,

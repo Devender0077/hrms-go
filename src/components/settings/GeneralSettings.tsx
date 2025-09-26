@@ -10,7 +10,6 @@ interface GeneralSettingsProps {
     favicon: string;
     primaryColor: string;
     secondaryColor: string;
-    themeMode: string;
     rtlEnabled: boolean;
     maintenanceMode: boolean;
     debugMode: boolean;
@@ -58,15 +57,6 @@ export default function GeneralSettings({ settings, onSettingsChange }: GeneralS
           value={settings.secondaryColor}
           onValueChange={(value) => onSettingsChange("secondaryColor", value)}
         />
-        <Select
-          label="Theme Mode"
-          selectedKeys={[settings.themeMode]}
-          onSelectionChange={(keys) => onSettingsChange("themeMode", Array.from(keys)[0])}
-        >
-          <SelectItem key="light" value="light">Light</SelectItem>
-          <SelectItem key="dark" value="dark">Dark</SelectItem>
-          <SelectItem key="system" value="system">System</SelectItem>
-        </Select>
         <Input
           label="Session Timeout (minutes)"
           type="number"

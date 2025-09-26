@@ -1,495 +1,215 @@
-import React from "react";
-    import { 
-      Card, 
-      CardBody, 
-      CardHeader,
-      Button,
-      Table,
-      TableHeader,
-      TableColumn,
-      TableBody,
-      TableRow,
-      TableCell,
-      Chip,
-      Input,
-      Pagination,
-      Modal,
-      ModalContent,
-      ModalHeader,
-      ModalBody,
-      ModalFooter,
-      useDisclosure,
-      Textarea,
-      addToast
-    } from "@heroui/react";
+import React, { useState } from "react";
+import { Button, Card, CardBody, CardHeader, Spinner, useDisclosure } from "@heroui/react";
     import { Icon } from "@iconify/react";
-    import { motion } from "framer-motion";
-    
-    // Sample branches data
-    const branchesData = [
-      { 
-        id: 1, 
-        name: "Headquarters", 
-        location: "New York, NY",
-        address: "123 Main Street, Suite 100",
-        city: "New York",
-        state: "NY",
-        country: "USA",
-        zipCode: "10001",
-        employees: 85,
-        status: "active"
-      },
-      { 
-        id: 2, 
-        name: "West Coast Office", 
-        location: "San Francisco, CA",
-        address: "456 Tech Avenue, Floor 4",
-        city: "San Francisco",
-        state: "CA",
-        country: "USA",
-        zipCode: "94105",
-        employees: 42,
-        status: "active"
-      },
-      { 
-        id: 3, 
-        name: "European Branch", 
-        location: "London, UK",
-        address: "10 Business Square",
-        city: "London",
-        state: "",
-        country: "United Kingdom",
-        zipCode: "EC1A 1BB",
-        employees: 28,
-        status: "active"
-      },
-      { 
-        id: 4, 
-        name: "Asia Pacific Office", 
-        location: "Singapore",
-        address: "88 Market Street, #15-01",
-        city: "Singapore",
-        state: "",
-        country: "Singapore",
-        zipCode: "048948",
-        employees: 35,
-        status: "active"
-      },
-      { 
-        id: 5, 
-        name: "Remote Office", 
-        location: "Virtual",
-        address: "N/A",
-        city: "N/A",
-        state: "N/A",
-        country: "Global",
-        zipCode: "N/A",
-        employees: 24,
-        status: "active"
-      },
-      { 
-        id: 6, 
-        name: "Research Center", 
-        location: "Boston, MA",
-        address: "789 Innovation Drive",
-        city: "Boston",
-        state: "MA",
-        country: "USA",
-        zipCode: "02110",
-        employees: 18,
-        status: "inactive"
-      },
-    ];
-    
-    const statusColorMap = {
-      active: "success",
-      inactive: "danger",
-    };
+import { useBranches, Branch } from "../../hooks/useBranches";
+import BranchStats from "../../components/branches/BranchStats";
+import BranchFilters from "../../components/branches/BranchFilters";
+import BranchTable from "../../components/branches/BranchTable";
+import BranchModals from "../../components/branches/BranchModals";
     
     export default function Branches() {
-      const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-      const [page, setPage] = React.useState(1);
-      const [searchQuery, setSearchQuery] = React.useState("");
-      const [selectedBranch, setSelectedBranch] = React.useState(null);
-      const [isEditing, setIsEditing] = React.useState(false);
-      
-      // Form state
-      const [formData, setFormData] = React.useState({
-        name: "",
-        location: "",
-        address: "",
-        city: "",
-        state: "",
-        country: "",
-        zipCode: "",
-        status: "active"
-      });
-      
-      const rowsPerPage = 5;
-      
-      // Filter branches based on search
-      const filteredBranches = React.useMemo(() => {
-        return branchesData.filter(branch => {
-          return branch.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                 branch.location.toLowerCase().includes(searchQuery.toLowerCase());
-        });
-      }, [searchQuery]);
-      
-      // Calculate pagination
-      const pages = Math.ceil(filteredBranches.length / rowsPerPage);
-      const items = React.useMemo(() => {
-        const start = (page - 1) * rowsPerPage;
-        const end = start + rowsPerPage;
-        
-        return filteredBranches.slice(start, end);
-      }, [page, filteredBranches]);
-      
-      const handleOpenModal = (branch = null, editing = false) => {
-        if (branch) {
+  const {
+    branches,
+    filteredBranches,
+    loading,
+    error,
+    searchQuery,
+    setSearchQuery,
+    selectedCountry,
+    setSelectedCountry,
+    countries,
+    stats,
+    addBranch,
+    updateBranch,
+    deleteBranch,
+  } = useBranches();
+
+  const { isOpen: isOpenAdd, onOpen: onOpenAdd, onOpenChange: onOpenChangeAdd } = useDisclosure();
+  const { isOpen: isOpenEdit, onOpen: onOpenEdit, onOpenChange: onOpenChangeEdit } = useDisclosure();
+  const { isOpen: isOpenView, onOpen: onViewOpen, onOpenChange: onViewOpenChange } = useDisclosure();
+
+  const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
+  const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+  const [page, setPage] = useState(1);
+  const rowsPerPage = 10;
+
+  // Paginate filtered branches
+  const totalPages = Math.ceil(filteredBranches.length / rowsPerPage);
+  const paginatedBranches = filteredBranches.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage
+  );
+
+  const handleViewBranch = (branch: Branch) => {
           setSelectedBranch(branch);
-          setFormData({
-            name: branch.name,
-            location: branch.location,
-            address: branch.address,
-            city: branch.city,
-            state: branch.state,
-            country: branch.country,
-            zipCode: branch.zipCode,
-            status: branch.status
-          });
-        } else {
-          setSelectedBranch(null);
-          setFormData({
-            name: "",
-            location: "",
-            address: "",
-            city: "",
-            state: "",
-            country: "",
-            zipCode: "",
-            status: "active"
-          });
-        }
-        setIsEditing(editing);
-        onOpen();
-      };
+    onViewOpen();
+  };
+
+  const handleEditBranchClick = (branch: Branch) => {
+    setEditingBranch(branch);
+    onOpenEdit();
+  };
+
+  const handleDeleteBranchClick = async (id: number) => {
+    if (window.confirm('Are you sure you want to delete this branch?')) {
+      try {
+        await deleteBranch(id);
+      } catch (err) {
+        // Error is already handled in the hook
+      }
+    }
+  };
+
+  const handleAddBranchSubmit = async (data: any) => {
+    try {
+      await addBranch(data);
+    } catch (err) {
+      // Error is already handled in the hook
+    }
+  };
+
+  const handleEditBranchSubmit = async (id: number, data: any) => {
+    try {
+      await updateBranch(id, data);
+    } catch (err) {
+      // Error is already handled in the hook
+    }
+  };
+
+  const handleExportBranches = async () => {
+    setIsExporting(true);
+    try {
+      // Simple CSV export
+      const csvContent = [
+        ['Name', 'Location', 'Address', 'City', 'State', 'Country', 'Zip Code', 'Employees', 'Departments', 'Created'],
+        ...filteredBranches.map(branch => [
+          branch.name,
+          branch.location || '',
+          branch.address || '',
+          branch.city || '',
+          branch.state || '',
+          branch.country || '',
+          branch.zip_code || '',
+          branch.employee_count.toString(),
+          branch.department_count.toString(),
+          new Date(branch.created_at).toLocaleDateString()
+        ])
+      ].map(row => row.join(',')).join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `branches-export-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
       
-      const handleInputChange = (field, value) => {
-        setFormData(prev => ({
-          ...prev,
-          [field]: value
-        }));
-      };
-      
-      const handleSubmit = () => {
-        // Validate form
-        if (!formData.name || !formData.location) {
-          addToast({
-            title: "Error",
-            description: "Please fill in all required fields",
-            color: "danger",
-          });
-          return;
-        }
-        
-        // Handle form submission (create or update)
-        if (isEditing) {
-          addToast({
-            title: "Success",
-            description: "Branch updated successfully",
-            color: "success",
-          });
-        } else {
-          addToast({
-            title: "Success",
-            description: "Branch created successfully",
-            color: "success",
-          });
-        }
-        
-        onClose();
-      };
-      
-      const handleDelete = (id) => {
-        addToast({
-          title: "Success",
-          description: "Branch deleted successfully",
-          color: "success",
-        });
-      };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="text-gray-600 mt-4">Loading branches...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+        <div className="text-center">
+          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Branches</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <Button color="primary" onPress={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
       
       return (
-        <div className="p-6 space-y-6">
+    <div className="min-h-screen bg-gray-50/50 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
           {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl">
+              <Icon icon="lucide:building" className="text-white text-2xl" />
+            </div>
             <div>
-              <h1 className="text-2xl font-bold">Branches</h1>
-              <p className="text-default-500">Manage company branches and locations</p>
-            </div>
-            <div className="flex gap-2">
-              <Button 
-                color="primary" 
-                startContent={<Icon icon="lucide:plus" />} 
-                onPress={() => handleOpenModal()}
-              >
-                Add Branch
-              </Button>
+              <h1 className="text-3xl font-bold text-gray-900">Branches</h1>
+              <p className="text-gray-600 mt-1">Manage company branches and locations</p>
             </div>
           </div>
-          
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-              <Card className="shadow-sm">
-                <CardBody className="flex flex-row items-center gap-4">
-                  <div className="p-3 rounded-full bg-primary/10">
-                    <Icon icon="lucide:building" className="text-2xl text-primary" />
                   </div>
+
+        {/* Statistics Cards */}
+        <BranchStats stats={stats} loading={loading} />
+
+        {/* Filters and Actions */}
+        <BranchFilters
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          selectedCountry={selectedCountry}
+          setSelectedCountry={setSelectedCountry}
+          onAddBranch={onOpenAdd}
+          onExportBranches={handleExportBranches}
+          isExporting={isExporting}
+          countries={countries}
+          totalCount={branches.length}
+          filteredCount={filteredBranches.length}
+        />
+
+        {/* Branches Table */}
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-3">
+              <Icon icon="lucide:table" className="text-blue-600 text-xl" />
                   <div>
-                    <p className="text-default-500">Total Branches</p>
-                    <h3 className="text-2xl font-bold">6</h3>
-                    <p className="text-primary text-xs flex items-center">
-                      <Icon icon="lucide:map-pin" className="mr-1" />
-                      Across 4 countries
-                    </p>
+                <h3 className="text-lg font-semibold text-gray-900">Branch Directory</h3>
+                <p className="text-gray-500 text-sm">Click on actions to view, edit, or manage branches</p>
                   </div>
-                </CardBody>
-              </Card>
-            </motion.div>
-            
-            <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-              <Card className="shadow-sm">
-                <CardBody className="flex flex-row items-center gap-4">
-                  <div className="p-3 rounded-full bg-success/10">
-                    <Icon icon="lucide:users" className="text-2xl text-success" />
-                  </div>
-                  <div>
-                    <p className="text-default-500">Total Employees</p>
-                    <h3 className="text-2xl font-bold">232</h3>
-                    <p className="text-success text-xs flex items-center">
-                      <Icon icon="lucide:trending-up" className="mr-1" />
-                      Across all branches
-                    </p>
-                  </div>
-                </CardBody>
-              </Card>
-            </motion.div>
-            
-            <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-              <Card className="shadow-sm">
-                <CardBody className="flex flex-row items-center gap-4">
-                  <div className="p-3 rounded-full bg-warning/10">
-                    <Icon icon="lucide:map" className="text-2xl text-warning" />
-                  </div>
-                  <div>
-                    <p className="text-default-500">Countries</p>
-                    <h3 className="text-2xl font-bold">4</h3>
-                    <p className="text-warning text-xs flex items-center">
-                      <Icon icon="lucide:globe" className="mr-1" />
-                      Global presence
-                    </p>
-                  </div>
-                </CardBody>
-              </Card>
-            </motion.div>
-            
-            <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-              <Card className="shadow-sm">
-                <CardBody className="flex flex-row items-center gap-4">
-                  <div className="p-3 rounded-full bg-danger/10">
-                    <Icon icon="lucide:building-2" className="text-2xl text-danger" />
-                  </div>
-                  <div>
-                    <p className="text-default-500">Inactive Branches</p>
-                    <h3 className="text-2xl font-bold">1</h3>
-                    <p className="text-danger text-xs flex items-center">
-                      <Icon icon="lucide:alert-circle" className="mr-1" />
-                      Temporarily closed
-                    </p>
-                  </div>
-                </CardBody>
-              </Card>
-            </motion.div>
           </div>
-          
-          <Card className="shadow-sm">
-            <CardHeader className="flex flex-col sm:flex-row gap-4 justify-between">
-              <Input
-                isClearable
-                placeholder="Search branches..."
-                startContent={<Icon icon="lucide:search" className="text-default-400" />}
-                value={searchQuery}
-                onValueChange={setSearchQuery}
-                className="w-full sm:max-w-[44%]"
-              />
             </CardHeader>
-            <CardBody>
-              <Table 
-                removeWrapper 
-                aria-label="Branches table"
-                bottomContent={
-                  <div className="flex w-full justify-center">
-                    <Pagination
-                      isCompact
-                      showControls
-                      showShadow
-                      color="primary"
+          <CardBody className="pt-0">
+            <BranchTable
+              branches={paginatedBranches}
                       page={page}
-                      total={pages}
-                      onChange={(page) => setPage(page)}
-                    />
-                  </div>
-                }
-              >
-                <TableHeader>
-                  <TableColumn>NAME</TableColumn>
-                  <TableColumn>LOCATION</TableColumn>
-                  <TableColumn>EMPLOYEES</TableColumn>
-                  <TableColumn>STATUS</TableColumn>
-                  <TableColumn>ACTIONS</TableColumn>
-                </TableHeader>
-                <TableBody emptyContent="No branches found">
-                  {items.map((branch) => (
-                    <TableRow key={branch.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 rounded-full bg-primary/10">
-                            <Icon icon="lucide:building" className="text-lg text-primary" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{branch.name}</p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-1">
-                          <Icon icon="lucide:map-pin" className="text-default-400" />
-                          <span>{branch.location}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{branch.employees}</TableCell>
-                      <TableCell>
-                        <Chip 
-                          size="sm" 
-                          color={statusColorMap[branch.status]}
-                          variant="flat"
-                        >
-                          {branch.status}
-                        </Chip>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button 
-                            isIconOnly 
-                            size="sm" 
-                            variant="light"
-                            onPress={() => handleOpenModal(branch, false)}
-                          >
-                            <Icon icon="lucide:eye" className="text-default-500" />
-                          </Button>
-                          <Button 
-                            isIconOnly 
-                            size="sm" 
-                            variant="light"
-                            onPress={() => handleOpenModal(branch, true)}
-                          >
-                            <Icon icon="lucide:edit" className="text-default-500" />
-                          </Button>
-                          <Button 
-                            isIconOnly 
-                            size="sm" 
-                            variant="light"
-                            onPress={() => handleDelete(branch.id)}
-                          >
-                            <Icon icon="lucide:trash" className="text-danger" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              totalPages={totalPages}
+              setPage={setPage}
+              onView={handleViewBranch}
+              onEdit={handleEditBranchClick}
+              onDelete={handleDeleteBranchClick}
+            />
             </CardBody>
           </Card>
           
-          {/* Branch Modal */}
-          <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="lg">
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    {isEditing ? "Edit Branch" : selectedBranch ? "Branch Details" : "Add Branch"}
-                  </ModalHeader>
-                  <ModalBody>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Input
-                        label="Branch Name"
-                        placeholder="Enter branch name"
-                        value={formData.name}
-                        onValueChange={(value) => handleInputChange("name", value)}
-                        isReadOnly={!isEditing && selectedBranch}
-                        isRequired
-                      />
-                      <Input
-                        label="Location"
-                        placeholder="Enter location"
-                        value={formData.location}
-                        onValueChange={(value) => handleInputChange("location", value)}
-                        isReadOnly={!isEditing && selectedBranch}
-                        isRequired
-                      />
-                      <Textarea
-                        label="Address"
-                        placeholder="Enter address"
-                        value={formData.address}
-                        onValueChange={(value) => handleInputChange("address", value)}
-                        isReadOnly={!isEditing && selectedBranch}
-                        className="col-span-1 md:col-span-2"
-                      />
-                      <Input
-                        label="City"
-                        placeholder="Enter city"
-                        value={formData.city}
-                        onValueChange={(value) => handleInputChange("city", value)}
-                        isReadOnly={!isEditing && selectedBranch}
-                      />
-                      <Input
-                        label="State/Province"
-                        placeholder="Enter state/province"
-                        value={formData.state}
-                        onValueChange={(value) => handleInputChange("state", value)}
-                        isReadOnly={!isEditing && selectedBranch}
-                      />
-                      <Input
-                        label="Country"
-                        placeholder="Enter country"
-                        value={formData.country}
-                        onValueChange={(value) => handleInputChange("country", value)}
-                        isReadOnly={!isEditing && selectedBranch}
-                      />
-                      <Input
-                        label="Zip/Postal Code"
-                        placeholder="Enter zip/postal code"
-                        value={formData.zipCode}
-                        onValueChange={(value) => handleInputChange("zipCode", value)}
-                        isReadOnly={!isEditing && selectedBranch}
+        {/* Modals */}
+        <BranchModals
+          isOpenAdd={isOpenAdd}
+          onOpenChangeAdd={onOpenChangeAdd}
+          isOpenEdit={isOpenEdit}
+          onOpenChangeEdit={onOpenChangeEdit}
+          isOpenView={isOpenView}
+          onOpenChangeView={onViewOpenChange}
+          selectedBranch={selectedBranch}
+          editingBranch={editingBranch}
+          handleAddBranch={handleAddBranchSubmit}
+          handleEditBranch={handleEditBranchSubmit}
                       />
                     </div>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button variant="flat" onPress={onClose}>
-                      {!isEditing && selectedBranch ? "Close" : "Cancel"}
-                    </Button>
-                    {(isEditing || !selectedBranch) && (
-                      <Button color="primary" onPress={handleSubmit}>
-                        {isEditing ? "Update" : "Create"}
-                      </Button>
-                    )}
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
-        </div>
+    </div>
       );
     }

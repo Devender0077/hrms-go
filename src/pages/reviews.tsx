@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Pagination, Button, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Textarea, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Progress } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/react";
+import { PageLayout, PageHeader } from "../components/layout/PageLayout";
 
 // Performance review interface
 interface PerformanceReview {
@@ -435,30 +436,22 @@ export default function Reviews() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl">
-              <Icon icon="lucide:clipboard-check" className="text-white text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Performance Reviews</h1>
-              <p className="text-gray-600 mt-1">Schedule and manage employee performance reviews</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              color="primary" 
-              startContent={<Icon icon="lucide:plus" />} 
-              onPress={() => setIsScheduleModalOpen(true)}
-              className="font-medium"
-            >
-              Schedule Review
-            </Button>
-          </div>
-        </div>
+    <PageLayout>
+      <PageHeader
+        title="Performance Reviews"
+        description="Schedule and manage employee performance reviews"
+        icon="lucide:clipboard-check"
+        iconColor="from-purple-500 to-indigo-600"
+        actions={
+          <Button 
+            color="primary"
+            startContent={<Icon icon="lucide:plus" />} 
+            onPress={() => setIsScheduleModalOpen(true)}
+          >
+            Schedule Review
+          </Button>
+        }
+      />
         
         {/* Statistics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -1076,7 +1069,6 @@ export default function Reviews() {
             </ModalFooter>
           </ModalContent>
         </Modal>
-      </div>
-    </div>
+    </PageLayout>
   );
 }

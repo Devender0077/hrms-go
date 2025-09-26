@@ -799,7 +799,7 @@ const paymentMethods = [
                       <TableCell>
                       <Dropdown>
                         <DropdownTrigger>
-                          <Button isIconOnly size="sm" variant="light">
+                          <Button isIconOnly size="sm" variant="light" aria-label="Payroll actions">
                             <Icon icon="lucide:more-vertical" className="w-4 h-4" />
                           </Button>
                         </DropdownTrigger>

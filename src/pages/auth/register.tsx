@@ -14,12 +14,10 @@ import {
   addToast,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { useTheme } from "@heroui/use-theme";
 import { motion } from "framer-motion";
 
 export default function Register() {
   const navigate = useNavigate();
-  const { theme, setTheme } = useTheme();
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");
@@ -77,25 +75,10 @@ export default function Register() {
     }, 1500);
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
-  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
       <div className="absolute top-4 right-4">
-        <Button
-          isIconOnly
-          variant="light"
-          onPress={toggleTheme}
-          aria-label="Toggle theme"
-          className="rounded-lg"
-        >
-          <Icon
-            icon={theme === "light" ? "lucide:moon" : "lucide:sun"}
-            className="text-xl"
-          />
-        </Button>
       </div>
 
       <motion.div

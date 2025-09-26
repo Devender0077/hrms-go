@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Migration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin: 10px 0;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Database Migration</h1>
+        <p>This tool will add the missing columns to the employees table and fix the attendance policies/regulations tables.</p>
+        
+        <button onclick="runMigration()" id="migrateBtn">Run Migration</button>
+        <button onclick="checkSchema()" id="checkBtn">Check Current Schema</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8000/api/v1';
+        
+        // Get token from localStorage (assuming user is logged in)
+        function getAuthToken() {
+            return localStorage.getItem('token') || sessionStorage.getItem('token');
+        }
+        
+        async function runMigration() {
+            const btn = document.getElementById('migrateBtn');
+            const resultDiv = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.textContent = 'Running Migration...';
+            resultDiv.innerHTML = '';
+            
+            try {
+                const token = getAuthToken();
+                if (!token) {
+                    throw new Error('No authentication token found. Please log in first.');
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/migrate-employee-fields`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Migration completed successfully!\n\nResults:\n${data.results.join('\n')}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Migration failed: ${data.message}\n\nError: ${data.error}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Run Migration';
+            }
+        }
+        
+        async function checkSchema() {
+            const btn = document.getElementById('checkBtn');
+            const resultDiv = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.textContent = 'Checking...';
+            resultDiv.innerHTML = '';
+            
+            try {
+                const token = getAuthToken();
+                if (!token) {
+                    throw new Error('No authentication token found. Please log in first.');
+                }
+                
+                // Try to get employees to see if the new fields exist
+                const response = await fetch(`${API_BASE_URL}/employees`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data && data.length > 0) {
+                    const employee = data[0];
+                    const newFields = [
+                        'employment_type',
+                        'attendance_policy_id',
+                        'bank_name',
+                        'bank_account_number',
+                        'bank_routing_number',
+                        'bank_swift_code',
+                        'bank_address'
+                    ];
+                    
+                    let schemaInfo = '📋 Current Employee Schema:\n\n';
+                    newFields.forEach(field => {
+                        if (employee.hasOwnProperty(field)) {
+                            schemaInfo += `✅ ${field}: ${employee[field] || 'null'}\n`;
+                        } else {
+                            schemaInfo += `❌ ${field}: missing\n`;
+                        }
+                    });
+                    
+                    resultDiv.className = 'result info';
+                    resultDiv.textContent = schemaInfo;
+                } else {
+                    resultDiv.className = 'result info';
+                    resultDiv.textContent = 'No employees found in database.';
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error checking schema: ${error.message}`;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Check Current Schema';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -660,9 +660,9 @@ export default function LeaveManagement() {
                     <TableCell>
                       <Dropdown>
                         <DropdownTrigger>
-                          <Button isIconOnly size="sm" variant="light">
-                            <Icon icon="lucide:more-vertical" className="w-4 h-4" />
-                          </Button>
+                        <Button isIconOnly size="sm" variant="light" aria-label="Leave actions">
+                          <Icon icon="lucide:more-vertical" className="w-4 h-4" />
+                        </Button>
                         </DropdownTrigger>
                         <DropdownMenu>
                           <DropdownItem

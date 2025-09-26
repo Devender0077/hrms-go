@@ -286,6 +286,9 @@
         // Create sample data for testing
         await createSampleData(connection, companyId);
         
+        // Create timekeeping tables
+        await createTimekeepingTables(connection);
+        
         console.log('Migration completed successfully!');
         
       } catch (error) {
@@ -1240,5 +1243,236 @@
         throw error;
       }
     }
+
+    // Create timekeeping tables
+    const createTimekeepingTables = async (connection) => {
+      try {
+        console.log('Creating timekeeping tables...');
+
+        // Create attendance_policies table
+        await connection.execute(`
+          CREATE TABLE IF NOT EXISTS attendance_policies (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            policy_type ENUM('general', 'department', 'employee') NOT NULL DEFAULT 'general',
+            department_id INT NULL,
+            employee_id INT NULL,
+            late_arrival_penalty DECIMAL(10,2) DEFAULT 0.00,
+            early_departure_penalty DECIMAL(10,2) DEFAULT 0.00,
+            absent_penalty DECIMAL(10,2) DEFAULT 0.00,
+            overtime_rate DECIMAL(3,2) DEFAULT 1.50,
+            max_overtime_hours DECIMAL(4,2) DEFAULT 4.00,
+            require_approval_for_overtime BOOLEAN DEFAULT TRUE,
+            allow_remote_work BOOLEAN DEFAULT FALSE,
+            require_location_tracking BOOLEAN DEFAULT TRUE,
+            auto_approve_overtime BOOLEAN DEFAULT FALSE,
+            is_active BOOLEAN DEFAULT TRUE,
+            company_id INT DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
+            FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE SET NULL,
+            INDEX idx_policy_type (policy_type),
+            INDEX idx_department_id (department_id),
+            INDEX idx_employee_id (employee_id),
+            INDEX idx_company_id (company_id)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // Create attendance_regulations table
+        await connection.execute(`
+          CREATE TABLE IF NOT EXISTS attendance_regulations (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            description TEXT,
+            regulation_type ENUM('general', 'department', 'employee') NOT NULL DEFAULT 'general',
+            department_id INT NULL,
+            employee_id INT NULL,
+            min_work_hours DECIMAL(4,2) DEFAULT 8.00,
+            max_work_hours DECIMAL(4,2) DEFAULT 12.00,
+            break_duration INT DEFAULT 15,
+            lunch_duration INT DEFAULT 60,
+            grace_period_minutes INT DEFAULT 15,
+            late_penalty_threshold INT DEFAULT 30,
+            overtime_threshold DECIMAL(4,2) DEFAULT 8.00,
+            require_break BOOLEAN DEFAULT TRUE,
+            require_lunch BOOLEAN DEFAULT TRUE,
+            allow_flexible_hours BOOLEAN DEFAULT FALSE,
+            weekend_work_allowed BOOLEAN DEFAULT FALSE,
+            holiday_work_allowed BOOLEAN DEFAULT FALSE,
+            is_active BOOLEAN DEFAULT TRUE,
+            company_id INT DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
+            FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE SET NULL,
+            INDEX idx_regulation_type (regulation_type),
+            INDEX idx_department_id (department_id),
+            INDEX idx_employee_id (employee_id),
+            INDEX idx_company_id (company_id)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // Insert default policies
+        await connection.execute(`
+          INSERT IGNORE INTO attendance_policies (
+            name, description, policy_type, late_arrival_penalty, early_departure_penalty, 
+            absent_penalty, overtime_rate, max_overtime_hours, require_approval_for_overtime,
+            allow_remote_work, require_location_tracking, auto_approve_overtime, is_active, company_id
+          ) VALUES 
+          (
+            'General Attendance Policy',
+            'Default attendance policy for all employees',
+            'general',
+            5.00,
+            5.00,
+            50.00,
+            1.50,
+            4.00,
+            TRUE,
+            FALSE,
+            TRUE,
+            FALSE,
+            TRUE,
+            1
+          ),
+          (
+            'Remote Work Policy',
+            'Policy for employees working remotely',
+            'general',
+            0.00,
+            0.00,
+            25.00,
+            1.25,
+            2.00,
+            TRUE,
+            TRUE,
+            FALSE,
+            TRUE,
+            TRUE,
+            1
+          )
+        `);
+
+        // Insert default regulations
+        await connection.execute(`
+          INSERT IGNORE INTO attendance_regulations (
+            name, description, regulation_type, min_work_hours, max_work_hours,
+            break_duration, lunch_duration, grace_period_minutes, late_penalty_threshold,
+            overtime_threshold, require_break, require_lunch, allow_flexible_hours,
+            weekend_work_allowed, holiday_work_allowed, is_active, company_id
+          ) VALUES 
+          (
+            'Standard Work Hours',
+            'Standard 8-hour work day regulations',
+            'general',
+            8.00,
+            12.00,
+            15,
+            60,
+            15,
+            30,
+            8.00,
+            TRUE,
+            TRUE,
+            FALSE,
+            FALSE,
+            FALSE,
+            TRUE,
+            1
+          ),
+          (
+            'Flexible Work Hours',
+            'Flexible work hours for eligible employees',
+            'general',
+            6.00,
+            10.00,
+            10,
+            45,
+            30,
+            60,
+            6.00,
+            TRUE,
+            TRUE,
+            TRUE,
+            TRUE,
+            TRUE,
+            TRUE,
+            1
+          )
+        `);
+
+        // Create attendance_regularizations table
+        await connection.execute(`
+          CREATE TABLE IF NOT EXISTS attendance_regularizations (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            regularization_id VARCHAR(50) UNIQUE NOT NULL,
+            employee_id INT NOT NULL,
+            date DATE NOT NULL,
+            original_check_in TIME NOT NULL,
+            original_check_out TIME NOT NULL,
+            requested_check_in TIME NOT NULL,
+            requested_check_out TIME NOT NULL,
+            reason TEXT NOT NULL,
+            work_hours_difference DECIMAL(4,2) DEFAULT 0.00,
+            status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending',
+            approved_by INT NULL,
+            approved_at TIMESTAMP NULL,
+            rejection_reason TEXT NULL,
+            company_id INT DEFAULT 1,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+            FOREIGN KEY (approved_by) REFERENCES employees(id) ON DELETE SET NULL,
+            INDEX idx_employee_id (employee_id),
+            INDEX idx_date (date),
+            INDEX idx_status (status),
+            INDEX idx_company_id (company_id)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // Insert sample regularization data
+        await connection.execute(`
+          INSERT IGNORE INTO attendance_regularizations (
+            regularization_id, employee_id, date, original_check_in, original_check_out,
+            requested_check_in, requested_check_out, reason, work_hours_difference,
+            status, company_id
+          ) VALUES 
+          (
+            'REG20240101001',
+            1,
+            '2024-01-15',
+            '09:30:00',
+            '18:00:00',
+            '09:00:00',
+            '18:00:00',
+            'Late arrival due to traffic jam',
+            0.50,
+            'approved',
+            1
+          ),
+          (
+            'REG20240101002',
+            2,
+            '2024-01-16',
+            '09:00:00',
+            '17:30:00',
+            '09:00:00',
+            '18:00:00',
+            'Need to work extra hours for project deadline',
+            0.50,
+            'pending',
+            1
+          )
+        `);
+
+        console.log('✅ Timekeeping tables created successfully!');
+        console.log('✅ Default policies and regulations inserted!');
+
+      } catch (error) {
+        console.error('❌ Error creating timekeeping tables:', error);
+      }
+    };
     
     runMigration();
