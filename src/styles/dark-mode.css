@@ -10,21 +10,44 @@
 
 /* Dark mode body and html */
 .dark body {
-  background-color: #111827;
-  color: #f9fafb;
+  background-color: #111827 !important;
+  color: #f9fafb !important;
 }
 
 .dark html {
-  background-color: #111827;
+  background-color: #111827 !important;
 }
 
 /* Dark mode main containers */
 .dark .main-container {
-  background-color: #111827;
+  background-color: #111827 !important;
 }
 
 .dark .content-container {
-  background-color: #1f2937;
+  background-color: #1f2937 !important;
+}
+
+/* Force consistent dark backgrounds */
+.dark {
+  --background: #111827;
+  --foreground: #f9fafb;
+  --card: #1f2937;
+  --card-foreground: #f9fafb;
+  --popover: #1f2937;
+  --popover-foreground: #f9fafb;
+  --primary: #006FEE;
+  --primary-foreground: #ffffff;
+  --secondary: #374151;
+  --secondary-foreground: #f9fafb;
+  --muted: #374151;
+  --muted-foreground: #9ca3af;
+  --accent: #374151;
+  --accent-foreground: #f9fafb;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #374151;
+  --input: #374151;
+  --ring: #006FEE;
 }
 
 /* Dark mode scrollbar */
@@ -156,6 +179,7 @@
 .dark [data-slot="base"] {
   background-color: #1f2937 !important;
   color: #f9fafb !important;
+  border-color: #374151 !important;
 }
 
 .dark [data-slot="content"] {
@@ -164,8 +188,9 @@
 }
 
 .dark [data-slot="header"] {
-  background-color: #111827 !important;
+  background-color: #1f2937 !important;
   color: #f9fafb !important;
+  border-color: #374151 !important;
 }
 
 .dark [data-slot="body"] {
@@ -174,8 +199,26 @@
 }
 
 .dark [data-slot="footer"] {
-  background-color: #111827 !important;
+  background-color: #1f2937 !important;
   color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+/* Force all HeroUI components to use consistent colors */
+.dark [data-slot] {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-slot="trigger"] {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-slot="backdrop"] {
+  background-color: rgba(17, 24, 39, 0.8) !important;
 }
 
 /* Dark mode input and form elements */
@@ -219,12 +262,21 @@
 }
 
 .dark [data-slot="card-header"] {
-  background-color: #111827 !important;
+  background-color: #1f2937 !important;
   border-color: #374151 !important;
 }
 
 .dark [data-slot="card-body"] {
   background-color: #1f2937 !important;
+}
+
+/* Force all cards to use consistent styling */
+.dark .card,
+.dark [class*="card"],
+.dark [data-slot*="card"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
 }
 
 /* Dark mode navigation */
@@ -235,6 +287,15 @@
 
 .dark [data-slot="navbar-content"] {
   background-color: #1f2937 !important;
+}
+
+/* Force all navigation elements */
+.dark nav,
+.dark [class*="nav"],
+.dark [data-slot*="nav"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
 }
 
 /* Dark mode dropdowns */
@@ -252,13 +313,23 @@
   background-color: #374151 !important;
 }
 
+/* Force all dropdown elements */
+.dark [class*="dropdown"],
+.dark [data-slot*="dropdown"],
+.dark [class*="menu"],
+.dark [data-slot*="menu"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
 /* Dark mode modals */
 .dark [data-slot="modal"] {
   background-color: #1f2937 !important;
 }
 
 .dark [data-slot="modal-header"] {
-  background-color: #111827 !important;
+  background-color: #1f2937 !important;
   border-color: #374151 !important;
 }
 
@@ -267,8 +338,18 @@
 }
 
 .dark [data-slot="modal-footer"] {
-  background-color: #111827 !important;
+  background-color: #1f2937 !important;
   border-color: #374151 !important;
+}
+
+/* Force all modal elements */
+.dark [class*="modal"],
+.dark [data-slot*="modal"],
+.dark [class*="dialog"],
+.dark [data-slot*="dialog"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
 }
 
 /* Additional dark mode fixes */
@@ -379,4 +460,148 @@
 
 .dark .focus\:border-gray-500:focus {
   border-color: #6b7280 !important;
+}
+
+/* Force all common UI elements to use consistent colors */
+.dark div,
+.dark section,
+.dark article,
+.dark aside,
+.dark main,
+.dark header,
+.dark footer {
+  background-color: transparent !important;
+}
+
+/* Force all containers and wrappers */
+.dark .container,
+.dark .wrapper,
+.dark .content,
+.dark .main,
+.dark .page,
+.dark [class*="container"],
+.dark [class*="wrapper"],
+.dark [class*="content"] {
+  background-color: transparent !important;
+}
+
+/* Force all panels and sections */
+.dark .panel,
+.dark .section,
+.dark .block,
+.dark [class*="panel"],
+.dark [class*="section"],
+.dark [class*="block"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+/* Force all tables */
+.dark table,
+.dark thead,
+.dark tbody,
+.dark tr,
+.dark td,
+.dark th {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+/* Force all lists */
+.dark ul,
+.dark ol,
+.dark li {
+  background-color: transparent !important;
+  color: #f9fafb !important;
+}
+
+/* Force all buttons and interactive elements */
+.dark button,
+.dark [role="button"],
+.dark [type="button"],
+.dark [type="submit"],
+.dark [type="reset"] {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+.dark button:hover,
+.dark [role="button"]:hover,
+.dark [type="button"]:hover,
+.dark [type="submit"]:hover,
+.dark [type="reset"]:hover {
+  background-color: #4b5563 !important;
+}
+
+/* Force all links */
+.dark a {
+  color: #60a5fa !important;
+}
+
+.dark a:hover {
+  color: #93c5fd !important;
+}
+
+/* Force all form elements */
+.dark input,
+.dark textarea,
+.dark select,
+.dark [type="text"],
+.dark [type="email"],
+.dark [type="password"],
+.dark [type="number"],
+.dark [type="tel"],
+.dark [type="url"],
+.dark [type="search"] {
+  background-color: #374151 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: #006FEE !important;
+  box-shadow: 0 0 0 3px rgba(0, 111, 238, 0.1) !important;
+}
+
+/* Force all badges and tags */
+.dark .badge,
+.dark .tag,
+.dark [class*="badge"],
+.dark [class*="tag"] {
+  background-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+/* Force all alerts and notifications */
+.dark .alert,
+.dark .notification,
+.dark [class*="alert"],
+.dark [class*="notification"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
+}
+
+/* Force all progress bars */
+.dark .progress,
+.dark [class*="progress"] {
+  background-color: #374151 !important;
+}
+
+.dark .progress-bar,
+.dark [class*="progress-bar"] {
+  background-color: #006FEE !important;
+}
+
+/* Force all tooltips */
+.dark .tooltip,
+.dark [class*="tooltip"] {
+  background-color: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #f9fafb !important;
 }
