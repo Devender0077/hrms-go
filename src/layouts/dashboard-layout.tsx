@@ -65,7 +65,7 @@ import React, { useState, useEffect } from "react";
       }, [user?.id]);
       
       return (
-        <div className="flex h-screen bg-background dark:bg-gray-900">
+        <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
           {/* Desktop Sidebar */}
           <div className={`hidden md:block transition-all duration-300 ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
             <Sidebar isOpen={isSidebarOpen} />
@@ -77,7 +77,7 @@ import React, { useState, useEffect } from "react";
           {/* Main Content */}
           <div className="flex flex-col flex-1 overflow-hidden">
             {/* Top Navbar */}
-            <Navbar maxWidth="full" className="shadow-sm border-b border-divider">
+            <Navbar maxWidth="full" className="shadow-sm border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
               <NavbarContent className="sm:flex gap-4" justify="start">
                 <Button 
                   isIconOnly 
@@ -194,7 +194,7 @@ import React, { useState, useEffect } from "react";
             
             {/* Page Content */}
             <motion.main 
-              className="flex-1 overflow-y-auto bg-background dark:bg-gray-900"
+              className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
