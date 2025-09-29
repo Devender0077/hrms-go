@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Card,
   CardBody,
@@ -25,9 +25,11 @@ import {
   DropdownMenu,
   DropdownItem,
   useDisclosure,
-  Spinner
+  Spinner,
+  Pagination
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { motion } from 'framer-motion';
 import { apiRequest } from '../../services/api-service';
 
 interface EmployeeContract {
@@ -52,6 +54,162 @@ interface Employee {
   employee_id: string;
 }
 
+interface ContractStats {
+  total: number;
+  active: number;
+  expiringSoon: number;
+  expired: number;
+}
+
+interface ContractStatsProps {
+  stats: ContractStats;
+}
+
+const ContractStats: React.FC<ContractStatsProps> = ({ stats }) => {
+  const statCards = [
+    {
+      title: "Total Contracts",
+      value: stats.total,
+      icon: "lucide:file-text",
+      color: "blue",
+      bgColor: "bg-primary-100",
+      textColor: "text-primary-600"
+    },
+    {
+      title: "Active",
+      value: stats.active,
+      icon: "lucide:check-circle",
+      color: "green",
+      bgColor: "bg-success-100",
+      textColor: "text-success-600"
+    },
+    {
+      title: "Expiring Soon",
+      value: stats.expiringSoon,
+      icon: "lucide:clock",
+      color: "yellow",
+      bgColor: "bg-warning-100",
+      textColor: "text-warning-600"
+    },
+    {
+      title: "Expired",
+      value: stats.expired,
+      icon: "lucide:x-circle",
+      color: "red",
+      bgColor: "bg-danger-100",
+      textColor: "text-danger-600"
+    }
+  ];
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {statCards.map((stat, index) => (
+        <motion.div
+          key={stat.title}
+          whileHover={{ y: -5 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, delay: index * 0.1 }}
+        >
+          <Card className="border-0 shadow-sm">
+            <CardBody className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-default-600">{stat.title}</p>
+                  <p className={`text-2xl font-bold ${stat.textColor}`}>
+                    {stat.value}
+                  </p>
+                </div>
+                <div className={`p-3 ${stat.bgColor} rounded-full`}>
+                  <Icon icon={stat.icon} className={`${stat.textColor} text-xl`} />
+                </div>
+              </div>
+            </CardBody>
+          </Card>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+interface ContractFiltersProps {
+  filters: {
+    searchQuery: string;
+    selectedStatus: string;
+    selectedType: string;
+  };
+  onFiltersChange: (filters: {
+    searchQuery: string;
+    selectedStatus: string;
+    selectedType: string;
+  }) => void;
+}
+
+const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFiltersChange }) => {
+  const statusOptions = [
+    { key: 'all', label: 'All Status' },
+    { key: 'active', label: 'Active' },
+    { key: 'expired', label: 'Expired' },
+    { key: 'terminated', label: 'Terminated' },
+    { key: 'pending', label: 'Pending' }
+  ];
+
+  const typeOptions = [
+    { key: 'all', label: 'All Types' },
+    { key: 'permanent', label: 'Permanent' },
+    { key: 'contract', label: 'Contract' },
+    { key: 'temporary', label: 'Temporary' },
+    { key: 'intern', label: 'Intern' },
+    { key: 'consultant', label: 'Consultant' }
+  ];
+
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardBody className="p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Input
+            placeholder="Search by employee name or ID..."
+            value={filters.searchQuery}
+            onChange={(e) => onFiltersChange({ ...filters, searchQuery: e.target.value })}
+            startContent={<Icon icon="lucide:search" className="text-default-400" />}
+            className="max-w-full"
+          />
+          
+          <Select
+            placeholder="Filter by status"
+            selectedKeys={filters.selectedStatus ? [filters.selectedStatus] : []}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0] as string;
+              onFiltersChange({ ...filters, selectedStatus: selected || 'all' });
+            }}
+          >
+            {statusOptions.map((status) => (
+              <SelectItem key={status.key}>
+                {status.label}
+              </SelectItem>
+            ))}
+          </Select>
+
+          <Select
+            placeholder="Filter by type"
+            selectedKeys={filters.selectedType ? [filters.selectedType] : []}
+            onSelectionChange={(keys) => {
+              const selected = Array.from(keys)[0] as string;
+              onFiltersChange({ ...filters, selectedType: selected || 'all' });
+            }}
+          >
+            {typeOptions.map((type) => (
+              <SelectItem key={type.key}>
+                {type.label}
+              </SelectItem>
+            ))}
+          </Select>
+        </div>
+      </CardBody>
+    </Card>
+  );
+};
+
 const EmployeeContractsPage: React.FC = () => {
   const [contracts, setContracts] = useState<EmployeeContract[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -59,6 +217,13 @@ const EmployeeContractsPage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [editingContract, setEditingContract] = useState<EmployeeContract | null>(null);
   const [viewingContract, setViewingContract] = useState<EmployeeContract | null>(null);
+  const [page, setPage] = useState(1);
+  const [filters, setFilters] = useState({
+    searchQuery: '',
+    selectedStatus: 'all',
+    selectedType: 'all'
+  });
+  const rowsPerPage = 10;
   const [formData, setFormData] = useState({
     employee_id: '',
     contract_type: '',
@@ -76,6 +241,49 @@ const EmployeeContractsPage: React.FC = () => {
     fetchContracts();
     fetchEmployees();
   }, []);
+
+  // Filtered contracts
+  const filteredContracts = useMemo(() => {
+    return contracts.filter(contract => {
+      const matchesSearch = !filters.searchQuery || 
+        contract.employee_name?.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+        contract.employee_id_string?.toLowerCase().includes(filters.searchQuery.toLowerCase());
+      
+      const matchesStatus = filters.selectedStatus === 'all' || contract.status === filters.selectedStatus;
+      const matchesType = filters.selectedType === 'all' || contract.contract_type === filters.selectedType;
+      
+      return matchesSearch && matchesStatus && matchesType;
+    });
+  }, [contracts, filters]);
+
+  // Paginated contracts
+  const paginatedContracts = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    return filteredContracts.slice(start, start + rowsPerPage);
+  }, [filteredContracts, page, rowsPerPage]);
+
+  // Statistics
+  const stats = useMemo((): ContractStats => {
+    const total = contracts.length;
+    const active = contracts.filter(c => c.status === 'active').length;
+    const expiringSoon = contracts.filter(c => {
+      if (!c.end_date) return false;
+      const endDate = new Date(c.end_date);
+      const today = new Date();
+      const diffTime = endDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays <= 30 && diffDays > 0;
+    }).length;
+    const expired = contracts.filter(c => {
+      if (!c.end_date) return false;
+      return new Date(c.end_date) < new Date();
+    }).length;
+
+    return { total, active, expiringSoon, expired };
+  }, [contracts]);
+
+  // Pagination
+  const totalPages = Math.ceil(filteredContracts.length / rowsPerPage);
 
   const fetchContracts = async () => {
     try {
@@ -238,10 +446,14 @@ const EmployeeContractsPage: React.FC = () => {
     { key: 'pending', label: 'Pending' }
   ];
 
+  // Loading state
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Spinner size="lg" />
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="text-default-600 mt-4">Loading contracts...</p>
+        </div>
       </div>
     );
   }
@@ -273,70 +485,14 @@ const EmployeeContractsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 border-primary-200 dark:border-primary-700">
-            <CardBody className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-primary-600 dark:text-primary-400">Total Contracts</p>
-                  <p className="text-2xl font-bold text-primary-900 dark:text-primary-100">{contracts.length}</p>
-                </div>
-                <div className="p-3 bg-primary-500 rounded-xl">
-                  <Icon icon="lucide:file-text" className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-success-50 to-success-100 dark:from-success-900/20 dark:to-success-800/20 border-success-200 dark:border-success-700">
-            <CardBody className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-success-600 dark:text-success-400">Active Contracts</p>
-                  <p className="text-2xl font-bold text-success-900 dark:text-success-100">
-                    {contracts.filter(c => c.status === 'active').length}
-                  </p>
-                </div>
-                <div className="p-3 bg-success-500 rounded-xl">
-                  <Icon icon="lucide:check-circle" className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20 border-warning-200 dark:border-warning-700">
-            <CardBody className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-warning-600 dark:text-warning-400">Expiring Soon</p>
-                  <p className="text-2xl font-bold text-warning-900 dark:text-warning-100">
-                    {contracts.filter(c => isContractExpiring(c.end_date || '')).length}
-                  </p>
-                </div>
-                <div className="p-3 bg-warning-500 rounded-xl">
-                  <Icon icon="lucide:calendar" className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-          
-          <Card className="bg-gradient-to-br from-danger-50 to-danger-100 dark:from-danger-900/20 dark:to-danger-800/20 border-danger-200 dark:border-danger-700">
-            <CardBody className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-danger-600 dark:text-danger-400">Expired</p>
-                  <p className="text-2xl font-bold text-danger-900 dark:text-danger-100">
-                    {contracts.filter(c => isContractExpired(c.end_date || '')).length}
-                  </p>
-                </div>
-                <div className="p-3 bg-danger-500 rounded-xl">
-                  <Icon icon="lucide:alert-circle" className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </CardBody>
-          </Card>
-        </div>
+        {/* Statistics */}
+        <ContractStats stats={stats} />
+
+        {/* Filters */}
+        <ContractFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+        />
 
         {/* Contracts Table */}
         <Card className="shadow-lg">
@@ -344,7 +500,7 @@ const EmployeeContractsPage: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-bold text-foreground">Employee Contracts</h2>
-                <p className="text-sm text-default-600 mt-1">{contracts.length} total contracts</p>
+                <p className="text-sm text-default-600 mt-1">{filteredContracts.length} contracts found</p>
               </div>
             </div>
           </CardHeader>
@@ -360,7 +516,7 @@ const EmployeeContractsPage: React.FC = () => {
               <TableColumn>ACTIONS</TableColumn>
             </TableHeader>
             <TableBody>
-              {contracts.map((contract) => (
+              {paginatedContracts.map((contract) => (
                 <TableRow key={contract.id}>
                   <TableCell>
                     <div>
@@ -451,6 +607,20 @@ const EmployeeContractsPage: React.FC = () => {
               ))}
             </TableBody>
           </Table>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-6">
+              <Pagination
+                total={totalPages}
+                page={page}
+                onChange={setPage}
+                showControls
+                showShadow
+                color="primary"
+              />
+            </div>
+          )}
         </CardBody>
       </Card>
 
