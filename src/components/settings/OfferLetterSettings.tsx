@@ -73,10 +73,10 @@ export default function OfferLetterSettings({ settings, onSettingsChange }: Offe
         </CardHeader>
         <CardBody className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Use Custom Letterhead</span>
-                <span className="text-xs text-gray-500">Upload a custom letterhead template or use auto-generated one</span>
+                <span className="text-sm font-medium text-foreground">Use Custom Letterhead</span>
+                <span className="text-xs text-default-500">Upload a custom letterhead template or use auto-generated one</span>
               </div>
               <Switch
                 isSelected={settings.useCustomLetterhead}
@@ -86,7 +86,7 @@ export default function OfferLetterSettings({ settings, onSettingsChange }: Offe
             
             {settings.useCustomLetterhead ? (
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <div className="border-2 border-dashed border-divider rounded-lg p-6 text-center">
                   <input
                     type="file"
                     accept=".docx,.doc,.pdf"
@@ -100,31 +100,31 @@ export default function OfferLetterSettings({ settings, onSettingsChange }: Offe
                     id="letterhead-upload"
                   />
                   <label htmlFor="letterhead-upload" className="cursor-pointer">
-                    <div className="text-gray-500 mb-2">
+                    <div className="text-default-500 mb-2">
                       <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-default-600">
                       Click to upload letterhead template
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-default-500 mt-1">
                       Supports .docx, .doc, .pdf files
                     </p>
                   </label>
                 </div>
                 {settings.letterheadFile && (
-                  <div className="p-3 bg-green-50 rounded-lg">
-                    <p className="text-sm text-green-800">
+                  <div className="p-3 bg-success-50 rounded-lg">
+                    <p className="text-sm text-success-800">
                       ✓ Uploaded: {settings.letterheadFile.name}
                     </p>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <h4 className="text-sm font-medium text-blue-900 mb-2">Auto-Generated Letterhead</h4>
-                <p className="text-xs text-blue-700">
+              <div className="p-4 bg-primary-50 rounded-lg">
+                <h4 className="text-sm font-medium text-primary-900 mb-2">Auto-Generated Letterhead</h4>
+                <p className="text-xs text-primary-700">
                   We'll automatically generate a professional letterhead using your company logo and branding information.
                 </p>
               </div>
@@ -139,17 +139,17 @@ export default function OfferLetterSettings({ settings, onSettingsChange }: Offe
         </CardHeader>
         <CardBody className="space-y-4">
           <div className="mb-4">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">Available Variables</h4>
+            <h4 className="text-sm font-medium text-foreground mb-2">Available Variables</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-              <span className="bg-gray-100 px-2 py-1 rounded">[CANDIDATE_NAME]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[POSITION]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[DEPARTMENT]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[SALARY]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[START_DATE]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[COMPANY_NAME]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[HR_EMAIL]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[HR_PHONE]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[VALIDITY_DAYS]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[CANDIDATE_NAME]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[POSITION]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[DEPARTMENT]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[SALARY]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[START_DATE]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[COMPANY_NAME]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[HR_EMAIL]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[HR_PHONE]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[VALIDITY_DAYS]</span>
             </div>
           </div>
           <Textarea
@@ -168,60 +168,60 @@ export default function OfferLetterSettings({ settings, onSettingsChange }: Offe
         </CardHeader>
         <CardBody className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Auto-generate offer letters</span>
-                <span className="text-xs text-gray-500">Automatically generate offer letters when new employees are added</span>
+                <span className="text-sm font-medium text-foreground">Auto-generate offer letters</span>
+                <span className="text-xs text-default-500">Automatically generate offer letters when new employees are added</span>
               </div>
               <Switch
                 isSelected={settings.autoGenerate}
                 onValueChange={(value) => onSettingsChange("autoGenerate", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include salary information</span>
-                <span className="text-xs text-gray-500">Add salary details to the offer letter</span>
+                <span className="text-sm font-medium text-foreground">Include salary information</span>
+                <span className="text-xs text-default-500">Add salary details to the offer letter</span>
               </div>
               <Switch
                 isSelected={settings.includeSalary}
                 onValueChange={(value) => onSettingsChange("includeSalary", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include benefits package</span>
-                <span className="text-xs text-gray-500">Add benefits and perks information</span>
+                <span className="text-sm font-medium text-foreground">Include benefits package</span>
+                <span className="text-xs text-default-500">Add benefits and perks information</span>
               </div>
               <Switch
                 isSelected={settings.includeBenefits}
                 onValueChange={(value) => onSettingsChange("includeBenefits", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include start date</span>
-                <span className="text-xs text-gray-500">Add employment start date</span>
+                <span className="text-sm font-medium text-foreground">Include start date</span>
+                <span className="text-xs text-default-500">Add employment start date</span>
               </div>
               <Switch
                 isSelected={settings.includeStartDate}
                 onValueChange={(value) => onSettingsChange("includeStartDate", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Require digital signature</span>
-                <span className="text-xs text-gray-500">Make digital signature mandatory</span>
+                <span className="text-sm font-medium text-foreground">Require digital signature</span>
+                <span className="text-xs text-default-500">Make digital signature mandatory</span>
               </div>
               <Switch
                 isSelected={settings.signatureRequired}
                 onValueChange={(value) => onSettingsChange("signatureRequired", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable digital signature</span>
-                <span className="text-xs text-gray-500">Allow digital signature functionality</span>
+                <span className="text-sm font-medium text-foreground">Enable digital signature</span>
+                <span className="text-xs text-default-500">Allow digital signature functionality</span>
               </div>
               <Switch
                 isSelected={settings.digitalSignature}

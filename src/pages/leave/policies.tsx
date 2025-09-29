@@ -26,7 +26,7 @@ import {
   Pagination,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { PageLayout, PageHeader } from "../../components/layout/PageLayout";
+import PageLayout, { PageHeader } from "../../components/layout/PageLayout";
 import { apiRequest } from "../../services/api-service";
 
 interface LeavePolicy {
@@ -211,14 +211,14 @@ export default function LeavePolicies() {
         title="Leave Policies"
         description="Manage leave policies and rules for different leave types"
         icon="lucide:shield"
-        iconColor="from-purple-500 to-indigo-600"
+        iconColor="from-primary-500 to-secondary-500"
         actions={
           <>
             <Input
               placeholder="Search policies..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
             />
             <Button
@@ -253,8 +253,8 @@ export default function LeavePolicies() {
                 <TableRow key={policy.id}>
                   <TableCell>
                     <div>
-                      <p className="font-semibold text-gray-900">{policy.name}</p>
-                      <p className="text-sm text-gray-500">{policy.description}</p>
+                      <p className="font-semibold text-foreground">{policy.name}</p>
+                      <p className="text-sm text-default-500">{policy.description}</p>
                     </div>
                   </TableCell>
                   <TableCell>

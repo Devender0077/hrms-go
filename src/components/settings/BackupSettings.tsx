@@ -24,7 +24,7 @@ export default function BackupSettings({ settings, onSettingsChange }: BackupSet
         </div>
         <div>
           <h2 className="text-xl font-semibold">Backup & Storage</h2>
-          <p className="text-gray-600">Configure data backup and storage settings</p>
+          <p className="text-default-600">Configure data backup and storage settings</p>
         </div>
       </div>
 
@@ -37,7 +37,7 @@ export default function BackupSettings({ settings, onSettingsChange }: BackupSet
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Auto Backup</p>
-                <p className="text-sm text-gray-500">Automatically backup system data</p>
+                <p className="text-sm text-default-500">Automatically backup system data</p>
               </div>
               <Switch
                 isSelected={settings.autoBackup}
@@ -71,7 +71,7 @@ export default function BackupSettings({ settings, onSettingsChange }: BackupSet
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Encryption</p>
-                <p className="text-sm text-gray-500">Encrypt backup files</p>
+                <p className="text-sm text-default-500">Encrypt backup files</p>
               </div>
               <Switch
                 isSelected={settings.backupEncryption}
@@ -88,15 +88,15 @@ export default function BackupSettings({ settings, onSettingsChange }: BackupSet
           <CardBody className="space-y-4">
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-500">Last Backup:</span>
+                <span className="text-sm text-default-500">Last Backup:</span>
                 <span className="text-sm font-medium">{settings.lastBackup}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-500">Next Backup:</span>
+                <span className="text-sm text-default-500">Next Backup:</span>
                 <span className="text-sm font-medium">{settings.nextBackup}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-500">Backup Size:</span>
+                <span className="text-sm text-default-500">Backup Size:</span>
                 <span className="text-sm font-medium">2.4 GB</span>
               </div>
             </div>

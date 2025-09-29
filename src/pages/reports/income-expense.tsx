@@ -130,29 +130,29 @@ export default function IncomeExpenseReport() {
         label: "Total Income",
         value: `$${(totalIncome / 1000).toFixed(0)}k`,
         icon: "lucide:trending-up",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Total Expense",
         value: `$${(totalExpense / 1000).toFixed(0)}k`,
         icon: "lucide:trending-down",
-        color: "text-red-600",
-        bgColor: "bg-red-100"
+        color: "text-danger-600",
+        bgColor: "bg-danger-100"
       },
       {
         label: "Total Profit",
         value: `$${(totalProfit / 1000).toFixed(0)}k`,
         icon: "lucide:dollar-sign",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Avg Profit Margin",
         value: `${avgProfitMargin.toFixed(1)}%`,
         icon: "lucide:percent",
-        color: "text-purple-600",
-        bgColor: "bg-purple-100"
+        color: "text-secondary-600",
+        bgColor: "bg-secondary-100"
       }
     ];
   }, []);
@@ -202,14 +202,14 @@ export default function IncomeExpenseReport() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <ReportHeader
           title="Income vs Expense Report"
           description="Comprehensive financial analysis and profit tracking"
           icon="lucide:dollar-sign"
-          iconColor="from-green-500 to-blue-600"
+          iconColor="from-primary-500 to-secondary-500"
           onExport={handleExport}
           onRefresh={handleRefresh}
           isExporting={isExporting}
@@ -229,7 +229,7 @@ export default function IncomeExpenseReport() {
           filterLabel="Department"
           additionalFilters={
             <div className="flex items-end">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-default-600">
                 Showing {filteredData.length} of {incomeExpenseData.length} records
               </div>
             </div>
@@ -240,10 +240,10 @@ export default function IncomeExpenseReport() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-green-600 text-xl" />
+              <Icon icon="lucide:table" className="text-success-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Income vs Expense Data</h3>
-                <p className="text-gray-500 text-sm">Monthly financial performance analysis</p>
+                <h3 className="text-lg font-semibold text-foreground">Income vs Expense Data</h3>
+                <p className="text-default-500 text-sm">Monthly financial performance analysis</p>
               </div>
             </div>
           </CardHeader>
@@ -263,33 +263,33 @@ export default function IncomeExpenseReport() {
                   <TableRow key={record.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{record.month}</p>
-                        <p className="text-sm text-gray-500">{record.department}</p>
+                        <p className="font-medium text-foreground">{record.month}</p>
+                        <p className="text-sm text-default-500">{record.department}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:trending-up" className="w-4 h-4 text-green-500" />
-                        <span className="font-medium text-green-600">${(record.income / 1000).toFixed(0)}k</span>
+                        <Icon icon="lucide:trending-up" className="w-4 h-4 text-success" />
+                        <span className="font-medium text-success-600">${(record.income / 1000).toFixed(0)}k</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:trending-down" className="w-4 h-4 text-red-500" />
-                        <span className="font-medium text-red-600">${(record.expense / 1000).toFixed(0)}k</span>
+                        <Icon icon="lucide:trending-down" className="w-4 h-4 text-danger" />
+                        <span className="font-medium text-danger-600">${(record.expense / 1000).toFixed(0)}k</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:dollar-sign" className="w-4 h-4 text-blue-500" />
-                        <span className="font-medium text-blue-600">${(record.profit / 1000).toFixed(0)}k</span>
+                        <Icon icon="lucide:dollar-sign" className="w-4 h-4 text-primary" />
+                        <span className="font-medium text-primary-600">${(record.profit / 1000).toFixed(0)}k</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="w-16 h-2 bg-content3 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-blue-500 rounded-full" 
+                            className="h-full bg-primary rounded-full" 
                             style={{ width: `${Math.min(record.profitMargin, 100)}%` }}
                           ></div>
                         </div>

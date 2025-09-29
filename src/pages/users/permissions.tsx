@@ -124,8 +124,8 @@ const PermissionsPage: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Permission Management</h1>
-          <p className="text-gray-600">View and manage system permissions</p>
+          <h1 className="text-2xl font-bold text-foreground">Permission Management</h1>
+          <p className="text-default-600">View and manage system permissions</p>
         </div>
       </div>
 
@@ -187,7 +187,7 @@ const PermissionsPage: React.FC = () => {
                   <TableCell>
                     <div>
                       <div className="font-medium">{permission.permission_name}</div>
-                      <div className="text-sm text-gray-500">{permission.permission_key}</div>
+                      <div className="text-sm text-default-500">{permission.permission_key}</div>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -200,7 +200,7 @@ const PermissionsPage: React.FC = () => {
                     </Chip>
                   </TableCell>
                   <TableCell>
-                    <div className="text-gray-600">{permission.description}</div>
+                    <div className="text-default-600">{permission.description}</div>
                   </TableCell>
                   <TableCell>
                     <Chip
@@ -233,7 +233,7 @@ const PermissionsPage: React.FC = () => {
           <CardBody>
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">{permissions.length}</div>
-              <div className="text-sm text-gray-600">Total Permissions</div>
+              <div className="text-sm text-default-600">Total Permissions</div>
             </div>
           </CardBody>
         </Card>
@@ -243,7 +243,7 @@ const PermissionsPage: React.FC = () => {
               <div className="text-2xl font-bold text-success">
                 {permissions.filter(p => p.is_active).length}
               </div>
-              <div className="text-sm text-gray-600">Active Permissions</div>
+              <div className="text-sm text-default-600">Active Permissions</div>
             </div>
           </CardBody>
         </Card>
@@ -251,7 +251,7 @@ const PermissionsPage: React.FC = () => {
           <CardBody>
             <div className="text-center">
               <div className="text-2xl font-bold text-warning">{modules.length}</div>
-              <div className="text-sm text-gray-600">Modules</div>
+              <div className="text-sm text-default-600">Modules</div>
             </div>
           </CardBody>
         </Card>

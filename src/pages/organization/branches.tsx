@@ -115,10 +115,10 @@ import BranchModals from "../../components/branches/BranchModals";
       
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" />
-          <p className="text-gray-600 mt-4">Loading branches...</p>
+          <p className="text-default-600 mt-4">Loading branches...</p>
         </div>
       </div>
     );
@@ -126,11 +126,11 @@ import BranchModals from "../../components/branches/BranchModals";
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Branches</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-danger mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Error Loading Branches</h2>
+          <p className="text-default-600 mb-4">{error}</p>
           <Button color="primary" onPress={() => window.location.reload()}>
             Try Again
           </Button>
@@ -140,17 +140,17 @@ import BranchModals from "../../components/branches/BranchModals";
   }
       
       return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
           {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl">
-              <Icon icon="lucide:building" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:building" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Branches</h1>
-              <p className="text-gray-600 mt-1">Manage company branches and locations</p>
+              <h1 className="text-3xl font-bold text-foreground">Branches</h1>
+              <p className="text-default-600 mt-1">Manage company branches and locations</p>
             </div>
           </div>
                   </div>
@@ -176,10 +176,10 @@ import BranchModals from "../../components/branches/BranchModals";
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-blue-600 text-xl" />
+              <Icon icon="lucide:table" className="text-primary-600 text-xl" />
                   <div>
-                <h3 className="text-lg font-semibold text-gray-900">Branch Directory</h3>
-                <p className="text-gray-500 text-sm">Click on actions to view, edit, or manage branches</p>
+                <h3 className="text-lg font-semibold text-foreground">Branch Directory</h3>
+                <p className="text-default-500 text-sm">Click on actions to view, edit, or manage branches</p>
                   </div>
           </div>
             </CardHeader>

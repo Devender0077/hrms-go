@@ -209,8 +209,8 @@ export default function AssetsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Assets</h1>
-          <p className="text-gray-600">Manage company assets and equipment</p>
+          <h1 className="text-2xl font-bold text-foreground">Assets</h1>
+          <p className="text-default-600">Manage company assets and equipment</p>
         </div>
         <Button
           color="primary"
@@ -229,7 +229,7 @@ export default function AssetsPage() {
               placeholder="Search assets..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="max-w-sm"
             />
             <div className="flex gap-2">
@@ -273,7 +273,7 @@ export default function AssetsPage() {
                   <TableCell>
                     <div>
                       <p className="font-semibold">{asset.name}</p>
-                      <p className="text-sm text-gray-500">{asset.location || 'No location'}</p>
+                      <p className="text-sm text-default-500">{asset.location || 'No location'}</p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -296,11 +296,11 @@ export default function AssetsPage() {
                         />
                         <div>
                           <p className="text-sm font-medium">{asset.first_name} {asset.last_name}</p>
-                          <p className="text-xs text-gray-500">{asset.employee_id}</p>
+                          <p className="text-xs text-default-500">{asset.employee_id}</p>
                         </div>
                       </div>
                     ) : (
-                      <span className="text-gray-500">Unassigned</span>
+                      <span className="text-default-500">Unassigned</span>
                     )}
                   </TableCell>
                   <TableCell>

@@ -148,6 +148,16 @@ export default function CalendarPage() {
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 5);
 
+  // Debug logging
+  console.log('Calendar Debug:', {
+    totalEvents: events.length,
+    visibleEvents: visibleEvents.length,
+    upcomingEvents: upcomingEvents.length,
+    user: user?.email,
+    loading,
+    error
+  });
+
   const handleAddEvent = async () => {
     if (!newEvent.title || !newEvent.date || !newEvent.time) {
       addToast({
@@ -276,10 +286,10 @@ export default function CalendarPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" />
-          <p className="text-gray-600 mt-4">Loading calendar...</p>
+          <p className="text-default-600 mt-4">Loading calendar...</p>
         </div>
       </div>
     );
@@ -287,11 +297,11 @@ export default function CalendarPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lucide:lock" className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Access Denied</h2>
-          <p className="text-gray-600">Please log in to view the calendar.</p>
+          <Icon icon="lucide:lock" className="w-16 h-16 text-default-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Access Denied</h2>
+          <p className="text-default-600">Please log in to view the calendar.</p>
         </div>
       </div>
     );
@@ -299,11 +309,11 @@ export default function CalendarPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Calendar</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-danger mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Error Loading Calendar</h2>
+          <p className="text-default-600 mb-4">{error}</p>
           <Button color="primary" onPress={loadEvents}>
             Try Again
           </Button>
@@ -313,17 +323,17 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl">
-              <Icon icon="lucide:calendar" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:calendar" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
-              <p className="text-gray-600 mt-1">Manage events and schedule meetings</p>
+              <h1 className="text-3xl font-bold text-foreground">Calendar</h1>
+              <p className="text-default-600 mt-1">Manage events and schedule meetings</p>
             </div>
           </div>
           <Button 
@@ -343,10 +353,10 @@ export default function CalendarPage() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between w-full">
                   <div className="flex items-center gap-3">
-                    <Icon icon="lucide:calendar" className="text-purple-600 text-xl" />
+                    <Icon icon="lucide:calendar" className="text-secondary-600 text-xl" />
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">Calendar</h3>
-                      <p className="text-gray-500 text-sm">Click on a date to view events</p>
+                      <h3 className="text-lg font-semibold text-foreground">Calendar</h3>
+                      <p className="text-default-500 text-sm">Click on a date to view events</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -381,7 +391,7 @@ export default function CalendarPage() {
                 <div className="grid grid-cols-7 gap-1 text-center">
                   {/* Calendar Header */}
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="p-2 text-sm font-semibold text-gray-600 bg-gray-50 rounded">
+                    <div key={day} className="p-2 text-sm font-semibold text-default-600 bg-content1 rounded">
                       {day}
                     </div>
                   ))}
@@ -406,9 +416,9 @@ export default function CalendarPage() {
                       <div
                         key={i}
                         className={`
-                          p-2 min-h-[60px] border border-gray-200 rounded cursor-pointer hover:bg-gray-50
-                          ${isCurrentMonth ? 'bg-white' : 'bg-gray-50 text-gray-400'}
-                          ${isToday ? 'bg-blue-100 border-blue-300' : ''}
+                          p-2 min-h-[60px] border border-default-300 rounded cursor-pointer hover:bg-content1
+                          ${isCurrentMonth ? 'bg-content1' : 'bg-content1 text-default-400'}
+                          ${isToday ? 'bg-primary-100 border-primary-300' : ''}
                         `}
                         onClick={() => handleDateClick(date)}
                       >
@@ -432,7 +442,7 @@ export default function CalendarPage() {
                           ))}
                           {dayEvents.length > 2 && (
                             <div 
-                              className="text-xs text-gray-500 cursor-pointer hover:text-gray-700 hover:bg-gray-100 rounded px-1"
+                              className="text-xs text-default-500 cursor-pointer hover:text-default-700 hover:bg-content2 rounded px-1"
                               onClick={() => handleDateClick(date)}
                             >
                               +{dayEvents.length - 2} more
@@ -453,30 +463,40 @@ export default function CalendarPage() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:clock" className="text-blue-600 text-xl" />
+                  <Icon icon="lucide:clock" className="text-primary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Upcoming Events</h3>
-                    <p className="text-gray-500 text-sm">Next 5 events</p>
+                    <h3 className="text-lg font-semibold text-foreground">Upcoming Events</h3>
+                    <p className="text-default-500 text-sm">Next 5 events</p>
                   </div>
                 </div>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="space-y-3">
                   {upcomingEvents.length === 0 ? (
-                    <p className="text-gray-500 text-sm text-center py-4">No upcoming events</p>
+                    <div className="text-center py-4">
+                      <Icon icon="lucide:calendar-x" className="w-8 h-8 text-default-400 mx-auto mb-2" />
+                      <p className="text-default-500 text-sm">No upcoming events</p>
+                      <p className="text-default-400 text-xs mt-1">Click "Add Event" to create your first event</p>
+                    </div>
                   ) : (
                     upcomingEvents.map((event) => (
-                      <div key={event.id} className="p-3 bg-gray-50 rounded-lg">
+                      <div key={event.id} className="p-3 bg-content1 rounded-lg border border-default-200">
                         <div className="flex items-start gap-3">
-                          <div className={`w-3 h-3 rounded-full mt-1 bg-${event.color}-500`} />
+                          <div 
+                            className="w-3 h-3 rounded-full mt-1 flex-shrink-0" 
+                            style={{ backgroundColor: event.color }}
+                          />
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900 text-sm truncate">{event.title}</p>
-                            <p className="text-xs text-gray-500">{event.date} at {event.time}</p>
+                            <p className="font-medium text-foreground text-sm truncate">{event.title}</p>
+                            <p className="text-xs text-default-500">{event.date} at {event.time}</p>
                             {event.location && (
-                              <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                                <Icon icon="lucide:map-pin" className="w-3 h-3" />
-                                {event.location}
+                              <p className="text-xs text-default-400 flex items-center gap-1 mt-1">
+                                <Icon icon="lucide:map-pin" className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">{event.location}</span>
                               </p>
+                            )}
+                            {event.description && (
+                              <p className="text-xs text-default-400 mt-1 line-clamp-2">{event.description}</p>
                             )}
                           </div>
                         </div>
@@ -496,10 +516,10 @@ export default function CalendarPage() {
               <>
                 <ModalHeader className="flex flex-col gap-1">
                   <div className="flex items-center gap-3">
-                    <Icon icon={editingEvent ? "lucide:edit" : "lucide:plus"} className="text-blue-600 text-xl" />
+                    <Icon icon={editingEvent ? "lucide:edit" : "lucide:plus"} className="text-primary-600 text-xl" />
                     <div>
                       <h3 className="text-lg font-semibold">{editingEvent ? 'Edit Event' : 'Add New Event'}</h3>
-                      <p className="text-sm text-gray-500">{editingEvent ? 'Update calendar event details' : 'Create a new calendar event'}</p>
+                      <p className="text-sm text-default-500">{editingEvent ? 'Update calendar event details' : 'Create a new calendar event'}</p>
                     </div>
                   </div>
                 </ModalHeader>
@@ -717,20 +737,20 @@ export default function CalendarPage() {
               <>
                 <ModalHeader className="flex flex-col gap-1">
                   <div className="flex items-center gap-3">
-                    <Icon icon="lucide:calendar" className="text-purple-600 text-xl" />
+                    <Icon icon="lucide:calendar" className="text-secondary-600 text-xl" />
                     <div>
                       <h3 className="text-lg font-semibold">Events for {selectedDate.toLocaleDateString()}</h3>
-                      <p className="text-sm text-gray-500">{selectedDayEvents.length} event(s)</p>
+                      <p className="text-sm text-default-500">{selectedDayEvents.length} event(s)</p>
                     </div>
                   </div>
                 </ModalHeader>
                 <ModalBody>
                   <div className="max-h-96 overflow-y-auto space-y-3">
                     {selectedDayEvents.length === 0 ? (
-                      <p className="text-gray-500 text-center py-4">No events for this date</p>
+                      <p className="text-default-500 text-center py-4">No events for this date</p>
                     ) : (
                       selectedDayEvents.map((event) => (
-                        <div key={event.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div key={event.id} className="p-4 bg-content1 rounded-lg border border-default-300">
                           <div className="flex items-start gap-3">
                             <div 
                               className="w-4 h-4 rounded-full mt-1 flex-shrink-0" 
@@ -739,16 +759,16 @@ export default function CalendarPage() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between gap-2">
                                 <div className="flex-1 min-w-0">
-                                  <h4 className="font-semibold text-gray-900 truncate">{event.title}</h4>
-                                  <p className="text-sm text-gray-600 mt-1">{event.time}</p>
+                                  <h4 className="font-semibold text-foreground truncate">{event.title}</h4>
+                                  <p className="text-sm text-default-600 mt-1">{event.time}</p>
                                   {event.location && (
-                                    <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
+                                    <p className="text-sm text-default-500 flex items-center gap-1 mt-1">
                                       <Icon icon="lucide:map-pin" className="w-3 h-3 flex-shrink-0" />
                                       <span className="truncate">{event.location}</span>
                                     </p>
                                   )}
                                   {event.description && (
-                                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{event.description}</p>
+                                    <p className="text-sm text-default-600 mt-2 line-clamp-2">{event.description}</p>
                                   )}
                                   <div className="flex items-center gap-2 mt-2 flex-wrap">
                                     <Chip size="sm" variant="flat" className="text-xs">

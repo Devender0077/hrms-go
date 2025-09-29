@@ -249,36 +249,36 @@ export default function Users() {
         label: "Total Users",
         value: totalUsers,
         icon: "lucide:users",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Active",
         value: activeUsers,
         icon: "lucide:user-check",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Inactive",
         value: inactiveUsers,
         icon: "lucide:user-x",
-        color: "text-gray-600",
-        bgColor: "bg-gray-100"
+        color: "text-default-600",
+        bgColor: "bg-content2"
       },
       {
         label: "Suspended",
         value: suspendedUsers,
         icon: "lucide:user-minus",
-        color: "text-orange-600",
-        bgColor: "bg-orange-100"
+        color: "text-warning-600",
+        bgColor: "bg-warning-100"
       },
       {
         label: "Pending",
         value: pendingUsers,
         icon: "lucide:user-clock",
-        color: "text-purple-600",
-        bgColor: "bg-purple-100"
+        color: "text-secondary-600",
+        bgColor: "bg-secondary-100"
       }
     ];
   }, [users]);
@@ -477,17 +477,17 @@ export default function Users() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl">
-              <Icon icon="lucide:users" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:users" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Users</h1>
-              <p className="text-gray-600 mt-1">Manage system users and their permissions</p>
+              <h1 className="text-3xl font-bold text-foreground">Users</h1>
+              <p className="text-default-600 mt-1">Manage system users and their permissions</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -535,7 +535,7 @@ export default function Users() {
                 placeholder="Search users..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+                startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
               <Select
                 label="Role"
@@ -574,7 +574,7 @@ export default function Users() {
                 ))}
               </Select>
               <div className="flex items-end">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-default-600">
                   Showing {filteredUsers.length} of {users.length} users
                 </div>
               </div>
@@ -586,10 +586,10 @@ export default function Users() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-blue-600 text-xl" />
+              <Icon icon="lucide:table" className="text-primary-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Users List</h3>
-                <p className="text-gray-500 text-sm">Manage system users and access</p>
+                <h3 className="text-lg font-semibold text-foreground">Users List</h3>
+                <p className="text-default-500 text-sm">Manage system users and access</p>
               </div>
             </div>
           </CardHeader>
@@ -614,9 +614,9 @@ export default function Users() {
                           size="sm"
                         />
                         <div>
-                          <p className="font-medium text-gray-900">{user.fullName}</p>
-                          <p className="text-sm text-gray-500">{user.email}</p>
-                          <p className="text-xs text-gray-400">@{user.username}</p>
+                          <p className="font-medium text-foreground">{user.fullName}</p>
+                          <p className="text-sm text-default-500">{user.email}</p>
+                          <p className="text-xs text-default-400">@{user.username}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -640,8 +640,8 @@ export default function Users() {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{user.department}</p>
-                        <p className="text-sm text-gray-500">{user.position}</p>
+                        <p className="font-medium text-foreground">{user.department}</p>
+                        <p className="text-sm text-default-500">{user.position}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -649,18 +649,18 @@ export default function Users() {
                         {user.lastLogin ? (
                           <>
                             <p className="text-sm font-medium">{new Date(user.lastLogin).toLocaleDateString()}</p>
-                            <p className="text-xs text-gray-500">{new Date(user.lastLogin).toLocaleTimeString()}</p>
+                            <p className="text-xs text-default-500">{new Date(user.lastLogin).toLocaleTimeString()}</p>
                           </>
                         ) : (
-                          <span className="text-sm text-gray-400">Never</span>
+                          <span className="text-sm text-default-400">Never</span>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className={`w-2 h-2 rounded-full ${user.isEmailVerified ? 'bg-green-500' : 'bg-gray-300'}`} title="Email Verified" />
-                        <div className={`w-2 h-2 rounded-full ${user.isPhoneVerified ? 'bg-green-500' : 'bg-gray-300'}`} title="Phone Verified" />
-                        <div className={`w-2 h-2 rounded-full ${user.twoFactorEnabled ? 'bg-blue-500' : 'bg-gray-300'}`} title="2FA Enabled" />
+                        <div className={`w-2 h-2 rounded-full ${user.isEmailVerified ? 'bg-success' : 'bg-content4'}`} title="Email Verified" />
+                        <div className={`w-2 h-2 rounded-full ${user.isPhoneVerified ? 'bg-success' : 'bg-content4'}`} title="Phone Verified" />
+                        <div className={`w-2 h-2 rounded-full ${user.twoFactorEnabled ? 'bg-primary' : 'bg-content4'}`} title="2FA Enabled" />
                       </div>
                     </TableCell>
                     <TableCell>
@@ -923,8 +923,8 @@ export default function Users() {
                     />
                     <div>
                       <h3 className="text-2xl font-bold">{selectedUser.fullName}</h3>
-                      <p className="text-gray-600">{selectedUser.email}</p>
-                      <p className="text-gray-600">@{selectedUser.username}</p>
+                      <p className="text-default-600">{selectedUser.email}</p>
+                      <p className="text-default-600">@{selectedUser.username}</p>
                     </div>
                   </div>
                   

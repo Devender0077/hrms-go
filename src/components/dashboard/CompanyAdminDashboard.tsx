@@ -113,17 +113,17 @@ export default function CompanyAdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content1/50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl">
-              <Icon icon="lucide:building-2" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-success-500 to-primary-600 rounded-xl">
+              <Icon icon="lucide:building-2" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Company Admin Dashboard</h1>
-              <p className="text-gray-600 mt-1">Manage your organization and employees</p>
+              <h1 className="text-3xl font-bold text-foreground">Company Admin Dashboard</h1>
+              <p className="text-default-600 mt-1">Manage your organization and employees</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -157,12 +157,12 @@ export default function CompanyAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Total Employees</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{companyStats.totalEmployees}</p>
-                    <p className="text-green-600 text-sm mt-1">+{companyStats.newHires} new hires</p>
+                    <p className="text-default-500 text-sm font-medium">Total Employees</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{companyStats.totalEmployees}</p>
+                    <p className="text-success-600 text-sm mt-1">+{companyStats.newHires} new hires</p>
                   </div>
-                  <div className="p-3 bg-blue-100 rounded-xl">
-                    <Icon icon="lucide:users" className="text-blue-600 text-2xl" />
+                  <div className="p-3 bg-primary-100 rounded-xl">
+                    <Icon icon="lucide:users" className="text-primary-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -178,12 +178,12 @@ export default function CompanyAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Attendance Rate</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{companyStats.attendanceRate}%</p>
-                    <p className="text-green-600 text-sm mt-1">+2.1% from last month</p>
+                    <p className="text-default-500 text-sm font-medium">Attendance Rate</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{companyStats.attendanceRate}%</p>
+                    <p className="text-success-600 text-sm mt-1">+2.1% from last month</p>
                   </div>
-                  <div className="p-3 bg-green-100 rounded-xl">
-                    <Icon icon="lucide:user-check" className="text-green-600 text-2xl" />
+                  <div className="p-3 bg-success-100 rounded-xl">
+                    <Icon icon="lucide:user-check" className="text-success-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -199,12 +199,12 @@ export default function CompanyAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Pending Approvals</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{companyStats.pendingApprovals}</p>
-                    <p className="text-orange-600 text-sm mt-1">Requires attention</p>
+                    <p className="text-default-500 text-sm font-medium">Pending Approvals</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{companyStats.pendingApprovals}</p>
+                    <p className="text-warning-600 text-sm mt-1">Requires attention</p>
                   </div>
-                  <div className="p-3 bg-orange-100 rounded-xl">
-                    <Icon icon="lucide:clock" className="text-orange-600 text-2xl" />
+                  <div className="p-3 bg-warning-100 rounded-xl">
+                    <Icon icon="lucide:clock" className="text-warning-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -220,12 +220,12 @@ export default function CompanyAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Departments</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{companyStats.departmentCount}</p>
-                    <p className="text-blue-600 text-sm mt-1">Active departments</p>
+                    <p className="text-default-500 text-sm font-medium">Departments</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{companyStats.departmentCount}</p>
+                    <p className="text-primary-600 text-sm mt-1">Active departments</p>
                   </div>
-                  <div className="p-3 bg-purple-100 rounded-xl">
-                    <Icon icon="lucide:building" className="text-purple-600 text-2xl" />
+                  <div className="p-3 bg-secondary-100 rounded-xl">
+                    <Icon icon="lucide:building" className="text-secondary-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -243,10 +243,10 @@ export default function CompanyAdminDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:trending-up" className="text-blue-600 text-xl" />
+                  <Icon icon="lucide:trending-up" className="text-primary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Attendance Trends</h3>
-                    <p className="text-gray-500 text-sm">Monthly attendance overview</p>
+                    <h3 className="text-lg font-semibold text-foreground">Attendance Trends</h3>
+                    <p className="text-default-500 text-sm">Monthly attendance overview</p>
                   </div>
                 </div>
               </CardHeader>
@@ -288,10 +288,10 @@ export default function CompanyAdminDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:pie-chart" className="text-purple-600 text-xl" />
+                  <Icon icon="lucide:pie-chart" className="text-secondary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Department Distribution</h3>
-                    <p className="text-gray-500 text-sm">Employee count by department</p>
+                    <h3 className="text-lg font-semibold text-foreground">Department Distribution</h3>
+                    <p className="text-default-500 text-sm">Employee count by department</p>
                   </div>
                 </div>
               </CardHeader>
@@ -330,10 +330,10 @@ export default function CompanyAdminDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:bar-chart-3" className="text-green-600 text-xl" />
+                  <Icon icon="lucide:bar-chart-3" className="text-success-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Department Performance</h3>
-                    <p className="text-gray-500 text-sm">Budget utilization by department</p>
+                    <h3 className="text-lg font-semibold text-foreground">Department Performance</h3>
+                    <p className="text-default-500 text-sm">Budget utilization by department</p>
                   </div>
                 </div>
               </CardHeader>
@@ -342,15 +342,15 @@ export default function CompanyAdminDashboard() {
                   {departmentData.map((dept, index) => (
                     <div key={index} className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-gray-700">{dept.name}</span>
-                        <span className="text-sm font-semibold text-gray-900">{dept.utilization}%</span>
+                        <span className="text-sm font-medium text-default-700">{dept.name}</span>
+                        <span className="text-sm font-semibold text-foreground">{dept.utilization}%</span>
                       </div>
                       <Progress 
                         value={dept.utilization} 
                         color={dept.utilization > 90 ? "success" : dept.utilization > 80 ? "warning" : "danger"}
                         className="h-2"
                       />
-                      <div className="flex justify-between text-xs text-gray-500">
+                      <div className="flex justify-between text-xs text-default-500">
                         <span>{dept.employees} employees</span>
                         <span>${(dept.budget / 1000).toFixed(0)}k budget</span>
                       </div>
@@ -369,17 +369,17 @@ export default function CompanyAdminDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:clock" className="text-orange-600 text-xl" />
+                  <Icon icon="lucide:clock" className="text-warning-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Pending Approvals</h3>
-                    <p className="text-gray-500 text-sm">Items requiring your attention</p>
+                    <h3 className="text-lg font-semibold text-foreground">Pending Approvals</h3>
+                    <p className="text-default-500 text-sm">Items requiring your attention</p>
                   </div>
                 </div>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="space-y-4">
                   {pendingApprovals.map((approval) => (
-                    <div key={approval.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={approval.id} className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className={`p-2 bg-${getApprovalColor(approval.type)}-100 rounded-lg`}>
                           <Icon 
@@ -388,12 +388,12 @@ export default function CompanyAdminDashboard() {
                           />
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">{approval.employee}</p>
-                          <p className="text-sm text-gray-500">{approval.department}</p>
+                          <p className="font-medium text-foreground">{approval.employee}</p>
+                          <p className="text-sm text-default-500">{approval.department}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-gray-900">
+                        <p className="font-semibold text-foreground">
                           {approval.type === 'leave' && `${approval.days} days`}
                           {approval.type === 'expense' && `$${approval.amount}`}
                           {approval.type === 'overtime' && `${approval.hours}h`}
@@ -423,25 +423,25 @@ export default function CompanyAdminDashboard() {
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
-                <Icon icon="lucide:user-plus" className="text-blue-600 text-xl" />
+                <Icon icon="lucide:user-plus" className="text-primary-600 text-xl" />
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Recent Hires</h3>
-                  <p className="text-gray-500 text-sm">New employees this month</p>
+                  <h3 className="text-lg font-semibold text-foreground">Recent Hires</h3>
+                  <p className="text-default-500 text-sm">New employees this month</p>
                 </div>
               </div>
             </CardHeader>
             <CardBody className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {recentHires.map((hire, index) => (
-                  <div key={index} className="p-4 bg-gray-50 rounded-lg text-center">
+                  <div key={index} className="p-4 bg-content1 rounded-lg text-center">
                     <Avatar 
                       name={hire.name} 
-                      className="bg-gradient-to-br from-blue-500 to-purple-600 text-white mx-auto mb-3"
+                      className="bg-gradient-to-br from-primary-500 to-secondary-600 text-foreground mx-auto mb-3"
                       size="lg"
                     />
-                    <h4 className="font-semibold text-gray-900">{hire.name}</h4>
-                    <p className="text-sm text-gray-600">{hire.position}</p>
-                    <p className="text-xs text-gray-500 mt-1">{hire.department}</p>
+                    <h4 className="font-semibold text-foreground">{hire.name}</h4>
+                    <p className="text-sm text-default-600">{hire.position}</p>
+                    <p className="text-xs text-default-500 mt-1">{hire.department}</p>
                     <Chip 
                       size="sm" 
                       color="success"

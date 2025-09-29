@@ -257,8 +257,8 @@ const RegularizationPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Attendance Regularization</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Attendance Regularization</h1>
+          <p className="text-default-600 mt-2">
             Submit and manage attendance correction requests
           </p>
         </div>
@@ -270,7 +270,7 @@ const RegularizationPage: React.FC = () => {
           >
             Submit Request
           </Button>
-          <Icon icon="lucide:clock" className="text-4xl text-blue-600" />
+          <Icon icon="lucide:clock" className="text-4xl text-primary-600" />
         </div>
       </div>
 
@@ -282,7 +282,7 @@ const RegularizationPage: React.FC = () => {
               placeholder="Search requests..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
             />
             <Select
@@ -324,10 +324,10 @@ const RegularizationPage: React.FC = () => {
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <Icon icon="lucide:table" className="text-green-600 text-xl" />
+            <Icon icon="lucide:table" className="text-success-600 text-xl" />
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Regularization Requests</h3>
-              <p className="text-gray-500 text-sm">
+              <h3 className="text-lg font-semibold text-foreground">Regularization Requests</h3>
+              <p className="text-default-500 text-sm">
                 {filteredRequests.length} of {requests.length} requests
               </p>
             </div>
@@ -351,8 +351,8 @@ const RegularizationPage: React.FC = () => {
                 <TableRow key={request.id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium text-gray-900">{request.employee_name || 'N/A'}</p>
-                      <p className="text-sm text-gray-500">{request.employee_code || 'N/A'}</p>
+                      <p className="font-medium text-foreground">{request.employee_name || 'N/A'}</p>
+                      <p className="text-sm text-default-500">{request.employee_code || 'N/A'}</p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -380,7 +380,7 @@ const RegularizationPage: React.FC = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <p className="text-sm text-gray-600 truncate max-w-xs">
+                    <p className="text-sm text-default-600 truncate max-w-xs">
                       {request.reason || 'No reason provided'}
                     </p>
                   </TableCell>
@@ -394,7 +394,7 @@ const RegularizationPage: React.FC = () => {
                     </Chip>
                   </TableCell>
                   <TableCell>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-default-500">
                       {new Date(request.submitted_at).toLocaleDateString()}
                     </p>
                   </TableCell>
@@ -551,18 +551,18 @@ const RegularizationPage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Employee</label>
-                        <p className="text-sm text-gray-900">{selectedRequest.employee_name || 'N/A'}</p>
+                        <label className="text-sm font-medium text-default-700">Employee</label>
+                        <p className="text-sm text-foreground">{selectedRequest.employee_name || 'N/A'}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Date</label>
-                        <p className="text-sm text-gray-900">{new Date(selectedRequest.attendance_date).toLocaleDateString()}</p>
+                        <label className="text-sm font-medium text-default-700">Date</label>
+                        <p className="text-sm text-foreground">{new Date(selectedRequest.attendance_date).toLocaleDateString()}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Request Type</label>
+                        <label className="text-sm font-medium text-default-700">Request Type</label>
                         <Chip 
                           color={getRequestTypeColor(selectedRequest.request_type) as any}
                           variant="flat"
@@ -572,7 +572,7 @@ const RegularizationPage: React.FC = () => {
                         </Chip>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Status</label>
+                        <label className="text-sm font-medium text-default-700">Status</label>
                         <Chip 
                           color={getStatusColor(selectedRequest.status) as any}
                           variant="flat"
@@ -587,15 +587,15 @@ const RegularizationPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Current Times</label>
-                        <div className="text-sm text-gray-900">
+                        <label className="text-sm font-medium text-default-700">Current Times</label>
+                        <div className="text-sm text-foreground">
                           {selectedRequest.current_check_in && <div>Check In: {selectedRequest.current_check_in}</div>}
                           {selectedRequest.current_check_out && <div>Check Out: {selectedRequest.current_check_out}</div>}
                         </div>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Requested Times</label>
-                        <div className="text-sm text-gray-900">
+                        <label className="text-sm font-medium text-default-700">Requested Times</label>
+                        <div className="text-sm text-foreground">
                           {selectedRequest.requested_check_in && <div>Check In: {selectedRequest.requested_check_in}</div>}
                           {selectedRequest.requested_check_out && <div>Check Out: {selectedRequest.requested_check_out}</div>}
                         </div>
@@ -603,14 +603,14 @@ const RegularizationPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Reason</label>
-                      <p className="text-sm text-gray-900">{selectedRequest.reason || 'No reason provided'}</p>
+                      <label className="text-sm font-medium text-default-700">Reason</label>
+                      <p className="text-sm text-foreground">{selectedRequest.reason || 'No reason provided'}</p>
                     </div>
 
                     {selectedRequest.review_notes && (
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Review Notes</label>
-                        <p className="text-sm text-gray-900">{selectedRequest.review_notes}</p>
+                        <label className="text-sm font-medium text-default-700">Review Notes</label>
+                        <p className="text-sm text-foreground">{selectedRequest.review_notes}</p>
                       </div>
                     )}
 
@@ -618,15 +618,15 @@ const RegularizationPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Submitted</label>
-                        <p className="text-sm text-gray-900">
+                        <label className="text-sm font-medium text-default-700">Submitted</label>
+                        <p className="text-sm text-foreground">
                           {new Date(selectedRequest.submitted_at).toLocaleString()}
                         </p>
                       </div>
                       {selectedRequest.reviewed_at && (
                         <div>
-                          <label className="text-sm font-medium text-gray-700">Reviewed</label>
-                          <p className="text-sm text-gray-900">
+                          <label className="text-sm font-medium text-default-700">Reviewed</label>
+                          <p className="text-sm text-foreground">
                             {new Date(selectedRequest.reviewed_at).toLocaleString()}
                           </p>
                         </div>

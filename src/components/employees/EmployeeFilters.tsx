@@ -39,7 +39,7 @@ const EmployeeFiltersComponent: React.FC<EmployeeFiltersProps> = ({
             placeholder="Search employees..."
             value={filters.searchQuery}
             onChange={(e) => handleFilterChange('searchQuery', e.target.value)}
-            startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+            startContent={<Icon icon="lucide:search" className="text-default-400" />}
             aria-label="Search employees"
           />
           

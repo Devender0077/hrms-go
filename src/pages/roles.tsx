@@ -201,27 +201,27 @@ const RolesPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl">
-              <Icon icon="lucide:shield-check" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:shield-check" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Roles & Permissions</h1>
-              <p className="text-gray-600">Manage user roles and their access permissions</p>
+              <h1 className="text-2xl font-bold text-foreground">Roles & Permissions</h1>
+              <p className="text-default-600">Manage user roles and their access permissions</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <div className="text-2xl font-bold text-gray-900">{roles.length}</div>
-              <div className="text-sm text-gray-500">Total Roles</div>
+              <div className="text-2xl font-bold text-foreground">{roles.length}</div>
+              <div className="text-sm text-default-500">Total Roles</div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">{permissions.length}</div>
-              <div className="text-sm text-gray-500">Permissions</div>
+              <div className="text-2xl font-bold text-primary-600">{permissions.length}</div>
+              <div className="text-sm text-default-500">Permissions</div>
             </div>
           </div>
         </div>
@@ -233,7 +233,7 @@ const RolesPage: React.FC = () => {
               placeholder="Search roles..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               variant="bordered"
               size="md"
             />
@@ -252,8 +252,8 @@ const RolesPage: React.FC = () => {
         <Card className="shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-gray-900">Role Management</h3>
-              <div className="text-sm text-gray-500">
+              <h3 className="text-lg font-semibold text-foreground">Role Management</h3>
+              <div className="text-sm text-default-500">
                 {filteredRoles.length} of {roles.length} roles
               </div>
             </div>
@@ -272,15 +272,15 @@ const RolesPage: React.FC = () => {
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${
-                          getRoleColor(role.name) === 'danger' ? 'bg-red-500' : 
-                          getRoleColor(role.name) === 'warning' ? 'bg-yellow-500' : 
-                          getRoleColor(role.name) === 'success' ? 'bg-green-500' : 'bg-blue-500'
+                          getRoleColor(role.name) === 'danger' ? 'bg-danger' : 
+                          getRoleColor(role.name) === 'warning' ? 'bg-warning' : 
+                          getRoleColor(role.name) === 'success' ? 'bg-success' : 'bg-primary'
                         }`}></div>
                         <div>
-                          <div className="font-semibold text-gray-900">
+                          <div className="font-semibold text-foreground">
                             {getRoleDisplayName(role.name)}
                           </div>
-                          <div className="text-sm text-gray-500 capitalize">
+                          <div className="text-sm text-default-500 capitalize">
                             {role.name.replace('_', ' ')}
                           </div>
                         </div>
@@ -288,9 +288,9 @@ const RolesPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:key" className="w-4 h-4 text-gray-400" />
+                        <Icon icon="lucide:key" className="w-4 h-4 text-default-400" />
                         <span className="font-medium">{role.permission_count}</span>
-                        <span className="text-sm text-gray-500">permissions</span>
+                        <span className="text-sm text-default-500">permissions</span>
                       </div>
                       {role.permissions.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
@@ -352,15 +352,15 @@ const RolesPage: React.FC = () => {
           <ModalHeader className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
               <div className={`w-3 h-3 rounded-full ${
-                getRoleColor(selectedRole) === 'danger' ? 'bg-red-500' : 
-                getRoleColor(selectedRole) === 'warning' ? 'bg-yellow-500' : 
-                getRoleColor(selectedRole) === 'success' ? 'bg-green-500' : 'bg-blue-500'
+                getRoleColor(selectedRole) === 'danger' ? 'bg-danger' : 
+                getRoleColor(selectedRole) === 'warning' ? 'bg-warning' : 
+                getRoleColor(selectedRole) === 'success' ? 'bg-success' : 'bg-primary'
               }`}></div>
               <div>
-                <h3 className="text-xl font-semibold text-gray-900">
+                <h3 className="text-xl font-semibold text-foreground">
                   Manage Permissions - {getRoleDisplayName(selectedRole)}
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-default-600 mt-1">
                   Select the permissions to grant to this role.
                 </p>
               </div>
@@ -369,10 +369,10 @@ const RolesPage: React.FC = () => {
           <ModalBody>
             <div className="space-y-6">
               {Object.entries(groupedPermissions).map(([module, modulePermissions]) => (
-                <div key={module} className="border border-gray-200 rounded-lg p-4">
+                <div key={module} className="border border-default-300 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Icon icon="lucide:folder" className="w-4 h-4 text-gray-500" />
-                    <h4 className="text-base font-semibold text-gray-900 capitalize">
+                    <Icon icon="lucide:folder" className="w-4 h-4 text-default-500" />
+                    <h4 className="text-base font-semibold text-foreground capitalize">
                       {module.replace('_', ' ')} Module
                     </h4>
                     <Chip size="sm" variant="flat" color="default">
@@ -385,8 +385,8 @@ const RolesPage: React.FC = () => {
                         key={permission.id}
                         className={`flex items-start gap-2 p-2 border rounded transition-all duration-200 cursor-pointer ${
                           selectedPermissions.includes(permission.id)
-                            ? 'border-blue-300 bg-blue-50'
-                            : 'border-gray-200 hover:bg-gray-50'
+                            ? 'border-primary-300 bg-primary-50'
+                            : 'border-default-300 hover:bg-content1'
                         }`}
                         onClick={() => handlePermissionToggle(permission.id)}
                       >
@@ -397,10 +397,10 @@ const RolesPage: React.FC = () => {
                           size="sm"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm text-gray-900">
+                          <div className="font-medium text-sm text-foreground">
                             {permission.permission_name}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-default-500">
                             {permission.description || 'No description'}
                           </div>
                         </div>

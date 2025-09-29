@@ -41,12 +41,12 @@ const DesignationTable: React.FC<DesignationTableProps> = ({
             <TableRow key={designation.id}>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="lucide:award" className="text-purple-600 text-lg" />
+                  <div className="w-10 h-10 bg-secondary-100 rounded-lg flex items-center justify-center">
+                    <Icon icon="lucide:award" className="text-secondary-600 text-lg" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{designation.name}</p>
-                    <p className="text-sm text-gray-500 line-clamp-1">
+                    <p className="font-medium text-foreground">{designation.name}</p>
+                    <p className="text-sm text-default-500 line-clamp-1">
                       {designation.description || 'No description'}
                     </p>
                   </div>
@@ -54,21 +54,21 @@ const DesignationTable: React.FC<DesignationTableProps> = ({
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Icon icon="lucide:building" className="text-gray-400 text-sm" />
+                  <Icon icon="lucide:building" className="text-default-400 text-sm" />
                   <span className="text-sm">{designation.department_name || 'N/A'}</span>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-green-600">{designation.employee_count}</span>
+                  <div className="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-bold text-success-600">{designation.employee_count}</span>
                   </div>
-                  <span className="text-sm text-gray-600">employees</span>
+                  <span className="text-sm text-default-600">employees</span>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Icon icon="lucide:calendar" className="text-gray-400 text-sm" />
+                  <Icon icon="lucide:calendar" className="text-default-400 text-sm" />
                   <span className="text-sm">
                     {new Date(designation.created_at).toLocaleDateString()}
                   </span>

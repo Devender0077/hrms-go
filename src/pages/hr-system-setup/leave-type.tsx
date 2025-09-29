@@ -207,8 +207,8 @@ import React from "react";
             </div>
             <div className="flex gap-2">
               <Button 
-                color="primary" 
-                startContent={<Icon icon="lucide:plus" />} 
+                color="primary" variant="solid" 
+                startContent={<Icon icon="$1" />} 
                 onPress={() => handleOpenModal()}
               >
                 Add Leave Type
@@ -237,7 +237,7 @@ import React from "react";
                       isCompact
                       showControls
                       showShadow
-                      color="primary"
+                      color="primary" variant="solid"
                       page={page}
                       total={pages}
                       onChange={(page) => setPage(page)}
@@ -271,7 +271,7 @@ import React from "react";
                         <Chip 
                           size="sm" 
                           color={leaveType.requiresApproval ? "primary" : "default"}
-                          variant="flat"
+                          variant="solid"
                         >
                           {leaveType.requiresApproval ? "Yes" : "No"}
                         </Chip>
@@ -280,7 +280,7 @@ import React from "react";
                         <Chip 
                           size="sm" 
                           color={leaveType.isPaid ? "success" : "warning"}
-                          variant="flat"
+                          variant="solid"
                         >
                           {leaveType.isPaid ? "Paid" : "Unpaid"}
                         </Chip>
@@ -289,7 +289,7 @@ import React from "react";
                         <Chip 
                           size="sm" 
                           color={statusColorMap[leaveType.status]}
-                          variant="flat"
+                          variant="solid"
                         >
                           {leaveType.status}
                         </Chip>
@@ -299,7 +299,7 @@ import React from "react";
                           <Button 
                             isIconOnly 
                             size="sm" 
-                            variant="light"
+                            variant="ghost"
                             onPress={() => handleOpenModal(leaveType, false)}
                           >
                             <Icon icon="lucide:eye" className="text-default-500" />
@@ -307,7 +307,7 @@ import React from "react";
                           <Button 
                             isIconOnly 
                             size="sm" 
-                            variant="light"
+                            variant="ghost"
                             onPress={() => handleOpenModal(leaveType, true)}
                           >
                             <Icon icon="lucide:edit" className="text-default-500" />
@@ -315,7 +315,7 @@ import React from "react";
                           <Button 
                             isIconOnly 
                             size="sm" 
-                            variant="light"
+                            variant="ghost"
                             onPress={() => handleDelete(leaveType.id)}
                           >
                             <Icon icon="lucide:trash" className="text-danger" />
@@ -396,11 +396,11 @@ import React from "react";
                     </div>
                   </ModalBody>
                   <ModalFooter>
-                    <Button variant="flat" onPress={onClose}>
+                    <Button variant="solid" onPress={onClose} className="font-medium">
                       {!isEditing && selectedLeaveType ? "Close" : "Cancel"}
                     </Button>
                     {(isEditing || !selectedLeaveType) && (
-                      <Button color="primary" onPress={handleSubmit}>
+                      <Button color="primary" variant="solid" onPress={handleSubmit} className="font-medium">
                         {isEditing ? "Update" : "Create"}
                       </Button>
                     )}

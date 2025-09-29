@@ -24,6 +24,7 @@ import React from "react";
       shift_id?: number;
       employment_type: string;
       attendance_policy_id?: number;
+      reporting_to?: number;
       bank_name: string;
       bank_account_number: string;
       bank_routing_number: string;
@@ -44,6 +45,7 @@ import React from "react";
 
     interface EmployeeFormProps {
       employee?: any;
+      employees: Array<{ id: number; first_name: string; last_name: string; employee_id: string }>;
       departments: Array<{ id: number; name: string }>;
       designations: Array<{ id: number; name: string }>;
       branches: Array<{ id: number; name: string }>;
@@ -55,6 +57,7 @@ import React from "react";
     
     const EmployeeForm: React.FC<EmployeeFormProps> = ({
       employee,
+      employees,
       departments,
       designations,
       branches,
@@ -76,6 +79,7 @@ import React from "react";
         shift_id: employee?.shift_id || undefined,
         employment_type: employee?.employment_type || 'full_time',
         attendance_policy_id: employee?.attendance_policy_id || undefined,
+        reporting_to: employee?.reporting_to || undefined,
         bank_name: employee?.bank_name || '',
         bank_account_number: employee?.bank_account_number || '',
         bank_routing_number: employee?.bank_routing_number || '',
@@ -122,6 +126,7 @@ import React from "react";
             shift_id: employee.shift_id || undefined,
             employment_type: employee.employment_type || 'full_time',
             attendance_policy_id: employee.attendance_policy_id || undefined,
+            reporting_to: employee.reporting_to || undefined,
             bank_name: employee.bank_name || '',
             bank_account_number: employee.bank_account_number || '',
             bank_routing_number: employee.bank_routing_number || '',
@@ -508,6 +513,31 @@ import React from "react";
                 isRequired
                 className="rounded-lg"
               />
+              
+              <Select
+                label="Reports To"
+                placeholder="Select reporting manager"
+                selectedKeys={formData.reporting_to ? [formData.reporting_to.toString()] : []}
+                onSelectionChange={(keys) => {
+                  const selected = Array.from(keys)[0] as string;
+                  setFormData({...formData, reporting_to: selected ? parseInt(selected) : undefined});
+                }}
+                className="rounded-lg"
+                aria-label="Reports To"
+                description="Select the manager this employee reports to"
+              >
+                <SelectItem key="none" textValue="No Manager">
+                  No Manager (Top Level)
+                </SelectItem>
+                {employees
+                  .filter(emp => !employee || emp.id !== employee.id) // Don't allow self-reporting
+                  .map((emp) => (
+                    <SelectItem key={emp.id.toString()} textValue={`${emp.first_name} ${emp.last_name} (${emp.employee_id})`}>
+                      {emp.first_name} {emp.last_name} ({emp.employee_id})
+                    </SelectItem>
+                  ))
+                }
+              </Select>
             </div>
             
             <Divider />

@@ -170,29 +170,29 @@ export default function PayrollReport() {
         label: "Total Employees",
         value: totalEmployees,
         icon: "lucide:users",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Total Gross Salary",
         value: `$${(totalGrossSalary / 1000).toFixed(0)}k`,
         icon: "lucide:dollar-sign",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Total Deductions",
         value: `$${(totalDeductions / 1000).toFixed(0)}k`,
         icon: "lucide:minus-circle",
-        color: "text-red-600",
-        bgColor: "bg-red-100"
+        color: "text-danger-600",
+        bgColor: "bg-danger-100"
       },
       {
         label: "Total Net Salary",
         value: `$${(totalNetSalary / 1000).toFixed(0)}k`,
         icon: "lucide:wallet",
-        color: "text-purple-600",
-        bgColor: "bg-purple-100"
+        color: "text-secondary-600",
+        bgColor: "bg-secondary-100"
       }
     ];
   }, []);
@@ -240,14 +240,14 @@ export default function PayrollReport() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <ReportHeader
           title="Payroll Report"
           description="Comprehensive payroll analysis and salary distribution"
           icon="lucide:credit-card"
-          iconColor="from-green-500 to-emerald-600"
+          iconColor="from-success-500 to-emerald-600"
           onExport={handleExport}
           onRefresh={handleRefresh}
           isExporting={isExporting}
@@ -265,12 +265,12 @@ export default function PayrollReport() {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <select
                 value={selectedDepartment}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {departments.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
@@ -279,7 +279,7 @@ export default function PayrollReport() {
               <select
                 value={selectedPayPeriod}
                 onChange={(e) => setSelectedPayPeriod(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {payPeriods.map(period => (
                   <option key={period} value={period}>{period}</option>
@@ -288,14 +288,14 @@ export default function PayrollReport() {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {statuses.map(status => (
                   <option key={status} value={status}>{status}</option>
                 ))}
               </select>
               <div className="flex items-end">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-default-600">
                   Showing {filteredData.length} of {payrollReportData.length} records
                 </div>
               </div>
@@ -307,10 +307,10 @@ export default function PayrollReport() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-green-600 text-xl" />
+              <Icon icon="lucide:table" className="text-success-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Payroll Records</h3>
-                <p className="text-gray-500 text-sm">Employee salary details and payment status</p>
+                <h3 className="text-lg font-semibold text-foreground">Payroll Records</h3>
+                <p className="text-default-500 text-sm">Employee salary details and payment status</p>
               </div>
             </div>
           </CardHeader>
@@ -333,9 +333,9 @@ export default function PayrollReport() {
                   <TableRow key={record.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{record.employeeName}</p>
-                        <p className="text-sm text-gray-500">{record.employeeId}</p>
-                        <p className="text-sm text-gray-500">{record.position}</p>
+                        <p className="font-medium text-foreground">{record.employeeName}</p>
+                        <p className="text-sm text-default-500">{record.employeeId}</p>
+                        <p className="text-sm text-default-500">{record.position}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -344,42 +344,42 @@ export default function PayrollReport() {
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <p className="font-medium text-gray-900">{record.payPeriod}</p>
+                      <p className="font-medium text-foreground">{record.payPeriod}</p>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:dollar-sign" className="w-4 h-4 text-blue-500" />
+                        <Icon icon="lucide:dollar-sign" className="w-4 h-4 text-primary" />
                         <span className="font-medium">${record.basicSalary.toLocaleString()}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:plus" className="w-4 h-4 text-green-500" />
-                        <span className="font-medium text-green-600">${record.allowances.toLocaleString()}</span>
+                        <Icon icon="lucide:plus" className="w-4 h-4 text-success" />
+                        <span className="font-medium text-success-600">${record.allowances.toLocaleString()}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:clock" className="w-4 h-4 text-orange-500" />
-                        <span className="font-medium text-orange-600">${record.overtime.toLocaleString()}</span>
+                        <Icon icon="lucide:clock" className="w-4 h-4 text-warning" />
+                        <span className="font-medium text-warning-600">${record.overtime.toLocaleString()}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:gift" className="w-4 h-4 text-purple-500" />
-                        <span className="font-medium text-purple-600">${record.bonuses.toLocaleString()}</span>
+                        <Icon icon="lucide:gift" className="w-4 h-4 text-secondary" />
+                        <span className="font-medium text-secondary-600">${record.bonuses.toLocaleString()}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:minus" className="w-4 h-4 text-red-500" />
-                        <span className="font-medium text-red-600">${record.deductions.toLocaleString()}</span>
+                        <Icon icon="lucide:minus" className="w-4 h-4 text-danger" />
+                        <span className="font-medium text-danger-600">${record.deductions.toLocaleString()}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:wallet" className="w-4 h-4 text-green-500" />
-                        <span className="font-bold text-green-600">${record.netSalary.toLocaleString()}</span>
+                        <Icon icon="lucide:wallet" className="w-4 h-4 text-success" />
+                        <span className="font-bold text-success-600">${record.netSalary.toLocaleString()}</span>
                       </div>
                     </TableCell>
                     <TableCell>

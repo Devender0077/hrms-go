@@ -115,10 +115,10 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                   <Icon icon="lucide:key" className="text-warning-600 text-xl" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-foreground">
                     Change Password
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-default-500">
                     Reset password for {employee.first_name} {employee.last_name}
                   </p>
                 </div>
@@ -126,10 +126,10 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
             </ModalHeader>
             <ModalBody>
               <div className="space-y-4">
-                <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="p-3 bg-primary-50 rounded-lg border border-primary-200">
                   <div className="flex items-start gap-2">
-                    <Icon icon="lucide:info" className="text-blue-600 text-sm mt-0.5" />
-                    <div className="text-sm text-blue-800">
+                    <Icon icon="lucide:info" className="text-primary-600 text-sm mt-0.5" />
+                    <div className="text-sm text-primary-800">
                       <p className="font-medium">Employee Information:</p>
                       <p>Name: {employee.first_name} {employee.last_name}</p>
                       <p>Employee ID: {employee.employee_id}</p>
@@ -164,10 +164,10 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                   />
                 </div>
 
-                <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                <div className="p-3 bg-warning-50 rounded-lg border border-yellow-200">
                   <div className="flex items-start gap-2">
-                    <Icon icon="lucide:alert-triangle" className="text-yellow-600 text-sm mt-0.5" />
-                    <div className="text-sm text-yellow-800">
+                    <Icon icon="lucide:alert-triangle" className="text-warning-600 text-sm mt-0.5" />
+                    <div className="text-sm text-warning-800">
                       <p className="font-medium">Important:</p>
                       <p>This will immediately change the employee's login password. Make sure to inform them of the new password.</p>
                     </div>

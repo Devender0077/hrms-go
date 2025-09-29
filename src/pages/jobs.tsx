@@ -240,8 +240,8 @@ export default function JobsPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Job Postings</h1>
-          <p className="text-gray-600">Manage job postings and recruitment</p>
+          <h1 className="text-2xl font-bold text-foreground">Job Postings</h1>
+          <p className="text-default-600">Manage job postings and recruitment</p>
         </div>
         <Button
           color="primary"
@@ -260,7 +260,7 @@ export default function JobsPage() {
               placeholder="Search jobs..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="max-w-sm"
             />
             <div className="flex gap-2">
@@ -301,7 +301,7 @@ export default function JobsPage() {
                   <TableCell>
                     <div>
                       <p className="font-semibold">{job.title}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-default-500">
                         {job.vacancies} vacancy{job.vacancies !== 1 ? 'ies' : ''}
                       </p>
                     </div>

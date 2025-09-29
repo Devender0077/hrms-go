@@ -33,7 +33,6 @@ import PermissionsPage from "./pages/users/permissions";
 
 // Employee Management Pages
 import EmployeeDocumentsPage from "./pages/employees/documents";
-import EmployeeSalariesPage from "./pages/employees/salaries";
 import EmployeeContractsPage from "./pages/employees/contracts";
 
 // Timekeeping Pages
@@ -45,6 +44,12 @@ import Regulations from "./pages/timekeeping/regulations";
 import Regularization from "./pages/timekeeping/regularization";
 import Expenses from "./pages/expenses";
 import Payroll from "./pages/payroll";
+import SalaryComponentsPage from "./pages/payroll/salary-components";
+import EmployeeSalariesPage from "./pages/payroll/employee-salaries";
+import EmployeeSalaryManagementPage from "./pages/employees/salaries";
+import PayslipsPage from "./pages/payroll/payslips";
+import ColorTest from "./pages/color-test";
+import ThemeTest from "./pages/theme-test";
 // Individual Report Pages
 import IncomeExpenseReport from "./pages/reports/income-expense";
 import MonthlyAttendanceReport from "./pages/reports/monthly-attendance";
@@ -61,7 +66,7 @@ import Assets from "./pages/assets";
 import AssetAssignments from "./pages/asset-assignments";
 import Users from "./pages/users";
 import AuditLogs from "./pages/audit-logs";
-import OrganizationChart from "./pages/organization/org-chart";
+import OrganizationChart from "./pages/organization/org-chart-unicef";
 import Settings from "./pages/settings";
 import Profile from "./pages/profile";
 import Roles from "./pages/roles";
@@ -133,6 +138,28 @@ export default function App() {
           }
         />
 
+        {/* Color Test Route */}
+        <Route
+          path="/dashboard/color-test"
+          element={
+            <ProtectedRoute requiredPermissions={["dashboard.view"]}>
+              <DashboardLayout>
+                <ColorTest />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/theme-test"
+          element={
+            <ProtectedRoute requiredPermissions={["dashboard.view"]}>
+              <DashboardLayout>
+                <ThemeTest />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         {/* Calendar Route */}
         <Route
           path="/dashboard/calendar"
@@ -189,7 +216,7 @@ export default function App() {
               roles={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
-                <EmployeeSalariesPage />
+                <EmployeeSalaryManagementPage />
               </DashboardLayout>
             </ProtectedRoute>
           }
@@ -378,6 +405,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/leave-management"
+          element={
+            <ProtectedRoute requiredPermissions={["leave.view"]}>
+              <DashboardLayout>
+                <LeaveManagement />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Expenses Routes */}
         <Route
@@ -400,6 +437,42 @@ export default function App() {
             >
               <DashboardLayout>
               <Payroll />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/payroll/salary-components"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+              <SalaryComponentsPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/payroll/employee-salaries"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+              <EmployeeSalariesPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/payroll/payslips"
+          element={
+            <ProtectedRoute
+              roles={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+              <PayslipsPage />
               </DashboardLayout>
             </ProtectedRoute>
           }

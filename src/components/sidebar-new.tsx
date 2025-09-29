@@ -196,10 +196,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
   if (permissionsLoading) {
     return (
-      <div className="h-full bg-white border-r border-gray-200 flex items-center justify-center">
+      <div className="h-full bg-content1 border-r border-default-300 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lucide:loader-2" className="w-6 h-6 animate-spin text-gray-400 mx-auto mb-2" />
-          <p className="text-sm text-gray-500">Loading...</p>
+          <Icon icon="lucide:loader-2" className="w-6 h-6 animate-spin text-default-400 mx-auto mb-2" />
+          <p className="text-sm text-default-500">Loading...</p>
         </div>
       </div>
     );
@@ -210,13 +210,13 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       initial={false}
       animate={{ width: isOpen ? 280 : 80 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="h-full bg-white border-r border-gray-200 flex flex-col"
+      className="h-full bg-content1 border-r border-default-300 flex flex-col"
     >
       {/* Logo */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-4 border-b border-default-300">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <Icon icon="lucide:building-2" className="text-white text-xl" />
+          <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-lg flex items-center justify-center">
+            <Icon icon="lucide:building-2" className="text-foreground text-xl" />
           </div>
           {isOpen && (
             <motion.div
@@ -224,7 +224,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <h1 className="text-xl font-bold text-gray-900">HRMS</h1>
+              <h1 className="text-xl font-bold text-foreground">HRMS</h1>
             </motion.div>
           )}
         </div>
@@ -241,7 +241,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                 transition={{ delay: sectionIndex * 0.1 }}
                 className="px-4 mb-2"
               >
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <h3 className="text-xs font-semibold text-default-500 uppercase tracking-wider">
                   {section.title}
                 </h3>
               </motion.div>
@@ -271,7 +271,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                           <div className="relative">
                             <Icon icon={item.icon} className="text-lg" />
                             {item.badge && item.badge > 0 && (
-                              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                              <span className="absolute -top-2 -right-2 bg-danger text-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
                                 {item.badge > 99 ? "99+" : item.badge}
                               </span>
                             )}
@@ -299,10 +299,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       </div>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-default-300">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center">
-            <Icon icon="lucide:user" className="text-white text-sm" />
+            <Icon icon="lucide:user" className="text-foreground text-sm" />
           </div>
           {isOpen && (
             <motion.div
@@ -311,10 +311,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
               transition={{ delay: 0.3 }}
               className="flex-1 min-w-0"
             >
-              <p className="text-sm font-medium text-gray-900 truncate">
+              <p className="text-sm font-medium text-foreground truncate">
                 {user?.name || "User"}
               </p>
-              <p className="text-xs text-gray-500 truncate">
+              <p className="text-xs text-default-500 truncate">
                 {user?.role?.replace('_', ' ') || "Role"}
               </p>
             </motion.div>

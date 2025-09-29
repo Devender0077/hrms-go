@@ -28,11 +28,11 @@ export default function ReportHeader({
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div className="flex items-center gap-4">
         <div className={`p-3 bg-gradient-to-br ${iconColor} rounded-xl`}>
-          <Icon icon={icon} className="text-white text-2xl" />
+          <Icon icon={icon} className="text-foreground text-2xl" />
         </div>
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
-          <p className="text-gray-600 mt-1">{description}</p>
+          <h1 className="text-3xl font-bold text-foreground">{title}</h1>
+          <p className="text-default-600 mt-1">{description}</p>
         </div>
       </div>
       <div className="flex gap-3">

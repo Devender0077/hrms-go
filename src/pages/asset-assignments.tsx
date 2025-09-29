@@ -216,36 +216,36 @@ export default function AssetAssignments() {
         label: "Total Assignments",
         value: totalAssignments,
         icon: "lucide:clipboard-list",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Active",
         value: activeAssignments,
         icon: "lucide:check-circle",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Returned",
         value: returnedAssignments,
         icon: "lucide:undo",
-        color: "text-gray-600",
-        bgColor: "bg-gray-100"
+        color: "text-default-600",
+        bgColor: "bg-content2"
       },
       {
         label: "Overdue",
         value: overdueAssignments,
         icon: "lucide:clock",
-        color: "text-orange-600",
-        bgColor: "bg-orange-100"
+        color: "text-warning-600",
+        bgColor: "bg-warning-100"
       },
       {
         label: "Lost",
         value: lostAssignments,
         icon: "lucide:alert-triangle",
-        color: "text-red-600",
-        bgColor: "bg-red-100"
+        color: "text-danger-600",
+        bgColor: "bg-danger-100"
       }
     ];
   }, [assignments]);
@@ -398,17 +398,17 @@ export default function AssetAssignments() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl">
-              <Icon icon="lucide:user-check" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-xl">
+              <Icon icon="lucide:user-check" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Asset Assignments</h1>
-              <p className="text-gray-600 mt-1">Track asset assignments and returns</p>
+              <h1 className="text-3xl font-bold text-foreground">Asset Assignments</h1>
+              <p className="text-default-600 mt-1">Track asset assignments and returns</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -456,7 +456,7 @@ export default function AssetAssignments() {
                 placeholder="Search assignments..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+                startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
               <Select
                 label="Status"
@@ -482,7 +482,7 @@ export default function AssetAssignments() {
                 ))}
               </Select>
               <div className="flex items-end">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-default-600">
                   Showing {filteredAssignments.length} of {assignments.length} assignments
                 </div>
               </div>
@@ -494,10 +494,10 @@ export default function AssetAssignments() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-indigo-600 text-xl" />
+              <Icon icon="lucide:table" className="text-primary-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Asset Assignments</h3>
-                <p className="text-gray-500 text-sm">Track asset assignments and returns</p>
+                <h3 className="text-lg font-semibold text-foreground">Asset Assignments</h3>
+                <p className="text-default-500 text-sm">Track asset assignments and returns</p>
               </div>
             </div>
           </CardHeader>
@@ -517,9 +517,9 @@ export default function AssetAssignments() {
                   <TableRow key={assignment.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{assignment.assetName}</p>
-                        <p className="text-sm text-gray-500">{assignment.assignmentId}</p>
-                        <p className="text-xs text-gray-400">{assignment.assetCategory} • {assignment.assetType}</p>
+                        <p className="font-medium text-foreground">{assignment.assetName}</p>
+                        <p className="text-sm text-default-500">{assignment.assignmentId}</p>
+                        <p className="text-xs text-default-400">{assignment.assetCategory} • {assignment.assetType}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -529,23 +529,23 @@ export default function AssetAssignments() {
                           size="sm"
                         />
                         <div>
-                          <p className="font-medium text-gray-900">{assignment.employeeName}</p>
-                          <p className="text-sm text-gray-500">{assignment.employeeEmail}</p>
-                          <p className="text-xs text-gray-400">{assignment.employeeDepartment}</p>
+                          <p className="font-medium text-foreground">{assignment.employeeName}</p>
+                          <p className="text-sm text-default-500">{assignment.employeeEmail}</p>
+                          <p className="text-xs text-default-400">{assignment.employeeDepartment}</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{assignment.assignedBy}</p>
-                        <p className="text-sm text-gray-500">{new Date(assignment.assignedDate).toLocaleDateString()}</p>
+                        <p className="font-medium text-foreground">{assignment.assignedBy}</p>
+                        <p className="text-sm text-default-500">{new Date(assignment.assignedDate).toLocaleDateString()}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
                         <p className="text-sm font-medium">{new Date(assignment.assignedDate).toLocaleDateString()}</p>
                         {assignment.returnDate && (
-                          <p className="text-xs text-gray-500">Returned: {new Date(assignment.returnDate).toLocaleDateString()}</p>
+                          <p className="text-xs text-default-500">Returned: {new Date(assignment.returnDate).toLocaleDateString()}</p>
                         )}
                       </div>
                     </TableCell>
@@ -728,8 +728,8 @@ export default function AssetAssignments() {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-semibold">Asset Details</h4>
-                    <p className="text-gray-600">{selectedAssignment.assetName}</p>
-                    <p className="text-sm text-gray-500">Assigned to: {selectedAssignment.employeeName}</p>
+                    <p className="text-default-600">{selectedAssignment.assetName}</p>
+                    <p className="text-sm text-default-500">Assigned to: {selectedAssignment.employeeName}</p>
                   </div>
                   <Input
                     label="Return Date"
@@ -783,8 +783,8 @@ export default function AssetAssignments() {
                     />
                     <div>
                       <h3 className="text-xl font-bold">{selectedAssignment.employeeName}</h3>
-                      <p className="text-gray-600">{selectedAssignment.employeeEmail}</p>
-                      <p className="text-gray-600">{selectedAssignment.employeeDepartment}</p>
+                      <p className="text-default-600">{selectedAssignment.employeeEmail}</p>
+                      <p className="text-default-600">{selectedAssignment.employeeDepartment}</p>
                     </div>
                   </div>
                   
@@ -826,14 +826,14 @@ export default function AssetAssignments() {
                   {selectedAssignment.notes && (
                     <div>
                       <h4 className="font-semibold mb-2">Assignment Notes</h4>
-                      <p className="text-gray-700">{selectedAssignment.notes}</p>
+                      <p className="text-default-700">{selectedAssignment.notes}</p>
                     </div>
                   )}
                   
                   {selectedAssignment.returnNotes && (
                     <div>
                       <h4 className="font-semibold mb-2">Return Notes</h4>
-                      <p className="text-gray-700">{selectedAssignment.returnNotes}</p>
+                      <p className="text-default-700">{selectedAssignment.returnNotes}</p>
                     </div>
                   )}
                 </div>

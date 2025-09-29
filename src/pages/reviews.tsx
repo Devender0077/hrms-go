@@ -1,222 +1,102 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Pagination, Button, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Textarea, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Progress } from "@heroui/react";
+import { 
+  Card, 
+  CardBody, 
+  CardHeader,
+  Button,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Avatar,
+  Chip,
+  Input,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Pagination,
+  Select,
+  SelectItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Badge,
+  Textarea,
+  Progress,
+  Spinner
+} from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
-import { PageLayout, PageHeader } from "../components/layout/PageLayout";
-
-// Performance review interface
-interface PerformanceReview {
-  id: number;
-  employeeId: string;
-  employeeName: string;
-  reviewerId: string;
-  reviewerName: string;
-  reviewPeriod: string;
-  reviewType: "annual" | "quarterly" | "probation" | "promotion";
-  status: "draft" | "in-progress" | "completed" | "approved" | "rejected";
-  overallRating: number; // 1-5
-  goalsRating: number;
-  skillsRating: number;
-  behaviorRating: number;
-  attendanceRating: number;
-  scheduledDate: string;
-  completedDate?: string;
-  dueDate: string;
-  department: string;
-  position: string;
-  goals: string[];
-  achievements: string[];
-  areasForImprovement: string[];
-  feedback: string;
-  employeeComments?: string;
-  managerComments?: string;
-  nextReviewDate?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// Sample reviews data
-const initialReviews: PerformanceReview[] = [
-  {
-    id: 1,
-    employeeId: "EMP001",
-    employeeName: "John Smith",
-    reviewerId: "MGR001",
-    reviewerName: "Jane Doe",
-    reviewPeriod: "Q4 2024",
-    reviewType: "quarterly",
-    status: "completed",
-    overallRating: 4.2,
-    goalsRating: 4,
-    skillsRating: 4.5,
-    behaviorRating: 4,
-    attendanceRating: 4.5,
-    scheduledDate: "2024-12-15",
-    completedDate: "2024-12-20",
-    dueDate: "2024-12-31",
-    department: "IT",
-    position: "Senior Software Engineer",
-    goals: ["Complete React certification", "Lead 2 major projects", "Mentor junior developers"],
-    achievements: ["Successfully delivered Project Alpha", "Improved team productivity by 20%", "Completed React certification"],
-    areasForImprovement: ["Time management", "Documentation skills"],
-    feedback: "Excellent performance this quarter. John has shown great leadership skills and technical expertise.",
-    employeeComments: "I'm satisfied with my performance and look forward to taking on more challenging projects.",
-    managerComments: "John has exceeded expectations and is ready for a promotion consideration.",
-    nextReviewDate: "2025-03-31",
-    createdAt: "2024-12-01",
-    updatedAt: "2024-12-20"
-  },
-  {
-    id: 2,
-    employeeId: "EMP002",
-    employeeName: "Sarah Johnson",
-    reviewerId: "MGR002",
-    reviewerName: "Mike Wilson",
-    reviewPeriod: "Annual 2024",
-    reviewType: "annual",
-    status: "in-progress",
-    overallRating: 0,
-    goalsRating: 0,
-    skillsRating: 0,
-    behaviorRating: 0,
-    attendanceRating: 0,
-    scheduledDate: "2025-01-15",
-    dueDate: "2025-01-31",
-    department: "HR",
-    position: "HR Manager",
-    goals: ["Implement new HRIS system", "Reduce recruitment time by 30%", "Improve employee satisfaction"],
-    achievements: [],
-    areasForImprovement: [],
-    feedback: "",
-    createdAt: "2024-12-01",
-    updatedAt: "2024-12-01"
-  },
-  {
-    id: 3,
-    employeeId: "EMP003",
-    employeeName: "Michael Brown",
-    reviewerId: "MGR003",
-    reviewerName: "Lisa Anderson",
-    reviewPeriod: "Probation Review",
-    reviewType: "probation",
-    status: "draft",
-    overallRating: 0,
-    goalsRating: 0,
-    skillsRating: 0,
-    behaviorRating: 0,
-    attendanceRating: 0,
-    scheduledDate: "2025-02-01",
-    dueDate: "2025-02-15",
-    department: "Marketing",
-    position: "Marketing Specialist",
-    goals: ["Learn company processes", "Complete marketing training", "Contribute to 3 campaigns"],
-    achievements: [],
-    areasForImprovement: [],
-    feedback: "",
-    createdAt: "2024-12-01",
-    updatedAt: "2024-12-01"
-  }
-];
+import { usePerformanceReviews, PerformanceReview } from "../hooks/usePerformanceReviews";
+import PageLayout, { PageHeader } from "../components/layout/PageLayout";
 
 const statusColorMap = {
-  draft: "default",
-  "in-progress": "primary",
-  completed: "success",
-  approved: "success",
-  rejected: "danger",
+  "draft": "default",
+  "in_progress": "primary",
+  "completed": "success",
+  "cancelled": "danger",
 };
 
-const typeColorMap = {
-  annual: "primary",
-  quarterly: "secondary",
-  probation: "warning",
-  promotion: "success",
+const ratingColorMap = {
+  1: "danger",
+  2: "warning",
+  3: "primary",
+  4: "success",
+  5: "success",
 };
 
-const employees = [
-  "John Smith",
-  "Sarah Johnson",
-  "Michael Brown",
-  "Emily Davis",
-  "David Wilson",
-  "Lisa Anderson",
-  "Tom Johnson",
-  "Amy Rodriguez"
-];
-
-const reviewers = [
-  "Jane Doe",
-  "Mike Wilson",
-  "Lisa Anderson",
-  "David Chen",
-  "Sarah Miller",
-  "Tom Johnson",
-  "Amy Rodriguez"
-];
-
-const departments = [
-  "IT",
-  "HR",
-  "Marketing",
-  "Sales",
-  "Customer Success",
-  "Finance",
-  "Operations"
-];
-
-export default function Reviews() {
+export default function ReviewsPage() {
+  const { reviews, loading, error, createReview, updateReview, deleteReview } = usePerformanceReviews();
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const [selectedType, setSelectedType] = useState("all");
-  const [selectedEmployee, setSelectedEmployee] = useState("all");
-  const [reviews, setReviews] = useState<PerformanceReview[]>(initialReviews);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen: isViewOpen, onOpen: onViewOpen, onOpenChange: onViewOpenChange } = useDisclosure();
   const [selectedReview, setSelectedReview] = useState<PerformanceReview | null>(null);
-  const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [editingReview, setEditingReview] = useState<PerformanceReview | null>(null);
   
   const rowsPerPage = 10;
   
-  // New review form state
-  const [newReview, setNewReview] = useState<Partial<PerformanceReview>>({
-    employeeId: "",
-    employeeName: "",
-    reviewerId: "",
-    reviewerName: "",
-    reviewPeriod: "",
-    reviewType: "quarterly",
-    status: "draft",
-    overallRating: 0,
-    goalsRating: 0,
-    skillsRating: 0,
-    behaviorRating: 0,
-    attendanceRating: 0,
-    scheduledDate: "",
-    dueDate: "",
-    department: "",
-    position: "",
-    goals: [],
-    achievements: [],
-    areasForImprovement: [],
-    feedback: ""
+  // Form state for new review
+  const [newReview, setNewReview] = useState({
+    employee_id: 1,
+    reviewer_id: 1,
+    cycle_id: 1,
+    review_period_start: "",
+    review_period_end: "",
+    overall_rating: 0,
+    goals_rating: 0,
+    skills_rating: 0,
+    teamwork_rating: 0,
+    communication_rating: 0,
+    leadership_rating: 0,
+    comments: "",
+    strengths: "",
+    areas_for_improvement: "",
+    development_plan: ""
   });
-  
+
   // Filter reviews
   const filteredReviews = useMemo(() => {
     return reviews.filter(review => {
       const matchesSearch = 
-        review.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        review.reviewerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        review.reviewPeriod.toLowerCase().includes(searchQuery.toLowerCase());
+        (review.employee_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (review.reviewer_name || "").toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesStatus = selectedStatus === "all" || review.status === selectedStatus;
-      const matchesType = selectedType === "all" || review.reviewType === selectedType;
-      const matchesEmployee = selectedEmployee === "all" || review.employeeName === selectedEmployee;
       
-      return matchesSearch && matchesStatus && matchesType && matchesEmployee;
+      return matchesSearch && matchesStatus;
     });
-  }, [reviews, searchQuery, selectedStatus, selectedType, selectedEmployee]);
+  }, [reviews, searchQuery, selectedStatus]);
   
   // Paginate filtered reviews
   const paginatedReviews = useMemo(() => {
@@ -227,848 +107,682 @@ export default function Reviews() {
 
   // Calculate statistics
   const stats = useMemo(() => {
-    const totalReviews = reviews.length;
-    const completedReviews = reviews.filter(r => r.status === "completed").length;
-    const inProgressReviews = reviews.filter(r => r.status === "in-progress").length;
-    const overdueReviews = reviews.filter(r => 
-      r.status !== "completed" && new Date(r.dueDate) < new Date()
-    ).length;
+    const total = reviews.length;
+    const draft = reviews.filter(r => r.status === "draft").length;
+    const inProgress = reviews.filter(r => r.status === "in_progress").length;
+    const completed = reviews.filter(r => r.status === "completed").length;
+    const cancelled = reviews.filter(r => r.status === "cancelled").length;
     
-    return [
-      {
-        label: "Total Reviews",
-        value: totalReviews,
-        icon: "lucide:clipboard-check",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
-      },
-      {
-        label: "Completed",
-        value: completedReviews,
-        icon: "lucide:check-circle",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
-      },
-      {
-        label: "In Progress",
-        value: inProgressReviews,
-        icon: "lucide:clock",
-        color: "text-orange-600",
-        bgColor: "bg-orange-100"
-      },
-      {
-        label: "Overdue",
-        value: overdueReviews,
-        icon: "lucide:alert-triangle",
-        color: "text-red-600",
-        bgColor: "bg-red-100"
-      }
-    ];
+    const avgRating = reviews.length > 0 
+      ? reviews.reduce((sum, r) => sum + r.overall_rating, 0) / reviews.length 
+      : 0;
+    
+    return { total, draft, inProgress, completed, cancelled, avgRating };
   }, [reviews]);
 
-  // Handle schedule review
-  const handleScheduleReview = async () => {
-    if (!newReview.employeeName || !newReview.reviewerName || !newReview.scheduledDate || !newReview.dueDate) {
+  // Handle row actions
+  const handleRowAction = (actionKey: string, reviewId: number) => {
+    const review = reviews.find(r => r.id === reviewId);
+    if (!review) return;
+
+    switch (actionKey) {
+      case "view":
+        setSelectedReview(review);
+        onViewOpen();
+        break;
+      case "edit":
+        handleEditReview(review);
+        break;
+      case "delete":
+        handleDeleteReview(reviewId);
+        break;
+    }
+  };
+
+  const handleDeleteReview = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this performance review?")) {
+      try {
+        await deleteReview(id);
+        addToast({
+          title: "Success",
+          description: "Performance review deleted successfully",
+          color: "success"
+        });
+      } catch (error) {
+        addToast({
+          title: "Error",
+          description: "Failed to delete performance review",
+          color: "danger"
+        });
+      }
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!newReview.employee_id || !newReview.reviewer_id || !newReview.review_period_start || !newReview.review_period_end) {
       addToast({
-        title: "Missing Information",
-        description: "Please fill in all required fields (Employee, Reviewer, Scheduled Date, Due Date).",
-        color: "warning",
+        title: "Error",
+        description: "Please fill in all required fields",
+        color: "danger"
       });
       return;
     }
 
-    const review: PerformanceReview = {
-      id: Date.now(),
-      employeeId: newReview.employeeId || `EMP${Date.now()}`,
-      employeeName: newReview.employeeName!,
-      reviewerId: newReview.reviewerId || `MGR${Date.now()}`,
-      reviewerName: newReview.reviewerName!,
-      reviewPeriod: newReview.reviewPeriod || "",
-      reviewType: newReview.reviewType as PerformanceReview["reviewType"] || "quarterly",
-      status: newReview.status as PerformanceReview["status"] || "draft",
-      overallRating: newReview.overallRating || 0,
-      goalsRating: newReview.goalsRating || 0,
-      skillsRating: newReview.skillsRating || 0,
-      behaviorRating: newReview.behaviorRating || 0,
-      attendanceRating: newReview.attendanceRating || 0,
-      scheduledDate: newReview.scheduledDate!,
-      dueDate: newReview.dueDate!,
-      department: newReview.department || "",
-      position: newReview.position || "",
-      goals: newReview.goals || [],
-      achievements: newReview.achievements || [],
-      areasForImprovement: newReview.areasForImprovement || [],
-      feedback: newReview.feedback || "",
-      createdAt: new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0]
-    };
-
-    setReviews(prev => [...prev, review]);
-    setNewReview({
-      employeeId: "",
-      employeeName: "",
-      reviewerId: "",
-      reviewerName: "",
-      reviewPeriod: "",
-      reviewType: "quarterly",
-      status: "draft",
-      overallRating: 0,
-      goalsRating: 0,
-      skillsRating: 0,
-      behaviorRating: 0,
-      attendanceRating: 0,
-      scheduledDate: "",
-      dueDate: "",
-      department: "",
-      position: "",
-      goals: [],
-      achievements: [],
-      areasForImprovement: [],
-      feedback: ""
-    });
-    setIsScheduleModalOpen(false);
-    
-    addToast({
-      title: "Review Scheduled",
-      description: `Performance review scheduled for ${review.employeeName} on ${new Date(review.scheduledDate).toLocaleDateString()}.`,
-      color: "success",
-    });
-  };
-
-  // Handle edit review
-  const handleEditReview = async () => {
-    if (!selectedReview || !newReview.employeeName || !newReview.reviewerName) {
-      addToast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        color: "warning",
+    setIsSubmitting(true);
+    try {
+      if (editingReview) {
+        await updateReview(editingReview.id, newReview);
+        addToast({
+          title: "Success",
+          description: "Performance review updated successfully",
+          color: "success"
+        });
+      } else {
+        await createReview(newReview);
+        addToast({
+          title: "Success",
+          description: "Performance review created successfully",
+          color: "success"
+        });
+      }
+      
+      setNewReview({
+        employee_id: 1,
+        reviewer_id: 1,
+        cycle_id: 1,
+        review_period_start: "",
+        review_period_end: "",
+        overall_rating: 0,
+        goals_rating: 0,
+        skills_rating: 0,
+        teamwork_rating: 0,
+        communication_rating: 0,
+        leadership_rating: 0,
+        comments: "",
+        strengths: "",
+        areas_for_improvement: "",
+        development_plan: ""
       });
-      return;
+      setEditingReview(null);
+      onOpenChange();
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description: "Failed to save performance review",
+        color: "danger"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const updatedReview: PerformanceReview = {
-      ...selectedReview,
-      employeeName: newReview.employeeName!,
-      reviewerName: newReview.reviewerName!,
-      reviewPeriod: newReview.reviewPeriod || selectedReview.reviewPeriod,
-      reviewType: newReview.reviewType as PerformanceReview["reviewType"] || selectedReview.reviewType,
-      status: newReview.status as PerformanceReview["status"] || selectedReview.status,
-      overallRating: newReview.overallRating || selectedReview.overallRating,
-      goalsRating: newReview.goalsRating || selectedReview.goalsRating,
-      skillsRating: newReview.skillsRating || selectedReview.skillsRating,
-      behaviorRating: newReview.behaviorRating || selectedReview.behaviorRating,
-      attendanceRating: newReview.attendanceRating || selectedReview.attendanceRating,
-      scheduledDate: newReview.scheduledDate || selectedReview.scheduledDate,
-      dueDate: newReview.dueDate || selectedReview.dueDate,
-      department: newReview.department || selectedReview.department,
-      position: newReview.position || selectedReview.position,
-      goals: newReview.goals || selectedReview.goals,
-      achievements: newReview.achievements || selectedReview.achievements,
-      areasForImprovement: newReview.areasForImprovement || selectedReview.areasForImprovement,
-      feedback: newReview.feedback || selectedReview.feedback,
-      updatedAt: new Date().toISOString().split('T')[0]
-    };
-
-    setReviews(prev => prev.map(r => r.id === selectedReview.id ? updatedReview : r));
-    setIsEditModalOpen(false);
-    setSelectedReview(null);
-    
-    addToast({
-      title: "Review Updated",
-      description: `Performance review for ${updatedReview.employeeName} has been updated successfully.`,
-      color: "success",
-    });
   };
 
-  // Handle status update
-  const handleStatusUpdate = (review: PerformanceReview, newStatus: PerformanceReview["status"]) => {
-    const updatedReview = {
-      ...review,
-      status: newStatus,
-      completedDate: newStatus === "completed" ? new Date().toISOString().split('T')[0] : undefined,
-      updatedAt: new Date().toISOString().split('T')[0]
-    };
-
-    setReviews(prev => prev.map(r => r.id === review.id ? updatedReview : r));
-    
-    addToast({
-      title: "Status Updated",
-      description: `Review status updated to ${newStatus} for ${review.employeeName}.`,
-      color: "success",
-    });
-  };
-
-  // Handle delete review
-  const handleDeleteReview = (review: PerformanceReview) => {
-    setReviews(prev => prev.filter(r => r.id !== review.id));
-    
-    addToast({
-      title: "Review Deleted",
-      description: `Performance review for ${review.employeeName} has been removed.`,
-      color: "success",
-    });
-  };
-
-  // Open edit modal
-  const openEditModal = (review: PerformanceReview) => {
-    setSelectedReview(review);
+  const handleEditReview = (review: PerformanceReview) => {
+    setEditingReview(review);
     setNewReview({
-      employeeName: review.employeeName,
-      reviewerName: review.reviewerName,
-      reviewPeriod: review.reviewPeriod,
-      reviewType: review.reviewType,
-      status: review.status,
-      overallRating: review.overallRating,
-      goalsRating: review.goalsRating,
-      skillsRating: review.skillsRating,
-      behaviorRating: review.behaviorRating,
-      attendanceRating: review.attendanceRating,
-      scheduledDate: review.scheduledDate,
-      dueDate: review.dueDate,
-      department: review.department,
-      position: review.position,
-      goals: review.goals,
-      achievements: review.achievements,
-      areasForImprovement: review.areasForImprovement,
-      feedback: review.feedback
+      employee_id: review.employee_id,
+      reviewer_id: review.reviewer_id,
+      cycle_id: review.cycle_id,
+      review_period_start: review.review_period_start,
+      review_period_end: review.review_period_end,
+      overall_rating: review.overall_rating,
+      goals_rating: review.goals_rating,
+      skills_rating: review.skills_rating,
+      teamwork_rating: review.teamwork_rating,
+      communication_rating: review.communication_rating,
+      leadership_rating: review.leadership_rating,
+      comments: review.comments || "",
+      strengths: review.strengths || "",
+      areas_for_improvement: review.areas_for_improvement || "",
+      development_plan: review.development_plan || ""
     });
-    setIsEditModalOpen(true);
+    onOpen();
   };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Icon
+        key={i}
+        icon={i < rating ? "lucide:star" : "lucide:star"}
+        className={`w-4 h-4 ${i < rating ? 'text-warning-400 fill-current' : 'text-default-300'}`}
+      />
+    ));
+  };
+
+  if (loading) {
+    return (
+      <PageLayout>
+        <div className="flex justify-center items-center h-64">
+          <Spinner size="lg" />
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageLayout>
+        <div className="text-center text-danger">
+          <p>Error loading performance reviews: {error}</p>
+        </div>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout>
       <PageHeader
         title="Performance Reviews"
-        description="Schedule and manage employee performance reviews"
-        icon="lucide:clipboard-check"
-        iconColor="from-purple-500 to-indigo-600"
+        description="Manage employee performance reviews and evaluations"
         actions={
-          <Button 
+          <Button
             color="primary"
-            startContent={<Icon icon="lucide:plus" />} 
-            onPress={() => setIsScheduleModalOpen(true)}
+            startContent={<Icon icon="lucide:plus" />}
+            onPress={onOpen}
           >
-            Schedule Review
+            Add Review
           </Button>
         }
       />
-        
-        {/* Statistics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
-            <Card key={index} className="shadow-sm">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                  <Icon icon={stat.icon} className={`text-2xl ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-default-500">{stat.label}</p>
-                  <h3 className="text-2xl font-bold">{stat.value}</h3>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
 
-        {/* Filters */}
-        <Card className="border-0 shadow-sm">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <Card>
           <CardBody className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <Input
-                placeholder="Search reviews..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Icon icon="lucide:search" className="text-gray-400" />}
-              />
-              <Select
-                label="Status"
-                placeholder="All Statuses"
-                selectedKeys={[selectedStatus]}
-                onSelectionChange={(keys) => setSelectedStatus(Array.from(keys)[0] as string)}
-              >
-                <SelectItem key="all">All Statuses</SelectItem>
-                <SelectItem key="draft">Draft</SelectItem>
-                <SelectItem key="in-progress">In Progress</SelectItem>
-                <SelectItem key="completed">Completed</SelectItem>
-                <SelectItem key="approved">Approved</SelectItem>
-                <SelectItem key="rejected">Rejected</SelectItem>
-              </Select>
-              <Select
-                label="Type"
-                placeholder="All Types"
-                selectedKeys={[selectedType]}
-                onSelectionChange={(keys) => setSelectedType(Array.from(keys)[0] as string)}
-              >
-                <SelectItem key="all">All Types</SelectItem>
-                <SelectItem key="annual">Annual</SelectItem>
-                <SelectItem key="quarterly">Quarterly</SelectItem>
-                <SelectItem key="probation">Probation</SelectItem>
-                <SelectItem key="promotion">Promotion</SelectItem>
-              </Select>
-              <Select
-                label="Employee"
-                placeholder="All Employees"
-                selectedKeys={[selectedEmployee]}
-                onSelectionChange={(keys) => setSelectedEmployee(Array.from(keys)[0] as string)}
-              >
-                <SelectItem key="all">All Employees</SelectItem>
-                {employees.map(employee => (
-                  <SelectItem key={employee}>{employee}</SelectItem>
-                ))}
-              </Select>
-              <div className="flex items-end">
-                <div className="text-sm text-gray-600">
-                  Showing {filteredReviews.length} of {reviews.length} reviews
-                </div>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-
-        {/* Data Table */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-purple-600 text-xl" />
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Reviews List</h3>
-                <p className="text-gray-500 text-sm">Track and manage performance reviews</p>
+                <p className="text-sm text-default-500">Total Reviews</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
+              </div>
+              <div className="p-3 bg-primary-100 rounded-full">
+                <Icon icon="lucide:clipboard-list" className="w-6 h-6 text-primary-600" />
               </div>
             </div>
-          </CardHeader>
-          <CardBody className="pt-0">
-            <Table aria-label="Reviews table">
-              <TableHeader>
-                <TableColumn>EMPLOYEE</TableColumn>
-                <TableColumn>REVIEWER</TableColumn>
-                <TableColumn>PERIOD</TableColumn>
-                <TableColumn>TYPE</TableColumn>
-                <TableColumn>RATING</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>SCHEDULED DATE</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {paginatedReviews.map((review) => (
-                  <TableRow key={review.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar 
-                          name={review.employeeName}
-                          size="sm"
-                        />
-                        <div>
-                          <p className="font-medium text-gray-900">{review.employeeName}</p>
-                          <p className="text-sm text-gray-500">{review.position}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium text-gray-900">{review.reviewerName}</p>
-                        <p className="text-sm text-gray-500">{review.department}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <p className="font-medium">{review.reviewPeriod}</p>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        size="sm"
-                        color={typeColorMap[review.reviewType] as any}
-                        variant="flat"
-                      >
-                        {review.reviewType}
-                      </Chip>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {review.overallRating > 0 ? (
-                          <>
-                            <div className="flex items-center">
-                              {[1, 2, 3, 4, 5].map(star => (
-                                <Icon
-                                  key={star}
-                                  icon="lucide:star"
-                                  className={`w-4 h-4 ${
-                                    star <= review.overallRating 
-                                      ? "text-yellow-400 fill-current" 
-                                      : "text-gray-300"
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            <span className="text-sm font-medium">{review.overallRating.toFixed(1)}</span>
-                          </>
-                        ) : (
-                          <span className="text-sm text-gray-400">Not rated</span>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        size="sm"
-                        color={statusColorMap[review.status] as any}
-                        variant="flat"
-                      >
-                        {review.status}
-                      </Chip>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="text-sm font-medium">{new Date(review.scheduledDate).toLocaleDateString()}</p>
-                        {new Date(review.dueDate) < new Date() && review.status !== "completed" && (
-                          <p className="text-xs text-red-500">Overdue</p>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={() => {
-                            setSelectedReview(review);
-                            setIsViewModalOpen(true);
-                          }}
-                        >
-                          <Icon icon="lucide:eye" className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={() => openEditModal(review)}
-                        >
-                          <Icon icon="lucide:edit" className="w-4 h-4" />
-                        </Button>
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button size="sm" variant="flat">
-                              <Icon icon="lucide:more-horizontal" className="w-4 h-4" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu>
-                            <DropdownItem key="start" onPress={() => handleStatusUpdate(review, "in-progress")}>
-                              Start Review
-                            </DropdownItem>
-                            <DropdownItem key="complete" onPress={() => handleStatusUpdate(review, "completed")}>
-                              Complete Review
-                            </DropdownItem>
-                            <DropdownItem key="approve" onPress={() => handleStatusUpdate(review, "approved")}>
-                              Approve
-                            </DropdownItem>
-                            <DropdownItem key="reject" onPress={() => handleStatusUpdate(review, "rejected")}>
-                              Reject
-                            </DropdownItem>
-                            <DropdownItem key="delete" className="text-danger" onPress={() => handleDeleteReview(review)}>
-                              Delete
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            
-            {filteredReviews.length > rowsPerPage && (
-              <div className="flex justify-center mt-4">
-                <Pagination
-                  total={Math.ceil(filteredReviews.length / rowsPerPage)}
-                  page={page}
-                  onChange={setPage}
-                  showControls
-                />
-              </div>
-            )}
           </CardBody>
         </Card>
 
-        {/* Schedule Review Modal */}
-        <Modal isOpen={isScheduleModalOpen} onClose={() => setIsScheduleModalOpen(false)} size="2xl">
-          <ModalContent>
-            <ModalHeader>Schedule New Review</ModalHeader>
-            <ModalBody>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Select
-                  label="Employee *"
-                  placeholder="Select employee"
-                  selectedKeys={newReview.employeeName ? [newReview.employeeName] : []}
-                  onSelectionChange={(keys) => setNewReview(prev => ({ ...prev, employeeName: Array.from(keys)[0] as string }))}
-                >
-                  {employees.map(employee => (
-                    <SelectItem key={employee}>{employee}</SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Reviewer *"
-                  placeholder="Select reviewer"
-                  selectedKeys={newReview.reviewerName ? [newReview.reviewerName] : []}
-                  onSelectionChange={(keys) => setNewReview(prev => ({ ...prev, reviewerName: Array.from(keys)[0] as string }))}
-                >
-                  {reviewers.map(reviewer => (
-                    <SelectItem key={reviewer}>{reviewer}</SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  label="Review Period"
-                  placeholder="e.g., Q4 2024, Annual 2024"
-                  value={newReview.reviewPeriod || ""}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, reviewPeriod: e.target.value }))}
-                />
-                <Select
-                  label="Review Type"
-                  placeholder="Select type"
-                  selectedKeys={newReview.reviewType ? [newReview.reviewType] : []}
-                  onSelectionChange={(keys) => setNewReview(prev => ({ ...prev, reviewType: Array.from(keys)[0] as PerformanceReview["reviewType"] }))}
-                >
-                  <SelectItem key="annual">Annual</SelectItem>
-                  <SelectItem key="quarterly">Quarterly</SelectItem>
-                  <SelectItem key="probation">Probation</SelectItem>
-                  <SelectItem key="promotion">Promotion</SelectItem>
-                </Select>
-                <Input
-                  label="Scheduled Date *"
-                  type="date"
-                  value={newReview.scheduledDate || ""}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, scheduledDate: e.target.value }))}
-                />
-                <Input
-                  label="Due Date *"
-                  type="date"
-                  value={newReview.dueDate || ""}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, dueDate: e.target.value }))}
-                />
-                <Select
-                  label="Department"
-                  placeholder="Select department"
-                  selectedKeys={newReview.department ? [newReview.department] : []}
-                  onSelectionChange={(keys) => setNewReview(prev => ({ ...prev, department: Array.from(keys)[0] as string }))}
-                >
-                  {departments.map(dept => (
-                    <SelectItem key={dept}>{dept}</SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  label="Position"
-                  placeholder="e.g., Senior Software Engineer"
-                  value={newReview.position || ""}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, position: e.target.value }))}
-                />
+        <Card>
+          <CardBody className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">In Progress</p>
+                <p className="text-2xl font-bold text-primary-600">{stats.inProgress}</p>
               </div>
-              <Textarea
-                label="Goals (one per line)"
-                placeholder="Enter review goals"
-                value={newReview.goals?.join('\n') || ""}
-                onChange={(e) => setNewReview(prev => ({ ...prev, goals: e.target.value.split('\n').filter(goal => goal.trim()) }))}
-                minRows={3}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="flat" onPress={() => setIsScheduleModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button color="primary" onPress={handleScheduleReview}>
-                Schedule Review
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-
-        {/* Edit Review Modal */}
-        <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} size="3xl">
-          <ModalContent>
-            <ModalHeader>Edit Review</ModalHeader>
-            <ModalBody>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Select
-                  label="Employee *"
-                  placeholder="Select employee"
-                  selectedKeys={newReview.employeeName ? [newReview.employeeName] : []}
-                  onSelectionChange={(keys) => setNewReview(prev => ({ ...prev, employeeName: Array.from(keys)[0] as string }))}
-                >
-                  {employees.map(employee => (
-                    <SelectItem key={employee}>{employee}</SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Reviewer *"
-                  placeholder="Select reviewer"
-                  selectedKeys={newReview.reviewerName ? [newReview.reviewerName] : []}
-                  onSelectionChange={(keys) => setNewReview(prev => ({ ...prev, reviewerName: Array.from(keys)[0] as string }))}
-                >
-                  {reviewers.map(reviewer => (
-                    <SelectItem key={reviewer}>{reviewer}</SelectItem>
-                  ))}
-                </Select>
-                <Input
-                  label="Review Period"
-                  placeholder="e.g., Q4 2024, Annual 2024"
-                  value={newReview.reviewPeriod || ""}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, reviewPeriod: e.target.value }))}
-                />
-                <Select
-                  label="Review Type"
-                  placeholder="Select type"
-                  selectedKeys={newReview.reviewType ? [newReview.reviewType] : []}
-                  onSelectionChange={(keys) => setNewReview(prev => ({ ...prev, reviewType: Array.from(keys)[0] as PerformanceReview["reviewType"] }))}
-                >
-                  <SelectItem key="annual">Annual</SelectItem>
-                  <SelectItem key="quarterly">Quarterly</SelectItem>
-                  <SelectItem key="probation">Probation</SelectItem>
-                  <SelectItem key="promotion">Promotion</SelectItem>
-                </Select>
-                <Select
-                  label="Status"
-                  placeholder="Select status"
-                  selectedKeys={newReview.status ? [newReview.status] : []}
-                  onSelectionChange={(keys) => setNewReview(prev => ({ ...prev, status: Array.from(keys)[0] as PerformanceReview["status"] }))}
-                >
-                  <SelectItem key="draft">Draft</SelectItem>
-                  <SelectItem key="in-progress">In Progress</SelectItem>
-                  <SelectItem key="completed">Completed</SelectItem>
-                  <SelectItem key="approved">Approved</SelectItem>
-                  <SelectItem key="rejected">Rejected</SelectItem>
-                </Select>
-                <Input
-                  label="Overall Rating (1-5)"
-                  type="number"
-                  min="1"
-                  max="5"
-                  step="0.1"
-                  value={newReview.overallRating || 0}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, overallRating: parseFloat(e.target.value) || 0 }))}
-                />
-                <Input
-                  label="Goals Rating (1-5)"
-                  type="number"
-                  min="1"
-                  max="5"
-                  step="0.1"
-                  value={newReview.goalsRating || 0}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, goalsRating: parseFloat(e.target.value) || 0 }))}
-                />
-                <Input
-                  label="Skills Rating (1-5)"
-                  type="number"
-                  min="1"
-                  max="5"
-                  step="0.1"
-                  value={newReview.skillsRating || 0}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, skillsRating: parseFloat(e.target.value) || 0 }))}
-                />
-                <Input
-                  label="Behavior Rating (1-5)"
-                  type="number"
-                  min="1"
-                  max="5"
-                  step="0.1"
-                  value={newReview.behaviorRating || 0}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, behaviorRating: parseFloat(e.target.value) || 0 }))}
-                />
-                <Input
-                  label="Attendance Rating (1-5)"
-                  type="number"
-                  min="1"
-                  max="5"
-                  step="0.1"
-                  value={newReview.attendanceRating || 0}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, attendanceRating: parseFloat(e.target.value) || 0 }))}
-                />
-                <Input
-                  label="Scheduled Date"
-                  type="date"
-                  value={newReview.scheduledDate || ""}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, scheduledDate: e.target.value }))}
-                />
-                <Input
-                  label="Due Date"
-                  type="date"
-                  value={newReview.dueDate || ""}
-                  onChange={(e) => setNewReview(prev => ({ ...prev, dueDate: e.target.value }))}
-                />
+              <div className="p-3 bg-primary-100 rounded-full">
+                <Icon icon="lucide:play-circle" className="w-6 h-6 text-primary-600" />
               </div>
-              <Textarea
-                label="Goals (one per line)"
-                placeholder="Enter review goals"
-                value={newReview.goals?.join('\n') || ""}
-                onChange={(e) => setNewReview(prev => ({ ...prev, goals: e.target.value.split('\n').filter(goal => goal.trim()) }))}
-                minRows={3}
-              />
-              <Textarea
-                label="Achievements (one per line)"
-                placeholder="Enter achievements"
-                value={newReview.achievements?.join('\n') || ""}
-                onChange={(e) => setNewReview(prev => ({ ...prev, achievements: e.target.value.split('\n').filter(achievement => achievement.trim()) }))}
-                minRows={3}
-              />
-              <Textarea
-                label="Areas for Improvement (one per line)"
-                placeholder="Enter areas for improvement"
-                value={newReview.areasForImprovement?.join('\n') || ""}
-                onChange={(e) => setNewReview(prev => ({ ...prev, areasForImprovement: e.target.value.split('\n').filter(area => area.trim()) }))}
-                minRows={3}
-              />
-              <Textarea
-                label="Feedback"
-                placeholder="Enter overall feedback"
-                value={newReview.feedback || ""}
-                onChange={(e) => setNewReview(prev => ({ ...prev, feedback: e.target.value }))}
-                minRows={4}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="flat" onPress={() => setIsEditModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button color="primary" onPress={handleEditReview}>
-                Update Review
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+            </div>
+          </CardBody>
+        </Card>
 
-        {/* View Review Modal */}
-        <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} size="4xl">
-          <ModalContent>
-            <ModalHeader>Review Details</ModalHeader>
-            <ModalBody>
-              {selectedReview && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <Avatar 
-                      name={selectedReview.employeeName}
-                      size="lg"
+        <Card>
+          <CardBody className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">Completed</p>
+                <p className="text-2xl font-bold text-success-600">{stats.completed}</p>
+              </div>
+              <div className="p-3 bg-success-100 rounded-full">
+                <Icon icon="lucide:check-circle" className="w-6 h-6 text-success-600" />
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">Avg Rating</p>
+                <p className="text-2xl font-bold">{stats.avgRating.toFixed(1)}/5</p>
+              </div>
+              <div className="p-3 bg-warning-100 rounded-full">
+                <Icon icon="lucide:star" className="w-6 h-6 text-warning-600" />
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Filters and Search */}
+      <Card className="mb-6">
+        <CardBody className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <Input
+              placeholder="Search reviews..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              startContent={<Icon icon="lucide:search" />}
+              className="flex-1"
+            />
+            <Select
+              placeholder="Status"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full md:w-48"
+            >
+              <SelectItem key="all" value="all">All Status</SelectItem>
+              <SelectItem key="draft" value="draft">Draft</SelectItem>
+              <SelectItem key="in_progress" value="in_progress">In Progress</SelectItem>
+              <SelectItem key="completed" value="completed">Completed</SelectItem>
+              <SelectItem key="cancelled" value="cancelled">Cancelled</SelectItem>
+            </Select>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Reviews Table */}
+      <Card>
+        <CardHeader className="pb-0">
+          <div className="flex justify-between items-center w-full">
+            <h3 className="text-lg font-semibold">Performance Reviews</h3>
+            <p className="text-sm text-default-500">
+              Showing {paginatedReviews.length} of {filteredReviews.length} reviews
+            </p>
+          </div>
+        </CardHeader>
+        <CardBody>
+          <Table aria-label="Performance reviews table">
+            <TableHeader>
+              <TableColumn>EMPLOYEE</TableColumn>
+              <TableColumn>REVIEWER</TableColumn>
+              <TableColumn>PERIOD</TableColumn>
+              <TableColumn>OVERALL RATING</TableColumn>
+              <TableColumn>STATUS</TableColumn>
+              <TableColumn>CREATED</TableColumn>
+              <TableColumn>ACTIONS</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent="No performance reviews found">
+              {paginatedReviews.map((review) => (
+                <TableRow key={review.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar
+                        size="sm"
+                        name={review.employee_name || "Unknown"}
+                        className="flex-shrink-0"
+                      />
+                      <div>
+                        <p className="font-medium">{review.employee_name || "Unknown"}</p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar
+                        size="sm"
+                        name={review.reviewer_name || "Unknown"}
+                        className="flex-shrink-0"
+                      />
+                      <div>
+                        <p className="font-medium">{review.reviewer_name || "Unknown"}</p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <p className="text-sm">
+                        {formatDate(review.review_period_start)} - {formatDate(review.review_period_end)}
+                      </p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      {renderStars(review.overall_rating)}
+                      <span className="ml-2 text-sm text-default-500">
+                        ({review.overall_rating}/5)
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      color={statusColorMap[review.status as keyof typeof statusColorMap] || "default"}
+                      variant="flat"
+                    >
+                      {review.status.replace('_', ' ')}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>{formatDate(review.created_at)}</TableCell>
+                  <TableCell>
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button isIconOnly size="sm" variant="light">
+                          <Icon icon="lucide:more-vertical" />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        aria-label="Review actions"
+                        onAction={(key) => handleRowAction(key as string, review.id)}
+                      >
+                        <DropdownItem key="view" startContent={<Icon icon="lucide:eye" />}>
+                          View
+                        </DropdownItem>
+                        <DropdownItem key="edit" startContent={<Icon icon="lucide:edit" />}>
+                          Edit
+                        </DropdownItem>
+                        <DropdownItem 
+                          key="delete" 
+                          startContent={<Icon icon="lucide:trash" />}
+                          className="text-danger"
+                          color="danger"
+                        >
+                          Delete
+                        </DropdownItem>
+                      </DropdownMenu>
+                    </Dropdown>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+
+          {filteredReviews.length > rowsPerPage && (
+            <div className="flex justify-center mt-4">
+              <Pagination
+                total={Math.ceil(filteredReviews.length / rowsPerPage)}
+                page={page}
+                onChange={setPage}
+                showControls
+              />
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* Add/Edit Review Modal */}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="4xl">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                {editingReview ? "Edit Performance Review" : "Add New Performance Review"}
+              </ModalHeader>
+              <ModalBody>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Employee ID"
+                    type="number"
+                    value={newReview.employee_id.toString()}
+                    onChange={(e) => setNewReview({...newReview, employee_id: parseInt(e.target.value)})}
+                    isRequired
+                  />
+
+                  <Input
+                    label="Reviewer ID"
+                    type="number"
+                    value={newReview.reviewer_id.toString()}
+                    onChange={(e) => setNewReview({...newReview, reviewer_id: parseInt(e.target.value)})}
+                    isRequired
+                  />
+
+                  <Input
+                    label="Review Period Start"
+                    type="date"
+                    value={newReview.review_period_start}
+                    onChange={(e) => setNewReview({...newReview, review_period_start: e.target.value})}
+                    isRequired
+                  />
+
+                  <Input
+                    label="Review Period End"
+                    type="date"
+                    value={newReview.review_period_end}
+                    onChange={(e) => setNewReview({...newReview, review_period_end: e.target.value})}
+                    isRequired
+                  />
+
+                  <div className="md:col-span-2">
+                    <p className="text-sm font-medium mb-2">Ratings (1-5)</p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      <div>
+                        <label className="text-sm text-default-500">Overall</label>
+                        <Select
+                          value={newReview.overall_rating.toString()}
+                          onChange={(e) => setNewReview({...newReview, overall_rating: parseInt(e.target.value)})}
+                        >
+                          {[1,2,3,4,5].map(rating => (
+                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-default-500">Goals</label>
+                        <Select
+                          value={newReview.goals_rating.toString()}
+                          onChange={(e) => setNewReview({...newReview, goals_rating: parseInt(e.target.value)})}
+                        >
+                          {[1,2,3,4,5].map(rating => (
+                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-default-500">Skills</label>
+                        <Select
+                          value={newReview.skills_rating.toString()}
+                          onChange={(e) => setNewReview({...newReview, skills_rating: parseInt(e.target.value)})}
+                        >
+                          {[1,2,3,4,5].map(rating => (
+                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-default-500">Teamwork</label>
+                        <Select
+                          value={newReview.teamwork_rating.toString()}
+                          onChange={(e) => setNewReview({...newReview, teamwork_rating: parseInt(e.target.value)})}
+                        >
+                          {[1,2,3,4,5].map(rating => (
+                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-default-500">Communication</label>
+                        <Select
+                          value={newReview.communication_rating.toString()}
+                          onChange={(e) => setNewReview({...newReview, communication_rating: parseInt(e.target.value)})}
+                        >
+                          {[1,2,3,4,5].map(rating => (
+                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-sm text-default-500">Leadership</label>
+                        <Select
+                          value={newReview.leadership_rating.toString()}
+                          onChange={(e) => setNewReview({...newReview, leadership_rating: parseInt(e.target.value)})}
+                        >
+                          {[1,2,3,4,5].map(rating => (
+                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                          ))}
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <Textarea
+                      label="Comments"
+                      placeholder="Enter overall comments"
+                      value={newReview.comments}
+                      onChange={(e) => setNewReview({...newReview, comments: e.target.value})}
                     />
-                    <div>
-                      <h3 className="text-xl font-bold">{selectedReview.employeeName}</h3>
-                      <p className="text-gray-600">{selectedReview.position} • {selectedReview.department}</p>
-                      <p className="text-gray-600">Reviewer: {selectedReview.reviewerName}</p>
-                    </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-semibold mb-2">Review Information</h4>
-                      <p><strong>Period:</strong> {selectedReview.reviewPeriod}</p>
-                      <p><strong>Type:</strong> 
-                        <Chip size="sm" color={typeColorMap[selectedReview.reviewType] as any} variant="flat" className="ml-2">
-                          {selectedReview.reviewType}
-                        </Chip>
-                      </p>
-                      <p><strong>Status:</strong> 
-                        <Chip size="sm" color={statusColorMap[selectedReview.status] as any} variant="flat" className="ml-2">
-                          {selectedReview.status}
-                        </Chip>
-                      </p>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-semibold mb-2">Timeline</h4>
-                      <p><strong>Scheduled:</strong> {new Date(selectedReview.scheduledDate).toLocaleDateString()}</p>
-                      <p><strong>Due:</strong> {new Date(selectedReview.dueDate).toLocaleDateString()}</p>
-                      {selectedReview.completedDate && (
-                        <p><strong>Completed:</strong> {new Date(selectedReview.completedDate).toLocaleDateString()}</p>
-                      )}
-                    </div>
+
+                  <div className="md:col-span-2">
+                    <Textarea
+                      label="Strengths"
+                      placeholder="Enter employee strengths"
+                      value={newReview.strengths}
+                      onChange={(e) => setNewReview({...newReview, strengths: e.target.value})}
+                    />
                   </div>
-                  
-                  {selectedReview.overallRating > 0 && (
+
+                  <div className="md:col-span-2">
+                    <Textarea
+                      label="Areas for Improvement"
+                      placeholder="Enter areas for improvement"
+                      value={newReview.areas_for_improvement}
+                      onChange={(e) => setNewReview({...newReview, areas_for_improvement: e.target.value})}
+                    />
+                  </div>
+
+                  <div className="md:col-span-2">
+                    <Textarea
+                      label="Development Plan"
+                      placeholder="Enter development plan"
+                      value={newReview.development_plan}
+                      onChange={(e) => setNewReview({...newReview, development_plan: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button 
+                  color="primary" 
+                  onPress={handleSubmitReview}
+                  isLoading={isSubmitting}
+                >
+                  {editingReview ? "Update" : "Create"} Review
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* View Review Modal */}
+      <Modal isOpen={isViewOpen} onOpenChange={onViewOpenChange} size="4xl">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>Performance Review Details</ModalHeader>
+              <ModalBody>
+                {selectedReview && (
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-default-500">Employee</p>
+                        <p className="font-medium">{selectedReview.employee_name}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Reviewer</p>
+                        <p className="font-medium">{selectedReview.reviewer_name}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Review Period</p>
+                        <p className="font-medium">
+                          {formatDate(selectedReview.review_period_start)} - {formatDate(selectedReview.review_period_end)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Status</p>
+                        <Chip
+                          size="sm"
+                          color={statusColorMap[selectedReview.status as keyof typeof statusColorMap] || "default"}
+                          variant="flat"
+                        >
+                          {selectedReview.status.replace('_', ' ')}
+                        </Chip>
+                      </div>
+                    </div>
+
                     <div>
-                      <h4 className="font-semibold mb-2">Ratings</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <p><strong>Overall Rating:</strong> 
-                            <div className="flex items-center gap-2 mt-1">
-                              {[1, 2, 3, 4, 5].map(star => (
-                                <Icon
-                                  key={star}
-                                  icon="lucide:star"
-                                  className={`w-5 h-5 ${
-                                    star <= selectedReview.overallRating 
-                                      ? "text-yellow-400 fill-current" 
-                                      : "text-gray-300"
-                                  }`}
-                                />
-                              ))}
-                              <span className="ml-2 font-medium">{selectedReview.overallRating.toFixed(1)}/5</span>
-                            </div>
-                          </p>
+                      <p className="text-sm text-default-500 mb-2">Overall Rating</p>
+                      <div className="flex items-center gap-2">
+                        {renderStars(selectedReview.overall_rating)}
+                        <span className="text-lg font-medium">
+                          {selectedReview.overall_rating}/5
+                        </span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-default-500 mb-2">Detailed Ratings</p>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="flex justify-between">
+                          <span className="text-sm">Goals:</span>
+                          <span className="font-medium">{selectedReview.goals_rating}/5</span>
                         </div>
-                        <div>
-                          <p><strong>Goals Rating:</strong> {selectedReview.goalsRating.toFixed(1)}/5</p>
-                          <p><strong>Skills Rating:</strong> {selectedReview.skillsRating.toFixed(1)}/5</p>
-                          <p><strong>Behavior Rating:</strong> {selectedReview.behaviorRating.toFixed(1)}/5</p>
-                          <p><strong>Attendance Rating:</strong> {selectedReview.attendanceRating.toFixed(1)}/5</p>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Skills:</span>
+                          <span className="font-medium">{selectedReview.skills_rating}/5</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Teamwork:</span>
+                          <span className="font-medium">{selectedReview.teamwork_rating}/5</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Communication:</span>
+                          <span className="font-medium">{selectedReview.communication_rating}/5</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm">Leadership:</span>
+                          <span className="font-medium">{selectedReview.leadership_rating}/5</span>
                         </div>
                       </div>
                     </div>
-                  )}
-                  
-                  {selectedReview.goals.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Goals</h4>
-                      <ul className="list-disc list-inside space-y-1">
-                        {selectedReview.goals.map((goal, index) => (
-                          <li key={index} className="text-gray-700">{goal}</li>
-                        ))}
-                      </ul>
+
+                    {selectedReview.comments && (
+                      <div>
+                        <p className="text-sm text-default-500">Comments</p>
+                        <p className="font-medium">{selectedReview.comments}</p>
+                      </div>
+                    )}
+
+                    {selectedReview.strengths && (
+                      <div>
+                        <p className="text-sm text-default-500">Strengths</p>
+                        <p className="font-medium">{selectedReview.strengths}</p>
+                      </div>
+                    )}
+
+                    {selectedReview.areas_for_improvement && (
+                      <div>
+                        <p className="text-sm text-default-500">Areas for Improvement</p>
+                        <p className="font-medium">{selectedReview.areas_for_improvement}</p>
+                      </div>
+                    )}
+
+                    {selectedReview.development_plan && (
+                      <div>
+                        <p className="text-sm text-default-500">Development Plan</p>
+                        <p className="font-medium">{selectedReview.development_plan}</p>
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-default-500">Created</p>
+                        <p className="font-medium">{formatDate(selectedReview.created_at)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Last Updated</p>
+                        <p className="font-medium">{formatDate(selectedReview.updated_at)}</p>
+                      </div>
                     </div>
-                  )}
-                  
-                  {selectedReview.achievements.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Achievements</h4>
-                      <ul className="list-disc list-inside space-y-1">
-                        {selectedReview.achievements.map((achievement, index) => (
-                          <li key={index} className="text-gray-700">{achievement}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {selectedReview.areasForImprovement.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Areas for Improvement</h4>
-                      <ul className="list-disc list-inside space-y-1">
-                        {selectedReview.areasForImprovement.map((area, index) => (
-                          <li key={index} className="text-gray-700">{area}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {selectedReview.feedback && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Feedback</h4>
-                      <p className="text-gray-700">{selectedReview.feedback}</p>
-                    </div>
-                  )}
-                  
-                  {selectedReview.employeeComments && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Employee Comments</h4>
-                      <p className="text-gray-700">{selectedReview.employeeComments}</p>
-                    </div>
-                  )}
-                  
-                  {selectedReview.managerComments && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Manager Comments</h4>
-                      <p className="text-gray-700">{selectedReview.managerComments}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="flat" onPress={() => setIsViewModalOpen(false)}>
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+                  </div>
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </PageLayout>
   );
 }

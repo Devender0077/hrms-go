@@ -161,29 +161,29 @@ export default function AccountStatementReport() {
         label: "Total Income",
         value: `$${(totalIncome / 1000).toFixed(0)}k`,
         icon: "lucide:trending-up",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Total Expense",
         value: `$${(totalExpense / 1000).toFixed(0)}k`,
         icon: "lucide:trending-down",
-        color: "text-red-600",
-        bgColor: "bg-red-100"
+        color: "text-danger-600",
+        bgColor: "bg-danger-100"
       },
       {
         label: "Current Balance",
         value: `$${(currentBalance / 1000).toFixed(0)}k`,
         icon: "lucide:wallet",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Total Transactions",
         value: totalTransactions,
         icon: "lucide:receipt",
-        color: "text-purple-600",
-        bgColor: "bg-purple-100"
+        color: "text-secondary-600",
+        bgColor: "bg-secondary-100"
       }
     ];
   }, []);
@@ -231,14 +231,14 @@ export default function AccountStatementReport() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <ReportHeader
           title="Account Statement Report"
           description="Comprehensive financial account statement and transaction history"
           icon="lucide:receipt"
-          iconColor="from-purple-500 to-indigo-600"
+          iconColor="from-secondary-500 to-primary-600"
           onExport={handleExport}
           onRefresh={handleRefresh}
           isExporting={isExporting}
@@ -256,12 +256,12 @@ export default function AccountStatementReport() {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <select
                 value={selectedDepartment}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {departments.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
@@ -270,7 +270,7 @@ export default function AccountStatementReport() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {categories.map(category => (
                   <option key={category} value={category}>{category}</option>
@@ -279,14 +279,14 @@ export default function AccountStatementReport() {
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {types.map(type => (
                   <option key={type} value={type}>{type}</option>
                 ))}
               </select>
               <div className="flex items-end">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-default-600">
                   Showing {filteredData.length} of {accountStatementData.length} records
                 </div>
               </div>
@@ -298,10 +298,10 @@ export default function AccountStatementReport() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-purple-600 text-xl" />
+              <Icon icon="lucide:table" className="text-secondary-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Account Statement</h3>
-                <p className="text-gray-500 text-sm">Financial transaction history and balances</p>
+                <h3 className="text-lg font-semibold text-foreground">Account Statement</h3>
+                <p className="text-default-500 text-sm">Financial transaction history and balances</p>
               </div>
             </div>
           </CardHeader>
@@ -321,12 +321,12 @@ export default function AccountStatementReport() {
                 {paginatedData.map((record) => (
                   <TableRow key={record.id}>
                     <TableCell>
-                      <p className="font-medium text-gray-900">{new Date(record.date).toLocaleDateString()}</p>
+                      <p className="font-medium text-foreground">{new Date(record.date).toLocaleDateString()}</p>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{record.description}</p>
-                        <p className="text-sm text-gray-500">{record.department}</p>
+                        <p className="font-medium text-foreground">{record.description}</p>
+                        <p className="text-sm text-default-500">{record.department}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -344,7 +344,7 @@ export default function AccountStatementReport() {
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <div className={`flex items-center gap-2 ${record.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                      <div className={`flex items-center gap-2 ${record.type === 'income' ? 'text-success-600' : 'text-danger-600'}`}>
                         <Icon 
                           icon={record.type === 'income' ? 'lucide:plus' : 'lucide:minus'} 
                           className="w-4 h-4" 
@@ -356,12 +356,12 @@ export default function AccountStatementReport() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:wallet" className="w-4 h-4 text-blue-500" />
-                        <span className="font-medium text-blue-600">${(record.balance / 1000).toFixed(0)}k</span>
+                        <Icon icon="lucide:wallet" className="w-4 h-4 text-primary" />
+                        <span className="font-medium text-primary-600">${(record.balance / 1000).toFixed(0)}k</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <p className="text-sm font-mono text-gray-600">{record.reference}</p>
+                      <p className="text-sm font-mono text-default-600">{record.reference}</p>
                     </TableCell>
                     <TableCell>
                       <Chip

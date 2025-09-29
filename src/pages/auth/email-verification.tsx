@@ -43,7 +43,7 @@ export default function EmailVerification() {
         >
           <Card className="shadow-lg rounded-xl">
             <CardBody className="flex flex-col items-center py-8 gap-4">
-              <Spinner size="lg" color="primary" />
+              <Spinner size="lg" color="primary" variant="solid" />
               <h2 className="text-xl font-bold">Verifying Email</h2>
               <p className="text-center text-default-500">
                 Please wait while we verify your email address...
@@ -93,7 +93,7 @@ export default function EmailVerification() {
             )}
           </CardBody>
           <CardFooter className="flex justify-center">
-            <Button color="primary" as={Link} to="/login">
+            <Button color="primary" variant="solid" as={Link} to="/login" className="font-medium">
               Go to Login
             </Button>
           </CardFooter>

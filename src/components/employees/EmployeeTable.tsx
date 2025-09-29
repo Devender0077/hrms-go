@@ -61,10 +61,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
     <Card className="border-0 shadow-sm">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-3">
-          <Icon icon="lucide:table" className="text-green-600 text-xl" />
+          <Icon icon="lucide:table" className="text-success-600 text-xl" />
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Employee List</h3>
-            <p className="text-gray-500 text-sm">
+            <h3 className="text-lg font-semibold text-foreground">Employee List</h3>
+            <p className="text-default-500 text-sm">
               {employees.length} employee{employees.length !== 1 ? 's' : ''} found
             </p>
           </div>
@@ -93,39 +93,39 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                       size="sm"
                     />
                     <div>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-foreground">
                         {employee.first_name} {employee.last_name}
                       </p>
-                      <p className="text-sm text-gray-500">{employee.email}</p>
-                      <p className="text-xs text-gray-400">ID: {employee.employee_id}</p>
+                      <p className="text-sm text-default-500">{employee.email}</p>
+                      <p className="text-xs text-default-400">ID: {employee.employee_id}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Icon icon="lucide:building" className="text-gray-400 text-sm" />
+                    <Icon icon="lucide:building" className="text-default-400 text-sm" />
                     <span className="text-sm">{employee.department_name || 'N/A'}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Icon icon="lucide:briefcase" className="text-gray-400 text-sm" />
+                    <Icon icon="lucide:briefcase" className="text-default-400 text-sm" />
                     <span className="text-sm">{employee.designation_name || 'N/A'}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Icon icon="lucide:map-pin" className="text-gray-400 text-sm" />
+                    <Icon icon="lucide:map-pin" className="text-default-400 text-sm" />
                     <span className="text-sm">{employee.branch_name || 'N/A'}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Icon icon="lucide:clock" className="text-gray-400 text-sm" />
+                    <Icon icon="lucide:clock" className="text-default-400 text-sm" />
                     <div>
                       <span className="text-sm">{employee.shift_name || 'N/A'}</span>
                       {employee.shift_name && (
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-default-400">
                           {employee.shift_start_time} - {employee.shift_end_time}
                         </p>
                       )}
@@ -134,7 +134,7 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Icon icon="lucide:calendar" className="text-gray-400 text-sm" />
+                    <Icon icon="lucide:calendar" className="text-default-400 text-sm" />
                     <span className="text-sm">
                       {employee.joining_date ? new Date(employee.joining_date).toLocaleDateString() : 'N/A'}
                     </span>

@@ -819,26 +819,26 @@ Date: [NOC_DATE]`,
           default:
             return (
               <div className="flex items-center justify-center p-8">
-            <p className="text-gray-500">Select a settings category from the sidebar</p>
+                <p className="text-default-500">Select a settings category from the sidebar</p>
               </div>
             );
         }
       };
       
       return (
-    <div className="min-h-screen bg-gray-50/50">
+    <div className="min-h-screen bg-content2">
       {/* Header Section */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-content1 border-b border-default-300 px-6 py-4">
         <div className="flex items-center justify-between">
             <div>
-            <h1 className="text-2xl font-semibold text-gray-900">Settings</h1>
-            <p className="text-gray-600 mt-1">Manage your application settings and preferences</p>
+            <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
+            <p className="text-default-600 mt-1">Manage your application settings and preferences</p>
             </div>
           <div className="flex items-center gap-3">
             <Button 
               variant="bordered"
               startContent={<Icon icon="lucide:download" />}
-              className="border-gray-300"
+              className="border-divider"
             >
               Export Settings
             </Button>
@@ -868,28 +868,28 @@ Date: [NOC_DATE]`,
                   <button
                       key={tab.key}
                     onClick={() => setActiveTab(tab.key)}
-                    className={`w-full text-left p-4 hover:bg-gray-50 transition-colors ${
+                    className={`w-full text-left p-4 hover:bg-content1 transition-colors ${
                       activeTab === tab.key ? 'bg-primary-50 border-r-2 border-primary-500' : ''
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`p-2 rounded-lg ${
-                        activeTab === tab.key ? 'bg-primary-100' : 'bg-gray-100'
+                        activeTab === tab.key ? 'bg-primary-100' : 'bg-content2'
                       }`}>
                         <Icon 
                           icon={tab.icon} 
                           className={`text-lg ${
-                            activeTab === tab.key ? 'text-primary-600' : 'text-gray-600'
+                            activeTab === tab.key ? 'text-primary-600' : 'text-default-600'
                           }`} 
                         />
                       </div>
                       <div>
                         <p className={`font-medium ${
-                          activeTab === tab.key ? 'text-primary-600' : 'text-gray-900'
+                          activeTab === tab.key ? 'text-primary-600' : 'text-foreground'
                         }`}>
                           {tab.title}
                         </p>
-                        <p className="text-xs text-gray-500">{tab.description}</p>
+                        <p className="text-xs text-default-500">{tab.description}</p>
                       </div>
                         </div>
                   </button>

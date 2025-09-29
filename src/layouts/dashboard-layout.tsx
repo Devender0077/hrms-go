@@ -17,11 +17,11 @@ import React, { useState, useEffect } from "react";
     import { motion } from "framer-motion";
     import { useNavigate } from "react-router-dom";
     import { useAuth } from "../contexts/auth-context";
+    import { useTheme } from "../contexts/theme-context";
     import { employeeAPI } from "../services/api-service";
     import { getDefaultAvatar } from "../utils/avatarUtils";
     import Sidebar from "../components/sidebar";
     import MobileSidebar from "../components/mobile-sidebar";
-    import ThemeToggle from "../components/theme-toggle";
     
     interface DashboardLayoutProps {
       children: React.ReactNode;
@@ -33,6 +33,7 @@ import React, { useState, useEffect } from "react";
       const [userGender, setUserGender] = useState<string>('male');
       const { isOpen, onOpen, onClose } = useDisclosure();
       const { user, logout } = useAuth();
+      const { theme, toggleTheme } = useTheme();
       const navigate = useNavigate();
       
       const toggleSidebar = () => {
@@ -51,7 +52,7 @@ import React, { useState, useEffect } from "react";
           if (user?.id) {
             try {
               const userId = parseInt(user.id);
-              const profile = await employeeAPI.getById(userId);
+              const profile = await employeeAPI.getByUserId(userId);
               if (profile) {
                 setProfilePhoto(profile.profile_photo);
                 setUserGender(profile.gender || 'male');
@@ -101,8 +102,20 @@ import React, { useState, useEffect } from "react";
               </NavbarContent>
               
               <NavbarContent justify="end">
+                {/* Theme Toggle Button */}
                 <NavbarItem>
-                  <ThemeToggle />
+                  <Button 
+                    isIconOnly 
+                    variant="light" 
+                    onPress={toggleTheme}
+                    aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                    className="rounded-lg"
+                  >
+                    <Icon 
+                      icon={theme === 'light' ? 'lucide:moon' : 'lucide:sun'} 
+                      className="text-xl" 
+                    />
+                  </Button>
                 </NavbarItem>
                 
                 <NavbarItem>
@@ -208,7 +221,7 @@ import React, { useState, useEffect } from "react";
             
             {/* Footer */}
             <footer className="bg-content1 border-t border-divider py-4 px-6">
-              <div className="flex flex-col md:flex-row justify-between items-center text-sm text-default-500">
+              <div className="flex flex-col md:flex-row justify-between items-center text-sm text-default-600">
                 <div className="flex items-center space-x-4 mb-2 md:mb-0">
                   <span>© 2024 HRMS GO. All rights reserved.</span>
                 </div>

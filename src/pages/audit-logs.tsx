@@ -197,36 +197,36 @@ export default function AuditLogs() {
         label: "Total Logs",
         value: totalLogs,
         icon: "lucide:file-text",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Success",
         value: successLogs,
         icon: "lucide:check-circle",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Failed",
         value: failedLogs,
         icon: "lucide:x-circle",
-        color: "text-red-600",
-        bgColor: "bg-red-100"
+        color: "text-danger-600",
+        bgColor: "bg-danger-100"
       },
       {
         label: "Critical",
         value: criticalLogs,
         icon: "lucide:alert-triangle",
-        color: "text-orange-600",
-        bgColor: "bg-orange-100"
+        color: "text-warning-600",
+        bgColor: "bg-warning-100"
       },
       {
         label: "Today",
         value: todayLogs,
         icon: "lucide:calendar",
-        color: "text-purple-600",
-        bgColor: "bg-purple-100"
+        color: "text-secondary-600",
+        bgColor: "bg-secondary-100"
       }
     ];
   }, [auditLogs]);
@@ -312,17 +312,17 @@ export default function AuditLogs() {
   }, [auditLogs]);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-gray-500 to-gray-700 rounded-xl">
-              <Icon icon="lucide:shield-check" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:shield-check" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Audit Logs</h1>
-              <p className="text-gray-600 mt-1">Monitor system activities and security events</p>
+              <h1 className="text-3xl font-bold text-foreground">Audit Logs</h1>
+              <p className="text-default-600 mt-1">Monitor system activities and security events</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -372,7 +372,7 @@ export default function AuditLogs() {
                 placeholder="Search logs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+                startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
               <Select
                 label="Status"
@@ -420,7 +420,7 @@ export default function AuditLogs() {
                 ))}
               </Select>
               <div className="flex items-end">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-default-600">
                   Showing {filteredLogs.length} of {auditLogs.length} logs
                 </div>
               </div>
@@ -432,10 +432,10 @@ export default function AuditLogs() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-gray-600 text-xl" />
+              <Icon icon="lucide:table" className="text-default-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Audit Logs</h3>
-                <p className="text-gray-500 text-sm">System activity and security monitoring</p>
+                <h3 className="text-lg font-semibold text-foreground">Audit Logs</h3>
+                <p className="text-default-500 text-sm">System activity and security monitoring</p>
               </div>
             </div>
           </CardHeader>
@@ -461,22 +461,22 @@ export default function AuditLogs() {
                           size="sm"
                         />
                         <div>
-                          <p className="font-medium text-gray-900">{log.userName}</p>
-                          <p className="text-sm text-gray-500">{log.userEmail}</p>
-                          <p className="text-xs text-gray-400">{log.department}</p>
+                          <p className="font-medium text-foreground">{log.userName}</p>
+                          <p className="text-sm text-default-500">{log.userEmail}</p>
+                          <p className="text-xs text-default-400">{log.department}</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{log.action}</p>
-                        <p className="text-sm text-gray-500 max-w-xs truncate">{log.details}</p>
+                        <p className="font-medium text-foreground">{log.action}</p>
+                        <p className="text-sm text-default-500 max-w-xs truncate">{log.details}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{log.resource}</p>
-                        <p className="text-sm text-gray-500">{log.resourceId}</p>
+                        <p className="font-medium text-foreground">{log.resource}</p>
+                        <p className="text-sm text-default-500">{log.resourceId}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -500,13 +500,13 @@ export default function AuditLogs() {
                     <TableCell>
                       <div>
                         <p className="text-sm font-medium">{log.ipAddress}</p>
-                        <p className="text-xs text-gray-500">{log.location}</p>
+                        <p className="text-xs text-default-500">{log.location}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
                         <p className="text-sm font-medium">{new Date(log.timestamp).toLocaleDateString()}</p>
-                        <p className="text-xs text-gray-500">{new Date(log.timestamp).toLocaleTimeString()}</p>
+                        <p className="text-xs text-default-500">{new Date(log.timestamp).toLocaleTimeString()}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -555,8 +555,8 @@ export default function AuditLogs() {
                     />
                     <div>
                       <h3 className="text-xl font-bold">{selectedLog.userName}</h3>
-                      <p className="text-gray-600">{selectedLog.userEmail}</p>
-                      <p className="text-gray-600">{selectedLog.department} • {selectedLog.location}</p>
+                      <p className="text-default-600">{selectedLog.userEmail}</p>
+                      <p className="text-default-600">{selectedLog.department} • {selectedLog.location}</p>
                     </div>
                   </div>
                   
@@ -595,8 +595,8 @@ export default function AuditLogs() {
                   {selectedLog.changes && (
                     <div>
                       <h4 className="font-semibold mb-2">Changes Made</h4>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <pre className="text-sm text-gray-700">
+                      <div className="bg-content1 p-4 rounded-lg">
+                        <pre className="text-sm text-default-700">
                           {JSON.stringify(selectedLog.changes, null, 2)}
                         </pre>
                       </div>
@@ -606,8 +606,8 @@ export default function AuditLogs() {
                   {selectedLog.oldValues && (
                     <div>
                       <h4 className="font-semibold mb-2">Previous Values</h4>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <pre className="text-sm text-gray-700">
+                      <div className="bg-content1 p-4 rounded-lg">
+                        <pre className="text-sm text-default-700">
                           {JSON.stringify(selectedLog.oldValues, null, 2)}
                         </pre>
                       </div>
@@ -617,8 +617,8 @@ export default function AuditLogs() {
                   {selectedLog.newValues && (
                     <div>
                       <h4 className="font-semibold mb-2">New Values</h4>
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <pre className="text-sm text-gray-700">
+                      <div className="bg-content1 p-4 rounded-lg">
+                        <pre className="text-sm text-default-700">
                           {JSON.stringify(selectedLog.newValues, null, 2)}
                         </pre>
                       </div>

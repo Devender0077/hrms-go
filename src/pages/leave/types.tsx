@@ -31,7 +31,7 @@ import {
   Tooltip,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { PageLayout, PageHeader } from "../../components/layout/PageLayout";
+import PageLayout, { PageHeader } from "../../components/layout/PageLayout";
 import { apiRequest } from "../../services/api-service";
 
 interface LeaveType {
@@ -176,14 +176,14 @@ export default function LeaveTypes() {
         title="Leave Types"
         description="Manage different types of leave available to employees"
         icon="lucide:calendar-plus"
-        iconColor="from-blue-500 to-purple-600"
+        iconColor="from-primary-500 to-secondary-500"
         actions={
           <>
             <Input
               placeholder="Search leave types..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
             />
             <Button

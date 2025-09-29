@@ -246,29 +246,29 @@ export default function Interviews() {
         label: "Total Interviews",
         value: totalInterviews,
         icon: "lucide:calendar",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Scheduled",
         value: scheduledInterviews,
         icon: "lucide:clock",
-        color: "text-orange-600",
-        bgColor: "bg-orange-100"
+        color: "text-warning-600",
+        bgColor: "bg-warning-100"
       },
       {
         label: "Completed",
         value: completedInterviews,
         icon: "lucide:check-circle",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Today's Interviews",
         value: todayInterviews,
         icon: "lucide:calendar-days",
-        color: "text-purple-600",
-        bgColor: "bg-purple-100"
+        color: "text-secondary-600",
+        bgColor: "bg-secondary-100"
       }
     ];
   }, [interviews]);
@@ -416,10 +416,10 @@ export default function Interviews() {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:calendar" className="text-blue-600 text-xl" />
+              <Icon icon="lucide:calendar" className="text-primary-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Interview Calendar</h3>
-                <p className="text-gray-500 text-sm">View interviews by date</p>
+                <h3 className="text-lg font-semibold text-foreground">Interview Calendar</h3>
+                <p className="text-default-500 text-sm">View interviews by date</p>
               </div>
             </div>
             <Button
@@ -435,29 +435,29 @@ export default function Interviews() {
         <CardBody className="pt-0">
           <div className="grid grid-cols-7 gap-2 mb-4">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="text-center font-semibold text-gray-600 p-2">
+              <div key={day} className="text-center font-semibold text-default-600 p-2">
                 {day}
               </div>
             ))}
           </div>
           <div className="grid grid-cols-7 gap-2">
             {calendarDays.map((dayData, index) => (
-              <div key={index} className="min-h-[100px] border border-gray-200 rounded-lg p-2">
+              <div key={index} className="min-h-[100px] border border-default-300 rounded-lg p-2">
                 {dayData ? (
                   <div>
-                    <div className="font-semibold text-gray-900 mb-1">{dayData.day}</div>
+                    <div className="font-semibold text-foreground mb-1">{dayData.day}</div>
                     <div className="space-y-1">
                       {dayData.interviews.map(interview => (
                         <div
                           key={interview.id}
-                          className="text-xs p-1 bg-blue-100 text-blue-800 rounded cursor-pointer hover:bg-blue-200"
+                          className="text-xs p-1 bg-primary-100 text-primary-800 rounded cursor-pointer hover:bg-primary-200"
                           onClick={() => {
                             setSelectedInterview(interview);
                             setIsViewModalOpen(true);
                           }}
                         >
                           <div className="font-medium truncate">{interview.candidateName}</div>
-                          <div className="text-blue-600">{interview.scheduledTime}</div>
+                          <div className="text-primary-600">{interview.scheduledTime}</div>
                         </div>
                       ))}
                     </div>
@@ -472,17 +472,17 @@ export default function Interviews() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
-              <Icon icon="lucide:calendar" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-xl">
+              <Icon icon="lucide:calendar" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Interviews</h1>
-              <p className="text-gray-600 mt-1">Schedule and manage candidate interviews</p>
+              <h1 className="text-3xl font-bold text-foreground">Interviews</h1>
+              <p className="text-default-600 mt-1">Schedule and manage candidate interviews</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -534,7 +534,7 @@ export default function Interviews() {
                     placeholder="Search interviews..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+                    startContent={<Icon icon="lucide:search" className="text-default-400" />}
                   />
                   <Select
                     label="Status"
@@ -573,7 +573,7 @@ export default function Interviews() {
                     ))}
                   </Select>
                   <div className="flex items-end">
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-default-600">
                       Showing {filteredInterviews.length} of {interviews.length} interviews
                     </div>
                   </div>
@@ -585,10 +585,10 @@ export default function Interviews() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:table" className="text-blue-600 text-xl" />
+                  <Icon icon="lucide:table" className="text-primary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Interviews List</h3>
-                    <p className="text-gray-500 text-sm">Manage and track interview schedules</p>
+                    <h3 className="text-lg font-semibold text-foreground">Interviews List</h3>
+                    <p className="text-default-500 text-sm">Manage and track interview schedules</p>
                   </div>
                 </div>
               </CardHeader>
@@ -613,21 +613,21 @@ export default function Interviews() {
                               size="sm"
                             />
                             <div>
-                              <p className="font-medium text-gray-900">{interview.candidateName}</p>
-                              <p className="text-sm text-gray-500">{interview.candidateEmail}</p>
+                              <p className="font-medium text-foreground">{interview.candidateName}</p>
+                              <p className="text-sm text-default-500">{interview.candidateEmail}</p>
                             </div>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div>
-                            <p className="font-medium text-gray-900">{interview.position}</p>
-                            <p className="text-sm text-gray-500">Round {interview.round}</p>
+                            <p className="font-medium text-foreground">{interview.position}</p>
+                            <p className="text-sm text-default-500">Round {interview.round}</p>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div>
-                            <p className="font-medium text-gray-900">{interview.interviewer}</p>
-                            <p className="text-sm text-gray-500">{interview.interviewerEmail}</p>
+                            <p className="font-medium text-foreground">{interview.interviewer}</p>
+                            <p className="text-sm text-default-500">{interview.interviewerEmail}</p>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -642,7 +642,7 @@ export default function Interviews() {
                         <TableCell>
                           <div>
                             <p className="font-medium">{new Date(interview.scheduledDate).toLocaleDateString()}</p>
-                            <p className="text-sm text-gray-500">{interview.scheduledTime} ({interview.duration}min)</p>
+                            <p className="text-sm text-default-500">{interview.scheduledTime} ({interview.duration}min)</p>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -867,8 +867,8 @@ export default function Interviews() {
                     />
                     <div>
                       <h3 className="text-xl font-bold">{selectedInterview.candidateName}</h3>
-                      <p className="text-gray-600">{selectedInterview.candidateEmail}</p>
-                      <p className="text-gray-600">{selectedInterview.candidatePhone}</p>
+                      <p className="text-default-600">{selectedInterview.candidateEmail}</p>
+                      <p className="text-default-600">{selectedInterview.candidatePhone}</p>
                     </div>
                   </div>
                   
@@ -912,7 +912,7 @@ export default function Interviews() {
                         href={selectedInterview.meetingLink} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline"
+                        className="text-primary-600 hover:text-primary-800 underline"
                       >
                         {selectedInterview.meetingLink}
                       </a>
@@ -922,7 +922,7 @@ export default function Interviews() {
                   {selectedInterview.notes && (
                     <div>
                       <h4 className="font-semibold mb-2">Notes</h4>
-                      <p className="text-gray-700">{selectedInterview.notes}</p>
+                      <p className="text-default-700">{selectedInterview.notes}</p>
                     </div>
                   )}
                   
@@ -937,12 +937,12 @@ export default function Interviews() {
                               icon="lucide:star"
                               className={`w-5 h-5 ${
                                 star <= (selectedInterview.rating || 0) 
-                                  ? "text-yellow-400 fill-current" 
-                                  : "text-gray-300"
+                                  ? "text-warning-400 fill-current" 
+                                  : "text-default-300"
                               }`}
                             />
                           ))}
-                          <span className="ml-2 text-gray-600">
+                          <span className="ml-2 text-default-600">
                             {selectedInterview.rating || 0}/5
                           </span>
                         </div>
@@ -951,7 +951,7 @@ export default function Interviews() {
                       {selectedInterview.feedback && (
                         <div>
                           <h4 className="font-semibold mb-2">Feedback</h4>
-                          <p className="text-gray-700">{selectedInterview.feedback}</p>
+                          <p className="text-default-700">{selectedInterview.feedback}</p>
                         </div>
                       )}
                     </div>

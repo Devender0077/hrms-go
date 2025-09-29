@@ -434,17 +434,17 @@ export default function LeaveManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Page Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl">
-              <Icon icon="lucide:calendar-off" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:calendar-off" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Leave Management</h1>
-              <p className="text-gray-600 mt-1">Manage employee leave requests and approvals</p>
+              <h1 className="text-3xl font-bold text-foreground">Leave Management</h1>
+              <p className="text-default-600 mt-1">Manage employee leave requests and approvals</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -536,7 +536,7 @@ export default function LeaveManagement() {
                 placeholder="Search employees..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+                startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
               <Select
                 label="Status"
@@ -573,7 +573,7 @@ export default function LeaveManagement() {
                 )}
               </Select>
               <div className="flex items-end">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-default-600">
                   Showing {filteredRequests.length} of {leaveList.length} requests
                 </div>
               </div>
@@ -585,10 +585,10 @@ export default function LeaveManagement() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-green-600 text-xl" />
+              <Icon icon="lucide:table" className="text-success-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Leave Requests</h3>
-                <p className="text-gray-500 text-sm">Click on actions to view, approve, or reject leave requests</p>
+                <h3 className="text-lg font-semibold text-foreground">Leave Requests</h3>
+                <p className="text-default-500 text-sm">Click on actions to view, approve, or reject leave requests</p>
               </div>
             </div>
           </CardHeader>
@@ -610,9 +610,9 @@ export default function LeaveManagement() {
                       <div className="flex items-center gap-3">
                         <Avatar src={request.avatar} alt={request.employeeName} size="sm" />
                         <div>
-                          <p className="font-medium text-gray-900">{request.employeeName}</p>
-                          <p className="text-sm text-gray-500">{request.employeeId}</p>
-                          <p className="text-xs text-gray-400">{request.department}</p>
+                          <p className="font-medium text-foreground">{request.employeeName}</p>
+                          <p className="text-sm text-default-500">{request.employeeId}</p>
+                          <p className="text-xs text-default-400">{request.department}</p>
                         </div>
                       </div>
                     </TableCell>
@@ -627,20 +627,20 @@ export default function LeaveManagement() {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-foreground">
                           {new Date(request.startDate).toLocaleDateString()}
                         </p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-default-500">
                           to {new Date(request.endDate).toLocaleDateString()}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-bold text-blue-600">{request.days}</span>
+                        <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-bold text-primary-600">{request.days}</span>
                         </div>
-                        <span className="text-sm text-gray-600">days</span>
+                        <span className="text-sm text-default-600">days</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -653,7 +653,7 @@ export default function LeaveManagement() {
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <p className="text-sm text-gray-900">
+                      <p className="text-sm text-foreground">
                         {new Date(request.appliedDate).toLocaleDateString()}
                       </p>
                     </TableCell>
@@ -720,10 +720,10 @@ export default function LeaveManagement() {
               <>
                 <ModalHeader className="flex flex-col gap-1">
                   <div className="flex items-center gap-3">
-                    <Icon icon="lucide:eye" className="text-green-600 text-xl" />
+                    <Icon icon="lucide:eye" className="text-success-600 text-xl" />
                     <div>
                       <h3 className="text-lg font-semibold">Leave Request Details</h3>
-                      <p className="text-sm text-gray-500">Complete leave request information</p>
+                      <p className="text-sm text-default-500">Complete leave request information</p>
                     </div>
                   </div>
                 </ModalHeader>
@@ -731,12 +731,12 @@ export default function LeaveManagement() {
                   {selectedRequest && (
                     <div className="space-y-6">
                       {/* Employee Info */}
-                      <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center gap-4 p-4 bg-content1 rounded-lg">
                         <Avatar src={selectedRequest.avatar} alt={selectedRequest.employeeName} size="lg" />
                         <div>
-                          <h4 className="text-lg font-semibold text-gray-900">{selectedRequest.employeeName}</h4>
-                          <p className="text-gray-600">{selectedRequest.employeeId}</p>
-                          <p className="text-sm text-gray-500">{selectedRequest.department}</p>
+                          <h4 className="text-lg font-semibold text-foreground">{selectedRequest.employeeName}</h4>
+                          <p className="text-default-600">{selectedRequest.employeeId}</p>
+                          <p className="text-sm text-default-500">{selectedRequest.department}</p>
                         </div>
                       </div>
 
@@ -744,7 +744,7 @@ export default function LeaveManagement() {
                       <div className="grid grid-cols-2 gap-6">
                         <div className="space-y-4">
                           <div>
-                            <span className="text-gray-500 text-sm">Leave Type</span>
+                            <span className="text-default-500 text-sm">Leave Type</span>
                             <Chip
                               size="sm"
                               color={leaveTypes.find(t => t.key === selectedRequest.leaveType)?.color as any || "default"}
@@ -755,26 +755,26 @@ export default function LeaveManagement() {
                             </Chip>
                           </div>
                           <div>
-                            <span className="text-gray-500 text-sm">Start Date</span>
+                            <span className="text-default-500 text-sm">Start Date</span>
                             <p className="font-medium">{new Date(selectedRequest.startDate).toLocaleDateString()}</p>
                           </div>
                           <div>
-                            <span className="text-gray-500 text-sm">End Date</span>
+                            <span className="text-default-500 text-sm">End Date</span>
                             <p className="font-medium">{new Date(selectedRequest.endDate).toLocaleDateString()}</p>
                           </div>
                           <div>
-                            <span className="text-gray-500 text-sm">Total Days</span>
+                            <span className="text-default-500 text-sm">Total Days</span>
                             <div className="flex items-center gap-2 mt-1">
-                              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                                <span className="text-lg font-bold text-blue-600">{selectedRequest.days}</span>
+                              <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                                <span className="text-lg font-bold text-primary-600">{selectedRequest.days}</span>
                               </div>
-                              <span className="text-sm text-gray-600">days</span>
+                              <span className="text-sm text-default-600">days</span>
                             </div>
                           </div>
                         </div>
                         <div className="space-y-4">
                           <div>
-                            <span className="text-gray-500 text-sm">Status</span>
+                            <span className="text-default-500 text-sm">Status</span>
                             <Chip
                               size="sm"
                               color={statusColorMap[selectedRequest.status] as any}
@@ -785,18 +785,18 @@ export default function LeaveManagement() {
                             </Chip>
                           </div>
                           <div>
-                            <span className="text-gray-500 text-sm">Applied Date</span>
+                            <span className="text-default-500 text-sm">Applied Date</span>
                             <p className="font-medium">{new Date(selectedRequest.appliedDate).toLocaleDateString()}</p>
                           </div>
                           {selectedRequest.approvedBy && (
                             <div>
-                              <span className="text-gray-500 text-sm">Approved By</span>
+                              <span className="text-default-500 text-sm">Approved By</span>
                               <p className="font-medium">{selectedRequest.approvedBy}</p>
                             </div>
                           )}
                           {selectedRequest.approvedDate && (
                             <div>
-                              <span className="text-gray-500 text-sm">Approved Date</span>
+                              <span className="text-default-500 text-sm">Approved Date</span>
                               <p className="font-medium">{new Date(selectedRequest.approvedDate).toLocaleDateString()}</p>
                             </div>
                           )}
@@ -805,14 +805,14 @@ export default function LeaveManagement() {
 
                       {/* Reason */}
                       <div>
-                        <span className="text-gray-500 text-sm">Reason</span>
-                        <p className="mt-1 p-3 bg-gray-50 rounded-lg text-sm">{selectedRequest.reason}</p>
+                        <span className="text-default-500 text-sm">Reason</span>
+                        <p className="mt-1 p-3 bg-content1 rounded-lg text-sm">{selectedRequest.reason}</p>
                       </div>
 
                       {/* Emergency Contact */}
                       {selectedRequest.emergencyContact && (
                         <div>
-                          <span className="text-gray-500 text-sm">Emergency Contact</span>
+                          <span className="text-default-500 text-sm">Emergency Contact</span>
                           <p className="font-medium">{selectedRequest.emergencyContact}</p>
                         </div>
                       )}
@@ -820,8 +820,8 @@ export default function LeaveManagement() {
                       {/* Rejection Reason */}
                       {selectedRequest.rejectionReason && (
                         <div>
-                          <span className="text-gray-500 text-sm">Rejection Reason</span>
-                          <p className="mt-1 p-3 bg-red-50 rounded-lg text-sm text-red-700">{selectedRequest.rejectionReason}</p>
+                          <span className="text-default-500 text-sm">Rejection Reason</span>
+                          <p className="mt-1 p-3 bg-danger-50 rounded-lg text-sm text-danger-700">{selectedRequest.rejectionReason}</p>
                         </div>
                       )}
                     </div>
@@ -844,10 +844,10 @@ export default function LeaveManagement() {
               <>
                 <ModalHeader className="flex flex-col gap-1">
                   <div className="flex items-center gap-3">
-                    <Icon icon="lucide:plus" className="text-green-600 text-xl" />
+                    <Icon icon="lucide:plus" className="text-success-600 text-xl" />
                     <div>
                       <h3 className="text-lg font-semibold">Apply for Leave</h3>
-                      <p className="text-sm text-gray-500">Submit a new leave request</p>
+                      <p className="text-sm text-default-500">Submit a new leave request</p>
                     </div>
                   </div>
                 </ModalHeader>
@@ -895,10 +895,10 @@ export default function LeaveManagement() {
                     </div>
                     
                     {newLeaveRequest.startDate && newLeaveRequest.endDate && (
-                      <div className="p-3 bg-blue-50 rounded-lg">
+                      <div className="p-3 bg-primary-50 rounded-lg">
                         <div className="flex items-center gap-2">
-                          <Icon icon="lucide:calendar" className="w-4 h-4 text-blue-600" />
-                          <span className="text-sm font-medium text-blue-900">
+                          <Icon icon="lucide:calendar" className="w-4 h-4 text-primary-600" />
+                          <span className="text-sm font-medium text-primary-900">
                             Total Days: {calculateDays(newLeaveRequest.startDate, newLeaveRequest.endDate)} days
                           </span>
                         </div>

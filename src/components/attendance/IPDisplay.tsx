@@ -62,7 +62,7 @@ const IPDisplay: React.FC<IPDisplayProps> = ({ onIPDetected }) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-primary to-secondary shadow-lg">
-              <Icon icon="lucide:shield-check" className="text-lg text-white" />
+              <Icon icon="lucide:shield-check" className="text-lg text-foreground" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-default-900">IP Address Detection</h3>

@@ -70,10 +70,10 @@ export default function CertificateSettings({ settings, onSettingsChange }: Cert
         </CardHeader>
         <CardBody className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Use Custom Letterhead</span>
-                <span className="text-xs text-gray-500">Upload a custom letterhead template or use auto-generated one</span>
+                <span className="text-sm font-medium text-foreground">Use Custom Letterhead</span>
+                <span className="text-xs text-default-500">Upload a custom letterhead template or use auto-generated one</span>
               </div>
               <Switch
                 isSelected={settings.useCustomLetterhead}
@@ -83,7 +83,7 @@ export default function CertificateSettings({ settings, onSettingsChange }: Cert
             
             {settings.useCustomLetterhead ? (
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <div className="border-2 border-dashed border-divider rounded-lg p-6 text-center">
                   <input
                     type="file"
                     accept=".docx,.doc,.pdf"
@@ -97,31 +97,31 @@ export default function CertificateSettings({ settings, onSettingsChange }: Cert
                     id="certificate-letterhead-upload"
                   />
                   <label htmlFor="certificate-letterhead-upload" className="cursor-pointer">
-                    <div className="text-gray-500 mb-2">
+                    <div className="text-default-500 mb-2">
                       <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-default-600">
                       Click to upload letterhead template
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-default-500 mt-1">
                       Supports .docx, .doc, .pdf files
                     </p>
                   </label>
                 </div>
                 {settings.letterheadFile && (
-                  <div className="p-3 bg-green-50 rounded-lg">
-                    <p className="text-sm text-green-800">
+                  <div className="p-3 bg-success-50 rounded-lg">
+                    <p className="text-sm text-success-800">
                       ✓ Uploaded: {settings.letterheadFile.name}
                     </p>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <h4 className="text-sm font-medium text-blue-900 mb-2">Auto-Generated Letterhead</h4>
-                <p className="text-xs text-blue-700">
+              <div className="p-4 bg-primary-50 rounded-lg">
+                <h4 className="text-sm font-medium text-primary-900 mb-2">Auto-Generated Letterhead</h4>
+                <p className="text-xs text-primary-700">
                   We'll automatically generate a professional letterhead using your company logo and branding information.
                 </p>
               </div>
@@ -136,20 +136,20 @@ export default function CertificateSettings({ settings, onSettingsChange }: Cert
         </CardHeader>
         <CardBody className="space-y-4">
           <div className="mb-4">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">Available Variables</h4>
+            <h4 className="text-sm font-medium text-foreground mb-2">Available Variables</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-              <span className="bg-gray-100 px-2 py-1 rounded">[EMPLOYEE_NAME]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[POSITION]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[DEPARTMENT]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[START_DATE]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[END_DATE]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[DURATION]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[JOB_DESCRIPTION]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[PERFORMANCE_RATING]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[SKILLS]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[PROJECTS]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[ACHIEVEMENTS]</span>
-              <span className="bg-gray-100 px-2 py-1 rounded">[COMPANY_NAME]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[EMPLOYEE_NAME]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[POSITION]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[DEPARTMENT]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[START_DATE]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[END_DATE]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[DURATION]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[JOB_DESCRIPTION]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[PERFORMANCE_RATING]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[SKILLS]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[PROJECTS]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[ACHIEVEMENTS]</span>
+              <span className="bg-content2 px-2 py-1 rounded">[COMPANY_NAME]</span>
             </div>
           </div>
           <Textarea
@@ -168,110 +168,110 @@ export default function CertificateSettings({ settings, onSettingsChange }: Cert
         </CardHeader>
         <CardBody className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Auto-generate experience certificates</span>
-                <span className="text-xs text-gray-500">Automatically generate certificates when employees leave</span>
+                <span className="text-sm font-medium text-foreground">Auto-generate experience certificates</span>
+                <span className="text-xs text-default-500">Automatically generate certificates when employees leave</span>
               </div>
               <Switch
                 isSelected={settings.autoGenerate}
                 onValueChange={(value) => onSettingsChange("autoGenerate", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include job description</span>
-                <span className="text-xs text-gray-500">Add detailed job responsibilities</span>
+                <span className="text-sm font-medium text-foreground">Include job description</span>
+                <span className="text-xs text-default-500">Add detailed job responsibilities</span>
               </div>
               <Switch
                 isSelected={settings.includeJobDescription}
                 onValueChange={(value) => onSettingsChange("includeJobDescription", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include performance rating</span>
-                <span className="text-xs text-gray-500">Add performance evaluation details</span>
+                <span className="text-sm font-medium text-foreground">Include performance rating</span>
+                <span className="text-xs text-default-500">Add performance evaluation details</span>
               </div>
               <Switch
                 isSelected={settings.includePerformanceRating}
                 onValueChange={(value) => onSettingsChange("includePerformanceRating", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include skills and competencies</span>
-                <span className="text-xs text-gray-500">Add technical and soft skills</span>
+                <span className="text-sm font-medium text-foreground">Include skills and competencies</span>
+                <span className="text-xs text-default-500">Add technical and soft skills</span>
               </div>
               <Switch
                 isSelected={settings.includeSkills}
                 onValueChange={(value) => onSettingsChange("includeSkills", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include project details</span>
-                <span className="text-xs text-gray-500">Add major projects and contributions</span>
+                <span className="text-sm font-medium text-foreground">Include project details</span>
+                <span className="text-xs text-default-500">Add major projects and contributions</span>
               </div>
               <Switch
                 isSelected={settings.includeProjects}
                 onValueChange={(value) => onSettingsChange("includeProjects", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include achievements and awards</span>
-                <span className="text-xs text-gray-500">Add recognition and accomplishments</span>
+                <span className="text-sm font-medium text-foreground">Include achievements and awards</span>
+                <span className="text-xs text-default-500">Add recognition and accomplishments</span>
               </div>
               <Switch
                 isSelected={settings.includeAchievements}
                 onValueChange={(value) => onSettingsChange("includeAchievements", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include employment duration</span>
-                <span className="text-xs text-gray-500">Add total service period</span>
+                <span className="text-sm font-medium text-foreground">Include employment duration</span>
+                <span className="text-xs text-default-500">Add total service period</span>
               </div>
               <Switch
                 isSelected={settings.includeDuration}
                 onValueChange={(value) => onSettingsChange("includeDuration", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include reason for leaving</span>
-                <span className="text-xs text-gray-500">Add departure reason (optional)</span>
+                <span className="text-sm font-medium text-foreground">Include reason for leaving</span>
+                <span className="text-xs text-default-500">Add departure reason (optional)</span>
               </div>
               <Switch
                 isSelected={settings.includeReasonForLeaving}
                 onValueChange={(value) => onSettingsChange("includeReasonForLeaving", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Include recommendation statement</span>
-                <span className="text-xs text-gray-500">Add professional recommendation</span>
+                <span className="text-sm font-medium text-foreground">Include recommendation statement</span>
+                <span className="text-xs text-default-500">Add professional recommendation</span>
               </div>
               <Switch
                 isSelected={settings.includeRecommendation}
                 onValueChange={(value) => onSettingsChange("includeRecommendation", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Require digital signature</span>
-                <span className="text-xs text-gray-500">Make digital signature mandatory</span>
+                <span className="text-sm font-medium text-foreground">Require digital signature</span>
+                <span className="text-xs text-default-500">Make digital signature mandatory</span>
               </div>
               <Switch
                 isSelected={settings.signatureRequired}
                 onValueChange={(value) => onSettingsChange("signatureRequired", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable digital signature</span>
-                <span className="text-xs text-gray-500">Allow digital signature functionality</span>
+                <span className="text-sm font-medium text-foreground">Enable digital signature</span>
+                <span className="text-xs text-default-500">Allow digital signature functionality</span>
               </div>
               <Switch
                 isSelected={settings.digitalSignature}

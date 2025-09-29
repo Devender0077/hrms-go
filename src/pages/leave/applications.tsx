@@ -32,7 +32,7 @@ import {
 } from "@heroui/react";
 import { parseDate, getLocalTimeZone } from "@internationalized/date";
 import { Icon } from "@iconify/react";
-import { PageLayout, PageHeader } from "../../components/layout/PageLayout";
+import PageLayout, { PageHeader } from "../../components/layout/PageLayout";
 import { apiRequest } from "../../services/api-service";
 
 interface LeaveApplication {
@@ -238,14 +238,14 @@ export default function LeaveApplications() {
         title="Leave Applications"
         description="Manage employee leave applications and approvals"
         icon="lucide:file-text"
-        iconColor="from-orange-500 to-red-600"
+        iconColor="from-primary-500 to-secondary-500"
         actions={
           <>
             <Input
               placeholder="Search applications..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
             />
             <Select

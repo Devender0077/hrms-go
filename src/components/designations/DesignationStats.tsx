@@ -20,7 +20,7 @@ const DesignationStats: React.FC<DesignationStatsProps> = ({ stats, loading }) =
           <Card key={index} className="shadow-sm">
             <CardBody className="flex flex-row items-center gap-4 p-4">
               <Spinner size="sm" />
-              <div className="h-10 w-24 bg-gray-200 rounded animate-pulse"></div>
+              <div className="h-10 w-24 bg-content3 rounded animate-pulse"></div>
             </CardBody>
           </Card>
         ))}
@@ -35,11 +35,11 @@ const DesignationStats: React.FC<DesignationStatsProps> = ({ stats, loading }) =
           <CardBody className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Designations</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-sm text-default-600">Total Designations</p>
+                <p className="text-2xl font-bold text-foreground">{stats.total}</p>
               </div>
-              <div className="p-3 bg-purple-100 rounded-full">
-                <Icon icon="lucide:award" className="text-purple-600 text-xl" />
+              <div className="p-3 bg-secondary-100 rounded-full">
+                <Icon icon="lucide:award" className="text-secondary-600 text-xl" />
               </div>
             </div>
           </CardBody>
@@ -51,13 +51,13 @@ const DesignationStats: React.FC<DesignationStatsProps> = ({ stats, loading }) =
           <CardBody className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Employees</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-sm text-default-600">Total Employees</p>
+                <p className="text-2xl font-bold text-success-600">
                   {stats.totalEmployees}
                 </p>
               </div>
-              <div className="p-3 bg-green-100 rounded-full">
-                <Icon icon="lucide:users" className="text-green-600 text-xl" />
+              <div className="p-3 bg-success-100 rounded-full">
+                <Icon icon="lucide:users" className="text-success-600 text-xl" />
               </div>
             </div>
           </CardBody>
@@ -69,13 +69,13 @@ const DesignationStats: React.FC<DesignationStatsProps> = ({ stats, loading }) =
           <CardBody className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Departments</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-sm text-default-600">Departments</p>
+                <p className="text-2xl font-bold text-primary-600">
                   {stats.totalDepartments}
                 </p>
               </div>
-              <div className="p-3 bg-blue-100 rounded-full">
-                <Icon icon="lucide:building" className="text-blue-600 text-xl" />
+              <div className="p-3 bg-primary-100 rounded-full">
+                <Icon icon="lucide:building" className="text-primary-600 text-xl" />
               </div>
             </div>
           </CardBody>

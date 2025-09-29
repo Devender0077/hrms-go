@@ -10,7 +10,6 @@ import {
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/auth-context";
-import ThemeToggle from "./theme-toggle";
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -217,11 +216,10 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   return (
     <Drawer isOpen={isOpen} onClose={onClose} placement="left">
       <DrawerContent>
-        <DrawerHeader className="flex items-center justify-between border-b border-default-100 px-4">
+        <DrawerHeader className="flex items-center justify-center border-b border-default-100">
           <h1 className="text-xl font-bold">
             HRM<span className="text-primary">GO</span>
           </h1>
-          <ThemeToggle />
         </DrawerHeader>
         <DrawerBody className="p-0">
           <nav className="py-4">
@@ -254,7 +252,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                                 <div className="relative">
                                   <Icon icon={item.icon} className="text-lg" />
                                   {item.badge && (
-                                    <span className="absolute -top-1 -right-1 bg-danger text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                    <span className="absolute -top-1 -right-1 bg-danger text-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center">
                                       {item.badge}
                                     </span>
                                   )}

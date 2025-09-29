@@ -69,7 +69,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                 {/* Basic Information */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Date</label>
+                    <label className="text-sm font-medium text-default-700">Date</label>
                     <Input
                       value={formatDate(record.date)}
                       isReadOnly
@@ -77,7 +77,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Employee ID</label>
+                    <label className="text-sm font-medium text-default-700">Employee ID</label>
                     <Input
                       value={record.employee_id}
                       isReadOnly
@@ -89,7 +89,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                 {/* Time Information */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Check In Time</label>
+                    <label className="text-sm font-medium text-default-700">Check In Time</label>
                     <Input
                       value={formatTime(record.check_in)}
                       isReadOnly
@@ -97,7 +97,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Check Out Time</label>
+                    <label className="text-sm font-medium text-default-700">Check Out Time</label>
                     <Input
                       value={formatTime(record.check_out)}
                       isReadOnly
@@ -108,7 +108,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
 
                 {/* Status */}
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Status</label>
+                  <label className="text-sm font-medium text-default-700">Status</label>
                   <div className="mt-1">
                     <Chip 
                       color={statusColorMap[record.status] as any}
@@ -124,7 +124,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                 {/* Work Hours */}
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Work Hours</label>
+                    <label className="text-sm font-medium text-default-700">Work Hours</label>
                     <Input
                       value={formatHours(record.work_hours)}
                       isReadOnly
@@ -132,7 +132,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Total Hours</label>
+                    <label className="text-sm font-medium text-default-700">Total Hours</label>
                     <Input
                       value={formatHours(record.total_hours)}
                       isReadOnly
@@ -140,7 +140,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Overtime Hours</label>
+                    <label className="text-sm font-medium text-default-700">Overtime Hours</label>
                     <Input
                       value={formatHours(record.overtime_hours)}
                       isReadOnly
@@ -152,7 +152,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                 {/* Department and Designation */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Department</label>
+                    <label className="text-sm font-medium text-default-700">Department</label>
                     <Input
                       value={record.department || '-'}
                       isReadOnly
@@ -160,7 +160,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Designation</label>
+                    <label className="text-sm font-medium text-default-700">Designation</label>
                     <Input
                       value={record.designation_name || '-'}
                       isReadOnly
@@ -172,7 +172,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                 {/* Shift */}
                 {record.shift_name && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Shift</label>
+                    <label className="text-sm font-medium text-default-700">Shift</label>
                     <Input
                       value={record.shift_name}
                       isReadOnly
@@ -184,7 +184,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                 {/* IP Address */}
                 {record.ip_address && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700">IP Address</label>
+                    <label className="text-sm font-medium text-default-700">IP Address</label>
                     <Input
                       value={record.ip_address}
                       isReadOnly
@@ -196,7 +196,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                 {/* Location */}
                 {record.location_latitude && record.location_longitude && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Location</label>
+                    <label className="text-sm font-medium text-default-700">Location</label>
                     <Input
                       value={`${parseFloat(record.location_latitude).toFixed(6)}, ${parseFloat(record.location_longitude).toFixed(6)}`}
                       isReadOnly
@@ -208,7 +208,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                 {/* Notes */}
                 {record.note && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Note</label>
+                    <label className="text-sm font-medium text-default-700">Note</label>
                     <Input
                       value={record.note}
                       isReadOnly

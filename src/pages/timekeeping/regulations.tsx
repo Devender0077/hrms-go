@@ -357,8 +357,8 @@ const RegulationsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Attendance Regulations</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Attendance Regulations</h1>
+          <p className="text-default-600 mt-2">
             Manage attendance regulations and compliance requirements
           </p>
         </div>
@@ -370,7 +370,7 @@ const RegulationsPage: React.FC = () => {
           >
             Add Regulation
           </Button>
-          <Icon icon="lucide:file-text" className="text-4xl text-blue-600" />
+          <Icon icon="lucide:file-text" className="text-4xl text-primary-600" />
         </div>
       </div>
 
@@ -382,7 +382,7 @@ const RegulationsPage: React.FC = () => {
               placeholder="Search regulations..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
             />
             <Select
@@ -438,10 +438,10 @@ const RegulationsPage: React.FC = () => {
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <Icon icon="lucide:table" className="text-green-600 text-xl" />
+            <Icon icon="lucide:table" className="text-success-600 text-xl" />
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Attendance Regulations</h3>
-              <p className="text-gray-500 text-sm">
+              <h3 className="text-lg font-semibold text-foreground">Attendance Regulations</h3>
+              <p className="text-default-500 text-sm">
                 {filteredRegulations.length} of {regulations.length} regulations
               </p>
             </div>
@@ -464,8 +464,8 @@ const RegulationsPage: React.FC = () => {
                 <TableRow key={regulation.id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium text-gray-900">{regulation.title || 'N/A'}</p>
-                      <p className="text-sm text-gray-500 truncate max-w-xs">
+                      <p className="font-medium text-foreground">{regulation.title || 'N/A'}</p>
+                      <p className="text-sm text-default-500 truncate max-w-xs">
                         {regulation.description || 'No description'}
                       </p>
                     </div>
@@ -490,20 +490,20 @@ const RegulationsPage: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     {regulation.department_name && (
-                      <span className="text-sm text-gray-900">{regulation.department_name}</span>
+                      <span className="text-sm text-foreground">{regulation.department_name}</span>
                     )}
                     {regulation.employee_name && (
-                      <span className="text-sm text-gray-900">{regulation.employee_name}</span>
+                      <span className="text-sm text-foreground">{regulation.employee_name}</span>
                     )}
                     {!regulation.department_name && !regulation.employee_name && (
-                      <span className="text-sm text-gray-500">All Employees</span>
+                      <span className="text-sm text-default-500">All Employees</span>
                     )}
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
                       <div>{new Date(regulation.effective_date).toLocaleDateString()}</div>
                       {regulation.expiry_date && (
-                        <div className="text-gray-500">Expires: {new Date(regulation.expiry_date).toLocaleDateString()}</div>
+                        <div className="text-default-500">Expires: {new Date(regulation.expiry_date).toLocaleDateString()}</div>
                       )}
                     </div>
                   </TableCell>
@@ -831,11 +831,11 @@ const RegulationsPage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Regulation Title</label>
-                        <p className="text-sm text-gray-900">{selectedRegulation.title || 'N/A'}</p>
+                        <label className="text-sm font-medium text-default-700">Regulation Title</label>
+                        <p className="text-sm text-foreground">{selectedRegulation.title || 'N/A'}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Type</label>
+                        <label className="text-sm font-medium text-default-700">Type</label>
                         <Chip 
                           color={getRegulationTypeColor(selectedRegulation.regulation_type) as any}
                           variant="flat"
@@ -847,13 +847,13 @@ const RegulationsPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Description</label>
-                      <p className="text-sm text-gray-900">{selectedRegulation.description || 'No description'}</p>
+                      <label className="text-sm font-medium text-default-700">Description</label>
+                      <p className="text-sm text-foreground">{selectedRegulation.description || 'No description'}</p>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Category</label>
+                        <label className="text-sm font-medium text-default-700">Category</label>
                         <Chip 
                           color={getCategoryColor(selectedRegulation.category) as any}
                           variant="flat"
@@ -863,7 +863,7 @@ const RegulationsPage: React.FC = () => {
                         </Chip>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Mandatory</label>
+                        <label className="text-sm font-medium text-default-700">Mandatory</label>
                         <Chip 
                           color={selectedRegulation.is_mandatory ? 'warning' : 'default'}
                           variant="flat"
@@ -878,12 +878,12 @@ const RegulationsPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Effective Date</label>
-                        <p className="text-sm text-gray-900">{new Date(selectedRegulation.effective_date).toLocaleDateString()}</p>
+                        <label className="text-sm font-medium text-default-700">Effective Date</label>
+                        <p className="text-sm text-foreground">{new Date(selectedRegulation.effective_date).toLocaleDateString()}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Expiry Date</label>
-                        <p className="text-sm text-gray-900">
+                        <label className="text-sm font-medium text-default-700">Expiry Date</label>
+                        <p className="text-sm text-foreground">
                           {selectedRegulation.expiry_date ? new Date(selectedRegulation.expiry_date).toLocaleDateString() : 'No expiry'}
                         </p>
                       </div>
@@ -891,15 +891,15 @@ const RegulationsPage: React.FC = () => {
 
                     {selectedRegulation.penalty_description && (
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Penalty Description</label>
-                        <p className="text-sm text-gray-900">{selectedRegulation.penalty_description}</p>
+                        <label className="text-sm font-medium text-default-700">Penalty Description</label>
+                        <p className="text-sm text-foreground">{selectedRegulation.penalty_description}</p>
                       </div>
                     )}
 
                     {selectedRegulation.compliance_requirements && (
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Compliance Requirements</label>
-                        <p className="text-sm text-gray-900">{selectedRegulation.compliance_requirements}</p>
+                        <label className="text-sm font-medium text-default-700">Compliance Requirements</label>
+                        <p className="text-sm text-foreground">{selectedRegulation.compliance_requirements}</p>
                       </div>
                     )}
 
@@ -907,7 +907,7 @@ const RegulationsPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Status</label>
+                        <label className="text-sm font-medium text-default-700">Status</label>
                         <Chip 
                           color={selectedRegulation.is_active ? 'success' : 'danger'}
                           variant="flat"
@@ -917,8 +917,8 @@ const RegulationsPage: React.FC = () => {
                         </Chip>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Created</label>
-                        <p className="text-sm text-gray-900">
+                        <label className="text-sm font-medium text-default-700">Created</label>
+                        <p className="text-sm text-foreground">
                           {new Date(selectedRegulation.created_at).toLocaleDateString()}
                         </p>
                       </div>

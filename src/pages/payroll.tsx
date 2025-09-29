@@ -543,17 +543,17 @@ const paymentMethods = [
       };
       
       return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
           {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl">
-              <Icon icon="lucide:credit-card" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:credit-card" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Payroll</h1>
-              <p className="text-gray-600 mt-1">Manage employee salaries and payslips</p>
+              <h1 className="text-3xl font-bold text-foreground">Payroll</h1>
+              <p className="text-default-600 mt-1">Manage employee salaries and payslips</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -673,8 +673,8 @@ const paymentMethods = [
           <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
             <Card className="shadow-sm">
               <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 rounded-full bg-green-100">
-                  <Icon icon="lucide:dollar-sign" className="text-2xl text-green-600" />
+                <div className="p-3 rounded-full bg-success-100">
+                  <Icon icon="lucide:dollar-sign" className="text-2xl text-success-600" />
                   </div>
                   <div>
                   <p className="text-default-500">Total Amount</p>
@@ -693,7 +693,7 @@ const paymentMethods = [
                 placeholder="Search employees..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+                startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
               <Select
                 label="Month"
@@ -722,7 +722,7 @@ const paymentMethods = [
                 )}
               </Select>
               <div className="flex items-end">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-default-600">
                   Showing {filteredPayroll.length} of {payrollList.length} records
                 </div>
               </div>
@@ -734,10 +734,10 @@ const paymentMethods = [
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-green-600 text-xl" />
+              <Icon icon="lucide:table" className="text-success-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Payroll Records</h3>
-                <p className="text-gray-500 text-sm">Click on actions to view payslip or process payment</p>
+                <h3 className="text-lg font-semibold text-foreground">Payroll Records</h3>
+                <p className="text-default-500 text-sm">Click on actions to view payslip or process payment</p>
               </div>
               </div>
             </CardHeader>
@@ -760,32 +760,32 @@ const paymentMethods = [
                         <div className="flex items-center gap-3">
                           <Avatar src={payroll.avatar} size="sm" />
                           <div>
-                          <p className="font-medium text-gray-900">{payroll.employeeName}</p>
-                          <p className="text-sm text-gray-500">{payroll.employeeId}</p>
-                          <p className="text-xs text-gray-400">{payroll.department}</p>
+                          <p className="font-medium text-foreground">{payroll.employeeName}</p>
+                          <p className="text-sm text-default-500">{payroll.employeeId}</p>
+                          <p className="text-xs text-default-400">{payroll.department}</p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{payroll.month} {payroll.year}</p>
+                        <p className="font-medium text-foreground">{payroll.month} {payroll.year}</p>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <p className="font-medium text-gray-900">{formatCurrency(payroll.basicSalary)}</p>
+                      <p className="font-medium text-foreground">{formatCurrency(payroll.basicSalary)}</p>
                     </TableCell>
                     <TableCell>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-foreground">
                         {formatCurrency(Object.values(payroll.allowances).reduce((sum, val) => sum + val, 0))}
                       </p>
                     </TableCell>
                     <TableCell>
-                      <p className="font-medium text-gray-900">
+                      <p className="font-medium text-foreground">
                         {formatCurrency(Object.values(payroll.deductions).reduce((sum, val) => sum + val, 0))}
                       </p>
                     </TableCell>
                     <TableCell>
-                      <p className="font-bold text-gray-900">{formatCurrency(payroll.netSalary)}</p>
+                      <p className="font-bold text-foreground">{formatCurrency(payroll.netSalary)}</p>
                       </TableCell>
                       <TableCell>
                         <Chip 
@@ -848,12 +848,12 @@ const paymentMethods = [
                 <>
                   <ModalHeader className="flex flex-col gap-1">
                   <div className="flex items-center gap-3">
-                    <Icon icon="lucide:file-text" className="text-green-600 text-xl" />
+                    <Icon icon="lucide:file-text" className="text-success-600 text-xl" />
                     <div>
                       <h3 className="text-lg font-semibold">
                     Payslip - {selectedPayroll?.month} {selectedPayroll?.year}
                       </h3>
-                      <p className="text-sm text-gray-500">Employee salary breakdown</p>
+                      <p className="text-sm text-default-500">Employee salary breakdown</p>
                     </div>
                   </div>
                   </ModalHeader>
@@ -861,9 +861,9 @@ const paymentMethods = [
                     {selectedPayroll && (
                       <div className="space-y-6">
                       {/* Header */}
-                      <div className="flex justify-between items-start p-4 bg-gray-50 rounded-lg">
+                      <div className="flex justify-between items-start p-4 bg-content1 rounded-lg">
                         <div>
-                          <h4 className="text-lg font-semibold text-gray-900">Payslip Details</h4>
+                          <h4 className="text-lg font-semibold text-foreground">Payslip Details</h4>
                           <p className="text-sm">Payslip #: PS-{selectedPayroll.id.toString().padStart(4, '0')}</p>
                           <p className="text-sm">Date: {selectedPayroll.paymentDate || 'Pending'}</p>
                         </div>
@@ -873,23 +873,23 @@ const paymentMethods = [
                       </div>
 
                       {/* Employee Info */}
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <h5 className="font-semibold text-gray-900 mb-3">Employee Information</h5>
+                      <div className="p-4 border border-default-300 rounded-lg">
+                        <h5 className="font-semibold text-foreground mb-3">Employee Information</h5>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <span className="text-gray-500 text-sm">Name:</span>
+                            <span className="text-default-500 text-sm">Name:</span>
                             <p className="font-medium">{selectedPayroll.employeeName}</p>
                           </div>
                           <div>
-                            <span className="text-gray-500 text-sm">Employee ID:</span>
+                            <span className="text-default-500 text-sm">Employee ID:</span>
                             <p className="font-medium">{selectedPayroll.employeeId}</p>
                           </div>
                           <div>
-                            <span className="text-gray-500 text-sm">Department:</span>
+                            <span className="text-default-500 text-sm">Department:</span>
                             <p className="font-medium">{selectedPayroll.department}</p>
                         </div>
                             <div>
-                            <span className="text-gray-500 text-sm">Designation:</span>
+                            <span className="text-default-500 text-sm">Designation:</span>
                             <p className="font-medium">{selectedPayroll.designation}</p>
                             </div>
                           </div>
@@ -898,8 +898,8 @@ const paymentMethods = [
                       {/* Salary Breakdown */}
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Earnings */}
-                        <div className="p-4 border border-gray-200 rounded-lg">
-                          <h5 className="font-semibold text-gray-900 mb-3">Earnings</h5>
+                        <div className="p-4 border border-default-300 rounded-lg">
+                          <h5 className="font-semibold text-foreground mb-3">Earnings</h5>
                             <div className="space-y-2">
                               <div className="flex justify-between">
                                 <span>Basic Salary</span>
@@ -938,8 +938,8 @@ const paymentMethods = [
                           </div>
                           
                         {/* Deductions */}
-                        <div className="p-4 border border-gray-200 rounded-lg">
-                          <h5 className="font-semibold text-gray-900 mb-3">Deductions</h5>
+                        <div className="p-4 border border-default-300 rounded-lg">
+                          <h5 className="font-semibold text-foreground mb-3">Deductions</h5>
                             <div className="space-y-2">
                               <div className="flex justify-between">
                                 <span>Income Tax</span>
@@ -967,34 +967,34 @@ const paymentMethods = [
                       </div>
 
                       {/* Net Salary */}
-                      <div className="p-4 bg-green-50 rounded-lg">
+                      <div className="p-4 bg-success-50 rounded-lg">
                         <div className="flex justify-between items-center">
-                          <span className="text-lg font-semibold text-gray-900">Net Salary</span>
-                          <span className="text-2xl font-bold text-green-600">{formatCurrency(selectedPayroll.netSalary)}</span>
+                          <span className="text-lg font-semibold text-foreground">Net Salary</span>
+                          <span className="text-2xl font-bold text-success-600">{formatCurrency(selectedPayroll.netSalary)}</span>
                           </div>
                         </div>
                         
                       {/* Payment Info */}
                       {selectedPayroll.paymentDate && (
-                        <div className="p-4 border border-gray-200 rounded-lg">
-                          <h5 className="font-semibold text-gray-900 mb-3">Payment Information</h5>
+                        <div className="p-4 border border-default-300 rounded-lg">
+                          <h5 className="font-semibold text-foreground mb-3">Payment Information</h5>
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <span className="text-gray-500 text-sm">Payment Date:</span>
+                              <span className="text-default-500 text-sm">Payment Date:</span>
                               <p className="font-medium">{new Date(selectedPayroll.paymentDate).toLocaleDateString()}</p>
                             </div>
                             <div>
-                              <span className="text-gray-500 text-sm">Payment Method:</span>
+                              <span className="text-default-500 text-sm">Payment Method:</span>
                               <p className="font-medium">{paymentMethods.find(m => m.key === selectedPayroll.paymentMethod)?.label}</p>
                             </div>
                             {selectedPayroll.bankDetails && (
                               <>
                                 <div>
-                                  <span className="text-gray-500 text-sm">Bank:</span>
+                                  <span className="text-default-500 text-sm">Bank:</span>
                                   <p className="font-medium">{selectedPayroll.bankDetails.bankName}</p>
                                 </div>
                                 <div>
-                                  <span className="text-gray-500 text-sm">Account:</span>
+                                  <span className="text-default-500 text-sm">Account:</span>
                                   <p className="font-medium">{selectedPayroll.bankDetails.accountNumber}</p>
                                 </div>
                               </>
@@ -1032,28 +1032,28 @@ const paymentMethods = [
               <>
                 <ModalHeader className="flex flex-col gap-1">
                   <div className="flex items-center gap-3">
-                    <Icon icon="lucide:credit-card" className="text-green-600 text-xl" />
+                    <Icon icon="lucide:credit-card" className="text-success-600 text-xl" />
                     <div>
                       <h3 className="text-lg font-semibold">Confirm Payment</h3>
-                      <p className="text-sm text-gray-500">Process payment for employee</p>
+                      <p className="text-sm text-default-500">Process payment for employee</p>
                     </div>
                   </div>
                 </ModalHeader>
                 <ModalBody>
                   {selectedPayroll && (
                     <div className="space-y-4">
-                      <div className="p-4 bg-gray-50 rounded-lg">
+                      <div className="p-4 bg-content1 rounded-lg">
                         <div className="flex items-center gap-3">
                           <Avatar src={selectedPayroll.avatar} size="md" />
                           <div>
-                            <h4 className="font-semibold text-gray-900">{selectedPayroll.employeeName}</h4>
-                            <p className="text-sm text-gray-500">{selectedPayroll.employeeId} • {selectedPayroll.department}</p>
+                            <h4 className="font-semibold text-foreground">{selectedPayroll.employeeName}</h4>
+                            <p className="text-sm text-default-500">{selectedPayroll.employeeId} • {selectedPayroll.department}</p>
                           </div>
                         </div>
                       </div>
                       
-                      <div className="p-4 border border-gray-200 rounded-lg">
-                        <h5 className="font-semibold text-gray-900 mb-3">Payment Details</h5>
+                      <div className="p-4 border border-default-300 rounded-lg">
+                        <h5 className="font-semibold text-foreground mb-3">Payment Details</h5>
                         <div className="space-y-2">
                           <div className="flex justify-between">
                             <span>Period:</span>
@@ -1066,18 +1066,18 @@ const paymentMethods = [
                           <Divider />
                           <div className="flex justify-between font-semibold text-lg">
                             <span>Amount to Pay:</span>
-                            <span className="text-green-600">{formatCurrency(selectedPayroll.netSalary)}</span>
+                            <span className="text-success-600">{formatCurrency(selectedPayroll.netSalary)}</span>
                           </div>
                         </div>
                       </div>
                       
                       {selectedPayroll.bankDetails && (
-                        <div className="p-4 border border-gray-200 rounded-lg">
-                          <h5 className="font-semibold text-gray-900 mb-3">Bank Details</h5>
+                        <div className="p-4 border border-default-300 rounded-lg">
+                          <h5 className="font-semibold text-foreground mb-3">Bank Details</h5>
                           <div className="space-y-1 text-sm">
-                            <p><span className="text-gray-500">Bank:</span> {selectedPayroll.bankDetails.bankName}</p>
-                            <p><span className="text-gray-500">Account:</span> {selectedPayroll.bankDetails.accountNumber}</p>
-                            <p><span className="text-gray-500">Routing:</span> {selectedPayroll.bankDetails.routingNumber}</p>
+                            <p><span className="text-default-500">Bank:</span> {selectedPayroll.bankDetails.bankName}</p>
+                            <p><span className="text-default-500">Account:</span> {selectedPayroll.bankDetails.accountNumber}</p>
+                            <p><span className="text-default-500">Routing:</span> {selectedPayroll.bankDetails.routingNumber}</p>
                           </div>
                         </div>
                       )}

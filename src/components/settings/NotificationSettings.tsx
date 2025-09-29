@@ -33,47 +33,47 @@ export default function NotificationSettings({ settings, onSettingsChange }: Not
         </div>
         <div>
           <h2 className="text-xl font-semibold">Notification Settings</h2>
-          <p className="text-gray-600">Configure notification preferences and channels</p>
+          <p className="text-default-600">Configure notification preferences and channels</p>
         </div>
       </div>
       
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Notification Types</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">Email Notifications</span>
-              <span className="text-xs text-gray-500">Receive notifications via email</span>
+              <span className="text-sm font-medium text-foreground">Email Notifications</span>
+              <span className="text-xs text-default-500">Receive notifications via email</span>
             </div>
             <Switch
               isSelected={settings.emailNotifications}
               onValueChange={(value) => onSettingsChange("emailNotifications", value)}
             />
           </div>
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">SMS Notifications</span>
-              <span className="text-xs text-gray-500">Receive notifications via SMS</span>
+              <span className="text-sm font-medium text-foreground">SMS Notifications</span>
+              <span className="text-xs text-default-500">Receive notifications via SMS</span>
             </div>
             <Switch
               isSelected={settings.smsNotifications}
               onValueChange={(value) => onSettingsChange("smsNotifications", value)}
             />
           </div>
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">Push Notifications</span>
-              <span className="text-xs text-gray-500">Receive push notifications on mobile devices</span>
+              <span className="text-sm font-medium text-foreground">Push Notifications</span>
+              <span className="text-xs text-default-500">Receive push notifications on mobile devices</span>
             </div>
             <Switch
               isSelected={settings.pushNotifications}
               onValueChange={(value) => onSettingsChange("pushNotifications", value)}
             />
           </div>
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">In-App Notifications</span>
-              <span className="text-xs text-gray-500">Show notifications within the application</span>
+              <span className="text-sm font-medium text-foreground">In-App Notifications</span>
+              <span className="text-xs text-default-500">Show notifications within the application</span>
             </div>
             <Switch
               isSelected={settings.inAppNotifications}
@@ -175,10 +175,10 @@ export default function NotificationSettings({ settings, onSettingsChange }: Not
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Quiet Hours</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">Enable Quiet Hours</span>
-              <span className="text-xs text-gray-500">Disable notifications during specified hours</span>
+              <span className="text-sm font-medium text-foreground">Enable Quiet Hours</span>
+              <span className="text-xs text-default-500">Disable notifications during specified hours</span>
             </div>
             <Switch
               isSelected={settings.quietHours.enabled}

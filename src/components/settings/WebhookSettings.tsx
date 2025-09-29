@@ -99,10 +99,10 @@ export default function WebhookSettings({
               onChange={(e) => onSettingsChange("retryDelay", parseInt(e.target.value))}
             />
           </div>
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">Enable webhook system</span>
-              <span className="text-xs text-gray-500">Enable webhook functionality for real-time notifications</span>
+              <span className="text-sm font-medium text-foreground">Enable webhook system</span>
+              <span className="text-xs text-default-500">Enable webhook functionality for real-time notifications</span>
             </div>
             <Switch
               isSelected={settings.enabled}

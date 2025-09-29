@@ -24,7 +24,7 @@ export default function WorkflowSettings({ settings, onSettingsChange }: Workflo
         </div>
         <div>
           <h2 className="text-xl font-semibold">Workflow Settings</h2>
-          <p className="text-gray-600">Configure approval workflows and automation</p>
+          <p className="text-default-600">Configure approval workflows and automation</p>
         </div>
       </div>
       
@@ -124,9 +124,9 @@ export default function WorkflowSettings({ settings, onSettingsChange }: Workflo
         <div>
           <h3 className="text-lg font-semibold mb-4">Workflow Rules</h3>
           <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-content1 rounded-lg">
               <h4 className="font-medium mb-2">Leave Request Rules</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-default-600 space-y-1">
                 <li>• Requests under 3 days: Auto-approved for employees with good attendance</li>
                 <li>• Requests over 7 days: Require manager and HR approval</li>
                 <li>• Emergency leave: Can be approved by any manager</li>
@@ -134,9 +134,9 @@ export default function WorkflowSettings({ settings, onSettingsChange }: Workflo
               </ul>
             </div>
             
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-content1 rounded-lg">
               <h4 className="font-medium mb-2">Expense Claim Rules</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-default-600 space-y-1">
                 <li>• Expenses under $50: Auto-approved</li>
                 <li>• Expenses $50-$500: Manager approval required</li>
                 <li>• Expenses over $500: Finance department approval required</li>
@@ -144,9 +144,9 @@ export default function WorkflowSettings({ settings, onSettingsChange }: Workflo
               </ul>
             </div>
             
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-content1 rounded-lg">
               <h4 className="font-medium mb-2">Recruitment Rules</h4>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-default-600 space-y-1">
                 <li>• Junior positions: HR screening + Hiring manager interview</li>
                 <li>• Senior positions: HR + Manager + Team lead interviews</li>
                 <li>• Executive positions: Full hiring committee review</li>

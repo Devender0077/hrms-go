@@ -46,22 +46,22 @@ const CheckInOut: React.FC<CheckInOutProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Icon icon="lucide:clock-in" className="text-2xl text-green-600" />
+              <Icon icon="lucide:clock-in" className="text-2xl text-success-600" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Time Tracking</h3>
-                <p className="text-sm text-gray-600">Check in and out for attendance</p>
+                <h3 className="text-lg font-semibold text-foreground">Time Tracking</h3>
+                <p className="text-sm text-default-600">Check in and out for attendance</p>
                 {!canCheckIn && !canCheckOut && (
                   <p className="text-xs text-amber-600 mt-1">
                     ✓ You have completed today's attendance
                   </p>
                 )}
                 {canCheckIn && (
-                  <p className="text-xs text-blue-600 mt-1">
+                  <p className="text-xs text-primary-600 mt-1">
                     Ready to check in
                   </p>
                 )}
                 {canCheckOut && (
-                  <p className="text-xs text-orange-600 mt-1">
+                  <p className="text-xs text-warning-600 mt-1">
                     Ready to check out
                   </p>
                 )}
@@ -109,10 +109,10 @@ const CheckInOut: React.FC<CheckInOutProps> = ({
         </div>
         
         {locationError && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mt-4 p-3 bg-danger-50 border border-red-200 rounded-lg">
             <div className="flex items-center gap-2">
-              <Icon icon="lucide:alert-circle" className="text-red-500 text-sm" />
-              <p className="text-sm text-red-700">{locationError}</p>
+              <Icon icon="lucide:alert-circle" className="text-danger text-sm" />
+              <p className="text-sm text-danger-700">{locationError}</p>
             </div>
           </div>
         )}

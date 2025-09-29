@@ -25,7 +25,7 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
         </div>
         <div>
           <h2 className="text-xl font-semibold">Reports & Analytics</h2>
-          <p className="text-gray-600">Configure report generation and analytics settings</p>
+          <p className="text-default-600">Configure report generation and analytics settings</p>
         </div>
       </div>
 
@@ -35,10 +35,10 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
           <h3 className="text-lg font-semibold">Report Generation</h3>
         </CardHeader>
         <CardBody className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">Auto Report Generation</span>
-              <span className="text-xs text-gray-500">Automatically generate reports on schedule</span>
+              <span className="text-sm font-medium text-foreground">Auto Report Generation</span>
+              <span className="text-xs text-default-500">Automatically generate reports on schedule</span>
             </div>
             <Switch
               isSelected={settings.autoReportGeneration}
@@ -71,10 +71,10 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
             </Select>
           </div>
           
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">Email Reports</span>
-              <span className="text-xs text-gray-500">Automatically email reports to stakeholders</span>
+              <span className="text-sm font-medium text-foreground">Email Reports</span>
+              <span className="text-xs text-default-500">Automatically email reports to stakeholders</span>
             </div>
             <Switch
               isSelected={settings.emailReports}
@@ -99,10 +99,10 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
           <h3 className="text-lg font-semibold">Report Content</h3>
         </CardHeader>
         <CardBody className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">Include Charts</span>
-              <span className="text-xs text-gray-500">Add visual charts and graphs to reports</span>
+              <span className="text-sm font-medium text-foreground">Include Charts</span>
+              <span className="text-xs text-default-500">Add visual charts and graphs to reports</span>
             </div>
             <Switch
               isSelected={settings.includeCharts}
@@ -110,10 +110,10 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
             />
           </div>
           
-          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
             <div className="flex flex-col">
-              <span className="text-sm font-medium text-gray-900">Include Raw Data</span>
-              <span className="text-xs text-gray-500">Include detailed data tables in reports</span>
+              <span className="text-sm font-medium text-foreground">Include Raw Data</span>
+              <span className="text-xs text-default-500">Include detailed data tables in reports</span>
             </div>
             <Switch
               isSelected={settings.includeRawData}
@@ -147,10 +147,10 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 border rounded-lg">
               <div className="flex items-center gap-3 mb-2">
-                <Icon icon="lucide:users" className="text-blue-600" />
+                <Icon icon="lucide:users" className="text-primary-600" />
                 <h4 className="font-medium">Employee Reports</h4>
               </div>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-default-600 space-y-1">
                 <li>• Employee Directory</li>
                 <li>• Attendance Summary</li>
                 <li>• Performance Reviews</li>
@@ -160,10 +160,10 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
             
             <div className="p-4 border rounded-lg">
               <div className="flex items-center gap-3 mb-2">
-                <Icon icon="lucide:calendar" className="text-green-600" />
+                <Icon icon="lucide:calendar" className="text-success-600" />
                 <h4 className="font-medium">Leave Reports</h4>
               </div>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-default-600 space-y-1">
                 <li>• Leave Balance</li>
                 <li>• Leave Usage</li>
                 <li>• Holiday Calendar</li>
@@ -173,10 +173,10 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
             
             <div className="p-4 border rounded-lg">
               <div className="flex items-center gap-3 mb-2">
-                <Icon icon="lucide:dollar-sign" className="text-yellow-600" />
+                <Icon icon="lucide:dollar-sign" className="text-warning-600" />
                 <h4 className="font-medium">Payroll Reports</h4>
               </div>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-default-600 space-y-1">
                 <li>• Payroll Summary</li>
                 <li>• Tax Reports</li>
                 <li>• Benefits Summary</li>
@@ -186,10 +186,10 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
             
             <div className="p-4 border rounded-lg">
               <div className="flex items-center gap-3 mb-2">
-                <Icon icon="lucide:trending-up" className="text-purple-600" />
+                <Icon icon="lucide:trending-up" className="text-secondary-600" />
                 <h4 className="font-medium">Analytics Reports</h4>
               </div>
-              <ul className="text-sm text-gray-600 space-y-1">
+              <ul className="text-sm text-default-600 space-y-1">
                 <li>• HR Analytics</li>
                 <li>• Performance Metrics</li>
                 <li>• Cost Analysis</li>
@@ -207,20 +207,20 @@ export default function ReportsSettings({ settings, onSettingsChange }: ReportsS
         </CardHeader>
         <CardBody>
           <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-content1 rounded-lg">
               <h4 className="font-medium mb-2">Scheduled Reports</h4>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Weekly Attendance Report</span>
-                  <span className="text-xs text-gray-500">Every Monday at 9:00 AM</span>
+                  <span className="text-xs text-default-500">Every Monday at 9:00 AM</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Monthly Payroll Report</span>
-                  <span className="text-xs text-gray-500">1st of every month at 8:00 AM</span>
+                  <span className="text-xs text-default-500">1st of every month at 8:00 AM</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Quarterly Performance Report</span>
-                  <span className="text-xs text-gray-500">1st of quarter at 10:00 AM</span>
+                  <span className="text-xs text-default-500">1st of quarter at 10:00 AM</span>
                 </div>
               </div>
             </div>

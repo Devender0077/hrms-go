@@ -30,7 +30,9 @@ export const useAssets = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await assetsAPI.getAll();
+      const response = await assetsAPI.getAll();
+      // Handle both array response and object with data property
+      const data = Array.isArray(response) ? response : (response.data || []);
       setAssets(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load assets');

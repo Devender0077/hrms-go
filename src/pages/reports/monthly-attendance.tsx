@@ -142,29 +142,29 @@ export default function MonthlyAttendanceReport() {
         label: "Total Employees",
         value: totalEmployees,
         icon: "lucide:users",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Present Days",
         value: totalPresentDays,
         icon: "lucide:check-circle",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Absent Days",
         value: totalAbsentDays,
         icon: "lucide:x-circle",
-        color: "text-red-600",
-        bgColor: "bg-red-100"
+        color: "text-danger-600",
+        bgColor: "bg-danger-100"
       },
       {
         label: "Avg Attendance Rate",
         value: `${avgAttendanceRate.toFixed(1)}%`,
         icon: "lucide:trending-up",
-        color: "text-purple-600",
-        bgColor: "bg-purple-100"
+        color: "text-secondary-600",
+        bgColor: "bg-secondary-100"
       }
     ];
   }, []);
@@ -212,14 +212,14 @@ export default function MonthlyAttendanceReport() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <ReportHeader
           title="Monthly Attendance Report"
           description="Comprehensive monthly attendance analysis and tracking"
           icon="lucide:calendar-check"
-          iconColor="from-blue-500 to-indigo-600"
+          iconColor="from-primary-500 to-primary-600"
           onExport={handleExport}
           onRefresh={handleRefresh}
           isExporting={isExporting}
@@ -239,7 +239,7 @@ export default function MonthlyAttendanceReport() {
           filterLabel="Department"
           additionalFilters={
             <div className="flex items-end">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-default-600">
                 Showing {filteredData.length} of {monthlyAttendanceData.length} records
               </div>
             </div>
@@ -250,10 +250,10 @@ export default function MonthlyAttendanceReport() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-blue-600 text-xl" />
+              <Icon icon="lucide:table" className="text-primary-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Monthly Attendance Data</h3>
-                <p className="text-gray-500 text-sm">Department-wise attendance analysis</p>
+                <h3 className="text-lg font-semibold text-foreground">Monthly Attendance Data</h3>
+                <p className="text-default-500 text-sm">Department-wise attendance analysis</p>
               </div>
             </div>
           </CardHeader>
@@ -274,7 +274,7 @@ export default function MonthlyAttendanceReport() {
                 {paginatedData.map((record) => (
                   <TableRow key={record.id}>
                     <TableCell>
-                      <p className="font-medium text-gray-900">{record.month}</p>
+                      <p className="font-medium text-foreground">{record.month}</p>
                     </TableCell>
                     <TableCell>
                       <Chip size="sm" variant="flat" color="primary">
@@ -283,33 +283,33 @@ export default function MonthlyAttendanceReport() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:users" className="w-4 h-4 text-blue-500" />
+                        <Icon icon="lucide:users" className="w-4 h-4 text-primary" />
                         <span className="font-medium">{record.totalEmployees}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:check-circle" className="w-4 h-4 text-green-500" />
-                        <span className="font-medium text-green-600">{record.presentDays}</span>
+                        <Icon icon="lucide:check-circle" className="w-4 h-4 text-success" />
+                        <span className="font-medium text-success-600">{record.presentDays}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:x-circle" className="w-4 h-4 text-red-500" />
-                        <span className="font-medium text-red-600">{record.absentDays}</span>
+                        <Icon icon="lucide:x-circle" className="w-4 h-4 text-danger" />
+                        <span className="font-medium text-danger-600">{record.absentDays}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:clock" className="w-4 h-4 text-orange-500" />
-                        <span className="font-medium text-orange-600">{record.lateArrivals}</span>
+                        <Icon icon="lucide:clock" className="w-4 h-4 text-warning" />
+                        <span className="font-medium text-warning-600">{record.lateArrivals}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="w-16 h-2 bg-content3 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-green-500 rounded-full" 
+                            className="h-full bg-success rounded-full" 
                             style={{ width: `${Math.min(record.attendanceRate, 100)}%` }}
                           ></div>
                         </div>
@@ -318,7 +318,7 @@ export default function MonthlyAttendanceReport() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:clock" className="w-4 h-4 text-purple-500" />
+                        <Icon icon="lucide:clock" className="w-4 h-4 text-secondary" />
                         <span className="font-medium">{record.overtimeHours}h</span>
                       </div>
                     </TableCell>

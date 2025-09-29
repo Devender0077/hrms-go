@@ -175,29 +175,29 @@ export default function TimesheetReport() {
         label: "Total Hours",
         value: totalHours,
         icon: "lucide:clock",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Overtime Hours",
         value: totalOvertimeHours,
         icon: "lucide:clock-plus",
-        color: "text-orange-600",
-        bgColor: "bg-orange-100"
+        color: "text-warning-600",
+        bgColor: "bg-warning-100"
       },
       {
         label: "Total Amount",
         value: `$${totalAmount.toLocaleString()}`,
         icon: "lucide:dollar-sign",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Avg Hours/Day",
         value: avgHoursPerDay.toFixed(1),
         icon: "lucide:trending-up",
-        color: "text-purple-600",
-        bgColor: "bg-purple-100"
+        color: "text-secondary-600",
+        bgColor: "bg-secondary-100"
       }
     ];
   }, []);
@@ -245,14 +245,14 @@ export default function TimesheetReport() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <ReportHeader
           title="Timesheet Report"
           description="Comprehensive timesheet tracking and project time analysis"
           icon="lucide:clock"
-          iconColor="from-indigo-500 to-purple-600"
+          iconColor="from-primary-500 to-secondary-600"
           onExport={handleExport}
           onRefresh={handleRefresh}
           isExporting={isExporting}
@@ -270,12 +270,12 @@ export default function TimesheetReport() {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <select
                 value={selectedDepartment}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {departments.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
@@ -284,7 +284,7 @@ export default function TimesheetReport() {
               <select
                 value={selectedProject}
                 onChange={(e) => setSelectedProject(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {projects.map(project => (
                   <option key={project} value={project}>{project}</option>
@@ -293,14 +293,14 @@ export default function TimesheetReport() {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {statuses.map(status => (
                   <option key={status} value={status}>{status}</option>
                 ))}
               </select>
               <div className="flex items-end">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-default-600">
                   Showing {filteredData.length} of {timesheetReportData.length} records
                 </div>
               </div>
@@ -312,10 +312,10 @@ export default function TimesheetReport() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-indigo-600 text-xl" />
+              <Icon icon="lucide:table" className="text-primary-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Timesheet Records</h3>
-                <p className="text-gray-500 text-sm">Employee time tracking and project hours</p>
+                <h3 className="text-lg font-semibold text-foreground">Timesheet Records</h3>
+                <p className="text-default-500 text-sm">Employee time tracking and project hours</p>
               </div>
             </div>
           </CardHeader>
@@ -338,9 +338,9 @@ export default function TimesheetReport() {
                   <TableRow key={record.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{record.employeeName}</p>
-                        <p className="text-sm text-gray-500">{record.employeeId}</p>
-                        <p className="text-sm text-gray-500">{record.department}</p>
+                        <p className="font-medium text-foreground">{record.employeeName}</p>
+                        <p className="text-sm text-default-500">{record.employeeId}</p>
+                        <p className="text-sm text-default-500">{record.department}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -349,40 +349,40 @@ export default function TimesheetReport() {
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <p className="font-medium text-gray-900">{new Date(record.date).toLocaleDateString()}</p>
+                      <p className="font-medium text-foreground">{new Date(record.date).toLocaleDateString()}</p>
                     </TableCell>
                     <TableCell>
                       <div>
                         <p className="text-sm font-medium">{record.startTime} - {record.endTime}</p>
-                        <p className="text-sm text-gray-500">Break: {record.breakTime}min</p>
+                        <p className="text-sm text-default-500">Break: {record.breakTime}min</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:clock" className="w-4 h-4 text-blue-500" />
+                        <Icon icon="lucide:clock" className="w-4 h-4 text-primary" />
                         <span className="font-medium">{record.totalHours}h</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       {record.overtimeHours > 0 ? (
                         <div className="flex items-center gap-2">
-                          <Icon icon="lucide:clock-plus" className="w-4 h-4 text-orange-500" />
-                          <span className="font-medium text-orange-600">{record.overtimeHours}h</span>
+                          <Icon icon="lucide:clock-plus" className="w-4 h-4 text-warning" />
+                          <span className="font-medium text-warning-600">{record.overtimeHours}h</span>
                         </div>
                       ) : (
-                        <span className="text-gray-500">-</span>
+                        <span className="text-default-500">-</span>
                       )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:dollar-sign" className="w-4 h-4 text-green-500" />
+                        <Icon icon="lucide:dollar-sign" className="w-4 h-4 text-success" />
                         <span className="font-medium">${record.hourlyRate}/h</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:wallet" className="w-4 h-4 text-green-500" />
-                        <span className="font-bold text-green-600">${record.totalAmount}</span>
+                        <Icon icon="lucide:wallet" className="w-4 h-4 text-success" />
+                        <span className="font-bold text-success-600">${record.totalAmount}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -395,7 +395,7 @@ export default function TimesheetReport() {
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <p className="text-sm text-gray-700 max-w-32 truncate" title={record.description}>
+                      <p className="text-sm text-default-700 max-w-32 truncate" title={record.description}>
                         {record.description}
                       </p>
                     </TableCell>

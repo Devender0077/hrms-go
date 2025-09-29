@@ -25,7 +25,7 @@ import {
   Progress,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { PageLayout, PageHeader } from "../../components/layout/PageLayout";
+import PageLayout, { PageHeader } from "../../components/layout/PageLayout";
 import { apiRequest } from "../../services/api-service";
 
 interface LeaveBalance {
@@ -219,14 +219,14 @@ export default function LeaveBalances() {
         title="Leave Balances"
         description="Track and manage employee leave balances"
         icon="lucide:scale"
-        iconColor="from-green-500 to-teal-600"
+        iconColor="from-primary-500 to-secondary-500"
         actions={
           <>
             <Input
               placeholder="Search balances..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
             />
             <Select
@@ -291,7 +291,7 @@ export default function LeaveBalances() {
                     <span className="font-medium">{balance.used_days} days</span>
                   </TableCell>
                   <TableCell>
-                    <span className="font-medium text-green-600">{balance.remaining_days} days</span>
+                    <span className="font-medium text-success-600">{balance.remaining_days} days</span>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -300,7 +300,7 @@ export default function LeaveBalances() {
                         color={getUsageColor(balance.used_days, balance.total_days)}
                         className="w-20"
                       />
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm text-default-600">
                         {getUsagePercentage(balance.used_days, balance.total_days)}%
                       </span>
                     </div>

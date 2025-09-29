@@ -116,6 +116,8 @@ export const employeeAPI = {
 
   getById: (id) => apiRequest(`/employees/${id}`),
 
+  getByUserId: (userId) => apiRequest(`/employees/user/${userId}`),
+
   create: (employeeData) =>
     apiRequest("/employees", {
       method: "POST",

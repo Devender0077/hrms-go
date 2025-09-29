@@ -29,19 +29,19 @@ export default function SecuritySettings({ settings, onSettingsChange }: Securit
         </div>
         <div>
           <h2 className="text-xl font-semibold">Security & Privacy</h2>
-          <p className="text-gray-600">Configure security features and access restrictions</p>
+          <p className="text-default-600">Configure security features and access restrictions</p>
         </div>
       </div>
 
       {/* reCAPTCHA Settings */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between w-full p-3 bg-content1 rounded-lg">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:shield-check" className="text-green-600 text-lg" />
+              <Icon icon="lucide:shield-check" className="text-success-600 text-lg" />
               <div>
                 <h3 className="text-lg font-semibold">reCAPTCHA</h3>
-                <p className="text-sm text-gray-500">Protect forms from spam and abuse</p>
+                <p className="text-sm text-default-500">Protect forms from spam and abuse</p>
               </div>
             </div>
             <Switch
@@ -74,12 +74,12 @@ export default function SecuritySettings({ settings, onSettingsChange }: Securit
       {/* IP Restriction Settings */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between w-full p-3 bg-content1 rounded-lg">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:lock" className="text-red-600 text-lg" />
+              <Icon icon="lucide:lock" className="text-danger-600 text-lg" />
               <div>
                 <h3 className="text-lg font-semibold">IP Restriction</h3>
-                <p className="text-sm text-gray-500">Restrict access to specific IP addresses</p>
+                <p className="text-sm text-default-500">Restrict access to specific IP addresses</p>
               </div>
             </div>
             <Switch
@@ -104,12 +104,12 @@ export default function SecuritySettings({ settings, onSettingsChange }: Securit
       {/* Two-Factor Authentication Settings */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between w-full p-3 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between w-full p-3 bg-content1 rounded-lg">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:smartphone" className="text-blue-600 text-lg" />
+              <Icon icon="lucide:smartphone" className="text-primary-600 text-lg" />
               <div>
                 <h3 className="text-lg font-semibold">Two-Factor Authentication</h3>
-                <p className="text-sm text-gray-500">Add an extra layer of security to user accounts</p>
+                <p className="text-sm text-default-500">Add an extra layer of security to user accounts</p>
               </div>
             </div>
             <Switch
@@ -137,10 +137,10 @@ export default function SecuritySettings({ settings, onSettingsChange }: Securit
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <Icon icon="lucide:key" className="text-orange-600 text-lg" />
+            <Icon icon="lucide:key" className="text-warning-600 text-lg" />
             <div>
               <h3 className="text-lg font-semibold">Password Policy</h3>
-              <p className="text-sm text-gray-500">Configure password requirements and policies</p>
+              <p className="text-sm text-default-500">Configure password requirements and policies</p>
             </div>
           </div>
         </CardHeader>
@@ -163,28 +163,28 @@ export default function SecuritySettings({ settings, onSettingsChange }: Securit
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Require Uppercase Letters</p>
-                <p className="text-sm text-gray-500">Password must contain uppercase letters</p>
+                <p className="text-sm text-default-500">Password must contain uppercase letters</p>
               </div>
               <Switch defaultSelected />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Require Lowercase Letters</p>
-                <p className="text-sm text-gray-500">Password must contain lowercase letters</p>
+                <p className="text-sm text-default-500">Password must contain lowercase letters</p>
               </div>
               <Switch defaultSelected />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Require Numbers</p>
-                <p className="text-sm text-gray-500">Password must contain numbers</p>
+                <p className="text-sm text-default-500">Password must contain numbers</p>
               </div>
               <Switch defaultSelected />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Require Special Characters</p>
-                <p className="text-sm text-gray-500">Password must contain special characters</p>
+                <p className="text-sm text-default-500">Password must contain special characters</p>
               </div>
               <Switch defaultSelected />
             </div>
@@ -196,10 +196,10 @@ export default function SecuritySettings({ settings, onSettingsChange }: Securit
       <Card>
         <CardHeader>
           <div className="flex items-center gap-3">
-            <Icon icon="lucide:clock" className="text-purple-600 text-lg" />
+            <Icon icon="lucide:clock" className="text-secondary-600 text-lg" />
             <div>
               <h3 className="text-lg font-semibold">Session Security</h3>
-              <p className="text-sm text-gray-500">Configure session timeout and security</p>
+              <p className="text-sm text-default-500">Configure session timeout and security</p>
             </div>
           </div>
         </CardHeader>
@@ -222,14 +222,14 @@ export default function SecuritySettings({ settings, onSettingsChange }: Securit
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Force Logout on Password Change</p>
-                <p className="text-sm text-gray-500">Log out all sessions when password is changed</p>
+                <p className="text-sm text-default-500">Log out all sessions when password is changed</p>
               </div>
               <Switch defaultSelected />
             </div>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Remember Me</p>
-                <p className="text-sm text-gray-500">Allow users to stay logged in</p>
+                <p className="text-sm text-default-500">Allow users to stay logged in</p>
               </div>
               <Switch defaultSelected />
             </div>

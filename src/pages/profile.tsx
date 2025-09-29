@@ -217,10 +217,10 @@ export default function Profile() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content2 flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" color="primary" />
-          <p className="mt-4 text-gray-600">
+          <p className="mt-4 text-default-600">
             {authLoading ? 'Loading authentication...' : 'Loading profile...'}
           </p>
         </div>
@@ -230,11 +230,11 @@ export default function Profile() {
 
   if (error && !profile) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content2 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Profile</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-danger mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Error Loading Profile</h2>
+          <p className="text-default-600 mb-4">{error}</p>
           <Button color="primary" onPress={loadProfile}>
             Retry
           </Button>
@@ -245,20 +245,20 @@ export default function Profile() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content2 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lucide:user-x" className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Profile Not Found</h2>
-          <p className="text-gray-600">No profile information available.</p>
+          <Icon icon="lucide:user-x" className="w-16 h-16 text-default-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Profile Not Found</h2>
+          <p className="text-default-600">No profile information available.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-content1 to-secondary-50">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-6 py-6">
+      <div className="bg-content1/80 backdrop-blur-sm border-b border-default-300/50 px-6 py-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -266,8 +266,8 @@ export default function Profile() {
                 <Icon icon="lucide:user" className="text-primary-600 text-2xl" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-                <p className="text-gray-600 mt-1">Manage your personal information and profile settings</p>
+                <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
+                <p className="text-default-600 mt-1">Manage your personal information and profile settings</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -325,11 +325,11 @@ export default function Profile() {
       <div className="p-6 max-w-6xl mx-auto">
         {/* Error Message */}
         {error && (
-          <Card className="bg-red-50/80 backdrop-blur-sm border-red-200 mb-6 shadow-lg">
+          <Card className="bg-danger-50/80 backdrop-blur-sm border-red-200 mb-6 shadow-lg">
             <CardBody className="p-4">
               <div className="flex items-center gap-3">
-                <Icon icon="lucide:alert-circle" className="w-5 h-5 text-red-500" />
-                <p className="text-red-700 font-medium">{error}</p>
+                <Icon icon="lucide:alert-circle" className="w-5 h-5 text-danger" />
+                <p className="text-danger-700 font-medium">{error}</p>
               </div>
             </CardBody>
           </Card>
@@ -339,7 +339,7 @@ export default function Profile() {
 
           {/* Left Column - Profile Photo & Quick Info */}
           <div className="lg:col-span-1">
-            <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0 rounded-2xl overflow-hidden">
+            <Card className="bg-content1/80 backdrop-blur-sm shadow-xl border-0 rounded-2xl overflow-hidden">
               <CardBody className="p-6">
                 {/* Profile Photo Section */}
                 <div className="text-center mb-6">
@@ -363,10 +363,10 @@ export default function Profile() {
                     </div>
                   </div>
                   
-                  <h2 className="text-xl font-semibold text-gray-900 mt-4">
+                  <h2 className="text-xl font-semibold text-foreground mt-4">
                     {profile.first_name} {profile.last_name}
                   </h2>
-                  <p className="text-gray-600">{profile.email}</p>
+                  <p className="text-default-600">{profile.email}</p>
                   
                   {/* Upload Area */}
                   <div 
@@ -374,63 +374,63 @@ export default function Profile() {
                     className={`mt-4 p-4 border-2 border-dashed rounded-xl text-center cursor-pointer transition-all duration-200 hover:scale-105 ${
                       isDragActive 
                         ? 'border-primary-500 bg-primary-50 scale-105' 
-                        : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'
+                        : 'border-default-300 hover:border-primary-300 hover:bg-content1'
                     }`}
                   >
                     <input {...getInputProps()} />
-                    <Icon icon="lucide:upload-cloud" className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600 font-medium">
+                    <Icon icon="lucide:upload-cloud" className="w-8 h-8 text-default-400 mx-auto mb-2" />
+                    <p className="text-sm text-default-600 font-medium">
                       {isDragActive ? "Drop your photo here" : "Upload new photo"}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">JPG, PNG, GIF up to 5MB</p>
+                    <p className="text-xs text-default-500 mt-1">JPG, PNG, GIF up to 5MB</p>
                   </div>
                 </div>
 
                 {/* Quick Stats */}
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                     <div className="flex items-center gap-3">
                       <Icon icon="lucide:badge" className="text-primary-500" />
-                      <span className="text-sm font-medium text-gray-700">Employee ID</span>
+                      <span className="text-sm font-medium text-default-700">Employee ID</span>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900">{profile.employee_id}</span>
+                    <span className="text-sm font-semibold text-foreground">{profile.employee_id}</span>
                   </div>
                   
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                     <div className="flex items-center gap-3">
                       <Icon icon="lucide:calendar" className="text-primary-500" />
-                      <span className="text-sm font-medium text-gray-700">Joined</span>
+                      <span className="text-sm font-medium text-default-700">Joined</span>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900">
+                    <span className="text-sm font-semibold text-foreground">
                       {profile.joining_date ? new Date(profile.joining_date).toLocaleDateString() : 'N/A'}
                     </span>
                   </div>
                   
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                     <div className="flex items-center gap-3">
                       <Icon icon="lucide:building" className="text-primary-500" />
-                      <span className="text-sm font-medium text-gray-700">Department</span>
+                      <span className="text-sm font-medium text-default-700">Department</span>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900">{profile.department_name || 'N/A'}</span>
+                    <span className="text-sm font-semibold text-foreground">{profile.department_name || 'N/A'}</span>
                   </div>
                   
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                     <div className="flex items-center gap-3">
                       <Icon icon="lucide:briefcase" className="text-primary-500" />
-                      <span className="text-sm font-medium text-gray-700">Designation</span>
+                      <span className="text-sm font-medium text-default-700">Designation</span>
                     </div>
-                    <span className="text-sm font-semibold text-gray-900">{profile.designation_name || 'N/A'}</span>
+                    <span className="text-sm font-semibold text-foreground">{profile.designation_name || 'N/A'}</span>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                     <div className="flex items-center gap-3">
                       <Icon icon="lucide:user-check" className="text-primary-500" />
-                      <span className="text-sm font-medium text-gray-700">Status</span>
+                      <span className="text-sm font-medium text-default-700">Status</span>
                     </div>
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       profile.status === 'active' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-success-100 text-success-800' 
+                        : 'bg-danger-100 text-danger-800'
                     }`}>
                       {profile.status}
                     </span>
@@ -442,11 +442,11 @@ export default function Profile() {
 
           {/* Right Column - Detailed Information */}
           <div className="lg:col-span-2">
-            <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-0 rounded-2xl overflow-hidden">
-              <CardHeader className="flex items-center justify-between p-6 border-b border-gray-100">
+            <Card className="bg-content1/80 backdrop-blur-sm shadow-xl border-0 rounded-2xl overflow-hidden">
+              <CardHeader className="flex items-center justify-between p-6 border-b border-default-200">
                 <div className="flex items-center gap-3">
                   <Icon icon="lucide:edit-3" className="text-primary-500 text-xl" />
-                  <h3 className="text-xl font-semibold text-gray-900">Personal Information</h3>
+                  <h3 className="text-xl font-semibold text-foreground">Personal Information</h3>
                 </div>
               </CardHeader>
               
@@ -454,7 +454,7 @@ export default function Profile() {
                 <div className="space-y-8">
                   {/* Basic Information */}
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                       <Icon icon="lucide:user" className="text-primary-500" />
                       Basic Information
                     </h4>
@@ -466,8 +466,8 @@ export default function Profile() {
                         isReadOnly={!editMode}
                         variant={editMode ? "bordered" : "flat"}
                         classNames={{
-                          input: "text-gray-900",
-                          label: "text-gray-700 font-medium"
+                          input: "text-foreground",
+                          label: "text-default-700 font-medium"
                         }}
                       />
                       <Input
@@ -477,8 +477,8 @@ export default function Profile() {
                         isReadOnly={!editMode}
                         variant={editMode ? "bordered" : "flat"}
                         classNames={{
-                          input: "text-gray-900",
-                          label: "text-gray-700 font-medium"
+                          input: "text-foreground",
+                          label: "text-default-700 font-medium"
                         }}
                       />
                       <Input
@@ -489,10 +489,10 @@ export default function Profile() {
                         variant="flat"
                         className="col-span-1 md:col-span-2"
                         classNames={{
-                          input: "text-gray-600",
-                          label: "text-gray-700 font-medium"
+                          input: "text-default-600",
+                          label: "text-default-700 font-medium"
                         }}
-                        startContent={<Icon icon="lucide:mail" className="text-gray-400" />}
+                        startContent={<Icon icon="lucide:mail" className="text-default-400" />}
                         description="Email cannot be changed"
                       />
                       <Input
@@ -502,10 +502,10 @@ export default function Profile() {
                         isReadOnly={!editMode}
                         variant={editMode ? "bordered" : "flat"}
                         classNames={{
-                          input: "text-gray-900",
-                          label: "text-gray-700 font-medium"
+                          input: "text-foreground",
+                          label: "text-default-700 font-medium"
                         }}
-                        startContent={<Icon icon="lucide:phone" className="text-gray-400" />}
+                        startContent={<Icon icon="lucide:phone" className="text-default-400" />}
                       />
                       <Input
                         label="Date of Birth"
@@ -515,10 +515,10 @@ export default function Profile() {
                         isReadOnly={!editMode}
                         variant={editMode ? "bordered" : "flat"}
                         classNames={{
-                          input: "text-gray-900",
-                          label: "text-gray-700 font-medium"
+                          input: "text-foreground",
+                          label: "text-default-700 font-medium"
                         }}
-                        startContent={<Icon icon="lucide:calendar" className="text-gray-400" />}
+                        startContent={<Icon icon="lucide:calendar" className="text-default-400" />}
                       />
                       <Input
                         label="Gender"
@@ -526,10 +526,10 @@ export default function Profile() {
                         isReadOnly
                         variant="flat"
                         classNames={{
-                          input: "text-gray-600",
-                          label: "text-gray-700 font-medium"
+                          input: "text-default-600",
+                          label: "text-default-700 font-medium"
                         }}
-                        startContent={<Icon icon="lucide:users" className="text-gray-400" />}
+                        startContent={<Icon icon="lucide:users" className="text-default-400" />}
                         description="Gender cannot be changed"
                       />
                     </div>
@@ -537,7 +537,7 @@ export default function Profile() {
 
                   {/* Address Information */}
                   <div>
-                    <h4 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <h4 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                       <Icon icon="lucide:map-pin" className="text-primary-500" />
                       Address Information
                     </h4>
@@ -550,10 +550,10 @@ export default function Profile() {
                         variant={editMode ? "bordered" : "flat"}
                         rows={3}
                         classNames={{
-                          input: "text-gray-900",
-                          label: "text-gray-700 font-medium"
+                          input: "text-foreground",
+                          label: "text-default-700 font-medium"
                         }}
-                        startContent={<Icon icon="lucide:home" className="text-gray-400" />}
+                        startContent={<Icon icon="lucide:home" className="text-default-400" />}
                       />
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Input
@@ -563,10 +563,10 @@ export default function Profile() {
                           isReadOnly={!editMode}
                           variant={editMode ? "bordered" : "flat"}
                           classNames={{
-                            input: "text-gray-900",
-                            label: "text-gray-700 font-medium"
+                            input: "text-foreground",
+                            label: "text-default-700 font-medium"
                           }}
-                          startContent={<Icon icon="lucide:building-2" className="text-gray-400" />}
+                          startContent={<Icon icon="lucide:building-2" className="text-default-400" />}
                         />
                         <Input
                           label="State"
@@ -575,10 +575,10 @@ export default function Profile() {
                           isReadOnly={!editMode}
                           variant={editMode ? "bordered" : "flat"}
                           classNames={{
-                            input: "text-gray-900",
-                            label: "text-gray-700 font-medium"
+                            input: "text-foreground",
+                            label: "text-default-700 font-medium"
                           }}
-                          startContent={<Icon icon="lucide:map" className="text-gray-400" />}
+                          startContent={<Icon icon="lucide:map" className="text-default-400" />}
                         />
                         <Input
                           label="Country"
@@ -587,10 +587,10 @@ export default function Profile() {
                           isReadOnly={!editMode}
                           variant={editMode ? "bordered" : "flat"}
                           classNames={{
-                            input: "text-gray-900",
-                            label: "text-gray-700 font-medium"
+                            input: "text-foreground",
+                            label: "text-default-700 font-medium"
                           }}
-                          startContent={<Icon icon="lucide:globe" className="text-gray-400" />}
+                          startContent={<Icon icon="lucide:globe" className="text-default-400" />}
                         />
                         <Input
                           label="ZIP Code"
@@ -599,10 +599,10 @@ export default function Profile() {
                           isReadOnly={!editMode}
                           variant={editMode ? "bordered" : "flat"}
                           classNames={{
-                            input: "text-gray-900",
-                            label: "text-gray-700 font-medium"
+                            input: "text-foreground",
+                            label: "text-default-700 font-medium"
                           }}
-                          startContent={<Icon icon="lucide:hash" className="text-gray-400" />}
+                          startContent={<Icon icon="lucide:hash" className="text-default-400" />}
                         />
                       </div>
                     </div>
@@ -617,7 +617,7 @@ export default function Profile() {
 
       {/* Photo Upload Confirmation Modal */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center" size="md">
-        <ModalContent className="bg-white/95 backdrop-blur-sm">
+        <ModalContent className="bg-content1/95 backdrop-blur-sm">
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1 text-center">
@@ -626,8 +626,8 @@ export default function Profile() {
                     <Icon icon="lucide:camera" className="text-primary-600 text-2xl" />
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900">Update Profile Photo</h3>
-                <p className="text-gray-600 font-normal">Are you sure you want to upload this photo as your profile picture?</p>
+                <h3 className="text-xl font-semibold text-foreground">Update Profile Photo</h3>
+                <p className="text-default-600 font-normal">Are you sure you want to upload this photo as your profile picture?</p>
               </ModalHeader>
               <ModalBody className="text-center">
                 {previewUrl && (

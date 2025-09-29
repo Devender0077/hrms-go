@@ -75,7 +75,7 @@ export default function PermissionDebugger() {
               <div key={permission} className="flex items-center gap-2">
                 <Icon 
                   icon={hasPermission(permission) ? "lucide:check-circle" : "lucide:x-circle"} 
-                  className={`w-4 h-4 ${hasPermission(permission) ? 'text-green-500' : 'text-red-500'}`} 
+                  className={`w-4 h-4 ${hasPermission(permission) ? 'text-success' : 'text-danger'}`} 
                 />
                 <span className="text-sm font-mono">{permission}</span>
               </div>

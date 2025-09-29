@@ -23,10 +23,10 @@ export default function ProtectedRoute({
   // Show loading while authentication or permissions are loading
   if (authLoading || permissionsLoading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lucide:loader-2" className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
+          <Icon icon="lucide:loader-2" className="w-8 h-8 animate-spin text-primary mx-auto mb-4" />
+          <p className="text-default-600">Loading...</p>
         </div>
       </div>
     );
@@ -47,22 +47,22 @@ export default function ProtectedRoute({
 
   if (!hasPermission) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto p-8">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Icon icon="lucide:shield-x" className="w-10 h-10 text-red-500" />
+          <div className="w-20 h-20 bg-danger-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Icon icon="lucide:shield-x" className="w-10 h-10 text-danger" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-2xl font-bold text-foreground mb-4">Access Denied</h1>
+          <p className="text-default-600 mb-6">
             You don't have permission to access this page. Please contact your administrator if you believe this is an error.
           </p>
           <div className="space-y-2">
-            <p className="text-sm text-gray-500">Required permissions:</p>
+            <p className="text-sm text-default-500">Required permissions:</p>
             <div className="flex flex-wrap gap-2 justify-center">
               {requiredPermissions && requiredPermissions.map((permission) => (
                 <span
                   key={permission}
-                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-mono"
+                  className="px-3 py-1 bg-content2 text-default-700 rounded-full text-sm font-mono"
                 >
                   {permission}
                 </span>

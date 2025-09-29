@@ -25,7 +25,7 @@ import {
   Pagination,
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { PageLayout, PageHeader } from "../../components/layout/PageLayout";
+import PageLayout, { PageHeader } from "../../components/layout/PageLayout";
 import { apiRequest } from "../../services/api-service";
 
 interface Holiday {
@@ -207,14 +207,14 @@ export default function Holidays() {
         title="Holidays"
         description="Manage company holidays and observances"
         icon="lucide:calendar-days"
-        iconColor="from-yellow-500 to-orange-600"
+        iconColor="from-primary-500 to-secondary-500"
         actions={
           <>
             <Input
               placeholder="Search holidays..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
             />
             <Select
@@ -261,8 +261,8 @@ export default function Holidays() {
                 <TableRow key={holiday.id}>
                   <TableCell>
                     <div>
-                      <p className="font-semibold text-gray-900">{holiday.name}</p>
-                      <p className="text-sm text-gray-500">{holiday.description}</p>
+                      <p className="font-semibold text-foreground">{holiday.name}</p>
+                      <p className="text-sm text-default-500">{holiday.description}</p>
                     </div>
                   </TableCell>
                   <TableCell>

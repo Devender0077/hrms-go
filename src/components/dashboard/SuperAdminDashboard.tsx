@@ -115,17 +115,17 @@ export default function SuperAdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content1/50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl">
-              <Icon icon="lucide:shield-check" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-xl">
+              <Icon icon="lucide:shield-check" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Super Admin Dashboard</h1>
-              <p className="text-gray-600 mt-1">System overview and management</p>
+              <h1 className="text-3xl font-bold text-foreground">Super Admin Dashboard</h1>
+              <p className="text-default-600 mt-1">System overview and management</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -159,12 +159,12 @@ export default function SuperAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Total Companies</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{systemStats.totalCompanies}</p>
-                    <p className="text-green-600 text-sm mt-1">+12% from last month</p>
+                    <p className="text-default-500 text-sm font-medium">Total Companies</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{systemStats.totalCompanies}</p>
+                    <p className="text-success-600 text-sm mt-1">+12% from last month</p>
                   </div>
-                  <div className="p-3 bg-blue-100 rounded-xl">
-                    <Icon icon="lucide:building" className="text-blue-600 text-2xl" />
+                  <div className="p-3 bg-primary-100 rounded-xl">
+                    <Icon icon="lucide:building" className="text-primary-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -180,12 +180,12 @@ export default function SuperAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Total Users</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{systemStats.totalUsers.toLocaleString()}</p>
-                    <p className="text-green-600 text-sm mt-1">+8% from last month</p>
+                    <p className="text-default-500 text-sm font-medium">Total Users</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{systemStats.totalUsers.toLocaleString()}</p>
+                    <p className="text-success-600 text-sm mt-1">+8% from last month</p>
                   </div>
-                  <div className="p-3 bg-green-100 rounded-xl">
-                    <Icon icon="lucide:users" className="text-green-600 text-2xl" />
+                  <div className="p-3 bg-success-100 rounded-xl">
+                    <Icon icon="lucide:users" className="text-success-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -201,12 +201,12 @@ export default function SuperAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Total Employees</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{systemStats.totalEmployees.toLocaleString()}</p>
-                    <p className="text-green-600 text-sm mt-1">+15% from last month</p>
+                    <p className="text-default-500 text-sm font-medium">Total Employees</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{systemStats.totalEmployees.toLocaleString()}</p>
+                    <p className="text-success-600 text-sm mt-1">+15% from last month</p>
                   </div>
-                  <div className="p-3 bg-purple-100 rounded-xl">
-                    <Icon icon="lucide:user-check" className="text-purple-600 text-2xl" />
+                  <div className="p-3 bg-secondary-100 rounded-xl">
+                    <Icon icon="lucide:user-check" className="text-secondary-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -222,12 +222,12 @@ export default function SuperAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Monthly Revenue</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">${systemStats.monthlyRevenue.toLocaleString()}</p>
-                    <p className="text-green-600 text-sm mt-1">+22% from last month</p>
+                    <p className="text-default-500 text-sm font-medium">Monthly Revenue</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">${systemStats.monthlyRevenue.toLocaleString()}</p>
+                    <p className="text-success-600 text-sm mt-1">+22% from last month</p>
                   </div>
-                  <div className="p-3 bg-orange-100 rounded-xl">
-                    <Icon icon="lucide:dollar-sign" className="text-orange-600 text-2xl" />
+                  <div className="p-3 bg-warning-100 rounded-xl">
+                    <Icon icon="lucide:dollar-sign" className="text-warning-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -245,10 +245,10 @@ export default function SuperAdminDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:trending-up" className="text-blue-600 text-xl" />
+                  <Icon icon="lucide:trending-up" className="text-primary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Revenue & User Growth</h3>
-                    <p className="text-gray-500 text-sm">Monthly performance metrics</p>
+                    <h3 className="text-lg font-semibold text-foreground">Revenue & User Growth</h3>
+                    <p className="text-default-500 text-sm">Monthly performance metrics</p>
                   </div>
                 </div>
               </CardHeader>
@@ -289,10 +289,10 @@ export default function SuperAdminDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:activity" className="text-green-600 text-xl" />
+                  <Icon icon="lucide:activity" className="text-success-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">System Health</h3>
-                    <p className="text-gray-500 text-sm">Current system performance</p>
+                    <h3 className="text-lg font-semibold text-foreground">System Health</h3>
+                    <p className="text-default-500 text-sm">Current system performance</p>
                   </div>
                 </div>
               </CardHeader>
@@ -301,8 +301,8 @@ export default function SuperAdminDashboard() {
                   {systemHealthData.map((item, index) => (
                     <div key={index} className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-gray-700">{item.name}</span>
-                        <span className="text-sm font-semibold text-gray-900">{item.value}%</span>
+                        <span className="text-sm font-medium text-default-700">{item.name}</span>
+                        <span className="text-sm font-semibold text-foreground">{item.value}%</span>
                       </div>
                       <Progress 
                         value={item.value} 
@@ -327,30 +327,30 @@ export default function SuperAdminDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:building-2" className="text-purple-600 text-xl" />
+                  <Icon icon="lucide:building-2" className="text-secondary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Company Performance</h3>
-                    <p className="text-gray-500 text-sm">Top performing companies</p>
+                    <h3 className="text-lg font-semibold text-foreground">Company Performance</h3>
+                    <p className="text-default-500 text-sm">Top performing companies</p>
                   </div>
                 </div>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="space-y-4">
                   {companyData.slice(0, 5).map((company, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                       <div className="flex items-center gap-3">
                         <Avatar 
                           name={company.name.charAt(0)} 
-                          className="bg-gradient-to-br from-blue-500 to-purple-600 text-white"
+                          className="bg-gradient-to-br from-primary-500 to-secondary-600 text-foreground"
                           size="sm"
                         />
                         <div>
-                          <p className="font-medium text-gray-900">{company.name}</p>
-                          <p className="text-sm text-gray-500">{company.employees} employees</p>
+                          <p className="font-medium text-foreground">{company.name}</p>
+                          <p className="text-sm text-default-500">{company.employees} employees</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-gray-900">${(company.revenue / 1000000).toFixed(1)}M</p>
+                        <p className="font-semibold text-foreground">${(company.revenue / 1000000).toFixed(1)}M</p>
                         <Chip 
                           size="sm" 
                           color={getStatusColor(company.status)}
@@ -374,26 +374,26 @@ export default function SuperAdminDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:clock" className="text-orange-600 text-xl" />
+                  <Icon icon="lucide:clock" className="text-warning-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Recent Activities</h3>
-                    <p className="text-gray-500 text-sm">Latest system activities</p>
+                    <h3 className="text-lg font-semibold text-foreground">Recent Activities</h3>
+                    <p className="text-default-500 text-sm">Latest system activities</p>
                   </div>
                 </div>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="space-y-4">
                   {recentActivities.map((activity) => (
-                    <div key={activity.id} className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                      <div className="p-2 bg-gray-100 rounded-lg">
+                    <div key={activity.id} className="flex items-start gap-3 p-3 hover:bg-content1 rounded-lg transition-colors">
+                      <div className="p-2 bg-content2 rounded-lg">
                         <Icon 
                           icon={getActivityIcon(activity.type)} 
-                          className="text-gray-600 text-lg" 
+                          className="text-default-600 text-lg" 
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900">{activity.action}</p>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm font-medium text-foreground">{activity.action}</p>
+                        <p className="text-sm text-default-500 mt-1">
                           {activity.company && `${activity.company} • `}
                           {activity.user && `${activity.user} • `}
                           {activity.ticket && `${activity.ticket} • `}

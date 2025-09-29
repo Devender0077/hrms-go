@@ -28,7 +28,7 @@ export default function GeneralSettings({ settings, onSettingsChange }: GeneralS
         </div>
         <div>
           <h2 className="text-xl font-semibold">General Settings</h2>
-          <p className="text-gray-600">Basic system configuration and preferences</p>
+          <p className="text-default-600">Basic system configuration and preferences</p>
         </div>
       </div>
       
@@ -73,7 +73,7 @@ export default function GeneralSettings({ settings, onSettingsChange }: GeneralS
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Maintenance Mode</p>
-              <p className="text-sm text-gray-500">Enable maintenance mode to restrict access</p>
+              <p className="text-sm text-default-500">Enable maintenance mode to restrict access</p>
             </div>
             <Switch
               isSelected={settings.maintenanceMode}
@@ -83,7 +83,7 @@ export default function GeneralSettings({ settings, onSettingsChange }: GeneralS
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Debug Mode</p>
-              <p className="text-sm text-gray-500">Enable debug mode for development</p>
+              <p className="text-sm text-default-500">Enable debug mode for development</p>
             </div>
             <Switch
               isSelected={settings.debugMode}
@@ -93,7 +93,7 @@ export default function GeneralSettings({ settings, onSettingsChange }: GeneralS
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Auto Backup</p>
-              <p className="text-sm text-gray-500">Automatically backup system data</p>
+              <p className="text-sm text-default-500">Automatically backup system data</p>
             </div>
             <Switch
               isSelected={settings.autoBackup}
@@ -103,7 +103,7 @@ export default function GeneralSettings({ settings, onSettingsChange }: GeneralS
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">RTL Support</p>
-              <p className="text-sm text-gray-500">Enable right-to-left language support</p>
+              <p className="text-sm text-default-500">Enable right-to-left language support</p>
             </div>
             <Switch
               isSelected={settings.rtlEnabled}

@@ -1,246 +1,116 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Pagination, Button, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Textarea, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Progress } from "@heroui/react";
+import { 
+  Card, 
+  CardBody, 
+  CardHeader,
+  Button,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Avatar,
+  Chip,
+  Input,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Pagination,
+  Select,
+  SelectItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Badge,
+  Textarea,
+  Progress,
+  Spinner
+} from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
+import { useGoals, Goal } from "../hooks/useGoals";
+import PageLayout, { PageHeader } from "../components/layout/PageLayout";
 
-// Goal interface
-interface Goal {
-  id: number;
-  employeeId: string;
-  employeeName: string;
-  title: string;
-  description: string;
-  category: "performance" | "development" | "behavioral" | "project" | "sales" | "quality";
-  priority: "low" | "medium" | "high" | "critical";
-  status: "not-started" | "in-progress" | "completed" | "on-hold" | "cancelled";
-  progress: number; // 0-100
-  startDate: string;
-  dueDate: string;
-  completionDate?: string;
-  managerId: string;
-  managerName: string;
-  department: string;
-  kpis: string[];
-  milestones: string[];
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// Sample goals data
-const initialGoals: Goal[] = [
-  {
-    id: 1,
-    employeeId: "EMP001",
-    employeeName: "John Smith",
-    title: "Complete React Certification",
-    description: "Obtain React Developer Certification to enhance frontend development skills",
-    category: "development",
-    priority: "high",
-    status: "in-progress",
-    progress: 65,
-    startDate: "2025-01-01",
-    dueDate: "2025-03-31",
-    managerId: "MGR001",
-    managerName: "Jane Doe",
-    department: "IT",
-    kpis: ["Complete 80% of course modules", "Pass final exam with 85%+", "Build portfolio project"],
-    milestones: ["Module 1-3 completed", "Module 4-6 in progress", "Final exam scheduled"],
-    notes: "Employee is making good progress, on track to complete on time",
-    createdAt: "2025-01-01",
-    updatedAt: "2025-01-15"
-  },
-  {
-    id: 2,
-    employeeId: "EMP002",
-    employeeName: "Sarah Johnson",
-    title: "Increase Team Productivity by 20%",
-    description: "Implement new processes and tools to improve team efficiency",
-    category: "performance",
-    priority: "critical",
-    status: "in-progress",
-    progress: 40,
-    startDate: "2025-01-01",
-    dueDate: "2025-06-30",
-    managerId: "MGR002",
-    managerName: "Mike Wilson",
-    department: "HR",
-    kpis: ["Reduce task completion time by 20%", "Increase team satisfaction score", "Implement 3 new processes"],
-    milestones: ["Process audit completed", "Tool evaluation in progress", "Team training scheduled"],
-    notes: "Focus on automation and process optimization",
-    createdAt: "2025-01-01",
-    updatedAt: "2025-01-10"
-  },
-  {
-    id: 3,
-    employeeId: "EMP003",
-    employeeName: "Michael Brown",
-    title: "Launch Marketing Campaign",
-    description: "Develop and execute a comprehensive marketing campaign for Q2 product launch",
-    category: "project",
-    priority: "high",
-    status: "not-started",
-    progress: 0,
-    startDate: "2025-02-01",
-    dueDate: "2025-05-31",
-    managerId: "MGR003",
-    managerName: "Lisa Anderson",
-    department: "Marketing",
-    kpis: ["Generate 1000 leads", "Achieve 5% conversion rate", "Increase brand awareness by 30%"],
-    milestones: ["Campaign strategy approved", "Creative assets developed", "Launch execution"],
-    notes: "Waiting for final product specifications",
-    createdAt: "2025-01-15",
-    updatedAt: "2025-01-15"
-  },
-  {
-    id: 4,
-    employeeId: "EMP004",
-    employeeName: "Emily Davis",
-    title: "Improve Customer Satisfaction",
-    description: "Enhance customer service processes to achieve 95% satisfaction rating",
-    category: "quality",
-    priority: "medium",
-    status: "completed",
-    progress: 100,
-    startDate: "2024-10-01",
-    dueDate: "2024-12-31",
-    completionDate: "2024-12-15",
-    managerId: "MGR004",
-    managerName: "David Chen",
-    department: "Customer Success",
-    kpis: ["Achieve 95% satisfaction rating", "Reduce response time to 2 hours", "Implement feedback system"],
-    milestones: ["Process improvements implemented", "Training completed", "Feedback system launched"],
-    notes: "Goal completed ahead of schedule with excellent results",
-    createdAt: "2024-10-01",
-    updatedAt: "2024-12-15"
-  },
-  {
-    id: 5,
-    employeeId: "EMP005",
-    employeeName: "David Wilson",
-    title: "Sales Target Achievement",
-    description: "Meet quarterly sales targets and expand client base",
-    category: "sales",
-    priority: "critical",
-    status: "in-progress",
-    progress: 75,
-    startDate: "2025-01-01",
-    dueDate: "2025-03-31",
-    managerId: "MGR005",
-    managerName: "Sarah Miller",
-    department: "Sales",
-    kpis: ["Achieve $500K in sales", "Acquire 25 new clients", "Maintain 90% client retention"],
-    milestones: ["Q1 target 75% achieved", "15 new clients acquired", "Client retention at 92%"],
-    notes: "Strong performance, on track to exceed targets",
-    createdAt: "2025-01-01",
-    updatedAt: "2025-01-20"
-  }
+const categories = [
+  "performance", "development", "behavioral", "project", "sales", "quality"
 ];
 
+const priorities = ["low", "medium", "high", "critical"];
+
 const statusColorMap = {
-  "not-started": "default",
-  "in-progress": "primary",
+  "not_started": "default",
+  "in_progress": "primary",
   "completed": "success",
-  "on-hold": "warning",
   "cancelled": "danger",
 };
 
 const priorityColorMap = {
-  low: "default",
-  medium: "primary",
-  high: "warning",
-  critical: "danger",
+  "low": "default",
+  "medium": "warning",
+  "high": "danger",
+  "critical": "danger",
 };
 
 const categoryColorMap = {
-  performance: "success",
-  development: "primary",
-  behavioral: "secondary",
-  project: "warning",
-  sales: "danger",
-  quality: "default",
+  "performance": "primary",
+  "development": "secondary",
+  "behavioral": "success",
+  "project": "warning",
+  "sales": "danger",
+  "quality": "default",
 };
 
-const employees = [
-  "John Smith",
-  "Sarah Johnson",
-  "Michael Brown",
-  "Emily Davis",
-  "David Wilson",
-  "Lisa Anderson",
-  "Tom Johnson",
-  "Amy Rodriguez"
-];
-
-const managers = [
-  "Jane Doe",
-  "Mike Wilson",
-  "Lisa Anderson",
-  "David Chen",
-  "Sarah Miller",
-  "Tom Johnson",
-  "Amy Rodriguez"
-];
-
-const departments = [
-  "IT",
-  "HR",
-  "Marketing",
-  "Sales",
-  "Customer Success",
-  "Finance",
-  "Operations"
-];
-
-export default function Goals() {
+export default function GoalsPage() {
+  const { goals, loading, error, createGoal, updateGoal, deleteGoal } = useGoals();
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [selectedEmployee, setSelectedEmployee] = useState("all");
-  const [goals, setGoals] = useState<Goal[]>(initialGoals);
+  const [selectedPriority, setSelectedPriority] = useState("all");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen: isViewOpen, onOpen: onViewOpen, onOpenChange: onViewOpenChange } = useDisclosure();
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   
   const rowsPerPage = 10;
   
-  // New goal form state
-  const [newGoal, setNewGoal] = useState<Partial<Goal>>({
-    employeeId: "",
-    employeeName: "",
+  // Form state for new goal
+  const [newGoal, setNewGoal] = useState({
+    employee_id: 1,
     title: "",
     description: "",
-    category: "performance",
+    category: "",
     priority: "medium",
-    status: "not-started",
-    progress: 0,
-    startDate: "",
-    dueDate: "",
-    managerId: "",
-    managerName: "",
-    department: "",
-    kpis: [],
-    milestones: [],
-    notes: ""
+    start_date: "",
+    end_date: "",
+    target_value: "",
+    current_value: "0",
+    unit: ""
   });
-  
+
   // Filter goals
   const filteredGoals = useMemo(() => {
     return goals.filter(goal => {
       const matchesSearch = 
+        (goal.employee_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
         goal.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        goal.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        goal.description.toLowerCase().includes(searchQuery.toLowerCase());
+        (goal.description || "").toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesStatus = selectedStatus === "all" || goal.status === selectedStatus;
       const matchesCategory = selectedCategory === "all" || goal.category === selectedCategory;
-      const matchesEmployee = selectedEmployee === "all" || goal.employeeName === selectedEmployee;
+      const matchesPriority = selectedPriority === "all" || goal.priority === selectedPriority;
       
-      return matchesSearch && matchesStatus && matchesCategory && matchesEmployee;
+      return matchesSearch && matchesStatus && matchesCategory && matchesPriority;
     });
-  }, [goals, searchQuery, selectedStatus, selectedCategory, selectedEmployee]);
+  }, [goals, searchQuery, selectedStatus, selectedCategory, selectedPriority]);
   
   // Paginate filtered goals
   const paginatedGoals = useMemo(() => {
@@ -251,364 +121,335 @@ export default function Goals() {
 
   // Calculate statistics
   const stats = useMemo(() => {
-    const totalGoals = goals.length;
-    const completedGoals = goals.filter(g => g.status === "completed").length;
-    const inProgressGoals = goals.filter(g => g.status === "in-progress").length;
-    const overdueGoals = goals.filter(g => 
-      g.status !== "completed" && new Date(g.dueDate) < new Date()
-    ).length;
+    const total = goals.length;
+    const notStarted = goals.filter(g => g.status === "not_started").length;
+    const inProgress = goals.filter(g => g.status === "in_progress").length;
+    const completed = goals.filter(g => g.status === "completed").length;
+    const cancelled = goals.filter(g => g.status === "cancelled").length;
     
-    return [
-      {
-        label: "Total Goals",
-        value: totalGoals,
-        icon: "lucide:target",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
-      },
-      {
-        label: "Completed",
-        value: completedGoals,
-        icon: "lucide:check-circle",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
-      },
-      {
-        label: "In Progress",
-        value: inProgressGoals,
-        icon: "lucide:clock",
-        color: "text-orange-600",
-        bgColor: "bg-orange-100"
-      },
-      {
-        label: "Overdue",
-        value: overdueGoals,
-        icon: "lucide:alert-triangle",
-        color: "text-red-600",
-        bgColor: "bg-red-100"
-      }
-    ];
+    return { total, notStarted, inProgress, completed, cancelled };
   }, [goals]);
 
-  // Handle add goal
-  const handleAddGoal = async () => {
-    if (!newGoal.title || !newGoal.employeeName || !newGoal.startDate || !newGoal.dueDate) {
+  // Handle row actions
+  const handleRowAction = (actionKey: string, goalId: number) => {
+    const goal = goals.find(g => g.id === goalId);
+    if (!goal) return;
+
+    switch (actionKey) {
+      case "view":
+        setSelectedGoal(goal);
+        onViewOpen();
+        break;
+      case "edit":
+        handleEditGoal(goal);
+        break;
+      case "delete":
+        handleDeleteGoal(goalId);
+        break;
+    }
+  };
+
+  const handleDeleteGoal = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this goal?")) {
+      try {
+        await deleteGoal(id);
+        addToast({
+          title: "Success",
+          description: "Goal deleted successfully",
+          color: "success"
+        });
+      } catch (error) {
+        addToast({
+          title: "Error",
+          description: "Failed to delete goal",
+          color: "danger"
+        });
+      }
+    }
+  };
+
+  const handleSubmitGoal = async () => {
+    if (!newGoal.title || !newGoal.start_date || !newGoal.end_date) {
       addToast({
-        title: "Missing Information",
-        description: "Please fill in all required fields (Title, Employee, Start Date, Due Date).",
-        color: "warning",
+        title: "Error",
+        description: "Please fill in all required fields",
+        color: "danger"
       });
       return;
     }
 
-    const goal: Goal = {
-      id: Date.now(),
-      employeeId: newGoal.employeeId || `EMP${Date.now()}`,
-      employeeName: newGoal.employeeName!,
-      title: newGoal.title!,
-      description: newGoal.description || "",
-      category: newGoal.category as Goal["category"] || "performance",
-      priority: newGoal.priority as Goal["priority"] || "medium",
-      status: newGoal.status as Goal["status"] || "not-started",
-      progress: newGoal.progress || 0,
-      startDate: newGoal.startDate!,
-      dueDate: newGoal.dueDate!,
-      managerId: newGoal.managerId || "MGR001",
-      managerName: newGoal.managerName || "Manager",
-      department: newGoal.department || "",
-      kpis: newGoal.kpis || [],
-      milestones: newGoal.milestones || [],
-      notes: newGoal.notes || "",
-      createdAt: new Date().toISOString().split('T')[0],
-      updatedAt: new Date().toISOString().split('T')[0]
-    };
-
-    setGoals(prev => [...prev, goal]);
-    setNewGoal({
-      employeeId: "",
-      employeeName: "",
-      title: "",
-      description: "",
-      category: "performance",
-      priority: "medium",
-      status: "not-started",
-      progress: 0,
-      startDate: "",
-      dueDate: "",
-      managerId: "",
-      managerName: "",
-      department: "",
-      kpis: [],
-      milestones: [],
-      notes: ""
-    });
-    setIsAddModalOpen(false);
-    
-    addToast({
-      title: "Goal Added",
-      description: `Goal "${goal.title}" has been added for ${goal.employeeName}.`,
-      color: "success",
-    });
-  };
-
-  // Handle edit goal
-  const handleEditGoal = async () => {
-    if (!selectedGoal || !newGoal.title || !newGoal.employeeName) {
-      addToast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        color: "warning",
+    setIsSubmitting(true);
+    try {
+      if (editingGoal) {
+        await updateGoal(editingGoal.id, {
+          ...newGoal,
+          target_value: newGoal.target_value ? parseFloat(newGoal.target_value) : null,
+          current_value: parseFloat(newGoal.current_value)
+        });
+        addToast({
+          title: "Success",
+          description: "Goal updated successfully",
+          color: "success"
+        });
+      } else {
+        await createGoal({
+          ...newGoal,
+          target_value: newGoal.target_value ? parseFloat(newGoal.target_value) : null,
+          current_value: parseFloat(newGoal.current_value)
+        });
+        addToast({
+          title: "Success",
+          description: "Goal created successfully",
+          color: "success"
+        });
+      }
+      
+      setNewGoal({
+        employee_id: 1,
+        title: "",
+        description: "",
+        category: "",
+        priority: "medium",
+        start_date: "",
+        end_date: "",
+        target_value: "",
+        current_value: "0",
+        unit: ""
       });
-      return;
+      setEditingGoal(null);
+      onOpenChange();
+    } catch (error) {
+      addToast({
+        title: "Error",
+        description: "Failed to save goal",
+        color: "danger"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
-
-    const updatedGoal: Goal = {
-      ...selectedGoal,
-      title: newGoal.title!,
-      description: newGoal.description || "",
-      category: newGoal.category as Goal["category"] || selectedGoal.category,
-      priority: newGoal.priority as Goal["priority"] || selectedGoal.priority,
-      status: newGoal.status as Goal["status"] || selectedGoal.status,
-      progress: newGoal.progress || selectedGoal.progress,
-      startDate: newGoal.startDate || selectedGoal.startDate,
-      dueDate: newGoal.dueDate || selectedGoal.dueDate,
-      managerName: newGoal.managerName || selectedGoal.managerName,
-      department: newGoal.department || selectedGoal.department,
-      kpis: newGoal.kpis || selectedGoal.kpis,
-      milestones: newGoal.milestones || selectedGoal.milestones,
-      notes: newGoal.notes || selectedGoal.notes,
-      updatedAt: new Date().toISOString().split('T')[0]
-    };
-
-    setGoals(prev => prev.map(g => g.id === selectedGoal.id ? updatedGoal : g));
-    setIsEditModalOpen(false);
-    setSelectedGoal(null);
-    
-    addToast({
-      title: "Goal Updated",
-      description: `Goal "${updatedGoal.title}" has been updated successfully.`,
-      color: "success",
-    });
   };
 
-  // Handle progress update
-  const handleProgressUpdate = (goal: Goal, newProgress: number) => {
-    const updatedGoal = {
-      ...goal,
-      progress: newProgress,
-      status: newProgress === 100 ? "completed" as const : 
-              newProgress > 0 ? "in-progress" as const : "not-started" as const,
-      completionDate: newProgress === 100 ? new Date().toISOString().split('T')[0] : undefined,
-      updatedAt: new Date().toISOString().split('T')[0]
-    };
-
-    setGoals(prev => prev.map(g => g.id === goal.id ? updatedGoal : g));
-    
-    addToast({
-      title: "Progress Updated",
-      description: `Progress updated to ${newProgress}% for "${goal.title}".`,
-      color: "success",
-    });
-  };
-
-  // Handle status update
-  const handleStatusUpdate = (goal: Goal, newStatus: Goal["status"]) => {
-    const updatedGoal = {
-      ...goal,
-      status: newStatus,
-      completionDate: newStatus === "completed" ? new Date().toISOString().split('T')[0] : undefined,
-      updatedAt: new Date().toISOString().split('T')[0]
-    };
-
-    setGoals(prev => prev.map(g => g.id === goal.id ? updatedGoal : g));
-    
-    addToast({
-      title: "Status Updated",
-      description: `Status updated to ${newStatus} for "${goal.title}".`,
-      color: "success",
-    });
-  };
-
-  // Handle delete goal
-  const handleDeleteGoal = (goal: Goal) => {
-    setGoals(prev => prev.filter(g => g.id !== goal.id));
-    
-    addToast({
-      title: "Goal Deleted",
-      description: `Goal "${goal.title}" has been removed.`,
-      color: "success",
-    });
-  };
-
-  // Open edit modal
-  const openEditModal = (goal: Goal) => {
-    setSelectedGoal(goal);
+  const handleEditGoal = (goal: Goal) => {
+    setEditingGoal(goal);
     setNewGoal({
+      employee_id: goal.employee_id,
       title: goal.title,
-      description: goal.description,
-      category: goal.category,
+      description: goal.description || "",
+      category: goal.category || "",
       priority: goal.priority,
-      status: goal.status,
-      progress: goal.progress,
-      startDate: goal.startDate,
-      dueDate: goal.dueDate,
-      managerName: goal.managerName,
-      department: goal.department,
-      kpis: goal.kpis,
-      milestones: goal.milestones,
-      notes: goal.notes
+      start_date: goal.start_date,
+      end_date: goal.end_date,
+      target_value: goal.target_value?.toString() || "",
+      current_value: goal.current_value?.toString() || "0",
+      unit: goal.unit || ""
     });
-    setIsEditModalOpen(true);
+    onOpen();
   };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const calculateProgress = (current: number, target: number) => {
+    if (!target || target === 0) return 0;
+    return Math.min((current / target) * 100, 100);
+  };
+
+  if (loading) {
+    return (
+      <PageLayout>
+        <div className="flex justify-center items-center h-64">
+          <Spinner size="lg" />
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageLayout>
+        <div className="text-center text-danger">
+          <p>Error loading goals: {error}</p>
+        </div>
+      </PageLayout>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl">
-              <Icon icon="lucide:target" className="text-white text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Goals</h1>
-              <p className="text-gray-600 mt-1">Set and track employee performance goals</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              color="primary" 
-              startContent={<Icon icon="lucide:plus" />} 
-              onPress={() => setIsAddModalOpen(true)}
-              className="font-medium"
-            >
-              Add Goal
-            </Button>
-          </div>
-        </div>
-        
-        {/* Statistics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat, index) => (
-            <Card key={index} className="shadow-sm">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                  <Icon icon={stat.icon} className={`text-2xl ${stat.color}`} />
-                </div>
-                <div>
-                  <p className="text-default-500">{stat.label}</p>
-                  <h3 className="text-2xl font-bold">{stat.value}</h3>
-                </div>
-              </CardBody>
-            </Card>
-          ))}
-        </div>
+    <PageLayout>
+      <PageHeader
+        title="Goals Management"
+        description="Manage employee goals and performance objectives"
+        actions={
+          <Button
+            color="primary"
+            startContent={<Icon icon="lucide:plus" />}
+            onPress={onOpen}
+          >
+            Add Goal
+          </Button>
+        }
+      />
 
-        {/* Filters */}
-        <Card className="border-0 shadow-sm">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <Card>
           <CardBody className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              <Input
-                placeholder="Search goals..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                startContent={<Icon icon="lucide:search" className="text-gray-400" />}
-              />
-              <Select
-                label="Status"
-                placeholder="All Statuses"
-                selectedKeys={[selectedStatus]}
-                onSelectionChange={(keys) => setSelectedStatus(Array.from(keys)[0] as string)}
-              >
-                <SelectItem key="all">All Statuses</SelectItem>
-                <SelectItem key="not-started">Not Started</SelectItem>
-                <SelectItem key="in-progress">In Progress</SelectItem>
-                <SelectItem key="completed">Completed</SelectItem>
-                <SelectItem key="on-hold">On Hold</SelectItem>
-                <SelectItem key="cancelled">Cancelled</SelectItem>
-              </Select>
-              <Select
-                label="Category"
-                placeholder="All Categories"
-                selectedKeys={[selectedCategory]}
-                onSelectionChange={(keys) => setSelectedCategory(Array.from(keys)[0] as string)}
-              >
-                <SelectItem key="all">All Categories</SelectItem>
-                <SelectItem key="performance">Performance</SelectItem>
-                <SelectItem key="development">Development</SelectItem>
-                <SelectItem key="behavioral">Behavioral</SelectItem>
-                <SelectItem key="project">Project</SelectItem>
-                <SelectItem key="sales">Sales</SelectItem>
-                <SelectItem key="quality">Quality</SelectItem>
-              </Select>
-              <Select
-                label="Employee"
-                placeholder="All Employees"
-                selectedKeys={[selectedEmployee]}
-                onSelectionChange={(keys) => setSelectedEmployee(Array.from(keys)[0] as string)}
-              >
-                <SelectItem key="all">All Employees</SelectItem>
-                {employees.map(employee => (
-                  <SelectItem key={employee}>{employee}</SelectItem>
-                ))}
-              </Select>
-              <div className="flex items-end">
-                <div className="text-sm text-gray-600">
-                  Showing {filteredGoals.length} of {goals.length} goals
-                </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">Total Goals</p>
+                <p className="text-2xl font-bold">{stats.total}</p>
+              </div>
+              <div className="p-3 bg-primary-100 rounded-full">
+                <Icon icon="lucide:target" className="w-6 h-6 text-primary-600" />
               </div>
             </div>
           </CardBody>
         </Card>
 
-        {/* Data Table */}
-        <Card className="border-0 shadow-sm">
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-green-600 text-xl" />
+        <Card>
+          <CardBody className="p-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Goals List</h3>
-                <p className="text-gray-500 text-sm">Track and manage employee goals</p>
+                <p className="text-sm text-default-500">In Progress</p>
+                <p className="text-2xl font-bold text-primary-600">{stats.inProgress}</p>
+              </div>
+              <div className="p-3 bg-primary-100 rounded-full">
+                <Icon icon="lucide:play-circle" className="w-6 h-6 text-primary-600" />
               </div>
             </div>
-          </CardHeader>
-          <CardBody className="pt-0">
-            <Table aria-label="Goals table">
-              <TableHeader>
-                <TableColumn>GOAL</TableColumn>
-                <TableColumn>EMPLOYEE</TableColumn>
-                <TableColumn>CATEGORY</TableColumn>
-                <TableColumn>PRIORITY</TableColumn>
-                <TableColumn>PROGRESS</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>DUE DATE</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {paginatedGoals.map((goal) => (
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">Completed</p>
+                <p className="text-2xl font-bold text-success-600">{stats.completed}</p>
+              </div>
+              <div className="p-3 bg-success-100 rounded-full">
+                <Icon icon="lucide:check-circle" className="w-6 h-6 text-success-600" />
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardBody className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">Not Started</p>
+                <p className="text-2xl font-bold text-default-600">{stats.notStarted}</p>
+              </div>
+              <div className="p-3 bg-content2 rounded-full">
+                <Icon icon="lucide:clock" className="w-6 h-6 text-default-600" />
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
+      {/* Filters and Search */}
+      <Card className="mb-6">
+        <CardBody className="p-6">
+          <div className="flex flex-col md:flex-row gap-4">
+            <Input
+              placeholder="Search goals..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              startContent={<Icon icon="lucide:search" />}
+              className="flex-1"
+            />
+            <Select
+              placeholder="Status"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full md:w-48"
+            >
+              <SelectItem key="all" value="all">All Status</SelectItem>
+              <SelectItem key="not_started" value="not_started">Not Started</SelectItem>
+              <SelectItem key="in_progress" value="in_progress">In Progress</SelectItem>
+              <SelectItem key="completed" value="completed">Completed</SelectItem>
+              <SelectItem key="cancelled" value="cancelled">Cancelled</SelectItem>
+            </Select>
+            <Select
+              placeholder="Category"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="w-full md:w-48"
+            >
+              <SelectItem key="all" value="all">All Categories</SelectItem>
+              {categories.map(category => (
+                <SelectItem key={category} value={category}>{category}</SelectItem>
+              ))}
+            </Select>
+            <Select
+              placeholder="Priority"
+              value={selectedPriority}
+              onChange={(e) => setSelectedPriority(e.target.value)}
+              className="w-full md:w-48"
+            >
+              <SelectItem key="all" value="all">All Priorities</SelectItem>
+              {priorities.map(priority => (
+                <SelectItem key={priority} value={priority}>{priority}</SelectItem>
+              ))}
+            </Select>
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Goals Table */}
+      <Card>
+        <CardHeader className="pb-0">
+          <div className="flex justify-between items-center w-full">
+            <h3 className="text-lg font-semibold">Goals</h3>
+            <p className="text-sm text-default-500">
+              Showing {paginatedGoals.length} of {filteredGoals.length} goals
+            </p>
+          </div>
+        </CardHeader>
+        <CardBody>
+          <Table aria-label="Goals table">
+            <TableHeader>
+              <TableColumn>EMPLOYEE</TableColumn>
+              <TableColumn>TITLE</TableColumn>
+              <TableColumn>CATEGORY</TableColumn>
+              <TableColumn>PRIORITY</TableColumn>
+              <TableColumn>PROGRESS</TableColumn>
+              <TableColumn>DUE DATE</TableColumn>
+              <TableColumn>STATUS</TableColumn>
+              <TableColumn>ACTIONS</TableColumn>
+            </TableHeader>
+            <TableBody emptyContent="No goals found">
+              {paginatedGoals.map((goal) => {
+                const progress = calculateProgress(goal.current_value || 0, goal.target_value || 0);
+                return (
                   <TableRow key={goal.id}>
                     <TableCell>
-                      <div>
-                        <p className="font-medium text-gray-900">{goal.title}</p>
-                        <p className="text-sm text-gray-500 max-w-xs truncate">{goal.description}</p>
+                      <div className="flex items-center gap-3">
+                        <Avatar
+                          size="sm"
+                          name={goal.employee_name || "Unknown"}
+                          className="flex-shrink-0"
+                        />
+                        <div>
+                          <p className="font-medium">{goal.employee_name || "Unknown"}</p>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar 
-                          name={goal.employeeName}
-                          size="sm"
-                        />
-                        <div>
-                          <p className="font-medium text-gray-900">{goal.employeeName}</p>
-                          <p className="text-sm text-gray-500">{goal.department}</p>
-                        </div>
+                      <div className="max-w-xs">
+                        <p className="font-medium truncate">{goal.title}</p>
+                        {goal.description && (
+                          <p className="text-sm text-default-500 truncate">{goal.description}</p>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
                       <Chip
                         size="sm"
-                        color={categoryColorMap[goal.category] as any}
+                        color={categoryColorMap[goal.category as keyof typeof categoryColorMap] || "default"}
                         variant="flat"
                       >
                         {goal.category}
@@ -617,7 +458,7 @@ export default function Goals() {
                     <TableCell>
                       <Chip
                         size="sm"
-                        color={priorityColorMap[goal.priority] as any}
+                        color={priorityColorMap[goal.priority as keyof typeof priorityColorMap] || "default"}
                         variant="flat"
                       >
                         {goal.priority}
@@ -625,439 +466,283 @@ export default function Goals() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Progress 
-                          value={goal.progress} 
-                          className="w-20"
-                          color={goal.progress === 100 ? "success" : goal.progress >= 75 ? "primary" : goal.progress >= 50 ? "warning" : "danger"}
+                        <Progress
+                          value={progress}
+                          className="flex-1"
+                          size="sm"
+                          color={progress >= 100 ? "success" : progress >= 50 ? "primary" : "warning"}
                         />
-                        <span className="text-sm font-medium">{goal.progress}%</span>
+                        <span className="text-sm text-default-500 min-w-[3rem]">
+                          {Math.round(progress)}%
+                        </span>
                       </div>
                     </TableCell>
+                    <TableCell>{formatDate(goal.end_date)}</TableCell>
                     <TableCell>
                       <Chip
                         size="sm"
-                        color={statusColorMap[goal.status] as any}
+                        color={statusColorMap[goal.status as keyof typeof statusColorMap] || "default"}
                         variant="flat"
                       >
-                        {goal.status}
+                        {goal.status.replace('_', ' ')}
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <div>
-                        <p className="text-sm font-medium">{new Date(goal.dueDate).toLocaleDateString()}</p>
-                        {new Date(goal.dueDate) < new Date() && goal.status !== "completed" && (
-                          <p className="text-xs text-red-500">Overdue</p>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={() => {
-                            setSelectedGoal(goal);
-                            setIsViewModalOpen(true);
-                          }}
+                      <Dropdown>
+                        <DropdownTrigger>
+                          <Button isIconOnly size="sm" variant="light">
+                            <Icon icon="lucide:more-vertical" />
+                          </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                          aria-label="Goal actions"
+                          onAction={(key) => handleRowAction(key as string, goal.id)}
                         >
-                          <Icon icon="lucide:eye" className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={() => openEditModal(goal)}
-                        >
-                          <Icon icon="lucide:edit" className="w-4 h-4" />
-                        </Button>
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button size="sm" variant="flat">
-                              <Icon icon="lucide:more-horizontal" className="w-4 h-4" />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu>
-                            <DropdownItem key="update-progress" onPress={() => {
-                              const newProgress = prompt("Enter new progress (0-100):", goal.progress.toString());
-                              if (newProgress && !isNaN(Number(newProgress))) {
-                                handleProgressUpdate(goal, Number(newProgress));
-                              }
-                            }}>
-                              Update Progress
-                            </DropdownItem>
-                            <DropdownItem key="mark-complete" onPress={() => handleStatusUpdate(goal, "completed")}>
-                              Mark Complete
-                            </DropdownItem>
-                            <DropdownItem key="put-on-hold" onPress={() => handleStatusUpdate(goal, "on-hold")}>
-                              Put on Hold
-                            </DropdownItem>
-                            <DropdownItem key="delete" className="text-danger" onPress={() => handleDeleteGoal(goal)}>
-                              Delete
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
-                      </div>
+                          <DropdownItem key="view" startContent={<Icon icon="lucide:eye" />}>
+                            View
+                          </DropdownItem>
+                          <DropdownItem key="edit" startContent={<Icon icon="lucide:edit" />}>
+                            Edit
+                          </DropdownItem>
+                          <DropdownItem 
+                            key="delete" 
+                            startContent={<Icon icon="lucide:trash" />}
+                            className="text-danger"
+                            color="danger"
+                          >
+                            Delete
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            
-            {filteredGoals.length > rowsPerPage && (
-              <div className="flex justify-center mt-4">
-                <Pagination
-                  total={Math.ceil(filteredGoals.length / rowsPerPage)}
-                  page={page}
-                  onChange={setPage}
-                  showControls
-                />
-              </div>
-            )}
-          </CardBody>
-        </Card>
+                );
+              })}
+            </TableBody>
+          </Table>
 
-        {/* Add Goal Modal */}
-        <Modal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} size="2xl">
-          <ModalContent>
-            <ModalHeader>Add New Goal</ModalHeader>
-            <ModalBody>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="Goal Title *"
-                  placeholder="Enter goal title"
-                  value={newGoal.title || ""}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, title: e.target.value }))}
-                />
-                <Select
-                  label="Employee *"
-                  placeholder="Select employee"
-                  selectedKeys={newGoal.employeeName ? [newGoal.employeeName] : []}
-                  onSelectionChange={(keys) => setNewGoal(prev => ({ ...prev, employeeName: Array.from(keys)[0] as string }))}
-                >
-                  {employees.map(employee => (
-                    <SelectItem key={employee}>{employee}</SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Category"
-                  placeholder="Select category"
-                  selectedKeys={newGoal.category ? [newGoal.category] : []}
-                  onSelectionChange={(keys) => setNewGoal(prev => ({ ...prev, category: Array.from(keys)[0] as Goal["category"] }))}
-                >
-                  <SelectItem key="performance">Performance</SelectItem>
-                  <SelectItem key="development">Development</SelectItem>
-                  <SelectItem key="behavioral">Behavioral</SelectItem>
-                  <SelectItem key="project">Project</SelectItem>
-                  <SelectItem key="sales">Sales</SelectItem>
-                  <SelectItem key="quality">Quality</SelectItem>
-                </Select>
-                <Select
-                  label="Priority"
-                  placeholder="Select priority"
-                  selectedKeys={newGoal.priority ? [newGoal.priority] : []}
-                  onSelectionChange={(keys) => setNewGoal(prev => ({ ...prev, priority: Array.from(keys)[0] as Goal["priority"] }))}
-                >
-                  <SelectItem key="low">Low</SelectItem>
-                  <SelectItem key="medium">Medium</SelectItem>
-                  <SelectItem key="high">High</SelectItem>
-                  <SelectItem key="critical">Critical</SelectItem>
-                </Select>
-                <Input
-                  label="Start Date *"
-                  type="date"
-                  value={newGoal.startDate || ""}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, startDate: e.target.value }))}
-                />
-                <Input
-                  label="Due Date *"
-                  type="date"
-                  value={newGoal.dueDate || ""}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, dueDate: e.target.value }))}
-                />
-                <Select
-                  label="Manager"
-                  placeholder="Select manager"
-                  selectedKeys={newGoal.managerName ? [newGoal.managerName] : []}
-                  onSelectionChange={(keys) => setNewGoal(prev => ({ ...prev, managerName: Array.from(keys)[0] as string }))}
-                >
-                  {managers.map(manager => (
-                    <SelectItem key={manager}>{manager}</SelectItem>
-                  ))}
-                </Select>
-                <Select
-                  label="Department"
-                  placeholder="Select department"
-                  selectedKeys={newGoal.department ? [newGoal.department] : []}
-                  onSelectionChange={(keys) => setNewGoal(prev => ({ ...prev, department: Array.from(keys)[0] as string }))}
-                >
-                  {departments.map(dept => (
-                    <SelectItem key={dept}>{dept}</SelectItem>
-                  ))}
-                </Select>
-              </div>
-              <Textarea
-                label="Description"
-                placeholder="Enter goal description"
-                value={newGoal.description || ""}
-                onChange={(e) => setNewGoal(prev => ({ ...prev, description: e.target.value }))}
-                minRows={3}
+          {filteredGoals.length > rowsPerPage && (
+            <div className="flex justify-center mt-4">
+              <Pagination
+                total={Math.ceil(filteredGoals.length / rowsPerPage)}
+                page={page}
+                onChange={setPage}
+                showControls
               />
-              <Textarea
-                label="KPIs (one per line)"
-                placeholder="Enter key performance indicators"
-                value={newGoal.kpis?.join('\n') || ""}
-                onChange={(e) => setNewGoal(prev => ({ ...prev, kpis: e.target.value.split('\n').filter(kpi => kpi.trim()) }))}
-                minRows={3}
-              />
-              <Textarea
-                label="Milestones (one per line)"
-                placeholder="Enter milestones"
-                value={newGoal.milestones?.join('\n') || ""}
-                onChange={(e) => setNewGoal(prev => ({ ...prev, milestones: e.target.value.split('\n').filter(milestone => milestone.trim()) }))}
-                minRows={3}
-              />
-              <Textarea
-                label="Notes"
-                placeholder="Additional notes"
-                value={newGoal.notes || ""}
-                onChange={(e) => setNewGoal(prev => ({ ...prev, notes: e.target.value }))}
-                minRows={2}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="flat" onPress={() => setIsAddModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button color="primary" onPress={handleAddGoal}>
-                Add Goal
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+            </div>
+          )}
+        </CardBody>
+      </Card>
 
-        {/* Edit Goal Modal */}
-        <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} size="2xl">
-          <ModalContent>
-            <ModalHeader>Edit Goal</ModalHeader>
-            <ModalBody>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  label="Goal Title *"
-                  placeholder="Enter goal title"
-                  value={newGoal.title || ""}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, title: e.target.value }))}
-                />
-                <Select
-                  label="Category"
-                  placeholder="Select category"
-                  selectedKeys={newGoal.category ? [newGoal.category] : []}
-                  onSelectionChange={(keys) => setNewGoal(prev => ({ ...prev, category: Array.from(keys)[0] as Goal["category"] }))}
-                >
-                  <SelectItem key="performance">Performance</SelectItem>
-                  <SelectItem key="development">Development</SelectItem>
-                  <SelectItem key="behavioral">Behavioral</SelectItem>
-                  <SelectItem key="project">Project</SelectItem>
-                  <SelectItem key="sales">Sales</SelectItem>
-                  <SelectItem key="quality">Quality</SelectItem>
-                </Select>
-                <Select
-                  label="Priority"
-                  placeholder="Select priority"
-                  selectedKeys={newGoal.priority ? [newGoal.priority] : []}
-                  onSelectionChange={(keys) => setNewGoal(prev => ({ ...prev, priority: Array.from(keys)[0] as Goal["priority"] }))}
-                >
-                  <SelectItem key="low">Low</SelectItem>
-                  <SelectItem key="medium">Medium</SelectItem>
-                  <SelectItem key="high">High</SelectItem>
-                  <SelectItem key="critical">Critical</SelectItem>
-                </Select>
-                <Select
-                  label="Status"
-                  placeholder="Select status"
-                  selectedKeys={newGoal.status ? [newGoal.status] : []}
-                  onSelectionChange={(keys) => setNewGoal(prev => ({ ...prev, status: Array.from(keys)[0] as Goal["status"] }))}
-                >
-                  <SelectItem key="not-started">Not Started</SelectItem>
-                  <SelectItem key="in-progress">In Progress</SelectItem>
-                  <SelectItem key="completed">Completed</SelectItem>
-                  <SelectItem key="on-hold">On Hold</SelectItem>
-                  <SelectItem key="cancelled">Cancelled</SelectItem>
-                </Select>
-                <Input
-                  label="Progress (%)"
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={newGoal.progress || 0}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, progress: parseInt(e.target.value) || 0 }))}
-                />
-                <Input
-                  label="Start Date"
-                  type="date"
-                  value={newGoal.startDate || ""}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, startDate: e.target.value }))}
-                />
-                <Input
-                  label="Due Date"
-                  type="date"
-                  value={newGoal.dueDate || ""}
-                  onChange={(e) => setNewGoal(prev => ({ ...prev, dueDate: e.target.value }))}
-                />
-                <Select
-                  label="Manager"
-                  placeholder="Select manager"
-                  selectedKeys={newGoal.managerName ? [newGoal.managerName] : []}
-                  onSelectionChange={(keys) => setNewGoal(prev => ({ ...prev, managerName: Array.from(keys)[0] as string }))}
-                >
-                  {managers.map(manager => (
-                    <SelectItem key={manager}>{manager}</SelectItem>
-                  ))}
-                </Select>
-              </div>
-              <Textarea
-                label="Description"
-                placeholder="Enter goal description"
-                value={newGoal.description || ""}
-                onChange={(e) => setNewGoal(prev => ({ ...prev, description: e.target.value }))}
-                minRows={3}
-              />
-              <Textarea
-                label="KPIs (one per line)"
-                placeholder="Enter key performance indicators"
-                value={newGoal.kpis?.join('\n') || ""}
-                onChange={(e) => setNewGoal(prev => ({ ...prev, kpis: e.target.value.split('\n').filter(kpi => kpi.trim()) }))}
-                minRows={3}
-              />
-              <Textarea
-                label="Milestones (one per line)"
-                placeholder="Enter milestones"
-                value={newGoal.milestones?.join('\n') || ""}
-                onChange={(e) => setNewGoal(prev => ({ ...prev, milestones: e.target.value.split('\n').filter(milestone => milestone.trim()) }))}
-                minRows={3}
-              />
-              <Textarea
-                label="Notes"
-                placeholder="Additional notes"
-                value={newGoal.notes || ""}
-                onChange={(e) => setNewGoal(prev => ({ ...prev, notes: e.target.value }))}
-                minRows={2}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="flat" onPress={() => setIsEditModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button color="primary" onPress={handleEditGoal}>
-                Update Goal
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
+      {/* Add/Edit Goal Modal */}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>
+                {editingGoal ? "Edit Goal" : "Add New Goal"}
+              </ModalHeader>
+              <ModalBody>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Title"
+                    placeholder="Enter goal title"
+                    value={newGoal.title}
+                    onChange={(e) => setNewGoal({...newGoal, title: e.target.value})}
+                    isRequired
+                  />
 
-        {/* View Goal Modal */}
-        <Modal isOpen={isViewModalOpen} onClose={() => setIsViewModalOpen(false)} size="3xl">
-          <ModalContent>
-            <ModalHeader>Goal Details</ModalHeader>
-            <ModalBody>
-              {selectedGoal && (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <Avatar 
-                      name={selectedGoal.employeeName}
-                      size="lg"
+                  <Select
+                    label="Category"
+                    placeholder="Select category"
+                    value={newGoal.category}
+                    onChange={(e) => setNewGoal({...newGoal, category: e.target.value})}
+                  >
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                    ))}
+                  </Select>
+
+                  <Select
+                    label="Priority"
+                    value={newGoal.priority}
+                    onChange={(e) => setNewGoal({...newGoal, priority: e.target.value})}
+                  >
+                    {priorities.map(priority => (
+                      <SelectItem key={priority} value={priority}>{priority}</SelectItem>
+                    ))}
+                  </Select>
+
+                  <Input
+                    label="Unit (Optional)"
+                    placeholder="e.g., hours, tasks, %"
+                    value={newGoal.unit}
+                    onChange={(e) => setNewGoal({...newGoal, unit: e.target.value})}
+                  />
+
+                  <Input
+                    label="Start Date"
+                    type="date"
+                    value={newGoal.start_date}
+                    onChange={(e) => setNewGoal({...newGoal, start_date: e.target.value})}
+                    isRequired
+                  />
+
+                  <Input
+                    label="End Date"
+                    type="date"
+                    value={newGoal.end_date}
+                    onChange={(e) => setNewGoal({...newGoal, end_date: e.target.value})}
+                    isRequired
+                  />
+
+                  <Input
+                    label="Target Value (Optional)"
+                    placeholder="0"
+                    type="number"
+                    value={newGoal.target_value}
+                    onChange={(e) => setNewGoal({...newGoal, target_value: e.target.value})}
+                  />
+
+                  <Input
+                    label="Current Value"
+                    placeholder="0"
+                    type="number"
+                    value={newGoal.current_value}
+                    onChange={(e) => setNewGoal({...newGoal, current_value: e.target.value})}
+                  />
+
+                  <div className="md:col-span-2">
+                    <Textarea
+                      label="Description (Optional)"
+                      placeholder="Enter goal description"
+                      value={newGoal.description}
+                      onChange={(e) => setNewGoal({...newGoal, description: e.target.value})}
                     />
-                    <div>
-                      <h3 className="text-xl font-bold">{selectedGoal.title}</h3>
-                      <p className="text-gray-600">{selectedGoal.employeeName} • {selectedGoal.department}</p>
-                      <p className="text-gray-600">Manager: {selectedGoal.managerName}</p>
-                    </div>
                   </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-semibold mb-2">Goal Information</h4>
-                      <p><strong>Category:</strong> 
-                        <Chip size="sm" color={categoryColorMap[selectedGoal.category] as any} variant="flat" className="ml-2">
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="light" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button 
+                  color="primary" 
+                  onPress={handleSubmitGoal}
+                  isLoading={isSubmitting}
+                >
+                  {editingGoal ? "Update" : "Create"} Goal
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      {/* View Goal Modal */}
+      <Modal isOpen={isViewOpen} onOpenChange={onViewOpenChange} size="2xl">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader>Goal Details</ModalHeader>
+              <ModalBody>
+                {selectedGoal && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm text-default-500">Employee</p>
+                        <p className="font-medium">{selectedGoal.employee_name}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Category</p>
+                        <Chip
+                          size="sm"
+                          color={categoryColorMap[selectedGoal.category as keyof typeof categoryColorMap] || "default"}
+                          variant="flat"
+                        >
                           {selectedGoal.category}
                         </Chip>
-                      </p>
-                      <p><strong>Priority:</strong> 
-                        <Chip size="sm" color={priorityColorMap[selectedGoal.priority] as any} variant="flat" className="ml-2">
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Priority</p>
+                        <Chip
+                          size="sm"
+                          color={priorityColorMap[selectedGoal.priority as keyof typeof priorityColorMap] || "default"}
+                          variant="flat"
+                        >
                           {selectedGoal.priority}
                         </Chip>
-                      </p>
-                      <p><strong>Status:</strong> 
-                        <Chip size="sm" color={statusColorMap[selectedGoal.status] as any} variant="flat" className="ml-2">
-                          {selectedGoal.status}
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Status</p>
+                        <Chip
+                          size="sm"
+                          color={statusColorMap[selectedGoal.status as keyof typeof statusColorMap] || "default"}
+                          variant="flat"
+                        >
+                          {selectedGoal.status.replace('_', ' ')}
                         </Chip>
-                      </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Start Date</p>
+                        <p className="font-medium">{formatDate(selectedGoal.start_date)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">End Date</p>
+                        <p className="font-medium">{formatDate(selectedGoal.end_date)}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Progress</p>
+                        <div className="flex items-center gap-2">
+                          <Progress
+                            value={calculateProgress(selectedGoal.current_value || 0, selectedGoal.target_value || 0)}
+                            className="flex-1"
+                            size="sm"
+                          />
+                          <span className="text-sm text-default-500">
+                            {Math.round(calculateProgress(selectedGoal.current_value || 0, selectedGoal.target_value || 0))}%
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm text-default-500">Created</p>
+                        <p className="font-medium">{formatDate(selectedGoal.created_at)}</p>
+                      </div>
                     </div>
-                    
                     <div>
-                      <h4 className="font-semibold mb-2">Timeline</h4>
-                      <p><strong>Start Date:</strong> {new Date(selectedGoal.startDate).toLocaleDateString()}</p>
-                      <p><strong>Due Date:</strong> {new Date(selectedGoal.dueDate).toLocaleDateString()}</p>
-                      {selectedGoal.completionDate && (
-                        <p><strong>Completed:</strong> {new Date(selectedGoal.completionDate).toLocaleDateString()}</p>
-                      )}
+                      <p className="text-sm text-default-500">Title</p>
+                      <p className="font-medium">{selectedGoal.title}</p>
                     </div>
+                    {selectedGoal.description && (
+                      <div>
+                        <p className="text-sm text-default-500">Description</p>
+                        <p className="font-medium">{selectedGoal.description}</p>
+                      </div>
+                    )}
+                    {(selectedGoal.target_value || selectedGoal.current_value) && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm text-default-500">Current Value</p>
+                          <p className="font-medium">{selectedGoal.current_value || 0} {selectedGoal.unit}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-default-500">Target Value</p>
+                          <p className="font-medium">{selectedGoal.target_value || "N/A"} {selectedGoal.unit}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
-                  <div>
-                    <h4 className="font-semibold mb-2">Progress</h4>
-                    <div className="flex items-center gap-4">
-                      <Progress 
-                        value={selectedGoal.progress} 
-                        className="flex-1"
-                        color={selectedGoal.progress === 100 ? "success" : selectedGoal.progress >= 75 ? "primary" : selectedGoal.progress >= 50 ? "warning" : "danger"}
-                      />
-                      <span className="text-lg font-bold">{selectedGoal.progress}%</span>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-semibold mb-2">Description</h4>
-                    <p className="text-gray-700">{selectedGoal.description}</p>
-                  </div>
-                  
-                  {selectedGoal.kpis.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Key Performance Indicators</h4>
-                      <ul className="list-disc list-inside space-y-1">
-                        {selectedGoal.kpis.map((kpi, index) => (
-                          <li key={index} className="text-gray-700">{kpi}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {selectedGoal.milestones.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Milestones</h4>
-                      <ul className="list-disc list-inside space-y-1">
-                        {selectedGoal.milestones.map((milestone, index) => (
-                          <li key={index} className="text-gray-700">{milestone}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  
-                  {selectedGoal.notes && (
-                    <div>
-                      <h4 className="font-semibold mb-2">Notes</h4>
-                      <p className="text-gray-700">{selectedGoal.notes}</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </ModalBody>
-            <ModalFooter>
-              <Button variant="flat" onPress={() => setIsViewModalOpen(false)}>
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      </div>
-    </div>
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="primary" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </PageLayout>
   );
 }

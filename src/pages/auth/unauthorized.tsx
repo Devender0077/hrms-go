@@ -31,10 +31,10 @@
               </CardBody>
               <CardFooter className="flex justify-center">
                 <Button 
-                  color="primary" 
+                  color="primary" variant="solid" 
                   as={Link} 
                   to="/dashboard"
-                  startContent={<Icon icon="lucide:home" />}
+                  startContent={<Icon icon="$1" />}
                 >
                   Back to Dashboard
                 </Button>

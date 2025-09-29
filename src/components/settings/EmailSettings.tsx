@@ -28,7 +28,7 @@ export default function EmailSettings({ settings, onSettingsChange }: EmailSetti
         </div>
         <div>
           <h2 className="text-xl font-semibold">Email Configuration</h2>
-          <p className="text-gray-600">Configure your email server settings for sending notifications</p>
+          <p className="text-default-600">Configure your email server settings for sending notifications</p>
         </div>
       </div>
       
@@ -101,7 +101,7 @@ export default function EmailSettings({ settings, onSettingsChange }: EmailSetti
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Mail Queue</p>
-              <p className="text-sm text-gray-500">Enable mail queue for better performance</p>
+              <p className="text-sm text-default-500">Enable mail queue for better performance</p>
             </div>
             <Switch
               isSelected={settings.mailQueueEnabled}
@@ -129,8 +129,8 @@ export default function EmailSettings({ settings, onSettingsChange }: EmailSetti
 
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Test Email Configuration</h3>
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="p-4 bg-content1 rounded-lg">
+          <p className="text-sm text-default-600 mb-4">
             Test your email configuration by sending a test email to verify the settings are working correctly.
           </p>
           <div className="flex items-center gap-4">
@@ -140,7 +140,7 @@ export default function EmailSettings({ settings, onSettingsChange }: EmailSetti
               placeholder="test@example.com"
               className="flex-1"
             />
-            <button className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+            <button className="px-4 py-2 bg-primary-600 text-foreground rounded-lg hover:bg-primary-700 transition-colors">
               Send Test Email
             </button>
           </div>

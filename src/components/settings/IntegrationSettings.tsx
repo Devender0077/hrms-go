@@ -48,7 +48,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
         </div>
         <div>
           <h2 className="text-xl font-semibold">Integration Settings</h2>
-          <p className="text-gray-600">Configure third-party service integrations</p>
+          <p className="text-default-600">Configure third-party service integrations</p>
         </div>
       </div>
 
@@ -57,10 +57,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
         <CardHeader>
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:zap" className="text-purple-600 text-lg" />
+              <Icon icon="lucide:zap" className="text-secondary-600 text-lg" />
               <div>
                 <h3 className="text-lg font-semibold">Pusher</h3>
-                <p className="text-sm text-gray-500">Real-time notifications and updates</p>
+                <p className="text-sm text-default-500">Real-time notifications and updates</p>
               </div>
             </div>
             <Switch
@@ -107,10 +107,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
         <CardHeader>
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:video" className="text-blue-600 text-lg" />
+              <Icon icon="lucide:video" className="text-primary-600 text-lg" />
               <div>
                 <h3 className="text-lg font-semibold">Zoom</h3>
-                <p className="text-sm text-gray-500">Video conferencing integration</p>
+                <p className="text-sm text-default-500">Video conferencing integration</p>
               </div>
             </div>
             <Switch
@@ -145,10 +145,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
         <CardHeader>
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:users" className="text-blue-500 text-lg" />
+              <Icon icon="lucide:users" className="text-primary text-lg" />
               <div>
                 <h3 className="text-lg font-semibold">Microsoft Teams</h3>
-                <p className="text-sm text-gray-500">Team collaboration integration</p>
+                <p className="text-sm text-default-500">Team collaboration integration</p>
               </div>
             </div>
             <Switch
@@ -183,10 +183,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
         <CardHeader>
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:message-square" className="text-purple-500 text-lg" />
+              <Icon icon="lucide:message-square" className="text-secondary text-lg" />
               <div>
                 <h3 className="text-lg font-semibold">Slack</h3>
-                <p className="text-sm text-gray-500">Team communication integration</p>
+                <p className="text-sm text-default-500">Team communication integration</p>
               </div>
             </div>
             <Switch
@@ -221,10 +221,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
         <CardHeader>
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:send" className="text-blue-400 text-lg" />
+              <Icon icon="lucide:send" className="text-primary-400 text-lg" />
               <div>
                 <h3 className="text-lg font-semibold">Telegram</h3>
-                <p className="text-sm text-gray-500">Messaging bot integration</p>
+                <p className="text-sm text-default-500">Messaging bot integration</p>
               </div>
             </div>
             <Switch
@@ -251,10 +251,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
         <CardHeader>
           <div className="flex items-center justify-between w-full">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:phone" className="text-red-500 text-lg" />
+              <Icon icon="lucide:phone" className="text-danger text-lg" />
               <div>
                 <h3 className="text-lg font-semibold">Twilio</h3>
-                <p className="text-sm text-gray-500">SMS and voice communication</p>
+                <p className="text-sm text-default-500">SMS and voice communication</p>
               </div>
             </div>
             <Switch

@@ -1,26 +1,23 @@
 import { useState, useEffect } from 'react';
-import { jobsAPI } from '../services/api-service';
 import { useAuthenticatedAPI } from './useAuthenticatedAPI';
 
 export interface Job {
   id: number;
   title: string;
-  description?: string;
-  requirements?: string;
-  responsibilities?: string;
-  location?: string;
-  job_type: 'full_time' | 'part_time' | 'contract' | 'internship' | 'remote';
-  experience_min?: number;
-  experience_max?: number;
+  department: string;
+  location: string;
+  employment_type: "full_time" | "part_time" | "contract" | "internship";
+  experience_level: "entry" | "mid" | "senior" | "executive";
   salary_min?: number;
   salary_max?: number;
-  vacancies: number;
+  description: string;
+  requirements: string;
+  responsibilities: string;
+  benefits?: string;
+  status: "draft" | "published" | "closed" | "cancelled";
+  posted_date: string;
   closing_date?: string;
-  status: 'draft' | 'published' | 'closed' | 'archived';
-  department_id?: number;
-  designation_id?: number;
-  department_name?: string;
-  designation_name?: string;
+  created_by: number;
   created_at: string;
   updated_at: string;
 }
@@ -35,7 +32,9 @@ export const useJobs = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await jobsAPI.getAll();
+      const response = await apiRequest('/jobs');
+      // Handle both array response and object with data property
+      const data = Array.isArray(response) ? response : (response.data || []);
       setJobs(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load jobs');
@@ -48,7 +47,10 @@ export const useJobs = () => {
   const createJob = async (jobData: Partial<Job>) => {
     try {
       setError(null);
-      const result = await jobsAPI.create(jobData);
+      const result = await apiRequest('/jobs', {
+        method: 'POST',
+        body: jobData,
+      });
       await loadJobs(); // Reload jobs after creation
       return result;
     } catch (err) {
@@ -61,7 +63,10 @@ export const useJobs = () => {
   const updateJob = async (id: number, jobData: Partial<Job>) => {
     try {
       setError(null);
-      const result = await jobsAPI.update(id, jobData);
+      const result = await apiRequest(`/jobs/${id}`, {
+        method: 'PUT',
+        body: jobData,
+      });
       await loadJobs(); // Reload jobs after update
       return result;
     } catch (err) {
@@ -74,7 +79,9 @@ export const useJobs = () => {
   const deleteJob = async (id: number) => {
     try {
       setError(null);
-      const result = await jobsAPI.delete(id);
+      const result = await apiRequest(`/jobs/${id}`, {
+        method: 'DELETE',
+      });
       await loadJobs(); // Reload jobs after deletion
       return result;
     } catch (err) {

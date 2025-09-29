@@ -41,12 +41,12 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
             <TableRow key={department.id}>
               <TableCell>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Icon icon="lucide:building" className="text-blue-600 text-lg" />
+                  <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                    <Icon icon="lucide:building" className="text-primary-600 text-lg" />
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">{department.name}</p>
-                    <p className="text-sm text-gray-500 line-clamp-1">
+                    <p className="font-medium text-foreground">{department.name}</p>
+                    <p className="text-sm text-default-500 line-clamp-1">
                       {department.description || 'No description'}
                     </p>
                   </div>
@@ -54,21 +54,21 @@ const DepartmentTable: React.FC<DepartmentTableProps> = ({
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Icon icon="lucide:map-pin" className="text-gray-400 text-sm" />
+                  <Icon icon="lucide:map-pin" className="text-default-400 text-sm" />
                   <span className="text-sm">{department.branch_name || 'N/A'}</span>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-bold text-green-600">{department.employee_count}</span>
+                  <div className="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-bold text-success-600">{department.employee_count}</span>
                   </div>
-                  <span className="text-sm text-gray-600">employees</span>
+                  <span className="text-sm text-default-600">employees</span>
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Icon icon="lucide:calendar" className="text-gray-400 text-sm" />
+                  <Icon icon="lucide:calendar" className="text-default-400 text-sm" />
                   <span className="text-sm">
                     {new Date(department.created_at).toLocaleDateString()}
                   </span>

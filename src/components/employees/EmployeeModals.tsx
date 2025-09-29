@@ -30,6 +30,7 @@ interface EmployeeModalsProps {
   selectedEmployee: Employee | null;
 
   // Data props
+  employees: Array<{ id: number; first_name: string; last_name: string; employee_id: string }>;
   branches: Array<{ id: number; name: string }>;
   departments: Array<{ id: number; name: string }>;
   designations: Array<{ id: number; name: string }>;
@@ -48,6 +49,7 @@ const EmployeeModals: React.FC<EmployeeModalsProps> = ({
   isViewOpen,
   onViewOpenChange,
   selectedEmployee,
+  employees,
   branches,
   departments,
   designations,
@@ -63,10 +65,10 @@ const EmployeeModals: React.FC<EmployeeModalsProps> = ({
             <>
               <ModalHeader>
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:user-plus" className="text-green-600 text-xl" />
+                  <Icon icon="lucide:user-plus" className="text-success-600 text-xl" />
                   <div>
                     <h3 className="text-lg font-semibold">Add New Employee</h3>
-                    <p className="text-sm text-gray-500">Enter employee information</p>
+                    <p className="text-sm text-default-500">Enter employee information</p>
                   </div>
                 </div>
               </ModalHeader>
@@ -77,6 +79,7 @@ const EmployeeModals: React.FC<EmployeeModalsProps> = ({
                     onClose();
                   }}
                   onCancel={onClose}
+                  employees={employees}
                   branches={branches}
                   departments={departments}
                   designations={designations}
@@ -96,10 +99,10 @@ const EmployeeModals: React.FC<EmployeeModalsProps> = ({
             <>
               <ModalHeader>
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:user-edit" className="text-blue-600 text-xl" />
+                  <Icon icon="lucide:user-edit" className="text-primary-600 text-xl" />
                   <div>
                     <h3 className="text-lg font-semibold">Edit Employee</h3>
-                    <p className="text-sm text-gray-500">Update employee information</p>
+                    <p className="text-sm text-default-500">Update employee information</p>
                   </div>
                 </div>
               </ModalHeader>
@@ -112,6 +115,7 @@ const EmployeeModals: React.FC<EmployeeModalsProps> = ({
                       onClose();
                     }}
                     onCancel={onClose}
+                    employees={employees}
                     branches={branches}
                     departments={departments}
                     designations={designations}
@@ -132,10 +136,10 @@ const EmployeeModals: React.FC<EmployeeModalsProps> = ({
             <>
               <ModalHeader>
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:user" className="text-purple-600 text-xl" />
+                  <Icon icon="lucide:user" className="text-secondary-600 text-xl" />
                   <div>
                     <h3 className="text-lg font-semibold">Employee Details</h3>
-                    <p className="text-sm text-gray-500">View complete employee information</p>
+                    <p className="text-sm text-default-500">View complete employee information</p>
                   </div>
                 </div>
               </ModalHeader>

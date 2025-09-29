@@ -143,17 +143,17 @@ export default function EmployeeDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content1/50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl">
-              <Icon icon="lucide:user" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-secondary-500 to-pink-600 rounded-xl">
+              <Icon icon="lucide:user" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Employee Dashboard</h1>
-              <p className="text-gray-600 mt-1">Welcome back! Here's your overview</p>
+              <h1 className="text-3xl font-bold text-foreground">Employee Dashboard</h1>
+              <p className="text-default-600 mt-1">Welcome back! Here's your overview</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -187,12 +187,12 @@ export default function EmployeeDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Tasks Completed</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{employeeStats.completedTasks}/{employeeStats.totalTasks}</p>
-                    <p className="text-green-600 text-sm mt-1">67% completion rate</p>
+                    <p className="text-default-500 text-sm font-medium">Tasks Completed</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{employeeStats.completedTasks}/{employeeStats.totalTasks}</p>
+                    <p className="text-success-600 text-sm mt-1">67% completion rate</p>
                   </div>
-                  <div className="p-3 bg-blue-100 rounded-xl">
-                    <Icon icon="lucide:check-circle" className="text-blue-600 text-2xl" />
+                  <div className="p-3 bg-primary-100 rounded-xl">
+                    <Icon icon="lucide:check-circle" className="text-primary-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -208,12 +208,12 @@ export default function EmployeeDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Attendance Rate</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{employeeStats.attendanceRate}%</p>
-                    <p className="text-green-600 text-sm mt-1">Excellent attendance</p>
+                    <p className="text-default-500 text-sm font-medium">Attendance Rate</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{employeeStats.attendanceRate}%</p>
+                    <p className="text-success-600 text-sm mt-1">Excellent attendance</p>
                   </div>
-                  <div className="p-3 bg-green-100 rounded-xl">
-                    <Icon icon="lucide:user-check" className="text-green-600 text-2xl" />
+                  <div className="p-3 bg-success-100 rounded-xl">
+                    <Icon icon="lucide:user-check" className="text-success-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -229,12 +229,12 @@ export default function EmployeeDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Leave Balance</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{employeeStats.leaveBalance}</p>
-                    <p className="text-blue-600 text-sm mt-1">Days remaining</p>
+                    <p className="text-default-500 text-sm font-medium">Leave Balance</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{employeeStats.leaveBalance}</p>
+                    <p className="text-primary-600 text-sm mt-1">Days remaining</p>
                   </div>
-                  <div className="p-3 bg-orange-100 rounded-xl">
-                    <Icon icon="lucide:calendar-days" className="text-orange-600 text-2xl" />
+                  <div className="p-3 bg-warning-100 rounded-xl">
+                    <Icon icon="lucide:calendar-days" className="text-warning-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -250,12 +250,12 @@ export default function EmployeeDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-500 text-sm font-medium">Upcoming Events</p>
-                    <p className="text-3xl font-bold text-gray-900 mt-1">{employeeStats.upcomingEvents}</p>
-                    <p className="text-purple-600 text-sm mt-1">This week</p>
+                    <p className="text-default-500 text-sm font-medium">Upcoming Events</p>
+                    <p className="text-3xl font-bold text-foreground mt-1">{employeeStats.upcomingEvents}</p>
+                    <p className="text-secondary-600 text-sm mt-1">This week</p>
                   </div>
-                  <div className="p-3 bg-purple-100 rounded-xl">
-                    <Icon icon="lucide:calendar" className="text-purple-600 text-2xl" />
+                  <div className="p-3 bg-secondary-100 rounded-xl">
+                    <Icon icon="lucide:calendar" className="text-secondary-600 text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -273,10 +273,10 @@ export default function EmployeeDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:trending-up" className="text-blue-600 text-xl" />
+                  <Icon icon="lucide:trending-up" className="text-primary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Performance Trends</h3>
-                    <p className="text-gray-500 text-sm">Monthly task completion and ratings</p>
+                    <h3 className="text-lg font-semibold text-foreground">Performance Trends</h3>
+                    <p className="text-default-500 text-sm">Monthly task completion and ratings</p>
                   </div>
                 </div>
               </CardHeader>
@@ -317,27 +317,27 @@ export default function EmployeeDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:clock" className="text-green-600 text-xl" />
+                  <Icon icon="lucide:clock" className="text-success-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Weekly Attendance</h3>
-                    <p className="text-gray-500 text-sm">Your attendance this week</p>
+                    <h3 className="text-lg font-semibold text-foreground">Weekly Attendance</h3>
+                    <p className="text-default-500 text-sm">Your attendance this week</p>
                   </div>
                 </div>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="space-y-4">
                   {attendanceData.map((day, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                       <div className="flex items-center gap-3">
-                        <div className="text-sm font-medium text-gray-700">
+                        <div className="text-sm font-medium text-default-700">
                           {new Date(day.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-default-500">
                           {day.checkIn} - {day.checkOut}
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-sm font-semibold text-gray-900">{day.hours}h</span>
+                        <span className="text-sm font-semibold text-foreground">{day.hours}h</span>
                         <Chip 
                           size="sm" 
                           color={getStatusColor(day.status)}
@@ -364,19 +364,19 @@ export default function EmployeeDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:list-checks" className="text-blue-600 text-xl" />
+                  <Icon icon="lucide:list-checks" className="text-primary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">My Tasks</h3>
-                    <p className="text-gray-500 text-sm">Current tasks and progress</p>
+                    <h3 className="text-lg font-semibold text-foreground">My Tasks</h3>
+                    <p className="text-default-500 text-sm">Current tasks and progress</p>
                   </div>
                 </div>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="space-y-4">
                   {taskData.map((task) => (
-                    <div key={task.id} className="p-4 bg-gray-50 rounded-lg">
+                    <div key={task.id} className="p-4 bg-content1 rounded-lg">
                       <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-medium text-gray-900">{task.title}</h4>
+                        <h4 className="font-medium text-foreground">{task.title}</h4>
                         <Chip 
                           size="sm" 
                           color={getPriorityColor(task.priority)}
@@ -386,7 +386,7 @@ export default function EmployeeDashboard() {
                         </Chip>
                       </div>
                       <div className="space-y-2">
-                        <div className="flex justify-between text-sm text-gray-500">
+                        <div className="flex justify-between text-sm text-default-500">
                           <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
                           <span>{task.progress}%</span>
                         </div>
@@ -423,17 +423,17 @@ export default function EmployeeDashboard() {
             <Card className="border-0 shadow-sm">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:calendar" className="text-purple-600 text-xl" />
+                  <Icon icon="lucide:calendar" className="text-secondary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Upcoming Events</h3>
-                    <p className="text-gray-500 text-sm">Your schedule this week</p>
+                    <h3 className="text-lg font-semibold text-foreground">Upcoming Events</h3>
+                    <p className="text-default-500 text-sm">Your schedule this week</p>
                   </div>
                 </div>
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="space-y-4">
                   {upcomingEvents.map((event) => (
-                    <div key={event.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div key={event.id} className="flex items-center gap-3 p-3 bg-content1 rounded-lg">
                       <div className={`p-2 bg-${getEventColor(event.type)}-100 rounded-lg`}>
                         <Icon 
                           icon={getEventIcon(event.type)} 
@@ -441,8 +441,8 @@ export default function EmployeeDashboard() {
                         />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{event.title}</h4>
-                        <p className="text-sm text-gray-500">
+                        <h4 className="font-medium text-foreground">{event.title}</h4>
+                        <p className="text-sm text-default-500">
                           {new Date(event.date).toLocaleDateString('en-US', { 
                             weekday: 'long', 
                             month: 'short', 
@@ -474,30 +474,30 @@ export default function EmployeeDashboard() {
           <Card className="border-0 shadow-sm">
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
-                <Icon icon="lucide:users" className="text-green-600 text-xl" />
+                <Icon icon="lucide:users" className="text-success-600 text-xl" />
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Team Members</h3>
-                  <p className="text-gray-500 text-sm">Your team and their status</p>
+                  <h3 className="text-lg font-semibold text-foreground">Team Members</h3>
+                  <p className="text-default-500 text-sm">Your team and their status</p>
                 </div>
               </div>
             </CardHeader>
             <CardBody className="pt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                 {teamMembers.map((member, index) => (
-                  <div key={index} className="p-4 bg-gray-50 rounded-lg text-center">
+                  <div key={index} className="p-4 bg-content1 rounded-lg text-center">
                     <div className="relative">
                       <Avatar 
                         name={member.avatar} 
-                        className="bg-gradient-to-br from-blue-500 to-purple-600 text-white mx-auto mb-3"
+                        className="bg-gradient-to-br from-primary-500 to-secondary-600 text-foreground mx-auto mb-3"
                         size="lg"
                       />
-                      <div className={`absolute bottom-2 right-2 w-3 h-3 rounded-full border-2 border-white ${
-                        member.status === 'online' ? 'bg-green-500' : 
-                        member.status === 'away' ? 'bg-yellow-500' : 'bg-gray-400'
+                      <div className={`absolute bottom-2 right-2 w-3 h-3 rounded-full border-2 border-background ${
+                        member.status === 'online' ? 'bg-success' : 
+                        member.status === 'away' ? 'bg-warning' : 'bg-default-400'
                       }`}></div>
                     </div>
-                    <h4 className="font-semibold text-gray-900">{member.name}</h4>
-                    <p className="text-sm text-gray-600">{member.role}</p>
+                    <h4 className="font-semibold text-foreground">{member.name}</h4>
+                    <p className="text-sm text-default-600">{member.role}</p>
                     <Chip 
                       size="sm" 
                       color={member.status === 'online' ? 'success' : member.status === 'away' ? 'warning' : 'default'}

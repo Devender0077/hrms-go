@@ -38,7 +38,7 @@ export default function CompanySettings({ settings, onSettingsChange }: CompanyS
         </div>
         <div>
           <h2 className="text-xl font-semibold">Company Information</h2>
-          <p className="text-gray-600">Manage your company details and branding</p>
+          <p className="text-default-600">Manage your company details and branding</p>
         </div>
       </div>
       
@@ -161,21 +161,21 @@ export default function CompanySettings({ settings, onSettingsChange }: CompanyS
             placeholder="https://linkedin.com/company/yourcompany"
             value={settings.socialMedia.linkedin}
             onValueChange={(value) => onSettingsChange("socialMedia", { ...settings.socialMedia, linkedin: value })}
-            startContent={<Icon icon="lucide:linkedin" className="text-blue-600" />}
+            startContent={<Icon icon="lucide:linkedin" className="text-primary-600" />}
           />
           <Input
             label="Twitter"
             placeholder="https://twitter.com/yourcompany"
             value={settings.socialMedia.twitter}
             onValueChange={(value) => onSettingsChange("socialMedia", { ...settings.socialMedia, twitter: value })}
-            startContent={<Icon icon="lucide:twitter" className="text-blue-400" />}
+            startContent={<Icon icon="lucide:twitter" className="text-primary-400" />}
           />
           <Input
             label="Facebook"
             placeholder="https://facebook.com/yourcompany"
             value={settings.socialMedia.facebook}
             onValueChange={(value) => onSettingsChange("socialMedia", { ...settings.socialMedia, facebook: value })}
-            startContent={<Icon icon="lucide:facebook" className="text-blue-600" />}
+            startContent={<Icon icon="lucide:facebook" className="text-primary-600" />}
           />
           <Input
             label="Instagram"

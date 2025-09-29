@@ -35,7 +35,7 @@ const DesignationFilters: React.FC<DesignationFiltersProps> = ({
             placeholder="Search designations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+            startContent={<Icon icon="lucide:search" className="text-default-400" />}
             className="max-w-xs"
             aria-label="Search designations"
           />
@@ -77,7 +77,7 @@ const DesignationFilters: React.FC<DesignationFiltersProps> = ({
             </Button>
           </div>
         </div>
-        <div className="mt-4 text-sm text-gray-600">
+        <div className="mt-4 text-sm text-default-600">
           Showing {filteredCount} of {totalCount} designations
         </div>
       </CardBody>

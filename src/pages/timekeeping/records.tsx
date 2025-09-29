@@ -307,8 +307,8 @@ const RecordsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Attendance Records</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Attendance Records</h1>
+          <p className="text-default-600 mt-2">
             View and manage detailed attendance records for all employees
           </p>
         </div>
@@ -320,7 +320,7 @@ const RecordsPage: React.FC = () => {
           >
             Export CSV
           </Button>
-          <Icon icon="lucide:file-text" className="text-4xl text-blue-600" />
+          <Icon icon="lucide:file-text" className="text-4xl text-primary-600" />
         </div>
       </div>
 
@@ -332,7 +332,7 @@ const RecordsPage: React.FC = () => {
               placeholder="Search employees..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="text-default-400" />}
             />
             <Select
               placeholder="Employee"
@@ -409,10 +409,10 @@ const RecordsPage: React.FC = () => {
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <Icon icon="lucide:table" className="text-green-600 text-xl" />
+            <Icon icon="lucide:table" className="text-success-600 text-xl" />
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Attendance Records</h3>
-              <p className="text-gray-500 text-sm">
+              <h3 className="text-lg font-semibold text-foreground">Attendance Records</h3>
+              <p className="text-default-500 text-sm">
                 {filteredRecords.length} of {records.length} records
               </p>
             </div>
@@ -434,27 +434,27 @@ const RecordsPage: React.FC = () => {
                 <TableRow key={record.id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium text-gray-900">{record.employee_name}</p>
-                      <p className="text-sm text-gray-500">{record.employee_id_code}</p>
-                      <p className="text-xs text-gray-400">{record.department}</p>
+                      <p className="font-medium text-foreground">{record.employee_name}</p>
+                      <p className="text-sm text-default-500">{record.employee_id_code}</p>
+                      <p className="text-xs text-default-400">{record.department}</p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="text-sm text-gray-900">{formatDate(record.date)}</p>
+                      <p className="text-sm text-foreground">{formatDate(record.date)}</p>
                       {record.shift_name && (
-                        <p className="text-xs text-gray-500">{record.shift_name}</p>
+                        <p className="text-xs text-default-500">{record.shift_name}</p>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
                       <div className="flex items-center gap-1">
-                        <Icon icon="lucide:log-in" className="text-green-600 text-xs" />
+                        <Icon icon="lucide:log-in" className="text-success-600 text-xs" />
                         <span>{formatTime(record.check_in)}</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <Icon icon="lucide:log-out" className="text-red-600 text-xs" />
+                        <Icon icon="lucide:log-out" className="text-danger-600 text-xs" />
                         <span>{formatTime(record.check_out)}</span>
                       </div>
                     </div>
@@ -472,7 +472,7 @@ const RecordsPage: React.FC = () => {
                     <div className="text-sm">
                       <div>Work: {record.work_hours || 0}h</div>
                       {record.overtime_hours > 0 && (
-                        <div className="text-orange-600">OT: {record.overtime_hours}h</div>
+                        <div className="text-warning-600">OT: {record.overtime_hours}h</div>
                       )}
                       <div className="font-medium">Total: {record.total_hours || 0}h</div>
                     </div>
@@ -481,18 +481,18 @@ const RecordsPage: React.FC = () => {
                     <div className="text-sm">
                       {record.check_in_location && (
                         <div className="flex items-center gap-1">
-                          <Icon icon="lucide:map-pin" className="text-gray-400 text-xs" />
-                          <span className="text-xs text-gray-600">In: {record.check_in_location}</span>
+                          <Icon icon="lucide:map-pin" className="text-default-400 text-xs" />
+                          <span className="text-xs text-default-600">In: {record.check_in_location}</span>
                         </div>
                       )}
                       {record.check_out_location && (
                         <div className="flex items-center gap-1">
-                          <Icon icon="lucide:map-pin" className="text-gray-400 text-xs" />
-                          <span className="text-xs text-gray-600">Out: {record.check_out_location}</span>
+                          <Icon icon="lucide:map-pin" className="text-default-400 text-xs" />
+                          <span className="text-xs text-default-600">Out: {record.check_out_location}</span>
                         </div>
                       )}
                       {!record.check_in_location && !record.check_out_location && (
-                        <span className="text-xs text-gray-400">-</span>
+                        <span className="text-xs text-default-400">-</span>
                       )}
                     </div>
                   </TableCell>
@@ -550,13 +550,13 @@ const RecordsPage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Employee</label>
-                        <p className="text-sm text-gray-900">{selectedRecord.employee_name}</p>
-                        <p className="text-xs text-gray-500">{selectedRecord.employee_id_code}</p>
+                        <label className="text-sm font-medium text-default-700">Employee</label>
+                        <p className="text-sm text-foreground">{selectedRecord.employee_name}</p>
+                        <p className="text-xs text-default-500">{selectedRecord.employee_id_code}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Date</label>
-                        <p className="text-sm text-gray-900">{formatDate(selectedRecord.date)}</p>
+                        <label className="text-sm font-medium text-default-700">Date</label>
+                        <p className="text-sm text-foreground">{formatDate(selectedRecord.date)}</p>
                       </div>
                     </div>
 
@@ -564,24 +564,24 @@ const RecordsPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Check In</label>
-                        <p className="text-sm text-gray-900">{formatTime(selectedRecord.check_in)}</p>
+                        <label className="text-sm font-medium text-default-700">Check In</label>
+                        <p className="text-sm text-foreground">{formatTime(selectedRecord.check_in)}</p>
                         {selectedRecord.check_in_location && (
-                          <p className="text-xs text-gray-500">{selectedRecord.check_in_location}</p>
+                          <p className="text-xs text-default-500">{selectedRecord.check_in_location}</p>
                         )}
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Check Out</label>
-                        <p className="text-sm text-gray-900">{formatTime(selectedRecord.check_out)}</p>
+                        <label className="text-sm font-medium text-default-700">Check Out</label>
+                        <p className="text-sm text-foreground">{formatTime(selectedRecord.check_out)}</p>
                         {selectedRecord.check_out_location && (
-                          <p className="text-xs text-gray-500">{selectedRecord.check_out_location}</p>
+                          <p className="text-xs text-default-500">{selectedRecord.check_out_location}</p>
                         )}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Status</label>
+                        <label className="text-sm font-medium text-default-700">Status</label>
                         <Chip 
                           color={getStatusColor(selectedRecord.status) as any}
                           variant="flat"
@@ -591,12 +591,12 @@ const RecordsPage: React.FC = () => {
                         </Chip>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Work Hours</label>
-                        <p className="text-sm text-gray-900">{selectedRecord.work_hours || 0} hours</p>
+                        <label className="text-sm font-medium text-default-700">Work Hours</label>
+                        <p className="text-sm text-foreground">{selectedRecord.work_hours || 0} hours</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Overtime Hours</label>
-                        <p className="text-sm text-gray-900">{selectedRecord.overtime_hours || 0} hours</p>
+                        <label className="text-sm font-medium text-default-700">Overtime Hours</label>
+                        <p className="text-sm text-foreground">{selectedRecord.overtime_hours || 0} hours</p>
                       </div>
                     </div>
 
@@ -604,19 +604,19 @@ const RecordsPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Department</label>
-                        <p className="text-sm text-gray-900">{selectedRecord.department}</p>
+                        <label className="text-sm font-medium text-default-700">Department</label>
+                        <p className="text-sm text-foreground">{selectedRecord.department}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Designation</label>
-                        <p className="text-sm text-gray-900">{selectedRecord.designation_name}</p>
+                        <label className="text-sm font-medium text-default-700">Designation</label>
+                        <p className="text-sm text-foreground">{selectedRecord.designation_name}</p>
                       </div>
                     </div>
 
                     {selectedRecord.note && (
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Note</label>
-                        <p className="text-sm text-gray-900">{selectedRecord.note}</p>
+                        <label className="text-sm font-medium text-default-700">Note</label>
+                        <p className="text-sm text-foreground">{selectedRecord.note}</p>
                       </div>
                     )}
                   </div>
@@ -645,18 +645,18 @@ const RecordsPage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Employee</label>
-                        <p className="text-sm text-gray-900">{editingRecord.employee_name}</p>
+                        <label className="text-sm font-medium text-default-700">Employee</label>
+                        <p className="text-sm text-foreground">{editingRecord.employee_name}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Date</label>
-                        <p className="text-sm text-gray-900">{formatDate(editingRecord.date)}</p>
+                        <label className="text-sm font-medium text-default-700">Date</label>
+                        <p className="text-sm text-foreground">{formatDate(editingRecord.date)}</p>
                       </div>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Check In</label>
+                        <label className="text-sm font-medium text-default-700">Check In</label>
                         <Input
                           type="datetime-local"
                           value={formData.check_in}
@@ -665,7 +665,7 @@ const RecordsPage: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Check Out</label>
+                        <label className="text-sm font-medium text-default-700">Check Out</label>
                         <Input
                           type="datetime-local"
                           value={formData.check_out}
@@ -677,7 +677,7 @@ const RecordsPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Status</label>
+                        <label className="text-sm font-medium text-default-700">Status</label>
                         <Select
                           selectedKeys={[formData.status]}
                           onSelectionChange={(keys) => {
@@ -694,7 +694,7 @@ const RecordsPage: React.FC = () => {
                         </Select>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Work Hours</label>
+                        <label className="text-sm font-medium text-default-700">Work Hours</label>
                         <Input
                           type="number"
                           step="0.1"
@@ -706,7 +706,7 @@ const RecordsPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Note</label>
+                      <label className="text-sm font-medium text-default-700">Note</label>
                       <Input
                         value={formData.note}
                         onChange={(e) => setFormData({...formData, note: e.target.value})}

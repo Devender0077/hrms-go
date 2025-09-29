@@ -349,8 +349,8 @@ const PoliciesPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Attendance Policies</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Attendance Policies</h1>
+          <p className="text-default-600 mt-2">
             Manage attendance policies and rules for your organization
           </p>
         </div>
@@ -362,7 +362,7 @@ const PoliciesPage: React.FC = () => {
           >
             Add Policy
           </Button>
-          <Icon icon="lucide:shield-check" className="text-4xl text-blue-600" />
+          <Icon icon="lucide:shield-check" className="text-4xl text-primary-600" />
         </div>
       </div>
 
@@ -374,7 +374,7 @@ const PoliciesPage: React.FC = () => {
               placeholder="Search policies..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
             />
             <Select
@@ -412,10 +412,10 @@ const PoliciesPage: React.FC = () => {
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <Icon icon="lucide:table" className="text-green-600 text-xl" />
+            <Icon icon="lucide:table" className="text-success-600 text-xl" />
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Attendance Policies</h3>
-              <p className="text-gray-500 text-sm">
+              <h3 className="text-lg font-semibold text-foreground">Attendance Policies</h3>
+              <p className="text-default-500 text-sm">
                 {filteredPolicies.length} of {policies.length} policies
               </p>
             </div>
@@ -436,8 +436,8 @@ const PoliciesPage: React.FC = () => {
                 <TableRow key={policy.id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium text-gray-900">{policy.name}</p>
-                      <p className="text-sm text-gray-500 truncate max-w-xs">
+                      <p className="font-medium text-foreground">{policy.name}</p>
+                      <p className="text-sm text-default-500 truncate max-w-xs">
                         {policy.description}
                       </p>
                     </div>
@@ -453,13 +453,13 @@ const PoliciesPage: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     {policy.policy_type === 'department' && policy.department_name && (
-                      <span className="text-sm text-gray-900">{policy.department_name}</span>
+                      <span className="text-sm text-foreground">{policy.department_name}</span>
                     )}
                     {policy.policy_type === 'employee' && policy.employee_name && (
-                      <span className="text-sm text-gray-900">{policy.employee_name}</span>
+                      <span className="text-sm text-foreground">{policy.employee_name}</span>
                     )}
                     {policy.policy_type === 'general' && (
-                      <span className="text-sm text-gray-500">All Employees</span>
+                      <span className="text-sm text-default-500">All Employees</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -812,11 +812,11 @@ const PoliciesPage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Policy Name</label>
-                        <p className="text-sm text-gray-900">{selectedPolicy.name}</p>
+                        <label className="text-sm font-medium text-default-700">Policy Name</label>
+                        <p className="text-sm text-foreground">{selectedPolicy.name}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Type</label>
+                        <label className="text-sm font-medium text-default-700">Type</label>
                         <Chip 
                           color={getPolicyTypeColor(selectedPolicy.policy_type) as any}
                           variant="flat"
@@ -828,35 +828,35 @@ const PoliciesPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Description</label>
-                      <p className="text-sm text-gray-900">{selectedPolicy.description}</p>
+                      <label className="text-sm font-medium text-default-700">Description</label>
+                      <p className="text-sm text-foreground">{selectedPolicy.description}</p>
                     </div>
 
                     <Divider />
 
                     <div className="grid grid-cols-3 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Late Arrival Penalty</label>
-                        <p className="text-sm text-gray-900">${selectedPolicy.late_arrival_penalty}</p>
+                        <label className="text-sm font-medium text-default-700">Late Arrival Penalty</label>
+                        <p className="text-sm text-foreground">${selectedPolicy.late_arrival_penalty}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Early Departure Penalty</label>
-                        <p className="text-sm text-gray-900">${selectedPolicy.early_departure_penalty}</p>
+                        <label className="text-sm font-medium text-default-700">Early Departure Penalty</label>
+                        <p className="text-sm text-foreground">${selectedPolicy.early_departure_penalty}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Absent Penalty</label>
-                        <p className="text-sm text-gray-900">${selectedPolicy.absent_penalty}</p>
+                        <label className="text-sm font-medium text-default-700">Absent Penalty</label>
+                        <p className="text-sm text-foreground">${selectedPolicy.absent_penalty}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Overtime Rate</label>
-                        <p className="text-sm text-gray-900">{selectedPolicy.overtime_rate}x</p>
+                        <label className="text-sm font-medium text-default-700">Overtime Rate</label>
+                        <p className="text-sm text-foreground">{selectedPolicy.overtime_rate}x</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Max Overtime Hours</label>
-                        <p className="text-sm text-gray-900">{selectedPolicy.max_overtime_hours} hours</p>
+                        <label className="text-sm font-medium text-default-700">Max Overtime Hours</label>
+                        <p className="text-sm text-foreground">{selectedPolicy.max_overtime_hours} hours</p>
                       </div>
                     </div>
 
@@ -864,7 +864,7 @@ const PoliciesPage: React.FC = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Status</label>
+                        <label className="text-sm font-medium text-default-700">Status</label>
                         <Chip 
                           color={selectedPolicy.is_active ? 'success' : 'danger'}
                           variant="flat"
@@ -874,8 +874,8 @@ const PoliciesPage: React.FC = () => {
                         </Chip>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Created</label>
-                        <p className="text-sm text-gray-900">
+                        <label className="text-sm font-medium text-default-700">Created</label>
+                        <p className="text-sm text-foreground">
                           {new Date(selectedPolicy.created_at).toLocaleDateString()}
                         </p>
                       </div>

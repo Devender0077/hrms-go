@@ -129,80 +129,80 @@ export default function SEOSettings({ settings, onSettingsChange }: SEOSettingsP
         </CardHeader>
         <CardBody className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable XML Sitemap</span>
-                <span className="text-xs text-gray-500">Generate XML sitemap for search engines</span>
+                <span className="text-sm font-medium text-foreground">Enable XML Sitemap</span>
+                <span className="text-xs text-default-500">Generate XML sitemap for search engines</span>
               </div>
               <Switch
                 isSelected={settings.enableSitemap}
                 onValueChange={(value) => onSettingsChange("enableSitemap", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable robots.txt</span>
-                <span className="text-xs text-gray-500">Generate robots.txt file for crawlers</span>
+                <span className="text-sm font-medium text-foreground">Enable robots.txt</span>
+                <span className="text-xs text-default-500">Generate robots.txt file for crawlers</span>
               </div>
               <Switch
                 isSelected={settings.enableRobotsTxt}
                 onValueChange={(value) => onSettingsChange("enableRobotsTxt", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable meta tags</span>
-                <span className="text-xs text-gray-500">Add meta description and keywords</span>
+                <span className="text-sm font-medium text-foreground">Enable meta tags</span>
+                <span className="text-xs text-default-500">Add meta description and keywords</span>
               </div>
               <Switch
                 isSelected={settings.enableMetaTags}
                 onValueChange={(value) => onSettingsChange("enableMetaTags", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable Open Graph tags</span>
-                <span className="text-xs text-gray-500">Add Open Graph meta tags for social sharing</span>
+                <span className="text-sm font-medium text-foreground">Enable Open Graph tags</span>
+                <span className="text-xs text-default-500">Add Open Graph meta tags for social sharing</span>
               </div>
               <Switch
                 isSelected={settings.enableOpenGraph}
                 onValueChange={(value) => onSettingsChange("enableOpenGraph", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable Twitter Cards</span>
-                <span className="text-xs text-gray-500">Add Twitter Card meta tags</span>
+                <span className="text-sm font-medium text-foreground">Enable Twitter Cards</span>
+                <span className="text-xs text-default-500">Add Twitter Card meta tags</span>
               </div>
               <Switch
                 isSelected={settings.enableTwitterCards}
                 onValueChange={(value) => onSettingsChange("enableTwitterCards", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable Schema markup</span>
-                <span className="text-xs text-gray-500">Add structured data markup</span>
+                <span className="text-sm font-medium text-foreground">Enable Schema markup</span>
+                <span className="text-xs text-default-500">Add structured data markup</span>
               </div>
               <Switch
                 isSelected={settings.enableSchemaMarkup}
                 onValueChange={(value) => onSettingsChange("enableSchemaMarkup", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable canonical URLs</span>
-                <span className="text-xs text-gray-500">Add canonical URL tags to prevent duplicate content</span>
+                <span className="text-sm font-medium text-foreground">Enable canonical URLs</span>
+                <span className="text-xs text-default-500">Add canonical URL tags to prevent duplicate content</span>
               </div>
               <Switch
                 isSelected={settings.enableCanonicalUrls}
                 onValueChange={(value) => onSettingsChange("enableCanonicalUrls", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable breadcrumbs</span>
-                <span className="text-xs text-gray-500">Add breadcrumb navigation for better UX</span>
+                <span className="text-sm font-medium text-foreground">Enable breadcrumbs</span>
+                <span className="text-xs text-default-500">Add breadcrumb navigation for better UX</span>
               </div>
               <Switch
                 isSelected={settings.enableBreadcrumbs}

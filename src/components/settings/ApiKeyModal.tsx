@@ -33,7 +33,7 @@ export default function ApiKeyModal({
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">Create API Key</h3>
-                  <p className="text-sm text-gray-500">Generate a new API key for external access</p>
+                  <p className="text-sm text-default-500">Generate a new API key for external access</p>
                 </div>
               </div>
             </ModalHeader>

@@ -293,8 +293,8 @@ const ShiftsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Shift Management</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Shift Management</h1>
+          <p className="text-default-600 mt-2">
             Create and manage work shifts, schedules, and shift assignments
           </p>
         </div>
@@ -306,7 +306,7 @@ const ShiftsPage: React.FC = () => {
           >
             Add Shift
           </Button>
-          <Icon icon="lucide:calendar-days" className="text-4xl text-green-600" />
+          <Icon icon="lucide:calendar-days" className="text-4xl text-success-600" />
         </div>
       </div>
 
@@ -318,7 +318,7 @@ const ShiftsPage: React.FC = () => {
               placeholder="Search shifts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+              startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
             />
             <Select
@@ -349,10 +349,10 @@ const ShiftsPage: React.FC = () => {
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <Icon icon="lucide:table" className="text-green-600 text-xl" />
+            <Icon icon="lucide:table" className="text-success-600 text-xl" />
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Shifts</h3>
-              <p className="text-gray-500 text-sm">
+              <h3 className="text-lg font-semibold text-foreground">Shifts</h3>
+              <p className="text-default-500 text-sm">
                 {shifts.length} shifts found
               </p>
             </div>
@@ -375,13 +375,13 @@ const ShiftsPage: React.FC = () => {
                 <TableRow key={shift.id}>
                   <TableCell>
                     <div>
-                      <p className="font-medium text-gray-900">{shift.name}</p>
-                      <p className="text-sm text-gray-500">{shift.description}</p>
+                      <p className="font-medium text-foreground">{shift.name}</p>
+                      <p className="text-sm text-default-500">{shift.description}</p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Icon icon="lucide:clock" className="text-gray-400 text-sm" />
+                      <Icon icon="lucide:clock" className="text-default-400 text-sm" />
                       <span className="text-sm">
                         {formatTime(shift.start_time)} - {formatTime(shift.end_time)}
                       </span>
@@ -389,7 +389,7 @@ const ShiftsPage: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Icon icon="lucide:calendar" className="text-gray-400 text-sm" />
+                      <Icon icon="lucide:calendar" className="text-default-400 text-sm" />
                       <span className="text-sm">{formatWorkingDays(shift.working_days)}</span>
                     </div>
                   </TableCell>
@@ -407,7 +407,7 @@ const ShiftsPage: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <Icon icon="lucide:users" className="text-gray-400 text-sm" />
+                      <Icon icon="lucide:users" className="text-default-400 text-sm" />
                       <span className="text-sm font-medium">
                         {shift.assigned_employees_count || 0}
                       </span>
@@ -426,7 +426,7 @@ const ShiftsPage: React.FC = () => {
                     <Dropdown>
                       <DropdownTrigger>
                         <Button isIconOnly size="sm" variant="light" aria-label="More actions">
-                          <Icon icon="lucide:more-horizontal" className="text-gray-400" />
+                          <Icon icon="lucide:more-horizontal" className="text-default-400" />
                         </Button>
                       </DropdownTrigger>
                       <DropdownMenu>
@@ -465,7 +465,7 @@ const ShiftsPage: React.FC = () => {
           {/* Pagination */}
           <div className="flex items-center justify-between mt-4">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-600">Rows per page:</span>
+              <span className="text-sm text-default-600">Rows per page:</span>
               <Select
                 size="sm"
                 className="w-20"
@@ -571,7 +571,7 @@ const ShiftsPage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-gray-700 mb-2 block">Working Days</label>
+                      <label className="text-sm font-medium text-default-700 mb-2 block">Working Days</label>
                       <div className="grid grid-cols-7 gap-2">
                         {dayNames.map((day, index) => (
                           <Checkbox
@@ -622,18 +622,18 @@ const ShiftsPage: React.FC = () => {
             <>
               <ModalHeader className="flex flex-col gap-1">
                 <h3 className="text-lg font-semibold">Shift Details</h3>
-                <p className="text-sm text-gray-600">{selectedShift?.name}</p>
+                <p className="text-sm text-default-600">{selectedShift?.name}</p>
               </ModalHeader>
               <ModalBody>
                 {selectedShift && (
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Name</label>
-                        <p className="text-sm text-gray-900">{selectedShift.name}</p>
+                        <label className="text-sm font-medium text-default-700">Name</label>
+                        <p className="text-sm text-foreground">{selectedShift.name}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Status</label>
+                        <label className="text-sm font-medium text-default-700">Status</label>
                         <Chip 
                           color={selectedShift.is_active ? "success" : "danger"}
                           variant="flat"
@@ -643,21 +643,21 @@ const ShiftsPage: React.FC = () => {
                         </Chip>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Time</label>
-                        <p className="text-sm text-gray-900">
+                        <label className="text-sm font-medium text-default-700">Time</label>
+                        <p className="text-sm text-foreground">
                           {formatTime(selectedShift.start_time)} - {formatTime(selectedShift.end_time)}
                         </p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Break Duration</label>
-                        <p className="text-sm text-gray-900">{selectedShift.break_duration} minutes</p>
+                        <label className="text-sm font-medium text-default-700">Break Duration</label>
+                        <p className="text-sm text-foreground">{selectedShift.break_duration} minutes</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Working Days</label>
-                        <p className="text-sm text-gray-900">{formatWorkingDays(selectedShift.working_days)}</p>
+                        <label className="text-sm font-medium text-default-700">Working Days</label>
+                        <p className="text-sm text-foreground">{formatWorkingDays(selectedShift.working_days)}</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Flexible Hours</label>
+                        <label className="text-sm font-medium text-default-700">Flexible Hours</label>
                         <Chip 
                           color={selectedShift.is_flexible ? "success" : "default"}
                           variant="flat"
@@ -667,22 +667,22 @@ const ShiftsPage: React.FC = () => {
                         </Chip>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Grace Period</label>
-                        <p className="text-sm text-gray-900">{selectedShift.grace_period} minutes</p>
+                        <label className="text-sm font-medium text-default-700">Grace Period</label>
+                        <p className="text-sm text-foreground">{selectedShift.grace_period} minutes</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Late Threshold</label>
-                        <p className="text-sm text-gray-900">{selectedShift.late_threshold} minutes</p>
+                        <label className="text-sm font-medium text-default-700">Late Threshold</label>
+                        <p className="text-sm text-foreground">{selectedShift.late_threshold} minutes</p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Overtime Rate</label>
-                        <p className="text-sm text-gray-900">{selectedShift.overtime_rate}x</p>
+                        <label className="text-sm font-medium text-default-700">Overtime Rate</label>
+                        <p className="text-sm text-foreground">{selectedShift.overtime_rate}x</p>
                       </div>
                     </div>
                     {selectedShift.description && (
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Description</label>
-                        <p className="text-sm text-gray-900">{selectedShift.description}</p>
+                        <label className="text-sm font-medium text-default-700">Description</label>
+                        <p className="text-sm text-foreground">{selectedShift.description}</p>
                       </div>
                     )}
                   </div>

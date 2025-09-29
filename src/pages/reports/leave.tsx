@@ -152,29 +152,29 @@ export default function LeaveReport() {
         label: "Total Leave Requests",
         value: totalLeaves,
         icon: "lucide:calendar",
-        color: "text-blue-600",
-        bgColor: "bg-blue-100"
+        color: "text-primary-600",
+        bgColor: "bg-primary-100"
       },
       {
         label: "Approved Leaves",
         value: approvedLeaves,
         icon: "lucide:check-circle",
-        color: "text-green-600",
-        bgColor: "bg-green-100"
+        color: "text-success-600",
+        bgColor: "bg-success-100"
       },
       {
         label: "Pending Leaves",
         value: pendingLeaves,
         icon: "lucide:clock",
-        color: "text-orange-600",
-        bgColor: "bg-orange-100"
+        color: "text-warning-600",
+        bgColor: "bg-warning-100"
       },
       {
         label: "Total Leave Days",
         value: totalDays,
         icon: "lucide:calendar-days",
-        color: "text-purple-600",
-        bgColor: "bg-purple-100"
+        color: "text-secondary-600",
+        bgColor: "bg-secondary-100"
       }
     ];
   }, []);
@@ -222,14 +222,14 @@ export default function LeaveReport() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <ReportHeader
           title="Leave Report"
           description="Comprehensive leave management and tracking analysis"
           icon="lucide:calendar-x"
-          iconColor="from-orange-500 to-red-600"
+          iconColor="from-warning-500 to-danger-600"
           onExport={handleExport}
           onRefresh={handleRefresh}
           isExporting={isExporting}
@@ -247,12 +247,12 @@ export default function LeaveReport() {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <select
                 value={selectedDepartment}
                 onChange={(e) => setSelectedDepartment(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {departments.map(dept => (
                   <option key={dept} value={dept}>{dept}</option>
@@ -261,7 +261,7 @@ export default function LeaveReport() {
               <select
                 value={selectedLeaveType}
                 onChange={(e) => setSelectedLeaveType(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {leaveTypes.map(type => (
                   <option key={type} value={type}>{type}</option>
@@ -270,14 +270,14 @@ export default function LeaveReport() {
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {statuses.map(status => (
                   <option key={status} value={status}>{status}</option>
                 ))}
               </select>
               <div className="flex items-end">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-default-600">
                   Showing {filteredData.length} of {leaveReportData.length} records
                 </div>
               </div>
@@ -289,10 +289,10 @@ export default function LeaveReport() {
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-orange-600 text-xl" />
+              <Icon icon="lucide:table" className="text-warning-600 text-xl" />
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">Leave Records</h3>
-                <p className="text-gray-500 text-sm">Employee leave requests and approvals</p>
+                <h3 className="text-lg font-semibold text-foreground">Leave Records</h3>
+                <p className="text-default-500 text-sm">Employee leave requests and approvals</p>
               </div>
             </div>
           </CardHeader>
@@ -313,8 +313,8 @@ export default function LeaveReport() {
                   <TableRow key={record.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{record.employeeName}</p>
-                        <p className="text-sm text-gray-500">Applied: {new Date(record.appliedDate).toLocaleDateString()}</p>
+                        <p className="font-medium text-foreground">{record.employeeName}</p>
+                        <p className="text-sm text-default-500">Applied: {new Date(record.appliedDate).toLocaleDateString()}</p>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -334,15 +334,15 @@ export default function LeaveReport() {
                     <TableCell>
                       <div>
                         <p className="text-sm font-medium">{new Date(record.startDate).toLocaleDateString()}</p>
-                        <p className="text-sm text-gray-500">to {new Date(record.endDate).toLocaleDateString()}</p>
+                        <p className="text-sm text-default-500">to {new Date(record.endDate).toLocaleDateString()}</p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-bold text-blue-600">{record.days}</span>
+                        <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-bold text-primary-600">{record.days}</span>
                         </div>
-                        <span className="text-sm text-gray-600">days</span>
+                        <span className="text-sm text-default-600">days</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -355,15 +355,15 @@ export default function LeaveReport() {
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <p className="text-sm text-gray-700 max-w-32 truncate" title={record.reason}>
+                      <p className="text-sm text-default-700 max-w-32 truncate" title={record.reason}>
                         {record.reason}
                       </p>
                     </TableCell>
                     <TableCell>
                       {record.approvedBy ? (
-                        <p className="text-sm font-medium text-gray-900">{record.approvedBy}</p>
+                        <p className="text-sm font-medium text-foreground">{record.approvedBy}</p>
                       ) : (
-                        <span className="text-sm text-gray-500">-</span>
+                        <span className="text-sm text-default-500">-</span>
                       )}
                     </TableCell>
                   </TableRow>

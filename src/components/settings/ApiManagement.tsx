@@ -33,7 +33,7 @@ export default function ApiManagement({ settings, onSettingsChange, onCreateApiK
           </div>
           <div>
             <h2 className="text-xl font-semibold">API Management</h2>
-            <p className="text-gray-600">Manage API keys and webhook configuration</p>
+            <p className="text-default-600">Manage API keys and webhook configuration</p>
           </div>
         </div>
         <Button
@@ -54,7 +54,7 @@ export default function ApiManagement({ settings, onSettingsChange, onCreateApiK
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">API Access</p>
-                <p className="text-sm text-gray-500">Enable API access for external applications</p>
+                <p className="text-sm text-default-500">Enable API access for external applications</p>
               </div>
               <Switch
                 isSelected={settings.apiEnabled}
@@ -93,8 +93,8 @@ export default function ApiManagement({ settings, onSettingsChange, onCreateApiK
                 <div key={key.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div>
                     <p className="font-medium">{key.name}</p>
-                    <p className="text-sm text-gray-500">{key.key}</p>
-                    <p className="text-xs text-gray-400">Created: {key.created} | Last used: {key.lastUsed}</p>
+                    <p className="text-sm text-default-500">{key.key}</p>
+                    <p className="text-xs text-default-400">Created: {key.created} | Last used: {key.lastUsed}</p>
                   </div>
                   <Button
                     isIconOnly

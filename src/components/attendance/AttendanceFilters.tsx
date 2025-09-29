@@ -33,7 +33,7 @@ const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
             placeholder="Search attendance records..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+            startContent={<Icon icon="lucide:search" className="text-default-400" />}
             className="flex-1"
           />
           

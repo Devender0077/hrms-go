@@ -191,13 +191,13 @@ const AttendancePage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Attendance Management</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Attendance Management</h1>
+          <p className="text-default-600 mt-2">
             Track employee attendance, check-in/out times, and work hours
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Icon icon="lucide:clock" className="text-4xl text-blue-600" />
+          <Icon icon="lucide:clock" className="text-4xl text-primary-600" />
         </div>
       </div>
 
@@ -231,10 +231,10 @@ const AttendancePage: React.FC = () => {
       <Card className="border-0 shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
-            <Icon icon="lucide:table" className="text-green-600 text-xl" />
+            <Icon icon="lucide:table" className="text-success-600 text-xl" />
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Attendance Records</h3>
-              <p className="text-gray-500 text-sm">
+              <h3 className="text-lg font-semibold text-foreground">Attendance Records</h3>
+              <p className="text-default-500 text-sm">
                 {filteredRecords.length} of {attendanceRecords.length} records
               </p>
             </div>
@@ -284,7 +284,7 @@ const AttendancePage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Check In Time</label>
+                        <label className="text-sm font-medium text-default-700">Check In Time</label>
                         <Input
                           type="datetime-local"
                           value={editingRecord.check_in ? new Date(editingRecord.check_in).toISOString().slice(0, 16) : ''}
@@ -293,7 +293,7 @@ const AttendancePage: React.FC = () => {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Check Out Time</label>
+                        <label className="text-sm font-medium text-default-700">Check Out Time</label>
                         <Input
                           type="datetime-local"
                           value={editingRecord.check_out ? new Date(editingRecord.check_out).toISOString().slice(0, 16) : ''}
@@ -304,7 +304,7 @@ const AttendancePage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Status</label>
+                      <label className="text-sm font-medium text-default-700">Status</label>
                       <Select
                         selectedKeys={[editingRecord.status]}
                         onSelectionChange={(keys) => {
@@ -322,7 +322,7 @@ const AttendancePage: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Note</label>
+                      <label className="text-sm font-medium text-default-700">Note</label>
                       <Input
                         value={editingRecord.note || ''}
                         onChange={(e) => setEditingRecord({...editingRecord, note: e.target.value})}

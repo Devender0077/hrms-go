@@ -41,10 +41,10 @@ const DepartmentModals: React.FC<DepartmentModalsProps> = ({
             <>
               <ModalHeader>
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:building-plus" className="text-green-600 text-xl" />
+                  <Icon icon="lucide:building-plus" className="text-success-600 text-xl" />
                   <div>
                     <h3 className="text-lg font-semibold">Add New Department</h3>
-                    <p className="text-sm text-gray-500">Enter department information</p>
+                    <p className="text-sm text-default-500">Enter department information</p>
                   </div>
                 </div>
               </ModalHeader>
@@ -70,10 +70,10 @@ const DepartmentModals: React.FC<DepartmentModalsProps> = ({
             <>
               <ModalHeader>
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:building-edit" className="text-blue-600 text-xl" />
+                  <Icon icon="lucide:building-edit" className="text-primary-600 text-xl" />
                   <div>
                     <h3 className="text-lg font-semibold">Edit Department</h3>
-                    <p className="text-sm text-gray-500">Update department information</p>
+                    <p className="text-sm text-default-500">Update department information</p>
                   </div>
                 </div>
               </ModalHeader>
@@ -103,10 +103,10 @@ const DepartmentModals: React.FC<DepartmentModalsProps> = ({
             <>
               <ModalHeader>
                 <div className="flex items-center gap-3">
-                  <Icon icon="lucide:building" className="text-purple-600 text-xl" />
+                  <Icon icon="lucide:building" className="text-secondary-600 text-xl" />
                   <div>
                     <h3 className="text-lg font-semibold">Department Details</h3>
-                    <p className="text-sm text-gray-500">View complete department information</p>
+                    <p className="text-sm text-default-500">View complete department information</p>
                   </div>
                 </div>
               </ModalHeader>

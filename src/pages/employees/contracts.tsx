@@ -27,7 +27,8 @@ import {
   useDisclosure,
   Spinner
 } from '@heroui/react';
-import { PlusIcon, PencilIcon, TrashIcon, MoreVerticalIcon, FileTextIcon, CalendarIcon } from 'lucide-react';
+import { Icon } from '@iconify/react';
+import PageLayout, { PageHeader } from '../../components/layout/PageLayout';
 import { apiRequest } from '../../services/api-service';
 
 interface EmployeeContract {
@@ -239,32 +240,32 @@ const EmployeeContractsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Employee Contracts</h1>
-          <p className="text-gray-600">Manage employee employment contracts</p>
-        </div>
-        <Button
-          color="primary"
-          startContent={<PlusIcon size={20} />}
-          onPress={handleCreateContract}
-        >
-          Add Contract
-        </Button>
-      </div>
+    <PageLayout>
+      <PageHeader
+        title="Employee Contracts"
+        description="Manage employee employment contracts"
+        icon="lucide:file-text"
+        actions={
+          <Button
+            color="primary"
+            startContent={<Icon icon="lucide:plus" />}
+            onPress={handleCreateContract}
+          >
+            Add Contract
+          </Button>
+        }
+      />
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardBody>
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileTextIcon className="w-6 h-6 text-blue-600" />
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <Icon icon="lucide:file-text" className="w-6 h-6 text-primary-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Total Contracts</p>
+                <p className="text-sm text-default-600">Total Contracts</p>
                 <p className="text-xl font-semibold">{contracts.length}</p>
               </div>
             </div>
@@ -273,11 +274,11 @@ const EmployeeContractsPage: React.FC = () => {
         <Card>
           <CardBody>
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <FileTextIcon className="w-6 h-6 text-green-600" />
+              <div className="p-2 bg-success-100 rounded-lg">
+                <Icon icon="lucide:file-text" className="w-6 h-6 text-success-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Active Contracts</p>
+                <p className="text-sm text-default-600">Active Contracts</p>
                 <p className="text-xl font-semibold">
                   {contracts.filter(c => c.status === 'active').length}
                 </p>
@@ -288,11 +289,11 @@ const EmployeeContractsPage: React.FC = () => {
         <Card>
           <CardBody>
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <CalendarIcon className="w-6 h-6 text-yellow-600" />
+              <div className="p-2 bg-warning-100 rounded-lg">
+                <Icon icon="lucide:calendar" className="w-6 h-6 text-warning-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Expiring Soon</p>
+                <p className="text-sm text-default-600">Expiring Soon</p>
                 <p className="text-xl font-semibold">
                   {contracts.filter(c => isContractExpiring(c.end_date || '')).length}
                 </p>
@@ -303,11 +304,11 @@ const EmployeeContractsPage: React.FC = () => {
         <Card>
           <CardBody>
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <FileTextIcon className="w-6 h-6 text-red-600" />
+              <div className="p-2 bg-danger-100 rounded-lg">
+                <Icon icon="lucide:file-text" className="w-6 h-6 text-danger-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Expired</p>
+                <p className="text-sm text-default-600">Expired</p>
                 <p className="text-xl font-semibold">
                   {contracts.filter(c => isContractExpired(c.end_date || '')).length}
                 </p>
@@ -340,7 +341,7 @@ const EmployeeContractsPage: React.FC = () => {
                     <div>
                       <div className="font-medium">{contract.employee_name || `Employee ${contract.employee_id}`}</div>
                       {contract.employee_id_string && (
-                        <div className="text-sm text-gray-500">{contract.employee_id_string}</div>
+                        <div className="text-sm text-default-500">{contract.employee_id_string}</div>
                       )}
                     </div>
                   </TableCell>
@@ -358,17 +359,17 @@ const EmployeeContractsPage: React.FC = () => {
                   </TableCell>
                   <TableCell>
                     {contract.end_date ? (
-                      <div className={`${isContractExpiring(contract.end_date) ? 'text-yellow-600 font-medium' : ''} ${isContractExpired(contract.end_date) ? 'text-red-600 font-medium' : ''}`}>
+                      <div className={`${isContractExpiring(contract.end_date) ? 'text-warning-600 font-medium' : ''} ${isContractExpired(contract.end_date) ? 'text-danger-600 font-medium' : ''}`}>
                         {new Date(contract.end_date).toLocaleDateString()}
                         {isContractExpiring(contract.end_date) && (
-                          <div className="text-xs text-yellow-600">Expiring Soon</div>
+                          <div className="text-xs text-warning-600">Expiring Soon</div>
                         )}
                         {isContractExpired(contract.end_date) && (
-                          <div className="text-xs text-red-600">Expired</div>
+                          <div className="text-xs text-danger-600">Expired</div>
                         )}
                       </div>
                     ) : (
-                      <span className="text-gray-500">No end date</span>
+                      <span className="text-default-500">No end date</span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -391,13 +392,13 @@ const EmployeeContractsPage: React.FC = () => {
                           size="sm"
                           variant="light"
                         >
-                          <MoreVerticalIcon size={16} />
+                          <Icon icon="lucide:more-vertical" />
                         </Button>
                       </DropdownTrigger>
                       <DropdownMenu>
                         <DropdownItem
                           key="edit"
-                          startContent={<PencilIcon size={16} />}
+                          startContent={<Icon icon="lucide:pencil" />}
                           onPress={() => handleEditContract(contract)}
                         >
                           Edit
@@ -406,7 +407,7 @@ const EmployeeContractsPage: React.FC = () => {
                           key="delete"
                           className="text-danger"
                           color="danger"
-                          startContent={<TrashIcon size={16} />}
+                          startContent={<Icon icon="lucide:trash" />}
                           onPress={() => handleDeleteContract(contract.id)}
                         >
                           Delete
@@ -530,7 +531,7 @@ const EmployeeContractsPage: React.FC = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </div>
+    </PageLayout>
   );
 };
 

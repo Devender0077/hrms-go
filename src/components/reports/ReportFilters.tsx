@@ -34,7 +34,7 @@ export default function ReportFilters({
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+            startContent={<Icon icon="lucide:search" className="text-default-400" />}
           />
           <Select
             label={filterLabel}

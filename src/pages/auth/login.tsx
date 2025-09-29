@@ -274,8 +274,8 @@ const handleFaceVerificationError = () => {
 
 export default function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
+  const [email, setEmail] = React.useState("demo@hrms.com");
+  const [password, setPassword] = React.useState("password123");
   const [rememberMe, setRememberMe] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [loginMethod, setLoginMethod] = React.useState("credentials");
@@ -379,7 +379,9 @@ export default function Login() {
     }
 
     try {
+      console.log("🔐 Attempting login with:", { email, password: password ? "***" : "empty", rememberMe });
       const user = await login({ email, password, rememberMe });
+      console.log("✅ Login successful:", user);
       // Use navigate function directly, not navigate.push
       navigate("/dashboard");
     } catch (error) {
@@ -633,7 +635,7 @@ export default function Login() {
         <Card className="shadow-lg rounded-xl">
           <CardHeader className="flex flex-col gap-1 text-center">
             <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-primary to-secondary shadow-lg">
-              <Icon icon="lucide:users" className="text-3xl text-white" />
+              <Icon icon="lucide:users" className="text-3xl text-foreground" />
             </div>
             <h1 className="text-2xl font-bold">Welcome to HRMGO</h1>
             <p className="text-default-500">Sign in to your account</p>
@@ -699,6 +701,13 @@ export default function Login() {
                 >
                   Sign In
                 </Button>
+                
+                <div className="text-center text-sm text-default-500 mt-4 p-3 bg-default-100 rounded-lg">
+                  <p className="font-medium mb-2">Demo Credentials:</p>
+                  <p>Email: demo@hrms.com | Password: password123</p>
+                  <p>Email: test@hrms.com | Password: test123</p>
+                  <p>Email: admin@hrms.com | Password: password</p>
+                </div>
 
                 <div className="flex justify-center">
                   <Button

@@ -87,70 +87,70 @@ export default function GoogleCalendarSettings({ settings, onSettingsChange }: G
         </CardHeader>
         <CardBody className="space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable Google Calendar integration</span>
-                <span className="text-xs text-gray-500">Connect and sync with Google Calendar</span>
+                <span className="text-sm font-medium text-foreground">Enable Google Calendar integration</span>
+                <span className="text-xs text-default-500">Connect and sync with Google Calendar</span>
               </div>
               <Switch
                 isSelected={settings.enabled}
                 onValueChange={(value) => onSettingsChange("enabled", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Sync employee calendars</span>
-                <span className="text-xs text-gray-500">Synchronize individual employee calendars</span>
+                <span className="text-sm font-medium text-foreground">Sync employee calendars</span>
+                <span className="text-xs text-default-500">Synchronize individual employee calendars</span>
               </div>
               <Switch
                 isSelected={settings.syncEmployees}
                 onValueChange={(value) => onSettingsChange("syncEmployees", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Sync leave requests</span>
-                <span className="text-xs text-gray-500">Automatically sync leave requests to calendar</span>
+                <span className="text-sm font-medium text-foreground">Sync leave requests</span>
+                <span className="text-xs text-default-500">Automatically sync leave requests to calendar</span>
               </div>
               <Switch
                 isSelected={settings.syncLeaveRequests}
                 onValueChange={(value) => onSettingsChange("syncLeaveRequests", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Sync meetings and appointments</span>
-                <span className="text-xs text-gray-500">Synchronize meeting schedules</span>
+                <span className="text-sm font-medium text-foreground">Sync meetings and appointments</span>
+                <span className="text-xs text-default-500">Synchronize meeting schedules</span>
               </div>
               <Switch
                 isSelected={settings.syncMeetings}
                 onValueChange={(value) => onSettingsChange("syncMeetings", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Sync interview schedules</span>
-                <span className="text-xs text-gray-500">Automatically sync interview appointments</span>
+                <span className="text-sm font-medium text-foreground">Sync interview schedules</span>
+                <span className="text-xs text-default-500">Automatically sync interview appointments</span>
               </div>
               <Switch
                 isSelected={settings.syncInterviews}
                 onValueChange={(value) => onSettingsChange("syncInterviews", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Sync company events</span>
-                <span className="text-xs text-gray-500">Synchronize company-wide events</span>
+                <span className="text-sm font-medium text-foreground">Sync company events</span>
+                <span className="text-xs text-default-500">Synchronize company-wide events</span>
               </div>
               <Switch
                 isSelected={settings.syncEvents}
                 onValueChange={(value) => onSettingsChange("syncEvents", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Auto-accept calendar invitations</span>
-                <span className="text-xs text-gray-500">Automatically accept calendar invitations</span>
+                <span className="text-sm font-medium text-foreground">Auto-accept calendar invitations</span>
+                <span className="text-xs text-default-500">Automatically accept calendar invitations</span>
               </div>
               <Switch
                 isSelected={settings.autoAccept}
@@ -192,16 +192,16 @@ export default function GoogleCalendarSettings({ settings, onSettingsChange }: G
             <label className="text-sm font-medium mb-4 block">Working Days</label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {workingDaysOptions.map((day) => (
-                <div key={day.value} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={day.value} className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-900">{day.label}</span>
-                    <span className="text-xs text-gray-500">Include {day.label.toLowerCase()} as a working day</span>
+                    <span className="text-sm font-medium text-foreground">{day.label}</span>
+                    <span className="text-xs text-default-500">Include {day.label.toLowerCase()} as a working day</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={settings.workingDays.includes(day.value)}
                     onChange={(e) => handleWorkingDayChange(day.value, e.target.checked)}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                    className="w-4 h-4 text-primary-600 bg-content2 border-divider rounded focus:ring-primary-500 focus:ring-2"
                   />
                 </div>
               ))}

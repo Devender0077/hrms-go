@@ -6,34 +6,34 @@ import { Icon } from "@iconify/react";
 import { useAuth } from "../contexts/auth-context";
 import { useTaskContext } from "../contexts/task-context";
 import { usePermissions } from "../hooks/usePermissions";
-
-interface SidebarProps {
-  isOpen: boolean;
-}
-
-interface NavItem {
-  title: string;
-  icon: string;
-  path: string;
-  badge?: number;
+    
+    interface SidebarProps {
+      isOpen: boolean;
+    }
+    
+    interface NavItem {
+      title: string;
+      icon: string;
+      path: string;
+      badge?: number;
   permissions: string[];
-}
-
-interface NavSection {
-  title: string;
-  items: NavItem[];
-}
-
-export default function Sidebar({ isOpen }: SidebarProps) {
-  const location = useLocation();
-  const { user } = useAuth();
+    }
+    
+    interface NavSection {
+      title: string;
+      items: NavItem[];
+    }
+    
+    export default function Sidebar({ isOpen }: SidebarProps) {
+      const location = useLocation();
+      const { user } = useAuth();
   const { taskCounts } = useTaskContext();
   const { hasAnyPermission, loading: permissionsLoading } = usePermissions();
-
-  const navSections: NavSection[] = [
-    {
-      title: "Main",
-      items: [
+      
+      const navSections: NavSection[] = [
+        {
+          title: "Main",
+          items: [
         { 
           title: "Dashboard", 
           icon: "lucide:layout-dashboard", 
@@ -60,14 +60,14 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           permissions: ["organization.view"]
         },
       ]
-    },
-    {
-      title: "HR Management",
-      items: [
-        { 
-          title: "Employees", 
-          icon: "lucide:users", 
-          path: "/dashboard/employees",
+        },
+        {
+          title: "HR Management",
+          items: [
+            { 
+              title: "Employees", 
+              icon: "lucide:users", 
+              path: "/dashboard/employees",
           permissions: ["employees.view"]
         },
         { 
@@ -93,16 +93,16 @@ export default function Sidebar({ isOpen }: SidebarProps) {
     {
       title: "Organization",
       items: [
-        { 
-          title: "Departments", 
+            { 
+              title: "Departments", 
           icon: "lucide:building-2", 
-          path: "/dashboard/departments",
+              path: "/dashboard/departments",
           permissions: ["departments.view"]
-        },
-        { 
-          title: "Designations", 
-          icon: "lucide:briefcase", 
-          path: "/dashboard/designations",
+            },
+            { 
+              title: "Designations", 
+              icon: "lucide:briefcase", 
+              path: "/dashboard/designations",
           permissions: ["designations.view"]
         },
         { 
@@ -117,6 +117,18 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       title: "Leave Management",
       items: [
         { 
+          title: "Leave Overview", 
+          icon: "lucide:calendar", 
+          path: "/dashboard/leave",
+          permissions: ["leave.view"]
+        },
+        { 
+          title: "Leave Management", 
+          icon: "lucide:calendar-heart", 
+          path: "/dashboard/leave-management",
+          permissions: ["leave.view"]
+        },
+        { 
           title: "Leave Applications", 
           icon: "lucide:calendar-days", 
           path: "/dashboard/leave/applications",
@@ -126,25 +138,25 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           title: "Leave Types", 
           icon: "lucide:calendar-plus", 
           path: "/dashboard/leave/types",
-          permissions: ["leave.manage"]
+          permissions: ["leave.types.manage"]
         },
         { 
           title: "Leave Balances", 
           icon: "lucide:calendar-check", 
           path: "/dashboard/leave/balances",
-          permissions: ["leave.view"]
+          permissions: ["leave.balances.view"]
         },
         { 
           title: "Leave Policies", 
           icon: "lucide:shield-check", 
           path: "/dashboard/leave/policies",
-          permissions: ["leave.manage"]
+          permissions: ["leave.policies.manage"]
         },
         { 
           title: "Holidays", 
           icon: "lucide:calendar-x", 
           path: "/dashboard/leave/holidays",
-          permissions: ["leave.manage"]
+          permissions: ["leave.holidays.manage"]
         },
         { 
           title: "Leave Reports", 
@@ -156,8 +168,8 @@ export default function Sidebar({ isOpen }: SidebarProps) {
     },
     {
       title: "Timekeeping",
-      items: [
-        { 
+          items: [
+            { 
           title: "Attendance", 
           icon: "lucide:clock", 
           path: "/dashboard/timekeeping/attendance",
@@ -192,14 +204,14 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           icon: "lucide:edit-3", 
           path: "/dashboard/timekeeping/regularization",
           permissions: ["regularization.view"]
+            },
+          ]
         },
-      ]
-    },
-    {
-      title: "Recruitment",
-      items: [
-        { 
-          title: "Recruitment", 
+        {
+          title: "Recruitment",
+          items: [
+            { 
+          title: "Recruitment Overview", 
           icon: "lucide:user-search", 
           path: "/dashboard/recruitment",
           permissions: ["recruitment.view"]
@@ -207,47 +219,65 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         { 
           title: "Jobs", 
           icon: "lucide:briefcase", 
-          path: "/dashboard/jobs",
+              path: "/dashboard/jobs",
           permissions: ["jobs.view"]
-        },
-        { 
-          title: "Candidates", 
-          icon: "lucide:user-plus", 
-          path: "/dashboard/candidates",
+            },
+            { 
+              title: "Candidates", 
+              icon: "lucide:user-plus", 
+              path: "/dashboard/candidates",
           permissions: ["candidates.view"]
-        },
-        { 
-          title: "Interviews", 
+            },
+            { 
+              title: "Interviews", 
           icon: "lucide:video", 
-          path: "/dashboard/interviews",
+              path: "/dashboard/interviews",
           permissions: ["interviews.view"]
+            },
+          ]
         },
-      ]
-    },
-    {
-      title: "Performance",
-      items: [
-        { 
-          title: "Goals", 
-          icon: "lucide:target", 
-          path: "/dashboard/goals",
+        {
+          title: "Performance",
+          items: [
+            { 
+              title: "Goals", 
+              icon: "lucide:target", 
+              path: "/dashboard/goals",
           permissions: ["goals.view"]
-        },
-        { 
-          title: "Reviews", 
-          icon: "lucide:star", 
-          path: "/dashboard/reviews",
+            },
+            { 
+              title: "Reviews", 
+              icon: "lucide:star", 
+              path: "/dashboard/reviews",
           permissions: ["reviews.view"]
+            },
+          ]
         },
-      ]
-    },
-    {
+        {
       title: "Finance",
       items: [
         { 
           title: "Payroll", 
           icon: "lucide:banknote", 
           path: "/dashboard/payroll",
+          permissions: ["payroll.view"]
+        },
+        { 
+          title: "Salary Components", 
+          icon: "lucide:credit-card", 
+          path: "/dashboard/payroll/salary-components",
+          permissions: ["payroll.view"]
+        },
+        { 
+          title: "Employee Salaries", 
+          icon: "lucide:banknote", 
+          path: "/dashboard/payroll/employee-salaries",
+          permissions: ["payroll.view"]
+        },
+        { 
+          title: "Payslips", 
+          icon: "lucide:receipt", 
+          path: "/dashboard/payroll/payslips",
           permissions: ["payroll.view"]
         },
         { 
@@ -295,17 +325,17 @@ export default function Sidebar({ isOpen }: SidebarProps) {
     },
     {
       title: "Assets & Documents",
-      items: [
-        { 
+          items: [
+            { 
           title: "Asset Management", 
           icon: "lucide:package", 
-          path: "/dashboard/assets",
+              path: "/dashboard/assets",
           permissions: ["assets.view"]
-        },
-        { 
+            },
+            { 
           title: "Asset Assignments", 
           icon: "lucide:package-check", 
-          path: "/dashboard/asset-assignments",
+              path: "/dashboard/asset-assignments",
           permissions: ["assets.assign"]
         },
         { 
@@ -317,8 +347,19 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       ]
     },
     {
-      title: "Administration",
+      title: "System Setup",
       items: [
+        { 
+          title: "HR System Setup", 
+          icon: "lucide:settings-2", 
+          path: "/dashboard/hr-system-setup",
+          permissions: ["settings.view"]
+            },
+          ]
+        },
+        {
+          title: "Administration",
+          items: [
         { 
           title: "Users", 
           icon: "lucide:user-cog", 
@@ -337,16 +378,16 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           path: "/dashboard/users/permissions",
           permissions: ["users.view"]
         },
-        { 
-          title: "Settings", 
-          icon: "lucide:settings", 
-          path: "/dashboard/settings",
+            { 
+              title: "Settings", 
+              icon: "lucide:settings", 
+              path: "/dashboard/settings",
           permissions: ["settings.view"]
-        },
-        { 
-          title: "Audit Logs", 
-          icon: "lucide:history", 
-          path: "/dashboard/audit-logs",
+            },
+            { 
+              title: "Audit Logs", 
+              icon: "lucide:history", 
+              path: "/dashboard/audit-logs",
           permissions: ["audit.view"]
         },
         { 
@@ -354,11 +395,11 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           icon: "lucide:user", 
           path: "/dashboard/profile",
           permissions: ["profile.view"]
-        },
-      ]
-    }
-  ];
-
+            },
+          ]
+        }
+      ];
+      
   // Filter navigation items based on permissions
   const filteredNavSections = navSections.map(section => ({
     ...section,
@@ -374,7 +415,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
 
   if (permissionsLoading) {
     return (
-      <div className="h-full bg-content1 border-r border-divider flex items-center justify-center">
+      <div className="h-full bg-content1 border-r border-default-300 flex items-center justify-center">
         <div className="text-center">
           <Icon icon="lucide:loader-2" className="w-6 h-6 animate-spin text-primary mx-auto mb-2" />
           <p className="text-sm text-default-500">Loading...</p>
@@ -382,97 +423,97 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       </div>
     );
   }
-
-  return (
-    <aside 
-      className={`bg-content1 shadow-md border-r border-divider transition-all duration-300 flex flex-col h-full ${
-        isOpen ? "w-64" : "w-20"
-      }`}
-    >
-      {/* Logo */}
-      <div className="p-4 flex items-center justify-center h-16 border-b border-divider">
-        {isOpen ? (
-          <h1 className="text-xl font-bold text-foreground">HRM<span className="text-primary">GO</span></h1>
-        ) : (
-          <h1 className="text-xl font-bold text-primary">HR</h1>
-        )}
-      </div>
       
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-2">
-        {filteredNavSections.map((section, idx) => (
-          <div key={idx} className="mb-6">
-            {isOpen && (
-              <p className="px-4 text-xs font-medium text-default-500 uppercase tracking-wider mb-2">
-                {section.title}
-              </p>
+      return (
+        <aside 
+      className={`bg-content1 shadow-md border-r border-default-300 transition-all duration-300 flex flex-col h-full ${
+            isOpen ? "w-64" : "w-20"
+      }`}
+        >
+          {/* Logo */}
+      <div className="p-4 flex items-center justify-center h-16 border-b border-default-300">
+            {isOpen ? (
+          <h1 className="text-xl font-bold text-foreground">HRM<span className="text-primary-600">GO</span></h1>
+            ) : (
+          <h1 className="text-xl font-bold text-primary-600">HR</h1>
             )}
-            
-            <ul>
+      </div>
+          
+          {/* Navigation */}
+          <nav className="flex-1 overflow-y-auto py-4 px-2">
+        {filteredNavSections.map((section, idx) => (
+                <div key={idx} className="mb-6">
+                  {isOpen && (
+                    <p className="px-4 text-xs font-medium text-default-500 uppercase tracking-wider mb-2">
+                      {section.title}
+                    </p>
+                  )}
+                  
+                  <ul>
               {section.items.map((item, itemIdx) => {
                 const isActiveItem = isActive(item.path);
-                
-                return (
-                  <motion.li 
-                    key={itemIdx}
-                    whileHover={{ x: isOpen ? 4 : 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {isOpen ? (
-                      <Link to={item.path}>
-                        <Button
+                      
+                      return (
+                        <motion.li 
+                          key={itemIdx}
+                          whileHover={{ x: isOpen ? 4 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {isOpen ? (
+                            <Link to={item.path}>
+                              <Button
                           variant={isActiveItem ? "flat" : "light"}
                           color={isActiveItem ? "primary" : "default"}
-                          className="justify-start w-full mb-1 rounded-lg"
-                          startContent={
-                            <div className="relative">
-                              <Icon icon={item.icon} className="text-lg" />
+                                className="justify-start w-full mb-1 rounded-lg"
+                                startContent={
+                                  <div className="relative">
+                                    <Icon icon={item.icon} className="text-lg" />
                               {item.badge && item.badge > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                      <span className="absolute -top-1 -right-1 bg-danger text-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center">
                                   {item.badge > 99 ? "99+" : item.badge}
-                                </span>
-                              )}
-                            </div>
-                          }
-                        >
-                          {item.title}
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Tooltip content={item.title} placement="right">
-                        <Link to={item.path}>
-                          <Button
-                            isIconOnly
+                                      </span>
+                                    )}
+                                  </div>
+                                }
+                              >
+                                {item.title}
+                              </Button>
+                            </Link>
+                          ) : (
+                            <Tooltip content={item.title} placement="right">
+                              <Link to={item.path}>
+                                <Button
+                                  isIconOnly
                             variant={isActiveItem ? "flat" : "light"}
                             color={isActiveItem ? "primary" : "default"}
-                            className="w-full mb-1 rounded-lg"
-                            aria-label={item.title}
-                          >
-                            <div className="relative">
-                              <Icon icon={item.icon} className="text-lg" />
+                                  className="w-full mb-1 rounded-lg"
+                                  aria-label={item.title}
+                                >
+                                  <div className="relative">
+                                    <Icon icon={item.icon} className="text-lg" />
                               {item.badge && item.badge > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                                      <span className="absolute -top-1 -right-1 bg-danger text-foreground text-xs rounded-full w-4 h-4 flex items-center justify-center">
                                   {item.badge > 99 ? "99+" : item.badge}
-                                </span>
-                              )}
-                            </div>
-                          </Button>
-                        </Link>
-                      </Tooltip>
-                    )}
-                  </motion.li>
-                );
-              })}
-            </ul>
-          </div>
+                                      </span>
+                                    )}
+                                  </div>
+                                </Button>
+                              </Link>
+                            </Tooltip>
+                          )}
+                        </motion.li>
+                      );
+                    })}
+                  </ul>
+                </div>
         ))}
-      </nav>
+          </nav>
 
       {/* System Status & Version */}
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-default-300">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
-            <Icon icon="lucide:activity" className="text-white text-sm" />
+          <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
+            <Icon icon="lucide:activity" className="text-foreground text-sm" />
           </div>
           {isOpen && (
             <div className="flex-1 min-w-0">
@@ -486,6 +527,6 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           )}
         </div>
       </div>
-    </aside>
-  );
-}
+        </aside>
+      );
+    }

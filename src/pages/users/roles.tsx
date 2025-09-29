@@ -164,8 +164,8 @@ const RolesPage: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Role Management</h1>
-          <p className="text-gray-600">Manage user roles and permissions</p>
+          <h1 className="text-2xl font-bold text-foreground">Role Management</h1>
+          <p className="text-default-600">Manage user roles and permissions</p>
         </div>
         <Button
           color="primary"
@@ -197,7 +197,7 @@ const RolesPage: React.FC = () => {
                     <div className="font-medium">{role.name}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="text-gray-600">{role.description}</div>
+                    <div className="text-default-600">{role.description}</div>
                   </TableCell>
                   <TableCell>
                     <Chip
@@ -276,7 +276,7 @@ const RolesPage: React.FC = () => {
                   isSelected={formData.is_active}
                   onValueChange={(value) => setFormData({ ...formData, is_active: value })}
                 />
-                <span className="text-sm text-gray-600">Active</span>
+                <span className="text-sm text-default-600">Active</span>
               </div>
             </div>
           </ModalBody>

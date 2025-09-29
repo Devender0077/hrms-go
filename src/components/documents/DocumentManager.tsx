@@ -318,7 +318,7 @@ HR Manager
                   )}
 
                   {selectedEmployee && (
-                    <div className="p-4 bg-gray-50 rounded-lg">
+                    <div className="p-4 bg-content1 rounded-lg">
                       <h4 className="font-medium mb-2">Selected Employee/Candidate:</h4>
                       <p><strong>Name:</strong> {selectedEmployee.name}</p>
                       <p><strong>Email:</strong> {selectedEmployee.email}</p>

@@ -85,10 +85,10 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({
                   size="sm"
                 />
                 <div>
-                  <p className="font-medium text-gray-900">{record.employee_name}</p>
-                  <p className="text-sm text-gray-500">{record.employee_id}</p>
+                  <p className="font-medium text-foreground">{record.employee_name}</p>
+                  <p className="text-sm text-default-500">{record.employee_id}</p>
                   {record.department && (
-                    <p className="text-xs text-gray-400">{record.department}</p>
+                    <p className="text-xs text-default-400">{record.department}</p>
                   )}
                 </div>
               </div>
@@ -98,10 +98,10 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({
               <div className="text-sm">
                 <div className="font-medium">{formatTime(record.check_in)}</div>
                 {record.check_in_location && (
-                  <div className="text-xs text-gray-500">📍 {record.check_in_location}</div>
+                  <div className="text-xs text-default-500">📍 {record.check_in_location}</div>
                 )}
                 {record.check_in_ip && (
-                  <div className="text-xs text-gray-500">🌐 {record.check_in_ip}</div>
+                  <div className="text-xs text-default-500">🌐 {record.check_in_ip}</div>
                 )}
               </div>
             </TableCell>
@@ -109,10 +109,10 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({
               <div className="text-sm">
                 <div className="font-medium">{formatTime(record.check_out)}</div>
                 {record.check_out_location && (
-                  <div className="text-xs text-gray-500">📍 {record.check_out_location}</div>
+                  <div className="text-xs text-default-500">📍 {record.check_out_location}</div>
                 )}
                 {record.check_out_ip && (
-                  <div className="text-xs text-gray-500">🌐 {record.check_out_ip}</div>
+                  <div className="text-xs text-default-500">🌐 {record.check_out_ip}</div>
                 )}
               </div>
             </TableCell>
@@ -127,38 +127,38 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
-                <Icon icon="lucide:clock" className="text-gray-400 text-sm" />
+                <Icon icon="lucide:clock" className="text-default-400 text-sm" />
                 <span className="text-sm">{formatHours(record.work_hours)}</span>
               </div>
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
-                <Icon icon="lucide:plus" className="text-orange-400 text-sm" />
+                <Icon icon="lucide:plus" className="text-warning-400 text-sm" />
                 <span className="text-sm">{formatHours(record.overtime_hours)}</span>
               </div>
             </TableCell>
             <TableCell>
               {record.location_latitude && record.location_longitude ? (
                 <div className="flex items-center gap-2">
-                  <Icon icon="lucide:map-pin" className="text-green-500 text-sm" />
-                  <span className="text-xs text-gray-600">
+                  <Icon icon="lucide:map-pin" className="text-success text-sm" />
+                  <span className="text-xs text-default-600">
                     {parseFloat(record.location_latitude).toFixed(4)}, {parseFloat(record.location_longitude).toFixed(4)}
                   </span>
                 </div>
               ) : (
-                <span className="text-gray-400 text-sm">-</span>
+                <span className="text-default-400 text-sm">-</span>
               )}
             </TableCell>
             <TableCell>
               <div className="text-sm">
                 {record.ip_address && (
                   <div className="flex items-center gap-1">
-                    <Icon icon="lucide:globe" className="text-blue-500 text-xs" />
+                    <Icon icon="lucide:globe" className="text-primary text-xs" />
                     <span className="text-xs">{record.ip_address}</span>
                   </div>
                 )}
                 {!record.ip_address && (
-                  <span className="text-gray-400 text-xs">-</span>
+                  <span className="text-default-400 text-xs">-</span>
                 )}
               </div>
             </TableCell>

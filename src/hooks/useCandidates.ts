@@ -1,19 +1,21 @@
 import { useState, useEffect } from 'react';
-import { candidatesAPI } from '../services/api-service';
 import { useAuthenticatedAPI } from './useAuthenticatedAPI';
 
 export interface Candidate {
   id: number;
-  job_posting_id: number;
   first_name: string;
   last_name: string;
   email: string;
   phone?: string;
-  resume: string;
-  cover_letter?: string;
-  status: 'new' | 'screening' | 'interview' | 'testing' | 'offer' | 'hired' | 'rejected';
+  position: string;
+  experience_years?: number;
+  current_salary?: number;
+  expected_salary?: number;
+  notice_period?: string;
+  resume_path?: string;
+  status: "applied" | "screening" | "interview" | "offered" | "hired" | "rejected";
   source?: string;
-  job_title?: string;
+  notes?: string;
   created_at: string;
   updated_at: string;
 }
@@ -28,7 +30,9 @@ export const useCandidates = () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await candidatesAPI.getAll();
+      const response = await apiRequest('/candidates');
+      // Handle both array response and object with data property
+      const data = Array.isArray(response) ? response : (response.data || []);
       setCandidates(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load candidates');
@@ -41,7 +45,10 @@ export const useCandidates = () => {
   const createCandidate = async (candidateData: Partial<Candidate>) => {
     try {
       setError(null);
-      const result = await candidatesAPI.create(candidateData);
+      const result = await apiRequest('/candidates', {
+        method: 'POST',
+        body: candidateData,
+      });
       await loadCandidates(); // Reload candidates after creation
       return result;
     } catch (err) {
@@ -54,7 +61,10 @@ export const useCandidates = () => {
   const updateCandidate = async (id: number, candidateData: Partial<Candidate>) => {
     try {
       setError(null);
-      const result = await candidatesAPI.update(id, candidateData);
+      const result = await apiRequest(`/candidates/${id}`, {
+        method: 'PUT',
+        body: candidateData,
+      });
       await loadCandidates(); // Reload candidates after update
       return result;
     } catch (err) {
@@ -67,7 +77,9 @@ export const useCandidates = () => {
   const deleteCandidate = async (id: number) => {
     try {
       setError(null);
-      const result = await candidatesAPI.delete(id);
+      const result = await apiRequest(`/candidates/${id}`, {
+        method: 'DELETE',
+      });
       await loadCandidates(); // Reload candidates after deletion
       return result;
     } catch (err) {

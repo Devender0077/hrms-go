@@ -110,10 +110,10 @@ import DesignationModals from "../../components/designations/DesignationModals";
       
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" />
-          <p className="text-gray-600 mt-4">Loading designations...</p>
+          <p className="text-default-600 mt-4">Loading designations...</p>
         </div>
       </div>
     );
@@ -121,11 +121,11 @@ import DesignationModals from "../../components/designations/DesignationModals";
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Designations</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-danger mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Error Loading Designations</h2>
+          <p className="text-default-600 mb-4">{error}</p>
           <Button color="primary" onPress={() => window.location.reload()}>
             Try Again
           </Button>
@@ -135,17 +135,17 @@ import DesignationModals from "../../components/designations/DesignationModals";
   }
       
       return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
           {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl">
-              <Icon icon="lucide:award" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:award" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Designations</h1>
-              <p className="text-gray-600 mt-1">Manage job titles and positions</p>
+              <h1 className="text-3xl font-bold text-foreground">Designations</h1>
+              <p className="text-default-600 mt-1">Manage job titles and positions</p>
             </div>
           </div>
                   </div>
@@ -171,10 +171,10 @@ import DesignationModals from "../../components/designations/DesignationModals";
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
-              <Icon icon="lucide:table" className="text-purple-600 text-xl" />
+              <Icon icon="lucide:table" className="text-secondary-600 text-xl" />
                   <div>
-                <h3 className="text-lg font-semibold text-gray-900">Designation Directory</h3>
-                <p className="text-gray-500 text-sm">Click on actions to view, edit, or manage designations</p>
+                <h3 className="text-lg font-semibold text-foreground">Designation Directory</h3>
+                <p className="text-default-500 text-sm">Click on actions to view, edit, or manage designations</p>
                   </div>
           </div>
             </CardHeader>

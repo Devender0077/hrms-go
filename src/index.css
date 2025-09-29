@@ -1,75 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @import "tailwindcss";
 @config "../tailwind.config.js";
-    
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    
-    :root {
-      font-family: 'Inter', sans-serif;
-    }
-    
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-    
-    /* Custom scrollbar */
-    @utility scrollbar-hidden {
-      &::-webkit-scrollbar {
-        display: none;
-      }
-    }
-    
-    @utility scrollbar-thin {
-      &::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-      }
-      
-      &::-webkit-scrollbar-track {
-        background: transparent;
-      }
-      
-      &::-webkit-scrollbar-thumb {
-        background: hsl(var(--heroui-default-300));
-        border-radius: 5px;
-      }
-      
-      &::-webkit-scrollbar-thumb:hover {
-        background: hsl(var(--heroui-default-400));
-      }
-    }
-    
-    /* Apply custom scrollbar to specific elements */
-    .sidebar-nav {
-      @apply scrollbar-thin;
-    }
-    
-    /* Animation utilities */
-    @utility animate-fade-in {
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    
-    @utility animate-slide-in {
-      animation: slideIn 0.3s ease-in-out;
-    }
-    
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-    
-    @keyframes slideIn {
-      from {
-        transform: translateY(20px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
+
+:root {
+  font-family: 'Inter', sans-serif;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom scrollbar */
+@utility scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-thin {
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: hsl(var(--heroui-default-300));
+    border-radius: 5px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--heroui-default-400));
+  }
+}
+
+/* Apply custom scrollbar to specific elements */
+.sidebar-nav {
+  @apply scrollbar-thin;
+}
+
+/* Animation utilities */
+@utility animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@utility animate-slide-in {
+  animation: slideIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

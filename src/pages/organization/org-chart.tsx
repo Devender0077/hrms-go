@@ -30,6 +30,7 @@ import React, { useState, useEffect, useRef } from "react";
     } from "@heroui/react";
     import { Icon } from "@iconify/react";
 import { motion, AnimatePresence } from "framer-motion";
+import PageLayout, { PageHeader } from "../../components/layout/PageLayout";
 import { useAuth } from "../../contexts/auth-context";
 import { apiRequest } from "../../services/api-service";
 
@@ -90,7 +91,7 @@ const OrganizationChartPage: React.FC = () => {
       console.log('Employees response:', employeesResponse);
       
       // Handle the API response structure
-      if (employeesResponse && employeesResponse.success && employeesResponse.data) {
+      if (employeesResponse && employeesResponse.data && Array.isArray(employeesResponse.data)) {
         setEmployees(employeesResponse.data || []);
         console.log('Employees loaded:', employeesResponse.data?.length || 0);
       } else if (employeesResponse && employeesResponse.success === false) {
@@ -107,7 +108,7 @@ const OrganizationChartPage: React.FC = () => {
       console.log('Departments response:', departmentsResponse);
       
       // Handle the API response structure
-      if (departmentsResponse && departmentsResponse.success && departmentsResponse.data) {
+      if (departmentsResponse && departmentsResponse.data && Array.isArray(departmentsResponse.data)) {
         setDepartments(departmentsResponse.data || []);
         console.log('Departments loaded:', departmentsResponse.data?.length || 0);
       } else if (departmentsResponse && departmentsResponse.success === false) {
@@ -204,21 +205,21 @@ const OrganizationChartPage: React.FC = () => {
                       src={getAvatarUrl(employee)}
                       name={`${employee.first_name} ${employee.last_name}`}
                   size="lg" 
-                      className="ring-4 ring-blue-100"
+                      className="ring-4 ring-primary-100"
                     />
-                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-white ${
-                      employee.status === "active" ? "bg-green-500" : 
-                      employee.status === "inactive" ? "bg-red-500" : "bg-yellow-500"
+                    <div className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-2 border-background ${
+                      employee.status === "active" ? "bg-success" : 
+                      employee.status === "inactive" ? "bg-danger" : "bg-warning"
                     }`}></div>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-gray-900 truncate text-lg">
+                    <h4 className="font-bold text-foreground truncate text-lg">
                       {employee.first_name} {employee.last_name}
                     </h4>
-                    <p className="text-sm text-blue-600 truncate font-semibold">
+                    <p className="text-sm text-primary-600 truncate font-semibold">
                       {employee.designation_name || 'No Designation'}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">
+                    <p className="text-xs text-default-500 truncate">
                       {employee.department_name || 'No Department'}
                     </p>
                     <div className="mt-3 flex items-center gap-2">
@@ -279,11 +280,11 @@ const OrganizationChartPage: React.FC = () => {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center py-16"
         >
-          <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Icon icon="lucide:users" className="w-12 h-12 text-blue-500" />
+          <div className="w-24 h-24 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Icon icon="lucide:users" className="w-12 h-12 text-primary" />
                   </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">No employees found</h3>
-          <p className="text-gray-500 max-w-md mx-auto">
+          <h3 className="text-xl font-bold text-foreground mb-2">No employees found</h3>
+          <p className="text-default-500 max-w-md mx-auto">
             {searchQuery || selectedDepartment !== "all" 
               ? "Try adjusting your search or filter criteria to find employees."
               : "No employees have been added to the organization yet."
@@ -372,36 +373,24 @@ const OrganizationChartPage: React.FC = () => {
   };
 
         return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="max-w-7xl mx-auto space-y-8 p-6">
-        {/* Modern Page Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6"
-        >
-          <div className="flex items-center gap-6">
-            <div className="p-4 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-2xl shadow-lg">
-              <Icon icon="lucide:network" className="text-white text-3xl" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Organization Chart
-              </h1>
-              <p className="text-gray-600 text-lg mt-2">Visualize your company's structure and employee hierarchy</p>
-            </div>
-          </div>
+    <PageLayout>
+      <PageHeader
+        title="Organization Chart"
+        description="Visualize your company's structure and employee hierarchy"
+        icon="lucide:network"
+        actions={
           <div className="flex items-center gap-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">{employees.length}</div>
-              <div className="text-sm text-gray-500 font-medium">Total Employees</div>
+              <div className="text-3xl font-bold text-foreground">{employees.length}</div>
+              <div className="text-sm text-default-500 font-medium">Total Employees</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-gray-900">{filteredEmployees.length}</div>
-              <div className="text-sm text-gray-500 font-medium">Filtered</div>
+              <div className="text-3xl font-bold text-foreground">{filteredEmployees.length}</div>
+              <div className="text-sm text-default-500 font-medium">Filtered</div>
             </div>
           </div>
-        </motion.div>
+        }
+      />
 
         {/* Enhanced Controls */}
         <motion.div
@@ -409,7 +398,7 @@ const OrganizationChartPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+          <Card className="border-0 shadow-xl bg-content1/80 backdrop-blur-sm">
             <CardBody className="p-6">
               <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
                 <div className="flex-1 max-w-md w-full">
@@ -417,7 +406,7 @@ const OrganizationChartPage: React.FC = () => {
                     placeholder="Search employees by name, email, or department..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    startContent={<Icon icon="lucide:search" className="w-5 h-5 text-gray-400" />}
+                    startContent={<Icon icon="lucide:search" className="w-5 h-5 text-default-400" />}
                     variant="bordered"
                     size="lg"
                     className="rounded-xl"
@@ -480,7 +469,7 @@ const OrganizationChartPage: React.FC = () => {
           >
             <div className="text-center">
               <Spinner size="lg" color="primary" />
-              <p className="mt-4 text-gray-600 text-lg">Loading organization chart...</p>
+              <p className="mt-4 text-default-600 text-lg">Loading organization chart...</p>
             </div>
           </motion.div>
         ) : (
@@ -489,14 +478,14 @@ const OrganizationChartPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="border-0 shadow-xl bg-white/90 backdrop-blur-sm">
+            <Card className="border-0 shadow-xl bg-content1/90 backdrop-blur-sm">
               <CardBody className="p-8">
                 {viewMode === "chart" ? (
                   <div className="space-y-6">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h3 className="text-2xl font-bold text-gray-900">Organization Tree</h3>
-                        <p className="text-gray-600 mt-1">Click and drag to navigate • Scroll to zoom • Click employee cards for details</p>
+                        <h3 className="text-2xl font-bold text-foreground">Organization Tree</h3>
+                        <p className="text-default-600 mt-1">Click and drag to navigate • Scroll to zoom • Click employee cards for details</p>
                       </div>
                       <div className="flex items-center gap-3">
                         <Button
@@ -508,7 +497,7 @@ const OrganizationChartPage: React.FC = () => {
                         >
                           Zoom Out
                         </Button>
-                        <span className="text-sm text-gray-600 min-w-[3rem] text-center font-semibold">{zoomLevel}%</span>
+                        <span className="text-sm text-default-600 min-w-[3rem] text-center font-semibold">{zoomLevel}%</span>
                         <Button
                           size="sm"
                           variant="flat"
@@ -531,7 +520,7 @@ const OrganizationChartPage: React.FC = () => {
                     </div>
                     
                     <div 
-                      className="overflow-auto border border-gray-200 rounded-2xl p-8 relative bg-gradient-to-br from-gray-50 to-white"
+                      className="overflow-auto border border-default-300 rounded-2xl p-8 relative bg-gradient-to-br from-gray-50 to-white"
                       ref={chartRef}
                       onMouseDown={handleMouseDown}
                       onMouseMove={handleMouseMove}
@@ -554,8 +543,8 @@ const OrganizationChartPage: React.FC = () => {
                       </div>
                       
                       {/* Enhanced zoom indicator */}
-                      <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg border border-gray-200">
-                        <div className="flex items-center gap-3 text-sm text-gray-600">
+                      <div className="absolute top-6 right-6 bg-content1/95 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg border border-default-300">
+                        <div className="flex items-center gap-3 text-sm text-default-600">
                           <Icon icon="lucide:zoom-in" className="w-4 h-4" />
                           <span className="font-semibold">{zoomLevel}%</span>
                         </div>
@@ -564,17 +553,17 @@ const OrganizationChartPage: React.FC = () => {
                   </div>
                 ) : (
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Employee Directory</h3>
+                    <h3 className="text-2xl font-bold text-foreground mb-6">Employee Directory</h3>
                     {filteredEmployees.length === 0 ? (
                       <motion.div 
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-center py-16"
                       >
-                        <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                          <Icon icon="lucide:users" className="w-12 h-12 text-blue-500" />
+                        <div className="w-24 h-24 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <Icon icon="lucide:users" className="w-12 h-12 text-primary" />
                         </div>
-                        <p className="text-gray-500 text-lg">No employees found</p>
+                        <p className="text-default-500 text-lg">No employees found</p>
                       </motion.div>
                     ) : (
                       <Table aria-label="Employees list" removeWrapper className="rounded-xl">
@@ -595,28 +584,28 @@ const OrganizationChartPage: React.FC = () => {
                                     src={getAvatarUrl(employee)}
                                     name={`${employee.first_name} ${employee.last_name}`}
                                     size="md"
-                                    className="ring-2 ring-blue-100"
+                                    className="ring-2 ring-primary-100"
                                   />
                                   <div>
-                                    <div className="font-semibold text-gray-900">
+                                    <div className="font-semibold text-foreground">
                                       {employee.first_name} {employee.last_name}
                                     </div>
-                                    <div className="text-sm text-gray-500">{employee.email}</div>
+                                    <div className="text-sm text-default-500">{employee.email}</div>
                                   </div>
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <div className="text-sm text-gray-900 font-medium">
+                                <div className="text-sm text-foreground font-medium">
                                   {employee.designation_name || 'No Designation'}
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <div className="text-sm text-gray-900 font-medium">
+                                <div className="text-sm text-foreground font-medium">
                                   {employee.department_name || 'No Department'}
                                 </div>
                               </TableCell>
                               <TableCell>
-                                <div className="text-sm text-gray-900 font-medium">
+                                <div className="text-sm text-foreground font-medium">
                                   {employee.manager_name || 'No Manager'}
                                 </div>
                               </TableCell>
@@ -652,7 +641,6 @@ const OrganizationChartPage: React.FC = () => {
             </Card>
           </motion.div>
         )}
-      </div>
 
       {/* Enhanced Employee Details Modal */}
       <Modal isOpen={isDetailsOpen} onClose={onDetailsClose} size="2xl" className="rounded-2xl">
@@ -661,12 +649,12 @@ const OrganizationChartPage: React.FC = () => {
                 <>
               <ModalHeader className="flex flex-col gap-1 pb-2">
                 <div className="flex items-center gap-4">
-                  <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl">
-                    <Icon icon="lucide:user" className="text-white text-xl" />
+                  <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+                    <Icon icon="lucide:user" className="text-foreground text-xl" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-900">Employee Details</h3>
-                    <p className="text-sm text-gray-500">Complete employee information</p>
+                    <h3 className="text-xl font-bold text-foreground">Employee Details</h3>
+                    <p className="text-sm text-default-500">Complete employee information</p>
                   </div>
                 </div>
                   </ModalHeader>
@@ -674,7 +662,7 @@ const OrganizationChartPage: React.FC = () => {
                     {selectedEmployee && (
                   <div className="space-y-6">
                     {/* Employee Header */}
-                    <div className="flex items-center gap-6 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
+                    <div className="flex items-center gap-6 p-6 bg-gradient-to-r from-primary-50 to-purple-50 rounded-2xl">
                           <Avatar 
                         src={getAvatarUrl(selectedEmployee)}
                         name={`${selectedEmployee.first_name} ${selectedEmployee.last_name}`}
@@ -682,11 +670,11 @@ const OrganizationChartPage: React.FC = () => {
                         className="ring-4 ring-white shadow-lg"
                       />
                       <div>
-                        <h4 className="text-2xl font-bold text-gray-900">
+                        <h4 className="text-2xl font-bold text-foreground">
                           {selectedEmployee.first_name} {selectedEmployee.last_name}
                         </h4>
-                        <p className="text-lg text-blue-600 font-semibold">{selectedEmployee.designation_name || 'No Designation'}</p>
-                        <p className="text-sm text-gray-500">{selectedEmployee.department_name || 'No Department'}</p>
+                        <p className="text-lg text-primary-600 font-semibold">{selectedEmployee.designation_name || 'No Designation'}</p>
+                        <p className="text-sm text-default-500">{selectedEmployee.department_name || 'No Department'}</p>
                       </div>
                     </div>
                     
@@ -694,21 +682,21 @@ const OrganizationChartPage: React.FC = () => {
                     <div className="grid grid-cols-2 gap-8">
                       <div className="space-y-6">
                         <div>
-                          <span className="text-gray-500 text-sm font-medium">Email Address</span>
-                          <p className="font-semibold text-gray-900">{selectedEmployee.email}</p>
+                          <span className="text-default-500 text-sm font-medium">Email Address</span>
+                          <p className="font-semibold text-foreground">{selectedEmployee.email}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500 text-sm font-medium">Phone Number</span>
-                          <p className="font-semibold text-gray-900">{selectedEmployee.phone || 'N/A'}</p>
+                          <span className="text-default-500 text-sm font-medium">Phone Number</span>
+                          <p className="font-semibold text-foreground">{selectedEmployee.phone || 'N/A'}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500 text-sm font-medium">Join Date</span>
-                          <p className="font-semibold text-gray-900">
+                          <span className="text-default-500 text-sm font-medium">Join Date</span>
+                          <p className="font-semibold text-foreground">
                             {selectedEmployee.joining_date ? new Date(selectedEmployee.joining_date).toLocaleDateString() : 'N/A'}
                           </p>
                         </div>
                         <div>
-                          <span className="text-gray-500 text-sm font-medium">Status</span>
+                          <span className="text-default-500 text-sm font-medium">Status</span>
                           <Chip
                             size="md"
                             color={getStatusColor(selectedEmployee.status)}
@@ -721,16 +709,16 @@ const OrganizationChartPage: React.FC = () => {
                       </div>
                       <div className="space-y-6">
                         <div>
-                          <span className="text-gray-500 text-sm font-medium">Manager</span>
-                          <p className="font-semibold text-gray-900">{selectedEmployee.manager_name || 'N/A'}</p>
+                          <span className="text-default-500 text-sm font-medium">Manager</span>
+                          <p className="font-semibold text-foreground">{selectedEmployee.manager_name || 'N/A'}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500 text-sm font-medium">Shift</span>
-                          <p className="font-semibold text-gray-900">{selectedEmployee.shift_name || 'N/A'}</p>
+                          <span className="text-default-500 text-sm font-medium">Shift</span>
+                          <p className="font-semibold text-foreground">{selectedEmployee.shift_name || 'N/A'}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500 text-sm font-medium">Employee ID</span>
-                          <p className="font-semibold text-gray-900">EMP{selectedEmployee.id.toString().padStart(3, '0')}</p>
+                          <span className="text-default-500 text-sm font-medium">Employee ID</span>
+                          <p className="font-semibold text-foreground">EMP{selectedEmployee.id.toString().padStart(3, '0')}</p>
                         </div>
                       </div>
                     </div>
@@ -746,7 +734,7 @@ const OrganizationChartPage: React.FC = () => {
               )}
             </ModalContent>
           </Modal>
-    </div>
+    </PageLayout>
       );
 };
 

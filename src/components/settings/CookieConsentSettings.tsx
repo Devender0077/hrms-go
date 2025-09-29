@@ -91,50 +91,50 @@ export default function CookieConsentSettings({ settings, onSettingsChange }: Co
           </div>
           
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Enable cookie consent banner</span>
-                <span className="text-xs text-gray-500">Show cookie consent banner to users</span>
+                <span className="text-sm font-medium text-foreground">Enable cookie consent banner</span>
+                <span className="text-xs text-default-500">Show cookie consent banner to users</span>
               </div>
               <Switch
                 isSelected={settings.enabled}
                 onValueChange={(value) => onSettingsChange("enabled", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Show decline button</span>
-                <span className="text-xs text-gray-500">Display decline option for users</span>
+                <span className="text-sm font-medium text-foreground">Show decline button</span>
+                <span className="text-xs text-default-500">Display decline option for users</span>
               </div>
               <Switch
                 isSelected={settings.showDeclineButton}
                 onValueChange={(value) => onSettingsChange("showDeclineButton", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Show learn more button</span>
-                <span className="text-xs text-gray-500">Display learn more link for detailed information</span>
+                <span className="text-sm font-medium text-foreground">Show learn more button</span>
+                <span className="text-xs text-default-500">Display learn more link for detailed information</span>
               </div>
               <Switch
                 isSelected={settings.showLearnMoreButton}
                 onValueChange={(value) => onSettingsChange("showLearnMoreButton", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Auto accept cookies</span>
-                <span className="text-xs text-gray-500">Automatically accept cookies after delay</span>
+                <span className="text-sm font-medium text-foreground">Auto accept cookies</span>
+                <span className="text-xs text-default-500">Automatically accept cookies after delay</span>
               </div>
               <Switch
                 isSelected={settings.autoAccept}
                 onValueChange={(value) => onSettingsChange("autoAccept", value)}
               />
             </div>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-gray-900">Remember user choice</span>
-                <span className="text-xs text-gray-500">Remember user's cookie preferences</span>
+                <span className="text-sm font-medium text-foreground">Remember user choice</span>
+                <span className="text-xs text-default-500">Remember user's cookie preferences</span>
               </div>
               <Switch
                 isSelected={settings.rememberChoice}
@@ -222,19 +222,19 @@ export default function CookieConsentSettings({ settings, onSettingsChange }: Co
           {cookieTypes.map((type) => (
             <div key={type.key}>
               <h4 className="text-md font-medium mb-2">{type.label}</h4>
-              <p className="text-sm text-gray-600 mb-4">{type.description}</p>
+              <p className="text-sm text-default-600 mb-4">{type.description}</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {settings[`${type.key}Cookies` as keyof typeof settings]?.map((cookie: string) => (
-                  <div key={cookie} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div key={cookie} className="flex items-center justify-between p-3 bg-content1 rounded-lg">
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-900">{cookie}</span>
-                      <span className="text-xs text-gray-500">Enable {cookie.toLowerCase()} cookie</span>
+                      <span className="text-sm font-medium text-foreground">{cookie}</span>
+                      <span className="text-xs text-default-500">Enable {cookie.toLowerCase()} cookie</span>
                     </div>
                     <input
                       type="checkbox"
                       checked={true}
                       onChange={() => handleCookieTypeChange(type.key, cookie)}
-                      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                      className="w-4 h-4 text-primary-600 bg-content2 border-divider rounded focus:ring-primary-500 focus:ring-2"
                     />
                   </div>
                 ))}

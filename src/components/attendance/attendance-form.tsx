@@ -182,14 +182,14 @@ import React from "react";
             
             <div className="flex justify-end gap-2 pt-4">
               <Button
-                variant="flat"
+                variant="solid"
                 onPress={onCancel}
                 className="rounded-lg"
               >
                 Cancel
               </Button>
               <Button
-                color="primary"
+                color="primary" variant="solid"
                 type="submit"
                 isLoading={isLoading}
                 className="rounded-lg"

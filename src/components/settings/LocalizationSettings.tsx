@@ -31,7 +31,7 @@ export default function LocalizationSettings({ settings, onSettingsChange }: Loc
         </div>
         <div>
           <h2 className="text-xl font-semibold">Localization Settings</h2>
-          <p className="text-gray-600">Configure language, timezone, and regional preferences</p>
+          <p className="text-default-600">Configure language, timezone, and regional preferences</p>
         </div>
       </div>
       

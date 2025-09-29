@@ -15,32 +15,32 @@ const EmployeeStats: React.FC<EmployeeStatsProps> = ({ stats }) => {
       value: stats.total,
       icon: "lucide:users",
       color: "blue",
-      bgColor: "bg-blue-100",
-      textColor: "text-blue-600"
+      bgColor: "bg-primary-100",
+      textColor: "text-primary-600"
     },
     {
       title: "Active",
       value: stats.active,
       icon: "lucide:user-check",
       color: "green",
-      bgColor: "bg-green-100",
-      textColor: "text-green-600"
+      bgColor: "bg-success-100",
+      textColor: "text-success-600"
     },
     {
       title: "On Leave",
       value: stats.onLeave,
       icon: "lucide:user-x",
       color: "yellow",
-      bgColor: "bg-yellow-100",
-      textColor: "text-yellow-600"
+      bgColor: "bg-warning-100",
+      textColor: "text-warning-600"
     },
     {
       title: "Departments",
       value: stats.departments,
       icon: "lucide:building",
       color: "purple",
-      bgColor: "bg-purple-100",
-      textColor: "text-purple-600"
+      bgColor: "bg-secondary-100",
+      textColor: "text-secondary-600"
     }
   ];
 
@@ -59,7 +59,7 @@ const EmployeeStats: React.FC<EmployeeStatsProps> = ({ stats }) => {
             <CardBody className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">{stat.title}</p>
+                  <p className="text-sm text-default-600">{stat.title}</p>
                   <p className={`text-2xl font-bold ${stat.textColor}`}>
                     {stat.value}
                   </p>

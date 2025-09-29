@@ -28,7 +28,7 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
-import { PageLayout, PageHeader } from "../components/layout/PageLayout";
+import PageLayout, { PageHeader } from "../components/layout/PageLayout";
 import { useAuth } from "../contexts/auth-context";
 import { useTaskContext } from "../contexts/task-context";
 import Papa from "papaparse";
@@ -306,7 +306,7 @@ export default function TasksPage() {
         title="Tasks"
         description="Manage and track your tasks"
         icon="lucide:check-square"
-        iconColor="from-green-500 to-blue-600"
+        iconColor="from-primary-500 to-secondary-500"
         actions={
           <>
             <Button 
@@ -335,7 +335,7 @@ export default function TasksPage() {
                 placeholder="Search tasks..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                startContent={<Icon icon="lucide:search" className="text-gray-400" />}
+                startContent={<Icon icon="lucide:search" className="text-default-400" />}
                 className="lg:col-span-2"
               />
               <Select
@@ -389,15 +389,15 @@ export default function TasksPage() {
                 tabList: "gap-6 w-full relative rounded-none p-0 border-b border-divider",
                 cursor: "w-full bg-primary",
                 tab: "max-w-fit px-6 h-12",
-                tabContent: "group-data-[selected=true]:text-white text-gray-800 font-medium"
+                tabContent: "group-data-[selected=true]:text-foreground text-foreground font-medium"
               }}
             >
               <Tab
                 key="all"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span className="text-gray-800 font-medium">All Tasks</span>
-                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                    <span className="text-foreground font-medium">All Tasks</span>
+                    <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-1 rounded-full">
                       {taskCounts.all}
                     </span>
                   </div>
@@ -407,8 +407,8 @@ export default function TasksPage() {
                 key="pending"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span className="text-gray-800 font-medium">Pending</span>
-                    <span className="bg-gray-100 text-gray-800 text-xs font-medium px-2 py-1 rounded-full">
+                    <span className="text-foreground font-medium">Pending</span>
+                    <span className="bg-content2 text-foreground text-xs font-medium px-2 py-1 rounded-full">
                       {taskCounts.pending}
                     </span>
                   </div>
@@ -418,8 +418,8 @@ export default function TasksPage() {
                 key="in_progress"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span className="text-gray-800 font-medium">In Progress</span>
-                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded-full">
+                    <span className="text-foreground font-medium">In Progress</span>
+                    <span className="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-1 rounded-full">
                       {taskCounts.in_progress}
                     </span>
                   </div>
@@ -429,8 +429,8 @@ export default function TasksPage() {
                 key="completed"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span className="text-gray-800 font-medium">Completed</span>
-                    <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded-full">
+                    <span className="text-foreground font-medium">Completed</span>
+                    <span className="bg-success-100 text-success-800 text-xs font-medium px-2 py-1 rounded-full">
                       {taskCounts.completed}
                     </span>
                   </div>
@@ -440,8 +440,8 @@ export default function TasksPage() {
                 key="cancelled"
                 title={
                   <div className="flex items-center space-x-2">
-                    <span className="text-gray-800 font-medium">Cancelled</span>
-                    <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded-full">
+                    <span className="text-foreground font-medium">Cancelled</span>
+                    <span className="bg-danger-100 text-danger-800 text-xs font-medium px-2 py-1 rounded-full">
                       {taskCounts.cancelled}
                     </span>
                   </div>
@@ -464,7 +464,7 @@ export default function TasksPage() {
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between w-full">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{task.title}</h3>
+                      <h3 className="text-lg font-semibold text-foreground mb-2">{task.title}</h3>
                       <div className="flex items-center gap-2 mb-2">
                         <Chip
                           size="sm"
@@ -511,12 +511,12 @@ export default function TasksPage() {
                   </div>
                 </CardHeader>
                 <CardBody className="pt-0">
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">{task.description}</p>
+                  <p className="text-default-600 text-sm mb-4 line-clamp-2">{task.description}</p>
                   
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500">Progress</span>
-                      <span className="text-sm font-medium text-gray-900">{task.progress}%</span>
+                      <span className="text-sm text-default-500">Progress</span>
+                      <span className="text-sm font-medium text-foreground">{task.progress}%</span>
                     </div>
                     <Progress
                       value={task.progress}
@@ -524,7 +524,7 @@ export default function TasksPage() {
                       className="h-2"
                     />
                     
-                    <div className="flex items-center justify-between text-sm text-gray-500">
+                    <div className="flex items-center justify-between text-sm text-default-500">
                       <div className="flex items-center gap-1">
                         <Icon icon="lucide:user" className="w-4 h-4" />
                         <span>{task.assignee}</span>
@@ -575,9 +575,9 @@ export default function TasksPage() {
         {filteredTasks.length === 0 && (
           <Card className="border-0 shadow-sm">
             <CardBody className="text-center py-12">
-              <Icon icon="lucide:check-square" className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No tasks found</h3>
-              <p className="text-gray-500 mb-4">Try adjusting your filters or create a new task.</p>
+              <Icon icon="lucide:check-square" className="w-16 h-16 text-default-300 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">No tasks found</h3>
+              <p className="text-default-500 mb-4">Try adjusting your filters or create a new task.</p>
               <Button color="primary" onPress={onOpen}>
                 Create Task
               </Button>
@@ -592,10 +592,10 @@ export default function TasksPage() {
               <>
                 <ModalHeader className="flex flex-col gap-1">
                   <div className="flex items-center gap-3">
-                    <Icon icon={editingTask ? "lucide:edit" : "lucide:plus"} className="text-blue-600 text-xl" />
+                    <Icon icon={editingTask ? "lucide:edit" : "lucide:plus"} className="text-primary-600 text-xl" />
                     <div>
                       <h3 className="text-lg font-semibold">{editingTask ? 'Edit Task' : 'Add New Task'}</h3>
-                      <p className="text-sm text-gray-500">{editingTask ? 'Update task details' : 'Create a new task for your team'}</p>
+                      <p className="text-sm text-default-500">{editingTask ? 'Update task details' : 'Create a new task for your team'}</p>
                     </div>
                   </div>
                 </ModalHeader>

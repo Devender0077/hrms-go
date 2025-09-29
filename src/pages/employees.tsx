@@ -113,10 +113,10 @@ export default function EmployeesPage() {
   // Loading state
   if (loading || !Array.isArray(employees)) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" />
-          <p className="text-gray-600 mt-4">Loading employees...</p>
+          <p className="text-default-600 mt-4">Loading employees...</p>
         </div>
       </div>
     );
@@ -125,11 +125,11 @@ export default function EmployeesPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50/50 flex items-center justify-center">
+      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
-          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Employees</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-danger mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-foreground mb-2">Error Loading Employees</h2>
+          <p className="text-default-600 mb-4">{error}</p>
           <Button color="primary" onPress={() => window.location.reload()}>
             Try Again
           </Button>
@@ -139,17 +139,17 @@ export default function EmployeesPage() {
   }
       
       return (
-    <div className="min-h-screen bg-gray-50/50 p-6">
+    <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
           {/* Page Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl">
-              <Icon icon="lucide:users" className="text-white text-2xl" />
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:users" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Employee Management</h1>
-              <p className="text-gray-600 mt-1">Manage your organization's employees</p>
+              <h1 className="text-3xl font-bold text-foreground">Employee Management</h1>
+              <p className="text-default-600 mt-1">Manage your organization's employees</p>
             </div>
           </div>
           <div className="flex gap-3">
@@ -201,6 +201,7 @@ export default function EmployeesPage() {
           isViewOpen={isViewOpen}
           onViewOpenChange={onViewOpenChange}
           selectedEmployee={selectedEmployee}
+          employees={employees}
           branches={branches}
           departments={departments}
           designations={designations}
