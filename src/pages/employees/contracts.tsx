@@ -28,7 +28,6 @@ import {
   Spinner
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import PageLayout, { PageHeader } from '../../components/layout/PageLayout';
 import { apiRequest } from '../../services/api-service';
 
 interface EmployeeContract {
@@ -78,7 +77,7 @@ const EmployeeContractsPage: React.FC = () => {
   const fetchContracts = async () => {
     try {
       setLoading(true);
-      const response = await apiRequest('GET', '/api/v1/employees/contracts');
+      const response = await apiRequest('/employees/contracts', { method: 'GET' });
       if (response.success) {
         setContracts(response.data || []);
       }
@@ -91,7 +90,7 @@ const EmployeeContractsPage: React.FC = () => {
 
   const fetchEmployees = async () => {
     try {
-      const response = await apiRequest('GET', '/api/v1/employees');
+      const response = await apiRequest('/employees', { method: 'GET' });
       if (response.success) {
         setEmployees(response.data || []);
       }
@@ -143,11 +142,11 @@ const EmployeeContractsPage: React.FC = () => {
       };
 
       const url = editingContract 
-        ? `/api/v1/employees/contracts/${editingContract.id}`
-        : '/api/v1/employees/contracts';
+        ? `/employees/contracts/${editingContract.id}`
+        : '/employees/contracts';
       const method = editingContract ? 'PUT' : 'POST';
       
-      const response = await apiRequest(method, url, contractData);
+      const response = await apiRequest(url, { method, body: contractData });
       if (response.success) {
         await fetchContracts();
         onClose();
@@ -162,7 +161,7 @@ const EmployeeContractsPage: React.FC = () => {
   const handleDeleteContract = async (contractId: number) => {
     if (window.confirm('Are you sure you want to delete this contract?')) {
       try {
-        const response = await apiRequest('DELETE', `/api/v1/employees/contracts/${contractId}`);
+        const response = await apiRequest(`/employees/contracts/${contractId}`, { method: 'DELETE' });
         if (response.success) {
           await fetchContracts();
         }
@@ -182,8 +181,8 @@ const EmployeeContractsPage: React.FC = () => {
     }
   };
 
-  const getContractTypeColor = (type: string) => {
-    const colors: { [key: string]: string } = {
+  const getContractTypeColor = (type: string): "default" | "success" | "danger" | "warning" | "primary" | "secondary" => {
+    const colors: { [key: string]: "default" | "success" | "danger" | "warning" | "primary" | "secondary" } = {
       'permanent': 'success',
       'contract': 'primary',
       'temporary': 'warning',
@@ -240,90 +239,108 @@ const EmployeeContractsPage: React.FC = () => {
   }
 
   return (
-    <PageLayout>
-      <PageHeader
-        title="Employee Contracts"
-        description="Manage employee employment contracts"
-        icon="lucide:file-text"
-        actions={
-          <Button
-            color="primary"
-            startContent={<Icon icon="lucide:plus" />}
-            onPress={handleCreateContract}
-          >
-            Add Contract
-          </Button>
-        }
-      />
+    <div className="min-h-screen bg-content2 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Page Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
+              <Icon icon="lucide:file-text" className="text-foreground text-2xl" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Employee Contracts</h1>
+              <p className="text-default-600 mt-1">Manage employee employment contracts</p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <Button 
+              color="primary" 
+              variant="flat"
+              startContent={<Icon icon="lucide:plus" />} 
+              onPress={handleCreateContract}
+              className="font-medium"
+            >
+              Add Contract
+            </Button>
+          </div>
+        </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <Card>
-          <CardBody>
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-primary-100 rounded-lg">
-                <Icon icon="lucide:file-text" className="w-6 h-6 text-primary-600" />
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 border-primary-200 dark:border-primary-700">
+            <CardBody className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-primary-600 dark:text-primary-400">Total Contracts</p>
+                  <p className="text-2xl font-bold text-primary-900 dark:text-primary-100">{contracts.length}</p>
+                </div>
+                <div className="p-3 bg-primary-500 rounded-xl">
+                  <Icon icon="lucide:file-text" className="w-6 h-6 text-white" />
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-default-600">Total Contracts</p>
-                <p className="text-xl font-semibold">{contracts.length}</p>
+            </CardBody>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-success-50 to-success-100 dark:from-success-900/20 dark:to-success-800/20 border-success-200 dark:border-success-700">
+            <CardBody className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-success-600 dark:text-success-400">Active Contracts</p>
+                  <p className="text-2xl font-bold text-success-900 dark:text-success-100">
+                    {contracts.filter(c => c.status === 'active').length}
+                  </p>
+                </div>
+                <div className="p-3 bg-success-500 rounded-xl">
+                  <Icon icon="lucide:check-circle" className="w-6 h-6 text-white" />
+                </div>
               </div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-success-100 rounded-lg">
-                <Icon icon="lucide:file-text" className="w-6 h-6 text-success-600" />
+            </CardBody>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-warning-50 to-warning-100 dark:from-warning-900/20 dark:to-warning-800/20 border-warning-200 dark:border-warning-700">
+            <CardBody className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-warning-600 dark:text-warning-400">Expiring Soon</p>
+                  <p className="text-2xl font-bold text-warning-900 dark:text-warning-100">
+                    {contracts.filter(c => isContractExpiring(c.end_date || '')).length}
+                  </p>
+                </div>
+                <div className="p-3 bg-warning-500 rounded-xl">
+                  <Icon icon="lucide:calendar" className="w-6 h-6 text-white" />
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-default-600">Active Contracts</p>
-                <p className="text-xl font-semibold">
-                  {contracts.filter(c => c.status === 'active').length}
-                </p>
+            </CardBody>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-danger-50 to-danger-100 dark:from-danger-900/20 dark:to-danger-800/20 border-danger-200 dark:border-danger-700">
+            <CardBody className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-danger-600 dark:text-danger-400">Expired</p>
+                  <p className="text-2xl font-bold text-danger-900 dark:text-danger-100">
+                    {contracts.filter(c => isContractExpired(c.end_date || '')).length}
+                  </p>
+                </div>
+                <div className="p-3 bg-danger-500 rounded-xl">
+                  <Icon icon="lucide:alert-circle" className="w-6 h-6 text-white" />
+                </div>
               </div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-warning-100 rounded-lg">
-                <Icon icon="lucide:calendar" className="w-6 h-6 text-warning-600" />
-              </div>
-              <div>
-                <p className="text-sm text-default-600">Expiring Soon</p>
-                <p className="text-xl font-semibold">
-                  {contracts.filter(c => isContractExpiring(c.end_date || '')).length}
-                </p>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-        <Card>
-          <CardBody>
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-danger-100 rounded-lg">
-                <Icon icon="lucide:file-text" className="w-6 h-6 text-danger-600" />
-              </div>
-              <div>
-                <p className="text-sm text-default-600">Expired</p>
-                <p className="text-xl font-semibold">
-                  {contracts.filter(c => isContractExpired(c.end_date || '')).length}
-                </p>
-              </div>
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+            </CardBody>
+          </Card>
+        </div>
 
-      {/* Contracts Table */}
-      <Card>
-        <CardHeader>
-          <h2 className="text-lg font-semibold">Contracts ({contracts.length})</h2>
-        </CardHeader>
-        <CardBody>
+        {/* Contracts Table */}
+        <Card className="shadow-lg">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-foreground">Employee Contracts</h2>
+                <p className="text-sm text-default-600 mt-1">{contracts.length} total contracts</p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardBody className="pt-0">
           <Table aria-label="Contracts table">
             <TableHeader>
               <TableColumn>EMPLOYEE</TableColumn>
@@ -441,7 +458,7 @@ const EmployeeContractsPage: React.FC = () => {
                 isRequired
               >
                 {employees.map((employee) => (
-                  <SelectItem key={employee.id.toString()} value={employee.id.toString()}>
+                  <SelectItem key={employee.id.toString()}>
                     {employee.first_name} {employee.last_name} ({employee.employee_id})
                   </SelectItem>
                 ))}
@@ -458,7 +475,7 @@ const EmployeeContractsPage: React.FC = () => {
                 isRequired
               >
                 {contractTypes.map((type) => (
-                  <SelectItem key={type.key} value={type.key}>
+                  <SelectItem key={type.key}>
                     {type.label}
                   </SelectItem>
                 ))}
@@ -502,7 +519,7 @@ const EmployeeContractsPage: React.FC = () => {
                 isRequired
               >
                 {statusOptions.map((status) => (
-                  <SelectItem key={status.key} value={status.key}>
+                  <SelectItem key={status.key}>
                     {status.label}
                   </SelectItem>
                 ))}
@@ -531,7 +548,8 @@ const EmployeeContractsPage: React.FC = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </PageLayout>
+      </div>
+    </div>
   );
 };
 

@@ -606,9 +606,23 @@
         
         const [contracts] = await pool.query(query);
         
+        // Map contract types back to frontend format
+        const contractTypeMap = {
+          'full_time': 'permanent',
+          'contract': 'contract',
+          'part_time': 'temporary',
+          'internship': 'intern'
+        };
+        
+        const mappedContracts = contracts.map(contract => ({
+          ...contract,
+          contract_type: contractTypeMap[contract.contract_type] || contract.contract_type,
+          terms: '' // Add empty terms field for frontend compatibility
+        }));
+        
         res.json({
           success: true,
-          data: contracts
+          data: mappedContracts
         });
       } catch (error) {
         console.error('Error fetching employee contracts:', error);
@@ -618,22 +632,32 @@
 
     app.post('/api/v1/employees/contracts', authenticateToken, async (req, res) => {
       try {
-        const { employee_id, contract_type, start_date, end_date, salary, status, terms } = req.body;
+        const { employee_id, contract_type, start_date, end_date, salary, status } = req.body;
         
-        if (!employee_id || !contract_type || !start_date || !salary) {
+        if (!employee_id || !contract_type || !start_date) {
           return res.status(400).json({ message: 'Missing required fields' });
         }
         
+        // Map contract types to match database enum
+        const contractTypeMap = {
+          'permanent': 'full_time',
+          'contract': 'contract',
+          'temporary': 'part_time',
+          'intern': 'internship',
+          'consultant': 'contract'
+        };
+        
+        const mappedContractType = contractTypeMap[contract_type] || 'full_time';
+        
         const query = `
           INSERT INTO employee_contracts (
-            employee_id, contract_type, start_date, end_date, salary,
-            status, terms, created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+            employee_id, contract_type, start_date, end_date, salary, status
+          ) VALUES (?, ?, ?, ?, ?, ?)
         `;
         
         const [result] = await pool.query(query, [
-          employee_id, contract_type, start_date, end_date, salary,
-          status || 'active', terms || ''
+          employee_id, mappedContractType, start_date, end_date, salary || null,
+          status || 'active'
         ]);
         
         res.status(201).json({
@@ -643,6 +667,73 @@
         });
       } catch (error) {
         console.error('Error creating contract:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.put('/api/v1/employees/contracts/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { employee_id, contract_type, start_date, end_date, salary, status } = req.body;
+        
+        if (!employee_id || !contract_type || !start_date) {
+          return res.status(400).json({ message: 'Missing required fields' });
+        }
+        
+        // Map contract types to match database enum
+        const contractTypeMap = {
+          'permanent': 'full_time',
+          'contract': 'contract',
+          'temporary': 'part_time',
+          'intern': 'internship',
+          'consultant': 'contract'
+        };
+        
+        const mappedContractType = contractTypeMap[contract_type] || 'full_time';
+        
+        const query = `
+          UPDATE employee_contracts 
+          SET employee_id = ?, contract_type = ?, start_date = ?, end_date = ?, 
+              salary = ?, status = ?
+          WHERE id = ?
+        `;
+        
+        const [result] = await pool.query(query, [
+          employee_id, mappedContractType, start_date, end_date, salary || null,
+          status || 'active', id
+        ]);
+        
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'Contract not found' });
+        }
+        
+        res.json({
+          success: true,
+          message: 'Contract updated successfully'
+        });
+      } catch (error) {
+        console.error('Error updating contract:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.delete('/api/v1/employees/contracts/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        
+        const query = 'DELETE FROM employee_contracts WHERE id = ?';
+        const [result] = await pool.query(query, [id]);
+        
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ message: 'Contract not found' });
+        }
+        
+        res.json({
+          success: true,
+          message: 'Contract deleted successfully'
+        });
+      } catch (error) {
+        console.error('Error deleting contract:', error);
         res.status(500).json({ message: 'Server error' });
       }
     });
@@ -4768,6 +4859,106 @@
           console.log('✅ Created employee_salary_components table');
         } catch (error) {
           console.log(`❌ Error creating employee_salary_components table: ${error.message}`);
+        }
+        
+        // Create employee_contracts table
+        try {
+          await pool.query(`
+            CREATE TABLE IF NOT EXISTS employee_contracts (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              employee_id INT NOT NULL,
+              contract_type ENUM('permanent', 'contract', 'temporary', 'intern', 'consultant') NOT NULL,
+              start_date DATE NOT NULL,
+              end_date DATE NULL,
+              salary DECIMAL(10,2) NOT NULL,
+              status ENUM('active', 'expired', 'terminated', 'pending') DEFAULT 'active',
+              terms TEXT,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+              FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+            )
+          `);
+          console.log('✅ Created employee_contracts table');
+        } catch (error) {
+          console.log(`❌ Error creating employee_contracts table: ${error.message}`);
+        }
+        
+        // Add demo data for employee contracts
+        try {
+          const [existingContracts] = await pool.query('SELECT COUNT(*) as count FROM employee_contracts');
+          if (existingContracts[0].count === 0) {
+            // Get existing employees first
+            const [employees] = await pool.query('SELECT id FROM employees ORDER BY id LIMIT 5');
+            
+            const demoContracts = [
+              {
+                employee_id: employees[0]?.id || 20,
+                contract_type: 'permanent',
+                start_date: '2023-01-15',
+                end_date: null,
+                salary: 75000.00,
+                status: 'active',
+                terms: 'Full-time permanent employment with standard benefits package including health insurance, paid time off, and retirement contributions.'
+              },
+              {
+                employee_id: employees[1]?.id || 19,
+                contract_type: 'contract',
+                start_date: '2023-06-01',
+                end_date: '2024-05-31',
+                salary: 65000.00,
+                status: 'active',
+                terms: '12-month contract position with possibility of extension. Includes health insurance and paid time off.'
+              },
+              {
+                employee_id: employees[2]?.id || 18,
+                contract_type: 'permanent',
+                start_date: '2022-09-01',
+                end_date: null,
+                salary: 85000.00,
+                status: 'active',
+                terms: 'Full-time permanent employment with comprehensive benefits including health, dental, vision insurance, and 401k matching.'
+              },
+              {
+                employee_id: employees[3]?.id || 17,
+                contract_type: 'temporary',
+                start_date: '2024-01-01',
+                end_date: '2024-12-31',
+                salary: 45000.00,
+                status: 'active',
+                terms: 'Temporary position for project duration. Includes basic health insurance coverage.'
+              },
+              {
+                employee_id: employees[4]?.id || 16,
+                contract_type: 'intern',
+                start_date: '2024-06-01',
+                end_date: '2024-08-31',
+                salary: 3000.00,
+                status: 'active',
+                terms: 'Summer internship program with learning opportunities and mentorship.'
+              }
+            ];
+            
+            for (const contract of demoContracts) {
+              await pool.query(`
+                INSERT INTO employee_contracts (
+                  employee_id, contract_type, start_date, end_date, salary, status, terms
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+              `, [
+                contract.employee_id,
+                contract.contract_type,
+                contract.start_date,
+                contract.end_date,
+                contract.salary,
+                contract.status,
+                contract.terms
+              ]);
+            }
+            console.log('✅ Added demo data for employee contracts');
+          } else {
+            console.log('ℹ️ Employee contracts demo data already exists');
+          }
+        } catch (error) {
+          console.log(`❌ Error adding employee contracts demo data: ${error.message}`);
         }
         
         // Add missing columns to user_permissions table if they don't exist
