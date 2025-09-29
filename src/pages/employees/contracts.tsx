@@ -40,6 +40,7 @@ interface EmployeeContract {
   status: string;
   terms: string;
   created_at: string;
+  updated_at: string;
   employee_name?: string;
   employee_id_string?: string;
 }
@@ -57,6 +58,7 @@ const EmployeeContractsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingContract, setEditingContract] = useState<EmployeeContract | null>(null);
+  const [viewingContract, setViewingContract] = useState<EmployeeContract | null>(null);
   const [formData, setFormData] = useState({
     employee_id: '',
     contract_type: '',
@@ -68,6 +70,7 @@ const EmployeeContractsPage: React.FC = () => {
   });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen: isViewOpen, onOpen: onViewOpen, onClose: onViewClose } = useDisclosure();
 
   useEffect(() => {
     fetchContracts();
@@ -111,6 +114,11 @@ const EmployeeContractsPage: React.FC = () => {
       terms: ''
     });
     onOpen();
+  };
+
+  const handleViewContract = (contract: EmployeeContract) => {
+    setViewingContract(contract);
+    onViewOpen();
   };
 
   const handleEditContract = (contract: EmployeeContract) => {
@@ -414,6 +422,13 @@ const EmployeeContractsPage: React.FC = () => {
                       </DropdownTrigger>
                       <DropdownMenu>
                         <DropdownItem
+                          key="view"
+                          startContent={<Icon icon="lucide:eye" />}
+                          onPress={() => handleViewContract(contract)}
+                        >
+                          View
+                        </DropdownItem>
+                        <DropdownItem
                           key="edit"
                           startContent={<Icon icon="lucide:pencil" />}
                           onPress={() => handleEditContract(contract)}
@@ -544,6 +559,112 @@ const EmployeeContractsPage: React.FC = () => {
               isLoading={saving}
             >
               {editingContract ? 'Update' : 'Create'}
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* View Contract Modal */}
+      <Modal isOpen={isViewOpen} onClose={onViewClose} size="2xl">
+        <ModalContent>
+          <ModalHeader>
+            Contract Details
+          </ModalHeader>
+          <ModalBody>
+            {viewingContract && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-default-600">Employee</label>
+                    <p className="text-lg font-semibold">
+                      {viewingContract.employee_name || `Employee ${viewingContract.employee_id}`}
+                    </p>
+                    {viewingContract.employee_id_string && (
+                      <p className="text-sm text-default-500">ID: {viewingContract.employee_id_string}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-default-600">Contract Type</label>
+                    <div className="mt-1">
+                      <Chip
+                        color={getContractTypeColor(viewingContract.contract_type)}
+                        size="sm"
+                        variant="flat"
+                      >
+                        {contractTypes.find(t => t.key === viewingContract.contract_type)?.label || viewingContract.contract_type}
+                      </Chip>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-default-600">Start Date</label>
+                    <p className="text-lg">{new Date(viewingContract.start_date).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-default-600">End Date</label>
+                    <p className="text-lg">
+                      {viewingContract.end_date ? new Date(viewingContract.end_date).toLocaleDateString() : 'No end date'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-default-600">Salary</label>
+                    <p className="text-lg font-semibold text-primary-600">
+                      {formatCurrency(viewingContract.salary)}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-default-600">Status</label>
+                    <div className="mt-1">
+                      <Chip
+                        color={getStatusColor(viewingContract.status)}
+                        size="sm"
+                        variant="flat"
+                      >
+                        {viewingContract.status}
+                      </Chip>
+                    </div>
+                  </div>
+                </div>
+
+                {viewingContract.terms && (
+                  <div>
+                    <label className="text-sm font-medium text-default-600">Terms & Conditions</label>
+                    <div className="mt-2 p-4 bg-default-50 rounded-lg">
+                      <p className="text-sm whitespace-pre-wrap">{viewingContract.terms}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-default-600">Created</label>
+                    <p className="text-sm">{new Date(viewingContract.created_at).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-default-600">Last Updated</label>
+                    <p className="text-sm">{new Date(viewingContract.updated_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={onViewClose}>
+              Close
+            </Button>
+            <Button
+              color="primary"
+              onPress={() => {
+                onViewClose();
+                handleEditContract(viewingContract!);
+              }}
+            >
+              Edit Contract
             </Button>
           </ModalFooter>
         </ModalContent>
