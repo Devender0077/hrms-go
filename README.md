@@ -1,26 +1,30 @@
 # 🏢 HRMS GO - Human Resource Management System
 
-A comprehensive, modern Human Resource Management System built with React, TypeScript, and HeroUI. This system provides complete HR functionality from employee onboarding to performance management.
+A comprehensive, modern Human Resource Management System built with React, TypeScript, and HeroUI. This system provides complete HR functionality from employee onboarding to performance management with a clean, production-ready codebase.
 
 ## ✨ Features
 
 ### 🎯 Core HR Management
-- **Employee Management** - Complete employee lifecycle management
+- **Employee Management** - Complete employee lifecycle management with reporting hierarchy
 - **Department & Designation Management** - Organizational structure management
 - **Branch Management** - Multi-location support
-- **User Management** - Role-based access control
-- **Organization Chart** - Interactive organizational hierarchy
+- **User Management** - Role-based access control with granular permissions
+- **Organization Chart** - Interactive organizational hierarchy with modern UI components
 
 ### ⏰ Time & Attendance
 - **Attendance Tracking** - Location-based check-in/out with IP tracking
 - **Leave Management** - Comprehensive leave request and approval system
 - **Timesheet Management** - Project-based time tracking
 - **Holiday Management** - Company holiday calendar
+- **Shift Management** - Flexible shift scheduling and assignments
+- **Attendance Policies** - Configurable attendance rules and regulations
 
 ### 💰 Payroll & Finance
 - **Payroll Management** - Complete payroll processing with PDF generation
+- **Salary Components** - Flexible salary component management (earnings, deductions)
+- **Employee Salaries** - Individual salary management with component calculations
+- **Payslips** - Automated payslip generation and distribution
 - **Expense Management** - Employee expense claims and approvals
-- **Salary Management** - Salary components and calculations
 - **Financial Reports** - Income vs Expense, Account statements
 
 ### 🎯 Recruitment
@@ -67,11 +71,18 @@ A comprehensive, modern Human Resource Management System built with React, TypeS
 ### Frontend
 - **React 18** - Modern React with hooks and functional components
 - **TypeScript** - Type-safe development
-- **HeroUI** - Modern UI component library
+- **HeroUI** - Modern UI component library with custom theme
 - **Tailwind CSS** - Utility-first CSS framework
 - **Framer Motion** - Smooth animations and transitions
 - **React Router** - Client-side routing
 - **React Context** - State management
+
+### Backend
+- **Node.js** - Server-side JavaScript runtime
+- **Express.js** - Web application framework
+- **MySQL** - Relational database management
+- **JWT** - JSON Web Token authentication
+- **bcrypt** - Password hashing
 
 ### Development Tools
 - **Vite** - Fast build tool and development server
@@ -85,19 +96,21 @@ A comprehensive, modern Human Resource Management System built with React, TypeS
 - **jsPDF** - PDF generation
 - **html2canvas** - HTML to canvas conversion
 - **Recharts** - Data visualization and charts
+- **React Org Chart** - Organization chart visualization
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js (v16 or higher)
 - npm or yarn package manager
+- MySQL database
 - Git
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/hrms-go.git
+   git clone https://github.com/Devender0077/hrms-go.git
    cd hrms-go
    ```
 
@@ -108,64 +121,99 @@ A comprehensive, modern Human Resource Management System built with React, TypeS
    yarn install
    ```
 
-3. **Start the development server**
+3. **Database Setup**
+   - Create a MySQL database named `hrmgo_hero`
+   - Update database credentials in `src/backend/.env`
+
+4. **Start the backend server**
+   ```bash
+   cd src/backend
+   node server.js
+   ```
+
+5. **Start the frontend development server**
    ```bash
    npm run dev
    # or
    yarn dev
    ```
 
-4. **Open your browser**
+6. **Open your browser**
    Navigate to `http://localhost:5173`
 
 ### Environment Setup
 
-Create a `.env` file in the root directory:
+Create a `.env` file in `src/backend/` directory:
 
 ```env
-VITE_API_BASE_URL=http://localhost:3000/api
-VITE_APP_NAME=HRMS GO
-VITE_APP_VERSION=1.0.0
+# Database Configuration
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=hrmgo_hero
+DB_PORT=3306
+
+# JWT Configuration
+JWT_SECRET=your_jwt_secret_key
+JWT_EXPIRES_IN=24h
+
+# Server Configuration
+PORT=8000
+NODE_ENV=development
 ```
 
 ## 📁 Project Structure
 
 ```
 src/
-├── components/          # Reusable UI components
-│   ├── auth/           # Authentication components
-│   ├── dashboard/      # Dashboard components
-│   ├── settings/       # Settings components
-│   └── sidebar.tsx     # Navigation sidebar
-├── contexts/           # React contexts for state management
+├── backend/              # Backend server and API
+│   ├── server.js         # Main server file
+│   ├── .env              # Environment variables
+│   └── migrations/       # Database migrations
+├── components/           # Reusable UI components
+│   ├── auth/            # Authentication components
+│   ├── dashboard/       # Dashboard components
+│   ├── employees/       # Employee management components
+│   ├── organization/    # Organization components
+│   ├── payroll/         # Payroll components
+│   ├── settings/        # Settings components
+│   └── sidebar.tsx      # Navigation sidebar
+├── contexts/            # React contexts for state management
 │   ├── auth-context.tsx
+│   ├── theme-context.tsx
 │   └── task-context.tsx
-├── database/           # Database schema and migrations
-│   └── schema.sql
-├── layouts/            # Layout components
+├── hooks/               # Custom React hooks
+│   ├── useAssets.ts
+│   ├── useEmployees.ts
+│   ├── usePayroll.ts
+│   └── usePermissions.ts
+├── layouts/             # Layout components
 │   └── dashboard-layout.tsx
-├── pages/              # Page components
-│   ├── auth/           # Authentication pages
-│   ├── organization/   # Organization management
-│   ├── reports/        # Report pages
-│   └── settings/       # Settings pages
-├── services/           # API services and utilities
+├── pages/               # Page components
+│   ├── auth/            # Authentication pages
+│   ├── employees/       # Employee management pages
+│   ├── organization/    # Organization management
+│   ├── payroll/         # Payroll management
+│   ├── reports/         # Report pages
+│   └── settings/        # Settings pages
+├── services/            # API services and utilities
 │   ├── api-service.ts
-│   ├── document-service.ts
-│   └── face-recognition-service.ts
-├── App.tsx             # Main application component
-├── main.tsx            # Application entry point
-└── index.css           # Global styles
+│   ├── auth-service.ts
+│   └── document-service.ts
+├── App.tsx              # Main application component
+├── main.tsx             # Application entry point
+└── index.css            # Global styles
 ```
 
 ## 🎨 UI/UX Features
 
 - **Responsive Design** - Works on desktop, tablet, and mobile
-- **Light Theme** - Clean, professional light theme
-- **Modern UI** - Clean, professional interface
+- **Light/Dark Theme** - Toggle between light and dark modes
+- **Modern UI** - Clean, professional interface with HeroUI components
 - **Interactive Charts** - Data visualization with Recharts
 - **Smooth Animations** - Framer Motion animations
 - **Accessibility** - WCAG compliant design
+- **Consistent Theming** - Unified color palette and design system
 
 ## 🔧 Available Scripts
 
@@ -180,9 +228,9 @@ src/
 The system includes a comprehensive database schema with 70+ tables covering:
 
 - **User Management** - Users, roles, permissions
-- **Employee Data** - Complete employee information
-- **Time Tracking** - Attendance, leave, timesheets
-- **Payroll** - Salary, benefits, deductions
+- **Employee Data** - Complete employee information with reporting hierarchy
+- **Time Tracking** - Attendance, leave, timesheets, shifts
+- **Payroll** - Salary components, employee salaries, payslips
 - **Assets** - Asset inventory and assignments
 - **Performance** - Goals, reviews, feedback
 - **Recruitment** - Jobs, candidates, interviews
@@ -197,10 +245,41 @@ npm run build
 
 ### Environment Variables for Production
 ```env
-VITE_API_BASE_URL=https://your-api-domain.com/api
-VITE_APP_NAME=HRMS GO
-VITE_APP_VERSION=1.0.0
+# Database Configuration
+DB_HOST=your_production_host
+DB_USER=your_production_user
+DB_PASSWORD=your_production_password
+DB_NAME=hrmgo_hero
+DB_PORT=3306
+
+# JWT Configuration
+JWT_SECRET=your_production_jwt_secret
+JWT_EXPIRES_IN=24h
+
+# Server Configuration
+PORT=8000
+NODE_ENV=production
 ```
+
+## 🧹 Recent Updates
+
+### Project Cleanup (Latest)
+- ✅ Removed 27+ unnecessary test files and documentation
+- ✅ Fixed salary components API endpoints and calculations
+- ✅ Fixed employee salaries calculations
+- ✅ Updated API request format consistency
+- ✅ Clean project structure for production readiness
+- ✅ Added new organization chart components
+- ✅ Added new custom hooks for expenses, goals, interviews, performance reviews
+- ✅ Added new payroll pages and components
+- ✅ Implemented consistent theming across all pages
+
+### Key Improvements
+- **API Consistency** - Standardized API request format across all components
+- **Calculation Fixes** - Fixed salary and payroll calculations
+- **UI Consistency** - Unified theming and component styling
+- **Code Quality** - Removed test files and improved code organization
+- **Performance** - Optimized API calls and data fetching
 
 ## 🤝 Contributing
 
@@ -230,13 +309,18 @@ For support and questions:
 - [ ] Advanced reporting features
 - [ ] API documentation
 - [ ] Unit and integration tests
+- [ ] Performance optimization
+- [ ] Security enhancements
 
 ## 🙏 Acknowledgments
 
 - HeroUI for the amazing component library
 - React team for the excellent framework
 - All contributors and testers
+- The open-source community
 
 ---
 
 **Built with ❤️ for modern HR management**
+
+*Last updated: January 2025*
