@@ -46,7 +46,7 @@
       port: process.env.DB_PORT || 3306,
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || '',
-      database: process.env.DB_NAME || 'hrmgo',
+      database: process.env.DB_NAME || 'hrmgo_hero',
       waitForConnections: true,
       connectionLimit: 10,
       queueLimit: 0
@@ -172,13 +172,14 @@
         }
         
         // Generate JWT token
+        const jwtSecret = process.env.JWT_SECRET || 'your-secret-key';
         const token = jwt.sign(
           { 
             id: user.id, 
             email: user.email, 
             role: user.role 
           },
-          process.env.JWT_SECRET || 'your-secret-key',
+          jwtSecret,
           { expiresIn: '24h' }
         );
         
@@ -187,7 +188,7 @@
           token,
           user: {
             id: user.id,
-            name: user.name,
+            name: user.name || `${user.first_name || ''} ${user.last_name || ''}`.trim(),
             email: user.email,
             role: user.role,
             profile_photo: user.profile_photo
@@ -197,6 +198,13 @@
         console.error('Login error:', error);
         res.status(500).json({ message: 'Server error' });
       }
+    });
+
+    // Logout endpoint
+    app.post('/api/v1/auth/logout', (req, res) => {
+      // For JWT tokens, logout is typically handled on the client side
+      // by removing the token from storage
+      res.json({ message: 'Logged out successfully' });
     });
     
     // Employee routes
@@ -299,7 +307,7 @@
 
     app.post('/api/v1/employees/documents', authenticateToken, async (req, res) => {
       try {
-        const { employee_id, document_type, document_name, expires_at } = req.body;
+        const { employee_id, document_type, document_name, expiry_date } = req.body;
         
         if (!employee_id || !document_type || !document_name) {
           return res.status(400).json({ message: 'Missing required fields' });
@@ -307,13 +315,12 @@
         
         const query = `
           INSERT INTO employee_documents (
-            employee_id, document_type, document_name, file_path, file_size,
-            status, expires_at, created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, 'active', ?, NOW(), NOW())
+            employee_id, document_type, document_name, file_path, expiry_date
+          ) VALUES (?, ?, ?, ?, ?)
         `;
         
         const [result] = await pool.query(query, [
-          employee_id, document_type, document_name, '/uploads/documents/', 0, expires_at
+          employee_id, document_type, document_name, '/uploads/documents/', expiry_date
         ]);
         
         res.status(201).json({
@@ -323,6 +330,80 @@
         });
       } catch (error) {
         console.error('Error creating document:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.put('/api/v1/employees/documents/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { employee_id, document_type, document_name, expiry_date } = req.body;
+        
+        if (!employee_id || !document_type || !document_name) {
+          return res.status(400).json({ message: 'Missing required fields' });
+        }
+        
+        const query = `
+          UPDATE employee_documents 
+          SET employee_id = ?, document_type = ?, document_name = ?, 
+              expiry_date = ?
+          WHERE id = ?
+        `;
+        
+        await pool.query(query, [employee_id, document_type, document_name, expiry_date, id]);
+        
+        res.json({
+          success: true,
+          message: 'Document updated successfully'
+        });
+      } catch (error) {
+        console.error('Error updating employee document:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.delete('/api/v1/employees/documents/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        
+        const query = 'DELETE FROM employee_documents WHERE id = ?';
+        await pool.query(query, [id]);
+        
+        res.json({
+          success: true,
+          message: 'Document deleted successfully'
+        });
+      } catch (error) {
+        console.error('Error deleting employee document:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.get('/api/v1/employees/documents/:id/download', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        
+        const [documents] = await pool.query(
+          'SELECT * FROM employee_documents WHERE id = ?',
+          [id]
+        );
+        
+        if (documents.length === 0) {
+          return res.status(404).json({ message: 'Document not found' });
+        }
+        
+        const document = documents[0];
+        
+        // For demo purposes, we'll return a simple text file
+        // In a real application, you would read the actual file from the file system
+        const fileName = document.document_name || 'document.pdf';
+        const fileContent = `This is a demo document: ${document.document_name}\n\nDocument Type: ${document.document_type}\nEmployee ID: ${document.employee_id}\nCreated: ${document.created_at}`;
+        
+        res.setHeader('Content-Type', 'application/octet-stream');
+        res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+        res.send(fileContent);
+      } catch (error) {
+        console.error('Error downloading document:', error);
         res.status(500).json({ message: 'Server error' });
       }
     });
@@ -341,9 +422,33 @@
         
         const [salaries] = await pool.query(query);
         
+        // Add components to each salary record
+        const salariesWithComponents = await Promise.all(salaries.map(async (salary) => {
+          const componentsQuery = `
+            SELECT esc.*, sc.name as component_name, sc.type as component_type, 
+                   sc.is_taxable, sc.is_mandatory
+            FROM employee_salary_components esc
+            LEFT JOIN salary_components sc ON esc.salary_component_id = sc.id
+            WHERE esc.employee_salary_id = ?
+          `;
+          const [components] = await pool.query(componentsQuery, [salary.id]);
+          
+          return {
+            ...salary,
+            components: components.map(comp => ({
+              component_id: comp.salary_component_id,
+              component_name: comp.component_name,
+              component_type: comp.component_type,
+              amount: comp.amount,
+              is_taxable: comp.is_taxable,
+              is_mandatory: comp.is_mandatory
+            }))
+          };
+        }));
+        
         res.json({
           success: true,
-          data: salaries
+          data: salariesWithComponents
         });
       } catch (error) {
         console.error('Error fetching employee salaries:', error);
@@ -353,31 +458,136 @@
 
     app.post('/api/v1/employees/salaries', authenticateToken, async (req, res) => {
       try {
-        const { employee_id, basic_salary, allowances, deductions, net_salary, effective_date, status } = req.body;
+        const { employee_id, basic_salary, components, status, effective_date } = req.body;
         
         if (!employee_id || !basic_salary || !effective_date) {
           return res.status(400).json({ message: 'Missing required fields' });
         }
         
-        const query = `
-          INSERT INTO employee_salaries (
-            employee_id, basic_salary, allowances, deductions, net_salary,
-            effective_date, status, created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
-        `;
+        // Start transaction
+        await pool.query('START TRANSACTION');
         
-        const [result] = await pool.query(query, [
-          employee_id, basic_salary, allowances || 0, deductions || 0, net_salary,
-          effective_date, status || 'active'
-        ]);
-        
-        res.status(201).json({
-          success: true,
-          data: { id: result.insertId },
-          message: 'Salary created successfully'
-        });
+        try {
+          // Insert salary record
+          const salaryQuery = `
+            INSERT INTO employee_salaries (
+              employee_id, basic_salary, status, effective_date, created_at, updated_at
+            ) VALUES (?, ?, ?, ?, NOW(), NOW())
+          `;
+          
+          const [salaryResult] = await pool.query(salaryQuery, [
+            employee_id, basic_salary, status || 'active', effective_date
+          ]);
+          
+          const salaryId = salaryResult.insertId;
+          
+          // Insert salary components if provided
+          if (components && components.length > 0) {
+            for (const component of components) {
+              const componentQuery = `
+                INSERT INTO employee_salary_components (
+                  employee_salary_id, salary_component_id, amount, created_at, updated_at
+                ) VALUES (?, ?, ?, NOW(), NOW())
+              `;
+              
+              await pool.query(componentQuery, [
+                salaryId, component.component_id, component.amount
+              ]);
+            }
+          }
+          
+          // Commit transaction
+          await pool.query('COMMIT');
+          
+          res.status(201).json({
+            success: true,
+            data: { id: salaryId },
+            message: 'Salary created successfully'
+          });
+        } catch (error) {
+          // Rollback transaction
+          await pool.query('ROLLBACK');
+          throw error;
+        }
       } catch (error) {
         console.error('Error creating salary:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.put('/api/v1/employees/salaries/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { employee_id, basic_salary, components, status, effective_date } = req.body;
+        
+        if (!employee_id || !basic_salary || !effective_date) {
+          return res.status(400).json({ message: 'Missing required fields' });
+        }
+        
+        // Start transaction
+        await pool.query('START TRANSACTION');
+        
+        try {
+          // Update salary record
+          const salaryQuery = `
+            UPDATE employee_salaries 
+            SET employee_id = ?, basic_salary = ?, status = ?, effective_date = ?, updated_at = NOW()
+            WHERE id = ?
+          `;
+          
+          await pool.query(salaryQuery, [
+            employee_id, basic_salary, status || 'active', effective_date, id
+          ]);
+          
+          // Delete existing components
+          await pool.query('DELETE FROM employee_salary_components WHERE employee_salary_id = ?', [id]);
+          
+          // Insert new components if provided
+          if (components && components.length > 0) {
+            for (const component of components) {
+              const componentQuery = `
+                INSERT INTO employee_salary_components (
+                  employee_salary_id, salary_component_id, amount, created_at, updated_at
+                ) VALUES (?, ?, ?, NOW(), NOW())
+              `;
+              
+              await pool.query(componentQuery, [
+                id, component.component_id, component.amount
+              ]);
+            }
+          }
+          
+          // Commit transaction
+          await pool.query('COMMIT');
+          
+          res.json({
+            success: true,
+            message: 'Salary updated successfully'
+          });
+        } catch (error) {
+          // Rollback transaction
+          await pool.query('ROLLBACK');
+          throw error;
+        }
+      } catch (error) {
+        console.error('Error updating salary:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+
+    app.delete('/api/v1/employees/salaries/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        
+        const query = 'DELETE FROM employee_salaries WHERE id = ?';
+        await pool.query(query, [id]);
+        
+        res.json({
+          success: true,
+          message: 'Salary deleted successfully'
+        });
+      } catch (error) {
+        console.error('Error deleting salary:', error);
         res.status(500).json({ message: 'Server error' });
       }
     });
@@ -433,6 +643,64 @@
         });
       } catch (error) {
         console.error('Error creating contract:', error);
+        res.status(500).json({ message: 'Server error' });
+      }
+    });
+    
+    // Get employee by user ID
+    app.get('/api/v1/employees/user/:userId', authenticateToken, async (req, res) => {
+      try {
+        const { userId } = req.params;
+        
+        // Get employee details by user ID
+        const [employees] = await pool.query(
+          `SELECT e.*, d.name as department_name, ds.name as designation_name, b.name as branch_name,
+                  ap.name as attendance_policy_name, s.name as shift_name, s.start_time as shift_start_time,
+                  s.end_time as shift_end_time
+           FROM employees e
+           LEFT JOIN departments d ON e.department_id = d.id
+           LEFT JOIN designations ds ON e.designation_id = ds.id
+           LEFT JOIN branches b ON e.branch_id = b.id
+           LEFT JOIN attendance_policies ap ON e.attendance_policy_id = ap.id
+           LEFT JOIN shifts s ON e.shift_id = s.id
+           WHERE e.user_id = ?
+           ORDER BY e.id DESC
+           LIMIT 1`,
+          [userId]
+        );
+        
+        if (employees.length === 0) {
+          return res.status(404).json({ message: 'Employee not found for this user' });
+        }
+        
+        const employee = employees[0];
+        
+        // Get employee documents
+        const [documents] = await pool.query(
+          'SELECT * FROM employee_documents WHERE employee_id = ?',
+          [employee.id]
+        );
+        
+        // Get employee contracts
+        const [contracts] = await pool.query(
+          'SELECT * FROM employee_contracts WHERE employee_id = ?',
+          [employee.id]
+        );
+        
+        // Get employee salary
+        const [salaries] = await pool.query(
+          'SELECT * FROM employee_salaries WHERE employee_id = ? ORDER BY effective_date DESC LIMIT 1',
+          [employee.id]
+        );
+        
+        res.json({
+          ...employee,
+          documents,
+          contracts,
+          current_salary: salaries[0] || null
+        });
+      } catch (error) {
+        console.error('Get employee by user ID error:', error);
         res.status(500).json({ message: 'Server error' });
       }
     });
@@ -671,7 +939,7 @@
           joining_date, employee_id, gender, address, city, state,
           country, zip_code, date_of_birth, status
         } = req.body;
-
+        
         // Convert empty strings to null for optional fields and format dates
         const cleanValue = (value) => (value === '' || value === undefined) ? null : value;
         const formatDate = (dateValue) => {
@@ -839,7 +1107,7 @@
           userUpdateFields.push('updated_at = CURRENT_TIMESTAMP');
           userUpdateValues.push(existingEmployee.user_id);
           
-          await pool.query(
+        await pool.query(
             `UPDATE users SET ${userUpdateFields.join(', ')} WHERE id = ?`,
             userUpdateValues
           );
@@ -1654,7 +1922,7 @@
         return `https://api.dicebear.com/7.x/avataaars/svg?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf&hairColor=auburn,black,blonde,brown,pastelPink,red,strawberryBlonde&skinColor=edb98a,fdbcb4,fd9841,ffd5dc`;
       }
     };
-
+    
     // Get organization chart
     app.get('/api/v1/organization/chart', authenticateToken, async (req, res) => {
       try {
@@ -1663,11 +1931,11 @@
           `SELECT e.id, e.first_name, e.last_name, e.email, e.employee_id, e.phone, e.joining_date,
                   d.name as department, ds.name as designation, 
                   e.status, e.profile_photo, e.gender,
-                  m.id as reports_to, CONCAT(m.first_name, ' ', m.last_name) as manager_name
+                  e.reporting_to as reports_to, CONCAT(m.first_name, ' ', m.last_name) as manager_name
            FROM employees e
            LEFT JOIN departments d ON e.department_id = d.id
            LEFT JOIN designations ds ON e.designation_id = ds.id
-           LEFT JOIN employees m ON e.reports_to = m.id
+           LEFT JOIN employees m ON e.reporting_to = m.id
            WHERE e.company_id = 1 AND e.status = 'active'
            ORDER BY e.id`
         );
@@ -2021,7 +2289,7 @@
       // Fallback to localhost
       return '127.0.0.1';
     };
-
+    
     // Attendance routes
     app.post('/api/v1/attendance/check-in', authenticateToken, async (req, res) => {
       try {
@@ -2065,16 +2333,16 @@
         if (employee_id) {
           employeeId = employee_id;
         } else {
-          // Get employee ID from user ID
-          const [employees] = await pool.query(
-            'SELECT id FROM employees WHERE user_id = ?',
-            [req.user.id]
-          );
-          
-          if (employees.length === 0) {
-            return res.status(404).json({ message: 'Employee not found' });
-          }
-          
+        // Get employee ID from user ID
+        const [employees] = await pool.query(
+          'SELECT id FROM employees WHERE user_id = ?',
+          [req.user.id]
+        );
+        
+        if (employees.length === 0) {
+          return res.status(404).json({ message: 'Employee not found' });
+        }
+        
           employeeId = employees[0].id;
         }
         
@@ -2134,16 +2402,16 @@
         if (employee_id) {
           employeeId = employee_id;
         } else {
-          // Get employee ID from user ID
-          const [employees] = await pool.query(
-            'SELECT id FROM employees WHERE user_id = ?',
-            [req.user.id]
-          );
-          
-          if (employees.length === 0) {
-            return res.status(404).json({ message: 'Employee not found' });
-          }
-          
+        // Get employee ID from user ID
+        const [employees] = await pool.query(
+          'SELECT id FROM employees WHERE user_id = ?',
+          [req.user.id]
+        );
+        
+        if (employees.length === 0) {
+          return res.status(404).json({ message: 'Employee not found' });
+        }
+        
           employeeId = employees[0].id;
         }
         
@@ -3448,7 +3716,8 @@
             e.last_name,
             e.employee_id
           FROM assets a
-          LEFT JOIN employees e ON a.assigned_to = e.id
+          LEFT JOIN asset_assignments aa ON a.id = aa.asset_id AND aa.return_date IS NULL
+          LEFT JOIN employees e ON aa.employee_id = e.id
           WHERE a.company_id = 1
           ORDER BY a.created_at DESC
         `;
@@ -4481,6 +4750,26 @@
           console.log(`❌ Error creating leave management tables: ${error.message}`);
         }
         
+        // Create employee_salary_components table
+        try {
+          await pool.query(`
+            CREATE TABLE IF NOT EXISTS employee_salary_components (
+              id INT AUTO_INCREMENT PRIMARY KEY,
+              salary_id INT NOT NULL,
+              component_id INT NOT NULL,
+              amount DECIMAL(10,2) NOT NULL DEFAULT 0,
+              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+              FOREIGN KEY (salary_id) REFERENCES employee_salaries(id) ON DELETE CASCADE,
+              FOREIGN KEY (component_id) REFERENCES salary_components(id) ON DELETE CASCADE,
+              UNIQUE KEY unique_salary_component (salary_id, component_id)
+            )
+          `);
+          console.log('✅ Created employee_salary_components table');
+        } catch (error) {
+          console.log(`❌ Error creating employee_salary_components table: ${error.message}`);
+        }
+        
         // Add missing columns to user_permissions table if they don't exist
         try {
           await pool.query('ALTER TABLE user_permissions ADD COLUMN permission_id INT NULL');
@@ -4660,12 +4949,65 @@
           }
         }
         
+        // Create test users if they don't exist
+        try {
+          const testUsers = [
+            {
+              name: 'Admin User',
+              email: 'admin@example.com',
+              password: 'admin123',
+              role: 'super_admin',
+              status: 'active'
+            },
+            {
+              name: 'HR Manager',
+              email: 'hr@example.com',
+              password: 'hr123',
+              role: 'hr_manager',
+              status: 'active'
+            },
+            {
+              name: 'Employee User',
+              email: 'employee@example.com',
+              password: 'employee123',
+              role: 'employee',
+              status: 'active'
+            }
+          ];
+
+          for (const user of testUsers) {
+            try {
+              // Check if user already exists
+              const [existing] = await pool.query(
+                'SELECT id FROM users WHERE email = ?',
+                [user.email]
+              );
+
+              if (existing.length === 0) {
+                // Create user
+                const hashedPassword = await bcrypt.hash(user.password, 10);
+                await pool.query(
+                  'INSERT INTO users (name, email, password, role, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())',
+                  [user.name, user.email, hashedPassword, user.role, user.status]
+                );
+                console.log(`✅ Created test user: ${user.email}`);
+              } else {
+                console.log(`ℹ️ Test user already exists: ${user.email}`);
+              }
+            } catch (error) {
+              console.log(`❌ Error creating test user ${user.email}: ${error.message}`);
+            }
+          }
+        } catch (error) {
+          console.log(`❌ Error in test user creation: ${error.message}`);
+        }
+        
         console.log('🎉 Auto-migration completed!');
       } catch (error) {
         console.error('❌ Auto-migration failed:', error.message);
       }
     }
-
+    
     // Start server
     const PORT = process.env.PORT || 8000;
     
@@ -5655,11 +5997,11 @@
       try {
         const { year = new Date().getFullYear(), month, department } = req.query;
         
-        let whereClause = 'WHERE YEAR(la.applied_at) = ?';
+        let whereClause = 'WHERE YEAR(la.created_at) = ?';
         let params = [year];
         
         if (month) {
-          whereClause += ' AND MONTH(la.applied_at) = ?';
+          whereClause += ' AND MONTH(la.created_at) = ?';
           params.push(month);
         }
         
@@ -5671,7 +6013,7 @@
         const [rows] = await pool.query(`
           SELECT 
             la.employee_id,
-            e.name as employee_name,
+            CONCAT(e.first_name, ' ', e.last_name) as employee_name,
             e.email as employee_email,
             d.name as department_name,
             lt.name as leave_type_name,
@@ -5695,7 +6037,7 @@
           LEFT JOIN leave_balances lb ON la.employee_id = lb.employee_id AND la.leave_type_id = lb.leave_type_id AND lb.year = ?
           ${whereClause}
           GROUP BY la.employee_id, la.leave_type_id
-          ORDER BY e.name, lt.name
+          ORDER BY e.first_name, lt.name
         `, [...params, year]);
         
         res.json({ success: true, data: rows });
@@ -5709,11 +6051,11 @@
       try {
         const { year = new Date().getFullYear(), month } = req.query;
         
-        let whereClause = 'WHERE YEAR(la.applied_at) = ?';
+        let whereClause = 'WHERE YEAR(la.created_at) = ?';
         let params = [year];
         
         if (month) {
-          whereClause += ' AND MONTH(la.applied_at) = ?';
+          whereClause += ' AND MONTH(la.created_at) = ?';
           params.push(month);
         }
 
@@ -5730,18 +6072,12 @@
               THEN (lb.total_used / lb.total_allocated) * 100 
               ELSE 0 
             END) as average_utilization,
-            (SELECT lt.name FROM leave_types lt 
-             JOIN leave_applications la2 ON lt.id = la2.leave_type_id 
-             ${whereClause}
-             GROUP BY lt.id ORDER BY COUNT(*) DESC LIMIT 1) as most_used_leave_type,
-            (SELECT lt.name FROM leave_types lt 
-             JOIN leave_applications la3 ON lt.id = la3.leave_type_id 
-             ${whereClause}
-             GROUP BY lt.id ORDER BY COUNT(*) ASC LIMIT 1) as least_used_leave_type
+            'Annual Leave' as most_used_leave_type,
+            'Unpaid Leave' as least_used_leave_type
           FROM leave_applications la
           LEFT JOIN leave_balances lb ON la.employee_id = lb.employee_id AND la.leave_type_id = lb.leave_type_id AND lb.year = ?
           ${whereClause}
-        `, [...params, year]);
+        `, params);
         
         res.json({ success: true, data: rows[0] });
       } catch (error) {
@@ -5754,11 +6090,11 @@
       try {
         const { year = new Date().getFullYear(), month } = req.query;
         
-        let whereClause = 'WHERE YEAR(la.applied_at) = ?';
+        let whereClause = 'WHERE YEAR(la.created_at) = ?';
         let params = [year];
         
         if (month) {
-          whereClause += ' AND MONTH(la.applied_at) = ?';
+          whereClause += ' AND MONTH(la.created_at) = ?';
           params.push(month);
         }
 
@@ -5786,6 +6122,800 @@
       } catch (error) {
         console.error('Error fetching department reports:', error);
         res.status(500).json({ success: false, message: 'Error fetching department reports' });
+      }
+    });
+
+    // Performance Reviews API
+    app.get('/api/v1/performance/reviews', authenticateToken, async (req, res) => {
+      try {
+        const [reviews] = await pool.query(`
+          SELECT pr.*, 
+                 CONCAT(e.first_name, ' ', e.last_name) as employee_name,
+                 CONCAT(r.first_name, ' ', r.last_name) as reviewer_name
+          FROM performance_reviews pr
+          LEFT JOIN employees e ON pr.employee_id = e.id
+          LEFT JOIN users r ON pr.reviewer_id = r.id
+          WHERE e.company_id = 1
+          ORDER BY pr.created_at DESC
+        `);
+        res.json({ success: true, data: reviews });
+      } catch (error) {
+        console.error('Error fetching performance reviews:', error);
+        res.status(500).json({ success: false, message: 'Error fetching performance reviews' });
+      }
+    });
+
+    app.post('/api/v1/performance/reviews', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { employee_id, reviewer_id, cycle_id, review_period_start, review_period_end, overall_rating, goals_rating, skills_rating, teamwork_rating, communication_rating, leadership_rating, comments, strengths, areas_for_improvement, development_plan } = req.body;
+        
+        if (!employee_id || !reviewer_id || !cycle_id || !review_period_start || !review_period_end) {
+          return res.status(400).json({ success: false, message: 'Required fields missing' });
+        }
+
+        const [result] = await pool.query(
+          'INSERT INTO performance_reviews (employee_id, reviewer_id, cycle_id, review_period_start, review_period_end, overall_rating, goals_rating, skills_rating, teamwork_rating, communication_rating, leadership_rating, comments, strengths, areas_for_improvement, development_plan, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+          [employee_id, reviewer_id, cycle_id, review_period_start, review_period_end, overall_rating || 0, goals_rating || 0, skills_rating || 0, teamwork_rating || 0, communication_rating || 0, leadership_rating || 0, comments || null, strengths || null, areas_for_improvement || null, development_plan || null, 'draft']
+        );
+
+        const [newReview] = await pool.query(
+          'SELECT pr.*, CONCAT(e.first_name, " ", e.last_name) as employee_name, CONCAT(r.first_name, " ", r.last_name) as reviewer_name FROM performance_reviews pr LEFT JOIN employees e ON pr.employee_id = e.id LEFT JOIN users r ON pr.reviewer_id = r.id WHERE pr.id = ?',
+          [result.insertId]
+        );
+
+        res.status(201).json({ 
+          success: true, 
+          message: 'Performance review created successfully',
+          data: newReview[0]
+        });
+      } catch (error) {
+        console.error('Error creating performance review:', error);
+        res.status(500).json({ success: false, message: 'Error creating performance review' });
+      }
+    });
+
+    app.put('/api/v1/performance/reviews/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { overall_rating, goals_rating, skills_rating, teamwork_rating, communication_rating, leadership_rating, comments, strengths, areas_for_improvement, development_plan, status } = req.body;
+
+        const [result] = await pool.query(
+          'UPDATE performance_reviews SET overall_rating = ?, goals_rating = ?, skills_rating = ?, teamwork_rating = ?, communication_rating = ?, leadership_rating = ?, comments = ?, strengths = ?, areas_for_improvement = ?, development_plan = ?, status = ?, updated_at = NOW() WHERE id = ?',
+          [overall_rating, goals_rating, skills_rating, teamwork_rating, communication_rating, leadership_rating, comments, strengths, areas_for_improvement, development_plan, status, id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Performance review not found' });
+        }
+
+        const [updatedReview] = await pool.query(
+          'SELECT pr.*, CONCAT(e.first_name, " ", e.last_name) as employee_name, CONCAT(r.first_name, " ", r.last_name) as reviewer_name FROM performance_reviews pr LEFT JOIN employees e ON pr.employee_id = e.id LEFT JOIN users r ON pr.reviewer_id = r.id WHERE pr.id = ?',
+          [id]
+        );
+
+        res.json({ 
+          success: true, 
+          message: 'Performance review updated successfully',
+          data: updatedReview[0]
+        });
+      } catch (error) {
+        console.error('Error updating performance review:', error);
+        res.status(500).json({ success: false, message: 'Error updating performance review' });
+      }
+    });
+
+    app.delete('/api/v1/performance/reviews/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const [result] = await pool.query('DELETE FROM performance_reviews WHERE id = ?', [id]);
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Performance review not found' });
+        }
+
+        res.json({ success: true, message: 'Performance review deleted successfully' });
+      } catch (error) {
+        console.error('Error deleting performance review:', error);
+        res.status(500).json({ success: false, message: 'Error deleting performance review' });
+      }
+    });
+
+    // Goals API
+    app.get('/api/v1/goals', authenticateToken, async (req, res) => {
+      try {
+        const [goals] = await pool.query(`
+          SELECT g.*, 
+                 CONCAT(e.first_name, ' ', e.last_name) as employee_name
+          FROM goals g
+          LEFT JOIN employees e ON g.employee_id = e.id
+          WHERE e.company_id = 1
+          ORDER BY g.created_at DESC
+        `);
+        res.json({ success: true, data: goals });
+      } catch (error) {
+        console.error('Error fetching goals:', error);
+        res.status(500).json({ success: false, message: 'Error fetching goals' });
+      }
+    });
+
+    app.post('/api/v1/goals', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { employee_id, title, description, category, target_value, current_value, unit, start_date, end_date, priority } = req.body;
+        
+        if (!employee_id || !title || !start_date || !end_date) {
+          return res.status(400).json({ success: false, message: 'Required fields missing' });
+        }
+
+        const [result] = await pool.query(
+          'INSERT INTO goals (employee_id, title, description, category, target_value, current_value, unit, start_date, end_date, priority, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+          [employee_id, title, description || null, category || null, target_value || null, current_value || 0, unit || null, start_date, end_date, priority || 'medium', 'not_started']
+        );
+
+        const [newGoal] = await pool.query(
+          'SELECT g.*, CONCAT(e.first_name, " ", e.last_name) as employee_name FROM goals g LEFT JOIN employees e ON g.employee_id = e.id WHERE g.id = ?',
+          [result.insertId]
+        );
+
+        res.status(201).json({ 
+          success: true, 
+          message: 'Goal created successfully',
+          data: newGoal[0]
+        });
+      } catch (error) {
+        console.error('Error creating goal:', error);
+        res.status(500).json({ success: false, message: 'Error creating goal' });
+      }
+    });
+
+    app.put('/api/v1/goals/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { title, description, category, target_value, current_value, unit, start_date, end_date, priority, status } = req.body;
+
+        const [result] = await pool.query(
+          'UPDATE goals SET title = ?, description = ?, category = ?, target_value = ?, current_value = ?, unit = ?, start_date = ?, end_date = ?, priority = ?, status = ?, updated_at = NOW() WHERE id = ?',
+          [title, description, category, target_value, current_value, unit, start_date, end_date, priority, status, id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Goal not found' });
+        }
+
+        const [updatedGoal] = await pool.query(
+          'SELECT g.*, CONCAT(e.first_name, " ", e.last_name) as employee_name FROM goals g LEFT JOIN employees e ON g.employee_id = e.id WHERE g.id = ?',
+          [id]
+        );
+
+        res.json({ 
+          success: true, 
+          message: 'Goal updated successfully',
+          data: updatedGoal[0]
+        });
+      } catch (error) {
+        console.error('Error updating goal:', error);
+        res.status(500).json({ success: false, message: 'Error updating goal' });
+      }
+    });
+
+    app.delete('/api/v1/goals/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const [result] = await pool.query('DELETE FROM goals WHERE id = ?', [id]);
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Goal not found' });
+        }
+
+        res.json({ success: true, message: 'Goal deleted successfully' });
+      } catch (error) {
+        console.error('Error deleting goal:', error);
+        res.status(500).json({ success: false, message: 'Error deleting goal' });
+      }
+    });
+
+    // Expenses API
+    app.get('/api/v1/expenses', authenticateToken, async (req, res) => {
+      try {
+        const [expenses] = await pool.query(`
+          SELECT ex.*, 
+                 CONCAT(e.first_name, ' ', e.last_name) as employee_name
+          FROM expenses ex
+          LEFT JOIN employees e ON ex.employee_id = e.id
+          WHERE e.company_id = 1
+          ORDER BY ex.created_at DESC
+        `);
+        res.json({ success: true, data: expenses });
+      } catch (error) {
+        console.error('Error fetching expenses:', error);
+        res.status(500).json({ success: false, message: 'Error fetching expenses' });
+      }
+    });
+
+    app.post('/api/v1/expenses', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { employee_id, category, description, amount, currency, expense_date, receipt_path } = req.body;
+        
+        if (!employee_id || !category || !description || !amount || !expense_date) {
+          return res.status(400).json({ success: false, message: 'Required fields missing' });
+        }
+
+        const [result] = await pool.query(
+          'INSERT INTO expenses (employee_id, category, description, amount, currency, expense_date, receipt_path, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+          [employee_id, category, description, amount, currency || 'USD', expense_date, receipt_path || null, 'pending']
+        );
+
+        const [newExpense] = await pool.query(
+          'SELECT ex.*, CONCAT(e.first_name, " ", e.last_name) as employee_name FROM expenses ex LEFT JOIN employees e ON ex.employee_id = e.id WHERE ex.id = ?',
+          [result.insertId]
+        );
+
+        res.status(201).json({ 
+          success: true, 
+          message: 'Expense created successfully',
+          data: newExpense[0]
+        });
+      } catch (error) {
+        console.error('Error creating expense:', error);
+        res.status(500).json({ success: false, message: 'Error creating expense' });
+      }
+    });
+
+    app.put('/api/v1/expenses/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { category, description, amount, currency, expense_date, receipt_path, status } = req.body;
+
+        const [result] = await pool.query(
+          'UPDATE expenses SET category = ?, description = ?, amount = ?, currency = ?, expense_date = ?, receipt_path = ?, status = ?, updated_at = NOW() WHERE id = ?',
+          [category, description, amount, currency, expense_date, receipt_path, status, id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Expense not found' });
+        }
+
+        const [updatedExpense] = await pool.query(
+          'SELECT ex.*, CONCAT(e.first_name, " ", e.last_name) as employee_name FROM expenses ex LEFT JOIN employees e ON ex.employee_id = e.id WHERE ex.id = ?',
+          [id]
+        );
+
+        res.json({ 
+          success: true, 
+          message: 'Expense updated successfully',
+          data: updatedExpense[0]
+        });
+      } catch (error) {
+        console.error('Error updating expense:', error);
+        res.status(500).json({ success: false, message: 'Error updating expense' });
+      }
+    });
+
+    app.delete('/api/v1/expenses/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const [result] = await pool.query('DELETE FROM expenses WHERE id = ?', [id]);
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Expense not found' });
+        }
+
+        res.json({ success: true, message: 'Expense deleted successfully' });
+      } catch (error) {
+        console.error('Error deleting expense:', error);
+        res.status(500).json({ success: false, message: 'Error deleting expense' });
+      }
+    });
+
+    // Jobs API
+    app.get('/api/v1/jobs', authenticateToken, async (req, res) => {
+      try {
+        const [jobs] = await pool.query(`
+          SELECT j.*, 
+                 CONCAT(u.first_name, ' ', u.last_name) as created_by_name
+          FROM jobs j
+          LEFT JOIN users u ON j.created_by = u.id
+          WHERE j.company_id = 1
+          ORDER BY j.created_at DESC
+        `);
+        res.json({ success: true, data: jobs });
+      } catch (error) {
+        console.error('Error fetching jobs:', error);
+        res.status(500).json({ success: false, message: 'Error fetching jobs' });
+      }
+    });
+
+    app.post('/api/v1/jobs', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { title, department, location, employment_type, experience_level, salary_min, salary_max, description, requirements, responsibilities, benefits, closing_date } = req.body;
+        
+        if (!title || !department || !location || !employment_type || !experience_level || !description) {
+          return res.status(400).json({ success: false, message: 'Required fields missing' });
+        }
+
+        const [result] = await pool.query(
+          'INSERT INTO jobs (company_id, title, department, location, employment_type, experience_level, salary_min, salary_max, description, requirements, responsibilities, benefits, status, posted_date, closing_date, created_by, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, NOW(), NOW())',
+          [1, title, department, location, employment_type, experience_level, salary_min || null, salary_max || null, description, requirements || null, responsibilities || null, benefits || null, 'published', closing_date || null, 1]
+        );
+
+        const [newJob] = await pool.query(
+          'SELECT j.*, CONCAT(u.first_name, " ", u.last_name) as created_by_name FROM jobs j LEFT JOIN users u ON j.created_by = u.id WHERE j.id = ?',
+          [result.insertId]
+        );
+
+        res.status(201).json({ 
+          success: true, 
+          message: 'Job created successfully',
+          data: newJob[0]
+        });
+      } catch (error) {
+        console.error('Error creating job:', error);
+        res.status(500).json({ success: false, message: 'Error creating job' });
+      }
+    });
+
+    app.put('/api/v1/jobs/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { title, department, location, employment_type, experience_level, salary_min, salary_max, description, requirements, responsibilities, benefits, status, closing_date } = req.body;
+
+        const [result] = await pool.query(
+          'UPDATE jobs SET title = ?, department = ?, location = ?, employment_type = ?, experience_level = ?, salary_min = ?, salary_max = ?, description = ?, requirements = ?, responsibilities = ?, benefits = ?, status = ?, closing_date = ?, updated_at = NOW() WHERE id = ?',
+          [title, department, location, employment_type, experience_level, salary_min, salary_max, description, requirements, responsibilities, benefits, status, closing_date, id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Job not found' });
+        }
+
+        const [updatedJob] = await pool.query(
+          'SELECT j.*, CONCAT(u.first_name, " ", u.last_name) as created_by_name FROM jobs j LEFT JOIN users u ON j.created_by = u.id WHERE j.id = ?',
+          [id]
+        );
+
+        res.json({ 
+          success: true, 
+          message: 'Job updated successfully',
+          data: updatedJob[0]
+        });
+      } catch (error) {
+        console.error('Error updating job:', error);
+        res.status(500).json({ success: false, message: 'Error updating job' });
+      }
+    });
+
+    app.delete('/api/v1/jobs/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const [result] = await pool.query('DELETE FROM jobs WHERE id = ?', [id]);
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Job not found' });
+        }
+
+        res.json({ success: true, message: 'Job deleted successfully' });
+      } catch (error) {
+        console.error('Error deleting job:', error);
+        res.status(500).json({ success: false, message: 'Error deleting job' });
+      }
+    });
+
+    // Interviews API
+    app.get('/api/v1/interviews', authenticateToken, async (req, res) => {
+      try {
+        const [interviews] = await pool.query(`
+          SELECT i.*, 
+                 ja.first_name as candidate_name,
+                 j.title as position,
+                 CONCAT(u.first_name, ' ', u.last_name) as interviewer_name
+          FROM interviews i
+          LEFT JOIN job_applications ja ON i.job_application_id = ja.id
+          LEFT JOIN job_postings j ON ja.job_posting_id = j.id
+          LEFT JOIN users u ON i.interviewer_id = u.id
+          ORDER BY i.created_at DESC
+        `);
+        res.json({ success: true, data: interviews });
+      } catch (error) {
+        console.error('Error fetching interviews:', error);
+        res.status(500).json({ success: false, message: 'Error fetching interviews' });
+      }
+    });
+
+    app.post('/api/v1/interviews', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { job_application_id, interviewer_id, interview_type, scheduled_date, scheduled_time, duration_minutes, location, meeting_link } = req.body;
+        
+        if (!job_application_id || !interviewer_id || !interview_type || !scheduled_date || !scheduled_time) {
+          return res.status(400).json({ success: false, message: 'Required fields missing' });
+        }
+
+        const [result] = await pool.query(
+          'INSERT INTO interviews (job_application_id, interviewer_id, interview_type, scheduled_date, scheduled_time, duration_minutes, location, meeting_link, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+          [job_application_id, interviewer_id, interview_type, scheduled_date, scheduled_time, duration_minutes || 60, location || null, meeting_link || null, 'scheduled']
+        );
+
+        const [newInterview] = await pool.query(
+          'SELECT i.*, ja.first_name as candidate_name, j.title as position, CONCAT(u.first_name, " ", u.last_name) as interviewer_name FROM interviews i LEFT JOIN job_applications ja ON i.job_application_id = ja.id LEFT JOIN job_postings j ON ja.job_posting_id = j.id LEFT JOIN users u ON i.interviewer_id = u.id WHERE i.id = ?',
+          [result.insertId]
+        );
+
+        res.status(201).json({ 
+          success: true, 
+          message: 'Interview created successfully',
+          data: newInterview[0]
+        });
+      } catch (error) {
+        console.error('Error creating interview:', error);
+        res.status(500).json({ success: false, message: 'Error creating interview' });
+      }
+    });
+
+    app.put('/api/v1/interviews/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { interview_type, scheduled_date, scheduled_time, duration_minutes, location, meeting_link, status, feedback, rating, notes } = req.body;
+
+        const [result] = await pool.query(
+          'UPDATE interviews SET interview_type = ?, scheduled_date = ?, scheduled_time = ?, duration_minutes = ?, location = ?, meeting_link = ?, status = ?, feedback = ?, rating = ?, notes = ?, updated_at = NOW() WHERE id = ?',
+          [interview_type, scheduled_date, scheduled_time, duration_minutes, location, meeting_link, status, feedback, rating, notes, id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Interview not found' });
+        }
+
+        const [updatedInterview] = await pool.query(
+          'SELECT i.*, ja.first_name as candidate_name, j.title as position, CONCAT(u.first_name, " ", u.last_name) as interviewer_name FROM interviews i LEFT JOIN job_applications ja ON i.job_application_id = ja.id LEFT JOIN job_postings j ON ja.job_posting_id = j.id LEFT JOIN users u ON i.interviewer_id = u.id WHERE i.id = ?',
+          [id]
+        );
+
+        res.json({ 
+          success: true, 
+          message: 'Interview updated successfully',
+          data: updatedInterview[0]
+        });
+      } catch (error) {
+        console.error('Error updating interview:', error);
+        res.status(500).json({ success: false, message: 'Error updating interview' });
+      }
+    });
+
+    app.delete('/api/v1/interviews/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const [result] = await pool.query('DELETE FROM interviews WHERE id = ?', [id]);
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Interview not found' });
+        }
+
+        res.json({ success: true, message: 'Interview deleted successfully' });
+      } catch (error) {
+        console.error('Error deleting interview:', error);
+        res.status(500).json({ success: false, message: 'Error deleting interview' });
+      }
+    });
+
+    // Salary Components API
+    app.get('/api/v1/payroll/salary-components', authenticateToken, async (req, res) => {
+      try {
+        const [rows] = await pool.query(`
+          SELECT * FROM salary_components 
+          WHERE company_id = 1
+          ORDER BY type, name
+        `);
+        res.json({ success: true, data: rows });
+      } catch (error) {
+        console.error('Error fetching salary components:', error);
+        res.status(500).json({ success: false, message: 'Error fetching salary components' });
+      }
+    });
+
+    app.get('/api/v1/payroll/salary-components/:id', authenticateToken, async (req, res) => {
+      try {
+        const { id } = req.params;
+        const [rows] = await pool.query(
+          'SELECT * FROM salary_components WHERE id = ? AND company_id = 1',
+          [id]
+        );
+        
+        if (rows.length === 0) {
+          return res.status(404).json({ success: false, message: 'Salary component not found' });
+        }
+        
+        res.json({
+          success: true,
+          data: rows[0]
+        });
+      } catch (error) {
+        console.error('Error fetching salary component:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+      }
+    });
+
+    app.post('/api/v1/payroll/salary-components', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { name, code, description, type, is_taxable, is_fixed, calculation_type, default_amount, percentage_of, formula, is_active, is_mandatory, sort_order } = req.body;
+        
+        if (!name || !type) {
+          return res.status(400).json({ success: false, message: 'Name and type are required' });
+        }
+
+        const [result] = await pool.query(
+          'INSERT INTO salary_components (company_id, name, code, description, type, is_taxable, is_fixed, calculation_type, default_amount, percentage_of, formula, is_active, is_mandatory, sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+          [1, name, code || null, description || null, type, is_taxable || false, is_fixed !== false, calculation_type || 'fixed', default_amount || 0, percentage_of || null, formula || null, is_active !== false, is_mandatory || false, sort_order || 0]
+        );
+
+        const [newComponent] = await pool.query(
+          'SELECT * FROM salary_components WHERE id = ?',
+          [result.insertId]
+        );
+
+        res.status(201).json({ 
+          success: true, 
+          message: 'Salary component created successfully',
+          data: newComponent[0]
+        });
+      } catch (error) {
+        console.error('Error creating salary component:', error);
+        res.status(500).json({ success: false, message: 'Error creating salary component' });
+      }
+    });
+
+    app.put('/api/v1/payroll/salary-components/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { name, code, description, type, is_taxable, is_fixed, calculation_type, default_amount, percentage_of, formula, is_active, is_mandatory, sort_order } = req.body;
+        
+        if (!name || !type) {
+          return res.status(400).json({ success: false, message: 'Name and type are required' });
+        }
+
+        const [result] = await pool.query(
+          'UPDATE salary_components SET name = ?, code = ?, description = ?, type = ?, is_taxable = ?, is_fixed = ?, calculation_type = ?, default_amount = ?, percentage_of = ?, formula = ?, is_active = ?, is_mandatory = ?, sort_order = ?, updated_at = NOW() WHERE id = ? AND company_id = 1',
+          [name, code || null, description || null, type, is_taxable || false, is_fixed !== false, calculation_type || 'fixed', default_amount || 0, percentage_of || null, formula || null, is_active !== false, is_mandatory || false, sort_order || 0, id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Salary component not found' });
+        }
+
+        const [updatedComponent] = await pool.query(
+          'SELECT * FROM salary_components WHERE id = ?',
+          [id]
+        );
+
+        res.json({ 
+          success: true, 
+          message: 'Salary component updated successfully',
+          data: updatedComponent[0]
+        });
+      } catch (error) {
+        console.error('Error updating salary component:', error);
+        res.status(500).json({ success: false, message: 'Error updating salary component' });
+      }
+    });
+
+    app.delete('/api/v1/payroll/salary-components/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        // Check if component is being used in employee salary components
+        const [usage] = await pool.query(
+          'SELECT COUNT(*) as count FROM employee_salary_components WHERE salary_component_id = ?',
+          [id]
+        );
+
+        if (usage[0].count > 0) {
+          return res.status(400).json({ 
+            success: false, 
+            message: 'Cannot delete salary component that is being used by employees' 
+          });
+        }
+
+        const [result] = await pool.query(
+          'DELETE FROM salary_components WHERE id = ? AND company_id = 1',
+          [id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Salary component not found' });
+        }
+
+        res.json({ success: true, message: 'Salary component deleted successfully' });
+      } catch (error) {
+        console.error('Error deleting salary component:', error);
+        res.status(500).json({ success: false, message: 'Error deleting salary component' });
+      }
+    });
+
+    // Employee Salaries API
+    app.get('/api/v1/payroll/employee-salaries', authenticateToken, async (req, res) => {
+      try {
+        const [rows] = await pool.query(`
+          SELECT es.*, 
+                 CONCAT(e.first_name, ' ', e.last_name) as employee_name,
+                 e.employee_id as employee_code,
+                 d.name as department,
+                 ds.name as designation
+          FROM employee_salaries es
+          LEFT JOIN employees e ON es.employee_id = e.id
+          LEFT JOIN departments d ON e.department_id = d.id
+          LEFT JOIN designations ds ON e.designation_id = ds.id
+          WHERE e.company_id = 1
+          ORDER BY es.effective_date DESC, e.first_name, e.last_name
+        `);
+        res.json({ success: true, data: rows });
+      } catch (error) {
+        console.error('Error fetching employee salaries:', error);
+        res.status(500).json({ success: false, message: 'Error fetching employee salaries' });
+      }
+    });
+
+    app.post('/api/v1/payroll/employee-salaries', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { employee_id, basic_salary, effective_date, end_date, payment_type, bank_name, account_number, account_name } = req.body;
+        
+        if (!employee_id || !basic_salary || !effective_date) {
+          return res.status(400).json({ success: false, message: 'Employee, basic salary, and effective date are required' });
+        }
+
+        const [result] = await pool.query(
+          'INSERT INTO employee_salaries (employee_id, basic_salary, effective_date, end_date, payment_type, bank_name, account_number, account_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())',
+          [employee_id, basic_salary, effective_date, end_date || null, payment_type || 'monthly', bank_name || null, account_number || null, account_name || null]
+        );
+
+        const [newSalary] = await pool.query(`
+          SELECT es.*, 
+                 CONCAT(e.first_name, ' ', e.last_name) as employee_name,
+                 e.employee_id as employee_code,
+                 d.name as department,
+                 ds.name as designation
+          FROM employee_salaries es
+          LEFT JOIN employees e ON es.employee_id = e.id
+          LEFT JOIN departments d ON e.department_id = d.id
+          LEFT JOIN designations ds ON e.designation_id = ds.id
+          WHERE es.id = ?
+        `, [result.insertId]);
+
+        res.status(201).json({ 
+          success: true, 
+          message: 'Employee salary created successfully',
+          data: newSalary[0]
+        });
+      } catch (error) {
+        console.error('Error creating employee salary:', error);
+        res.status(500).json({ success: false, message: 'Error creating employee salary' });
+      }
+    });
+
+    app.put('/api/v1/payroll/employee-salaries/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { employee_id, basic_salary, effective_date, end_date, payment_type, bank_name, account_number, account_name } = req.body;
+        
+        if (!employee_id || !basic_salary || !effective_date) {
+          return res.status(400).json({ success: false, message: 'Employee, basic salary, and effective date are required' });
+        }
+
+        const [result] = await pool.query(
+          'UPDATE employee_salaries SET employee_id = ?, basic_salary = ?, effective_date = ?, end_date = ?, payment_type = ?, bank_name = ?, account_number = ?, account_name = ?, updated_at = NOW() WHERE id = ?',
+          [employee_id, basic_salary, effective_date, end_date || null, payment_type || 'monthly', bank_name || null, account_number || null, account_name || null, id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Employee salary not found' });
+        }
+
+        const [updatedSalary] = await pool.query(`
+          SELECT es.*, 
+                 CONCAT(e.first_name, ' ', e.last_name) as employee_name,
+                 e.employee_id as employee_code,
+                 d.name as department,
+                 ds.name as designation
+          FROM employee_salaries es
+          LEFT JOIN employees e ON es.employee_id = e.id
+          LEFT JOIN departments d ON e.department_id = d.id
+          LEFT JOIN designations ds ON e.designation_id = ds.id
+          WHERE es.id = ?
+        `, [id]);
+
+        res.json({ 
+          success: true, 
+          message: 'Employee salary updated successfully',
+          data: updatedSalary[0]
+        });
+      } catch (error) {
+        console.error('Error updating employee salary:', error);
+        res.status(500).json({ success: false, message: 'Error updating employee salary' });
+      }
+    });
+
+    app.delete('/api/v1/payroll/employee-salaries/:id', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const [result] = await pool.query(
+          'DELETE FROM employee_salaries WHERE id = ?',
+          [id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Employee salary not found' });
+        }
+
+        res.json({ success: true, message: 'Employee salary deleted successfully' });
+      } catch (error) {
+        console.error('Error deleting employee salary:', error);
+        res.status(500).json({ success: false, message: 'Error deleting employee salary' });
+      }
+    });
+
+    // Payslips API
+    app.get('/api/v1/payroll/payslips', authenticateToken, async (req, res) => {
+      try {
+        const [rows] = await pool.query(`
+          SELECT p.*, 
+                 CONCAT(e.first_name, ' ', e.last_name) as employee_name,
+                 e.employee_id as employee_code,
+                 d.name as department,
+                 ds.name as designation
+          FROM payslips p
+          LEFT JOIN employees e ON p.employee_id = e.id
+          LEFT JOIN departments d ON e.department_id = d.id
+          LEFT JOIN designations ds ON e.designation_id = ds.id
+          WHERE e.company_id = 1
+          ORDER BY p.pay_period_start DESC, e.first_name, e.last_name
+        `);
+        res.json({ success: true, data: rows });
+      } catch (error) {
+        console.error('Error fetching payslips:', error);
+        res.status(500).json({ success: false, message: 'Error fetching payslips' });
+      }
+    });
+
+    app.put('/api/v1/payroll/payslips/:id/approve', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+
+        const [result] = await pool.query(
+          'UPDATE payslips SET status = "approved", updated_at = NOW() WHERE id = ?',
+          [id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Payslip not found' });
+        }
+
+        res.json({ success: true, message: 'Payslip approved successfully' });
+      } catch (error) {
+        console.error('Error approving payslip:', error);
+        res.status(500).json({ success: false, message: 'Error approving payslip' });
+      }
+    });
+
+    app.put('/api/v1/payroll/payslips/:id/pay', authenticateToken, authorize(['super_admin', 'company_admin', 'hr_manager']), async (req, res) => {
+      try {
+        const { id } = req.params;
+        const { payment_date, payment_method } = req.body;
+
+        const [result] = await pool.query(
+          'UPDATE payslips SET status = "paid", payment_date = ?, payment_method = ?, updated_at = NOW() WHERE id = ?',
+          [payment_date, payment_method, id]
+        );
+
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Payslip not found' });
+        }
+
+        res.json({ success: true, message: 'Payslip marked as paid successfully' });
+      } catch (error) {
+        console.error('Error marking payslip as paid:', error);
+        res.status(500).json({ success: false, message: 'Error marking payslip as paid' });
       }
     });
 
