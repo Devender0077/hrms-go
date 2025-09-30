@@ -1,7 +1,7 @@
 // API configuration file for centralized API settings
     
     // Environment-based API URL configuration
-    export const API_BASE_URL = 'http://localhost:8000/api/v1'; // Always use development URL
+    export const API_BASE_URL = '/api/v1'; // Use relative path with proxy
     
     // API endpoints configuration
     export const API_ENDPOINTS = {
