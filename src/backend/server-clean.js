@@ -1,4 +1,4 @@
-// Express server for HRM API - Clean Modular Version
+// Express server for HRM API
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -223,17 +223,6 @@ app.get('/api/v1', (req, res) => {
     documentation: '/api/v1/docs',
     health: '/api/v1/health'
   });
-});
-
-// Global permissions endpoint (used by multiple modules)
-app.get('/api/v1/permissions', authenticateToken, async (req, res) => {
-  try {
-    const [permissions] = await pool.query('SELECT * FROM permissions ORDER BY module, permission_name');
-    res.json({ success: true, data: permissions });
-  } catch (error) {
-    console.error('Error fetching permissions:', error);
-    res.status(500).json({ success: false, message: 'Error fetching permissions' });
-  }
 });
 
 // =====================================================
