@@ -1,7 +1,7 @@
 // Create a new API service file to handle all API requests
 
 // Base API URL - would be configured from environment variables in a real app
-const API_BASE_URL = "http://localhost:8000/api/v1"; // Always use development URL
+const API_BASE_URL = "/api/v1"; // Use relative path with proxy
 
 // Helper function to handle API responses
 const handleResponse = async (response) => {
