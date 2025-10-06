@@ -1,6 +1,6 @@
-# Lottie Animations for HRMS
+# Lottie Animations for HRMS v2
 
-This directory contains Lottie JSON animation files from IconScout for the HRMS application.
+This directory contains Lottie JSON animation files for the HRMS application. These animations can be used to enhance the user experience with smooth, lightweight animations.
 
 ## Directory Structure
 

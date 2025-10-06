@@ -101,10 +101,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
           item.description.toLowerCase().includes(query.toLowerCase())
       );
       setResults(filtered);
-      setIsOpen(filtered.length > 0);
+      setIsOpen(true); // Always show dropdown when there's a query
       setSelectedIndex(0);
       setIsLoading(false);
-    }, 300);
+    }, 200); // Reduced debounce time for better responsiveness
 
     return () => clearTimeout(debounceSearch);
   }, [query]);
@@ -119,6 +119,13 @@ const SearchBar: React.FC<SearchBarProps> = ({
     }
   };
 
+  const handleInputBlur = () => {
+    // Delay closing to allow for clicks on dropdown items
+    setTimeout(() => {
+      setIsOpen(false);
+    }, 150);
+  };
+
   const handleResultClick = (result: SearchResult) => {
     navigate(result.url);
     setIsOpen(false);
@@ -127,28 +134,47 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen || results.length === 0) return;
-
+    // Only handle specific navigation keys, let normal typing pass through
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex((prevIndex) => (prevIndex + 1) % results.length);
+        if (isOpen && results.length > 0) {
+          e.preventDefault();
+          const totalOptions = results.length + 1; // +1 for "Search for..." option
+          setSelectedIndex((prevIndex) => (prevIndex + 1) % totalOptions);
+        }
         break;
       case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex((prevIndex) => (prevIndex - 1 + results.length) % results.length);
+        if (isOpen && results.length > 0) {
+          e.preventDefault();
+          const totalOptions = results.length + 1; // +1 for "Search for..." option
+          setSelectedIndex((prevIndex) => (prevIndex - 1 + totalOptions) % totalOptions);
+        }
         break;
       case 'Enter':
-        e.preventDefault();
-        if (selectedIndex !== -1 && results[selectedIndex]) {
-          handleResultClick(results[selectedIndex]);
+        // Handle Enter based on selection
+        if (isOpen && results.length > 0) {
+          e.preventDefault();
+          if (selectedIndex === 0) {
+            // "Search for..." option selected
+            console.log(`Searching for: ${query}`);
+            setIsOpen(false);
+            setQuery('');
+            inputRef.current?.blur();
+          } else if (selectedIndex > 0 && results[selectedIndex - 1]) {
+            // A result is selected (adjusted for the "Search for..." option)
+            handleResultClick(results[selectedIndex - 1]);
+          }
         }
+        // If no dropdown open, allow normal Enter behavior
         break;
       case 'Escape':
         e.preventDefault();
         setIsOpen(false);
         setQuery('');
         inputRef.current?.blur();
+        break;
+      default:
+        // Let all other keys (typing, backspace, delete, etc.) pass through normally
         break;
     }
   };
@@ -178,6 +204,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
               value={query}
               onValueChange={handleInputChange}
               onFocus={handleInputFocus}
+              onBlur={handleInputBlur}
               onKeyDown={handleKeyDown}
               placeholder={placeholder}
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
@@ -194,11 +221,11 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </div>
         </DropdownTrigger>
         
-        <DropdownMenu
-          aria-label="Search results"
-          className="w-full max-w-md max-h-96 overflow-y-auto"
-          closeOnSelect={false}
-        >
+            <DropdownMenu
+              aria-label="Search results"
+              className="w-full max-w-md max-h-96 overflow-y-auto"
+              closeOnSelect={false}
+            >
           {isLoading ? (
             <DropdownItem key="loading" textValue="loading">
               <div className="flex items-center justify-center py-4">
@@ -215,30 +242,57 @@ const SearchBar: React.FC<SearchBarProps> = ({
               </div>
             </DropdownItem>
           ) : (
-            results.map((result, index) => {
-              const isSelected = index === selectedIndex;
-              
-              return (
-                <DropdownItem
-                  key={result.id}
-                  textValue={result.title}
-                  onPress={() => handleResultClick(result)}
-                  className={`p-0 ${isSelected ? 'bg-default-100' : ''}`}
-                >
-                  <div
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-150 ${
-                      isSelected ? 'bg-default-100 dark:bg-default-50' : 'hover:bg-default-50 dark:hover:bg-default-100/50'
-                    }`}
-                  >
-                    <Icon icon={getIconForType(result.type)} className="text-default-500 text-lg" />
-                    <div className="flex flex-col">
-                      <p className="text-sm font-medium text-foreground">{result.title}</p>
-                      <p className="text-xs text-default-500">{result.description}</p>
-                    </div>
+            <>
+              {/* Add a "Search for..." option at the top */}
+              <DropdownItem
+                key="search-for"
+                textValue={`Search for "${query}"`}
+                onPress={() => {
+                  // Allow user to search for their exact query
+                  console.log(`Searching for: ${query}`);
+                  setIsOpen(false);
+                  setQuery('');
+                  inputRef.current?.blur();
+                }}
+                className="p-0 border-b border-divider"
+              >
+                <div className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-150 ${
+                  selectedIndex === 0 ? 'bg-default-100 dark:bg-default-50' : 'hover:bg-default-50 dark:hover:bg-default-100/50'
+                }`}>
+                  <Icon icon="lucide:search" className="text-primary text-lg" />
+                  <div className="flex flex-col">
+                    <p className="text-sm font-medium text-primary">Search for "{query}"</p>
+                    <p className="text-xs text-default-500">Press Enter to search</p>
                   </div>
-                </DropdownItem>
-              );
-            })
+                </div>
+              </DropdownItem>
+              
+              {/* Show matching results */}
+              {results.map((result, index) => {
+                const isSelected = index + 1 === selectedIndex; // +1 because of the search-for option
+                
+                return (
+                  <DropdownItem
+                    key={result.id}
+                    textValue={result.title}
+                    onPress={() => handleResultClick(result)}
+                    className={`p-0 ${isSelected ? 'bg-default-100' : ''}`}
+                  >
+                    <div
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-150 ${
+                        isSelected ? 'bg-default-100 dark:bg-default-50' : 'hover:bg-default-50 dark:hover:bg-default-100/50'
+                      }`}
+                    >
+                      <Icon icon={getIconForType(result.type)} className="text-default-500 text-lg" />
+                      <div className="flex flex-col">
+                        <p className="text-sm font-medium text-foreground">{result.title}</p>
+                        <p className="text-xs text-default-500">{result.description}</p>
+                      </div>
+                    </div>
+                  </DropdownItem>
+                );
+              })}
+            </>
           )}
         </DropdownMenu>
       </Dropdown>

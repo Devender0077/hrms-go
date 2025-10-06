@@ -1,6 +1,6 @@
-# 🏢 HRMS HUI v1 - Enterprise HR Management System
+# 🏢 HRMS HUI v2 - Enterprise HR Management System
 
-A comprehensive, modern Human Resource Management System built with React, TypeScript, Node.js, and MySQL. Features a modular architecture, role-based access control, and a beautiful responsive UI.
+A comprehensive, modern Human Resource Management System built with React, TypeScript, Node.js, and MySQL. Features a modular architecture, role-based access control, and a beautiful responsive UI with advanced search functionality and dynamic theming.
 
 ## ✨ Features
 
@@ -26,14 +26,19 @@ A comprehensive, modern Human Resource Management System built with React, TypeS
 - **Modern Components** - Built with HeroUI and TailwindCSS
 - **Animations** - Smooth transitions and micro-interactions
 - **Accessibility** - WCAG compliant with keyboard navigation support
+- **Advanced Search** - Real-time search with keyboard shortcuts (Ctrl/Cmd + K)
+- **Smart Notifications** - Interactive notification system with unread counts
+- **Dynamic Theming** - Color customization that applies across the entire application
 
 ### 🏗️ Technical Architecture
-- **Modular Backend** - 17 focused route modules with clean separation
-- **Modular Database** - Schema split into 8 domain-specific files
+- **Modular Backend** - 23 focused route modules with clean separation
+- **Modular Database** - Schema split into domain-specific files with migration system
 - **Migration System** - Comprehensive database migration management
 - **API-First Design** - RESTful APIs with proper error handling
 - **Type Safety** - Full TypeScript implementation
 - **Security** - JWT authentication, role-based permissions, audit logging
+- **Global Settings** - Dynamic theming, maintenance mode, debug mode
+- **Advanced Search** - Real-time search with keyboard shortcuts and smart suggestions
 
 ## 🚀 Quick Start
 
@@ -47,7 +52,7 @@ A comprehensive, modern Human Resource Management System built with React, TypeS
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd hrms_hui_v1
+   cd hrms_hui_v2
    ```
 
 2. **Install dependencies**
@@ -94,28 +99,30 @@ A comprehensive, modern Human Resource Management System built with React, TypeS
    ```
 
 6. **Access the application**
-   - Frontend: http://localhost:5173
+   - Frontend: http://localhost:5174
    - Backend API: http://localhost:8000
 
 ## 📁 Project Structure
 
 ```
-hrms_hui_v1/
+hrms_hui_v2/
 ├── src/
 │   ├── backend/                 # Node.js backend
-│   │   ├── routes/             # 17 modular route files
+│   │   ├── routes/             # 23 modular route files
 │   │   ├── migrations/         # Database migration system
-│   │   │   ├── migrations/     # 8 sequential migration files
+│   │   │   ├── migrations/     # Sequential migration files
 │   │   │   └── migration-manager.js
-│   │   └── server.js           # Main server (268 lines)
-│   ├── database/               # Database schemas
-│   │   ├── schemas/            # 8 modular schema files
-│   │   └── load-schemas.js     # Schema loading tool
+│   │   └── server.cjs          # Main server
 │   ├── components/             # React components
+│   │   ├── common/             # Shared components (SearchBar, NotificationDropdown)
+│   │   ├── settings/           # Settings-specific components
+│   │   └── layouts/            # Layout components
+│   ├── contexts/               # React contexts (Settings, Auth, Theme)
 │   ├── pages/                  # Application pages
 │   ├── hooks/                  # Custom React hooks
 │   ├── services/               # API services
-│   └── utils/                  # Utility functions
+│   ├── utils/                  # Utility functions
+│   └── assets/                 # Static assets (images, lottie animations)
 ├── Documentation/              # Comprehensive guides
 └── README.md                   # This file
 ```
@@ -340,4 +347,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 Built with ❤️ using modern web technologies and best practices. Special thanks to all contributors and the open-source community.
 
-**HRMS HUI v1** - Empowering organizations with modern HR management solutions.
+**HRMS HUI v2** - Empowering organizations with modern HR management solutions.
