@@ -161,17 +161,24 @@ npm run dev          # Start with nodemon
 
 ## 🔐 Default Credentials
 
+The following default users are created automatically when you run the migrations:
+
 ### Super Admin
 - **Email**: admin@hrms.com
 - **Password**: admin123
+- **Role**: Super Administrator with full system access
 
 ### Company Admin
 - **Email**: company@hrms.com
 - **Password**: company123
+- **Role**: Company Administrator with company-level access
 
 ### Employee
 - **Email**: employee@hrms.com
 - **Password**: employee123
+- **Role**: Standard employee with basic access
+
+> **Note**: Additional test users may exist in the database (demo@hrms.com, admin@example.com, etc.) for development purposes. The above credentials are the primary default users as documented.
 
 ## 📊 System Requirements
 
