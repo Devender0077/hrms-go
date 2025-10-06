@@ -1,234 +1,358 @@
-import React from "react";
-import { Switch, Input, Select, SelectItem, Card, CardBody, CardHeader, Divider } from "@heroui/react";
-import { Icon } from "@iconify/react";
+import React from 'react';
+import { Card, CardBody, CardHeader, Switch, Input, Select, SelectItem, Textarea } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface ReportsSettingsProps {
-  settings: {
-    autoReportGeneration: boolean;
-    reportFrequency: string;
-    reportFormat: string;
-    emailReports: boolean;
-    reportRetention: number;
-    includeCharts: boolean;
-    includeRawData: boolean;
-    reportTimezone: string;
-  };
+  settings: Record<string, any>;
   onSettingsChange: (field: string, value: any) => void;
 }
 
 export default function ReportsSettings({ settings, onSettingsChange }: ReportsSettingsProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-primary-100 rounded-lg">
-          <Icon icon="lucide:bar-chart" className="text-primary-600 text-lg" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Reports & Analytics</h2>
-          <p className="text-default-600">Configure report generation and analytics settings</p>
-        </div>
-      </div>
-
+    <div className="space-y-4 sm:space-y-6">
       {/* Report Generation Settings */}
-      <Card>
-        <CardHeader>
-          <h3 className="text-lg font-semibold">Report Generation</h3>
-        </CardHeader>
-        <CardBody className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">Auto Report Generation</span>
-              <span className="text-xs text-default-500">Automatically generate reports on schedule</span>
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+              <Icon icon="lucide:file-bar-chart" className="text-primary-600 dark:text-primary-400 text-xl" />
             </div>
-            <Switch
-              isSelected={settings.autoReportGeneration}
-              onValueChange={(value) => onSettingsChange("autoReportGeneration", value)}
-            />
+            <h3 className="text-lg font-semibold text-foreground">Report Generation</h3>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        </CardHeader>
+        <CardBody className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Select
-              label="Report Frequency"
-              selectedKeys={[settings.reportFrequency]}
-              onSelectionChange={(keys) => onSettingsChange("reportFrequency", Array.from(keys)[0])}
+              label="Default Report Format"
+              placeholder="Select default format"
+              selectedKeys={settings.defaultReportFormat ? [settings.defaultReportFormat] : ['pdf']}
+              onSelectionChange={(keys) => onSettingsChange('defaultReportFormat', Array.from(keys)[0])}
             >
-              <SelectItem key="daily" value="daily">Daily</SelectItem>
-              <SelectItem key="weekly" value="weekly">Weekly</SelectItem>
-              <SelectItem key="monthly" value="monthly">Monthly</SelectItem>
-              <SelectItem key="quarterly" value="quarterly">Quarterly</SelectItem>
-              <SelectItem key="yearly" value="yearly">Yearly</SelectItem>
+              <SelectItem key="pdf">PDF</SelectItem>
+              <SelectItem key="excel">Excel</SelectItem>
+              <SelectItem key="csv">CSV</SelectItem>
+              <SelectItem key="html">HTML</SelectItem>
             </Select>
-            
+
             <Select
-              label="Report Format"
-              selectedKeys={[settings.reportFormat]}
-              onSelectionChange={(keys) => onSettingsChange("reportFormat", Array.from(keys)[0])}
+              label="Report Quality"
+              placeholder="Select quality"
+              selectedKeys={settings.reportQuality ? [settings.reportQuality] : ['high']}
+              onSelectionChange={(keys) => onSettingsChange('reportQuality', Array.from(keys)[0])}
             >
-              <SelectItem key="pdf" value="pdf">PDF</SelectItem>
-              <SelectItem key="excel" value="excel">Excel</SelectItem>
-              <SelectItem key="csv" value="csv">CSV</SelectItem>
-              <SelectItem key="json" value="json">JSON</SelectItem>
+              <SelectItem key="low">Low (Fast)</SelectItem>
+              <SelectItem key="medium">Medium</SelectItem>
+              <SelectItem key="high">High (Best)</SelectItem>
             </Select>
           </div>
-          
-          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">Email Reports</span>
-              <span className="text-xs text-default-500">Automatically email reports to stakeholders</span>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-default-50 dark:bg-default-100/50 rounded-lg">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Include Charts</p>
+              <p className="text-xs text-default-500 dark:text-default-400">Include visual charts in reports</p>
             </div>
             <Switch
-              isSelected={settings.emailReports}
-              onValueChange={(value) => onSettingsChange("emailReports", value)}
+              isSelected={settings.includeCharts === true || settings.includeCharts === 'true'}
+              onValueChange={(value) => onSettingsChange('includeCharts', value)}
+              color="primary"
             />
           </div>
-          
-          <Input
-            label="Report Retention (days)"
-            type="number"
-            placeholder="365"
-            value={settings.reportRetention.toString()}
-            onValueChange={(value) => onSettingsChange("reportRetention", parseInt(value))}
-            description="How long to keep generated reports"
-          />
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-default-50 dark:bg-default-100/50 rounded-lg">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Include Raw Data</p>
+              <p className="text-xs text-default-500 dark:text-default-400">Include raw data tables in reports</p>
+            </div>
+            <Switch
+              isSelected={settings.includeRawData === true || settings.includeRawData === 'true'}
+              onValueChange={(value) => onSettingsChange('includeRawData', value)}
+              color="primary"
+            />
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-default-50 dark:bg-default-100/50 rounded-lg">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Include Summary</p>
+              <p className="text-xs text-default-500 dark:text-default-400">Include executive summary in reports</p>
+            </div>
+            <Switch
+              isSelected={settings.includeSummary === true || settings.includeSummary === 'true'}
+              onValueChange={(value) => onSettingsChange('includeSummary', value)}
+              color="primary"
+            />
+          </div>
         </CardBody>
       </Card>
 
-      {/* Report Content Settings */}
+      {/* Auto-Generation Settings */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Report Content</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:calendar-clock" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Auto-Generation</h3>
+          </div>
         </CardHeader>
         <CardBody className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">Include Charts</span>
-              <span className="text-xs text-default-500">Add visual charts and graphs to reports</span>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Monthly Reports</p>
+              <p className="text-xs text-default-500">Automatically generate monthly reports</p>
             </div>
             <Switch
-              isSelected={settings.includeCharts}
-              onValueChange={(value) => onSettingsChange("includeCharts", value)}
+              isSelected={settings.autoGenerate?.monthly === true || settings.autoGenerate?.monthly === 'true'}
+              onValueChange={(value) => onSettingsChange('autoGenerate', {
+                ...settings.autoGenerate,
+                monthly: value
+              })}
             />
           </div>
-          
-          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">Include Raw Data</span>
-              <span className="text-xs text-default-500">Include detailed data tables in reports</span>
-            </div>
-            <Switch
-              isSelected={settings.includeRawData}
-              onValueChange={(value) => onSettingsChange("includeRawData", value)}
-            />
-          </div>
-          
-          <Select
-            label="Report Timezone"
-            selectedKeys={[settings.reportTimezone]}
-            onSelectionChange={(keys) => onSettingsChange("reportTimezone", Array.from(keys)[0])}
-          >
-            <SelectItem key="UTC" value="UTC">UTC</SelectItem>
-            <SelectItem key="America/New_York" value="America/New_York">Eastern Time</SelectItem>
-            <SelectItem key="America/Chicago" value="America/Chicago">Central Time</SelectItem>
-            <SelectItem key="America/Denver" value="America/Denver">Mountain Time</SelectItem>
-            <SelectItem key="America/Los_Angeles" value="America/Los_Angeles">Pacific Time</SelectItem>
-            <SelectItem key="Europe/London" value="Europe/London">London</SelectItem>
-            <SelectItem key="Europe/Paris" value="Europe/Paris">Paris</SelectItem>
-            <SelectItem key="Asia/Tokyo" value="Asia/Tokyo">Tokyo</SelectItem>
-          </Select>
-        </CardBody>
-      </Card>
 
-      {/* Available Reports */}
-      <Card>
-        <CardHeader>
-          <h3 className="text-lg font-semibold">Available Reports</h3>
-        </CardHeader>
-        <CardBody>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Quarterly Reports</p>
+              <p className="text-xs text-default-500">Automatically generate quarterly reports</p>
+            </div>
+            <Switch
+              isSelected={settings.autoGenerate?.quarterly === true || settings.autoGenerate?.quarterly === 'true'}
+              onValueChange={(value) => onSettingsChange('autoGenerate', {
+                ...settings.autoGenerate,
+                quarterly: value
+              })}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Yearly Reports</p>
+              <p className="text-xs text-default-500">Automatically generate yearly reports</p>
+            </div>
+            <Switch
+              isSelected={settings.autoGenerate?.yearly === true || settings.autoGenerate?.yearly === 'true'}
+              onValueChange={(value) => onSettingsChange('autoGenerate', {
+                ...settings.autoGenerate,
+                yearly: value
+              })}
+            />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-3 mb-2">
-                <Icon icon="lucide:users" className="text-primary-600" />
-                <h4 className="font-medium">Employee Reports</h4>
-              </div>
-              <ul className="text-sm text-default-600 space-y-1">
-                <li>• Employee Directory</li>
-                <li>• Attendance Summary</li>
-                <li>• Performance Reviews</li>
-                <li>• Salary Reports</li>
-              </ul>
-            </div>
-            
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-3 mb-2">
-                <Icon icon="lucide:calendar" className="text-success-600" />
-                <h4 className="font-medium">Leave Reports</h4>
-              </div>
-              <ul className="text-sm text-default-600 space-y-1">
-                <li>• Leave Balance</li>
-                <li>• Leave Usage</li>
-                <li>• Holiday Calendar</li>
-                <li>• Leave Trends</li>
-              </ul>
-            </div>
-            
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-3 mb-2">
-                <Icon icon="lucide:dollar-sign" className="text-warning-600" />
-                <h4 className="font-medium">Payroll Reports</h4>
-              </div>
-              <ul className="text-sm text-default-600 space-y-1">
-                <li>• Payroll Summary</li>
-                <li>• Tax Reports</li>
-                <li>• Benefits Summary</li>
-                <li>• Deduction Reports</li>
-              </ul>
-            </div>
-            
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-3 mb-2">
-                <Icon icon="lucide:trending-up" className="text-secondary-600" />
-                <h4 className="font-medium">Analytics Reports</h4>
-              </div>
-              <ul className="text-sm text-default-600 space-y-1">
-                <li>• HR Analytics</li>
-                <li>• Performance Metrics</li>
-                <li>• Cost Analysis</li>
-                <li>• Trend Analysis</li>
-              </ul>
-            </div>
+            <Input
+              label="Generation Time"
+              type="time"
+              
+              onChange={(e) => onSettingsChange('autoGenerate', {
+                ...settings.autoGenerate,
+                time: e.target.value
+              })}
+              startContent={<Icon icon="lucide:clock" className="text-default-400" />}
+            />
+
+            <Select
+              label="Generation Day"
+              placeholder="Select day"
+              selectedKeys={settings.autoGenerate?.day ? [settings.autoGenerate.day] : ['1']}
+              onSelectionChange={(keys) => onSettingsChange('autoGenerate', {
+                ...settings.autoGenerate,
+                day: Array.from(keys)[0]
+              })}
+            >
+              <SelectItem key="1">1st of Month</SelectItem>
+              <SelectItem key="15">15th of Month</SelectItem>
+              <SelectItem key="last">Last Day of Month</SelectItem>
+            </Select>
           </div>
         </CardBody>
       </Card>
 
-      {/* Report Scheduling */}
+      {/* Email Reports Settings */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Report Scheduling</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:mail" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Email Reports</h3>
+          </div>
         </CardHeader>
-        <CardBody>
-          <div className="space-y-4">
-            <div className="p-4 bg-content1 rounded-lg">
-              <h4 className="font-medium mb-2">Scheduled Reports</h4>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Weekly Attendance Report</span>
-                  <span className="text-xs text-default-500">Every Monday at 9:00 AM</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Monthly Payroll Report</span>
-                  <span className="text-xs text-default-500">1st of every month at 8:00 AM</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Quarterly Performance Report</span>
-                  <span className="text-xs text-default-500">1st of quarter at 10:00 AM</span>
-                </div>
-              </div>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Email Reports</p>
+              <p className="text-xs text-default-500">Automatically email generated reports</p>
             </div>
-            
-            <button className="w-full px-4 py-2 border border-primary-600 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors">
-              <Icon icon="lucide:plus" className="inline mr-2" />
-              Add New Scheduled Report
-            </button>
+            <Switch
+              isSelected={settings.emailReports?.enabled === true || settings.emailReports?.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('emailReports', {
+                ...settings.emailReports,
+                enabled: value
+              })}
+            />
+          </div>
+
+          {settings.emailReports?.enabled && (
+            <>
+              <Textarea
+                label="Email Recipients"
+                placeholder="Enter email addresses separated by commas"
+                
+                onChange={(e) => onSettingsChange('emailReports', {
+                  ...settings.emailReports,
+                  recipients: e.target.value.split(',').map(email => email.trim()).filter(email => email)
+                })}
+                description="Enter email addresses separated by commas"
+                startContent={<Icon icon="lucide:users" className="text-default-400" />}
+              />
+
+              <Input
+                label="Email Subject Template"
+                value={settings.emailReports?.subjectTemplate || 'Monthly Report - {month} {year}'}
+                onChange={(e) => onSettingsChange('emailReports', {
+                  ...settings.emailReports,
+                  subjectTemplate: e.target.value
+                })}
+                placeholder="Monthly HR Report - {month} {year}"
+                startContent={<Icon icon="lucide:mail" className="text-default-400" />}
+              />
+
+              <Textarea
+                label="Email Body Template"
+                placeholder="Enter email body template"
+                value={settings.emailReports?.bodyTemplate || 'Please find attached the monthly HR report for {month} {year}.'}
+                onChange={(e) => onSettingsChange('emailReports', {
+                  ...settings.emailReports,
+                  bodyTemplate: e.target.value
+                })}
+                description="Use {month}, {year}, {company} as placeholders"
+                startContent={<Icon icon="lucide:file-text" className="text-default-400" />}
+              />
+            </>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* Data Retention Settings */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:database" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Data Retention</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Retention Period (Days)"
+              type="number"
+              
+              onChange={(e) => onSettingsChange('retentionPeriod', parseInt(e.target.value) || 365)}
+              placeholder="365"
+              startContent={<Icon icon="lucide:calendar-days" className="text-default-400" />}
+            />
+
+            <Select
+              label="Archive Format"
+              placeholder="Select archive format"
+              selectedKeys={settings.archiveFormat ? [settings.archiveFormat] : ['zip']}
+              onSelectionChange={(keys) => onSettingsChange('archiveFormat', Array.from(keys)[0])}
+            >
+              <SelectItem key="zip">ZIP</SelectItem>
+              <SelectItem key="tar">TAR</SelectItem>
+              <SelectItem key="7z">7Z</SelectItem>
+            </Select>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Auto Archive</p>
+              <p className="text-xs text-default-500">Automatically archive old reports</p>
+            </div>
+            <Switch
+              isSelected={settings.autoArchive === true || settings.autoArchive === 'true'}
+              onValueChange={(value) => onSettingsChange('autoArchive', value)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Auto Delete</p>
+              <p className="text-xs text-default-500">Automatically delete archived reports after retention period</p>
+            </div>
+            <Switch
+              isSelected={settings.autoDelete === true || settings.autoDelete === 'true'}
+              onValueChange={(value) => onSettingsChange('autoDelete', value)}
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Report Templates */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:template" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Report Templates</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Company Logo URL"
+              
+              onChange={(e) => onSettingsChange('template', {
+                ...settings.template,
+                logoUrl: e.target.value
+              })}
+              placeholder="https://company.com/logo.png"
+              startContent={<Icon icon="lucide:image" className="text-default-400" />}
+            />
+
+            <Input
+              label="Company Name"
+              
+              onChange={(e) => onSettingsChange('template', {
+                ...settings.template,
+                companyName: e.target.value
+              })}
+              placeholder="Your Company Name"
+              startContent={<Icon icon="lucide:building" className="text-default-400" />}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Input
+              label="Primary Color"
+              type="color"
+              
+              onChange={(e) => onSettingsChange('template', {
+                ...settings.template,
+                primaryColor: e.target.value
+              })}
+              startContent={<Icon icon="lucide:palette" className="text-default-400" />}
+            />
+
+            <Input
+              label="Secondary Color"
+              type="color"
+              
+              onChange={(e) => onSettingsChange('template', {
+                ...settings.template,
+                secondaryColor: e.target.value
+              })}
+              startContent={<Icon icon="lucide:palette" className="text-default-400" />}
+            />
+
+            <Select
+              label="Font Family"
+              placeholder="Select font"
+              selectedKeys={settings.template?.fontFamily ? [settings.template.fontFamily] : ['Arial']}
+              onSelectionChange={(keys) => onSettingsChange('template', {
+                ...settings.template,
+                fontFamily: Array.from(keys)[0]
+              })}
+            >
+              <SelectItem key="Arial">Arial</SelectItem>
+              <SelectItem key="Times New Roman">Times New Roman</SelectItem>
+              <SelectItem key="Helvetica">Helvetica</SelectItem>
+              <SelectItem key="Calibri">Calibri</SelectItem>
+            </Select>
           </div>
         </CardBody>
       </Card>

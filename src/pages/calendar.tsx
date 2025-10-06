@@ -27,6 +27,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "../contexts/auth-context";
 import { useCalendar } from "../hooks/useCalendar";
 import { addToast } from "@heroui/react";
+import HeroSection from "../components/common/HeroSection";
 
 interface CalendarEvent {
   id: string;
@@ -125,7 +126,7 @@ export default function CalendarPage() {
       if (!event.visibility || event.visibility === 'all') return true;
       if (event.visibility === 'departments' && event.departments) {
         // Check if user's department is in the visible departments
-        return event.departments.includes(user.department || '');
+        return event.departments.includes((user as any).department || '');
       }
       if (event.visibility === 'specific' && event.visible_to) {
         return event.visible_to.includes(user.email);
@@ -323,28 +324,38 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-content2 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
-              <Icon icon="lucide:calendar" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Calendar</h1>
-              <p className="text-default-600 mt-1">Manage events and schedule meetings</p>
-            </div>
-          </div>
-          <Button 
-            color="primary" 
-            variant="flat"
-            startContent={<Icon icon="lucide:plus" />}
-            onPress={onOpen}
-          >
-            Add Event
-          </Button>
-        </div>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Calendar"
+          subtitle="Events & Scheduling"
+          description="Manage and view all company events, meetings, and important dates. Stay organized with our comprehensive calendar system."
+          icon="lucide:calendar"
+          illustration="calendar"
+          actions={[
+            {
+              label: "Add Event",
+              icon: "lucide:plus",
+              onPress: onOpen,
+              variant: "solid"
+            },
+            {
+              label: "Export Calendar",
+              icon: "lucide:download",
+              onPress: () => console.log("Export Calendar"),
+              variant: "bordered"
+            }
+          ]}
+        />
+
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-6"
+        >
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Calendar */}
@@ -508,6 +519,7 @@ export default function CalendarPage() {
             </Card>
           </div>
         </div>
+        </motion.div>
 
         {/* Add Event Modal */}
         <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
@@ -528,7 +540,7 @@ export default function CalendarPage() {
                     <Input
                       label="Event Title"
                       placeholder="Enter event title"
-                      value={newEvent.title}
+                      
                       onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
                       isRequired
                     />
@@ -537,14 +549,14 @@ export default function CalendarPage() {
                       <Input
                         type="date"
                         label="Date"
-                        value={newEvent.date}
+                        
                         onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
                         isRequired
                       />
                       <Input
                         type="time"
                         label="Time"
-                        value={newEvent.time}
+                        
                         onChange={(e) => setNewEvent({...newEvent, time: e.target.value})}
                         isRequired
                       />
@@ -561,7 +573,7 @@ export default function CalendarPage() {
                         }}
                       >
                         {eventTypes.map((type) => (
-                          <SelectItem key={type.key} value={type.key} textValue={type.label}>
+                          <SelectItem key={type.key}  textValue={type.label}>
                             <div className="flex items-center gap-2">
                               <Icon icon={type.icon} className="w-4 h-4" />
                               <span>{type.label}</span>
@@ -580,7 +592,7 @@ export default function CalendarPage() {
                         }}
                       >
                         {colorOptions.map((color) => (
-                          <SelectItem key={color.key} value={color.key} textValue={color.label}>
+                          <SelectItem key={color.key}  textValue={color.label}>
                             <div className="flex items-center gap-2">
                               <div className={`w-3 h-3 rounded-full bg-${color.color}-500`} />
                               <span>{color.label}</span>
@@ -593,14 +605,14 @@ export default function CalendarPage() {
                     <Input
                       label="Location"
                       placeholder="Enter event location"
-                      value={newEvent.location}
+                      
                       onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
                     />
 
                     <Textarea
                       label="Description"
                       placeholder="Enter event description"
-                      value={newEvent.description}
+                      
                       onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
                     />
 
@@ -640,12 +652,12 @@ export default function CalendarPage() {
                           setNewEvent({...newEvent, reminder_minutes: selectedKey ? parseInt(selectedKey) : null});
                         }}
                       >
-                        <SelectItem key="5" value="5" textValue="5 minutes before">5 minutes before</SelectItem>
-                        <SelectItem key="15" value="15" textValue="15 minutes before">15 minutes before</SelectItem>
-                        <SelectItem key="30" value="30" textValue="30 minutes before">30 minutes before</SelectItem>
-                        <SelectItem key="60" value="60" textValue="1 hour before">1 hour before</SelectItem>
-                        <SelectItem key="1440" value="1440" textValue="1 day before">1 day before</SelectItem>
-                        <SelectItem key="10080" value="10080" textValue="1 week before">1 week before</SelectItem>
+                        <SelectItem key="5" textValue="5 minutes before">5 minutes before</SelectItem>
+                        <SelectItem key="15" textValue="15 minutes before">15 minutes before</SelectItem>
+                        <SelectItem key="30" textValue="30 minutes before">30 minutes before</SelectItem>
+                        <SelectItem key="60" textValue="1 hour before">1 hour before</SelectItem>
+                        <SelectItem key="1440" textValue="1 day before">1 day before</SelectItem>
+                        <SelectItem key="10080" textValue="1 week before">1 week before</SelectItem>
                       </Select>
                     </div>
 
@@ -659,10 +671,10 @@ export default function CalendarPage() {
                           setNewEvent({...newEvent, recurrence_pattern: selectedKey});
                         }}
                       >
-                        <SelectItem key="daily" value="daily" textValue="Daily">Daily</SelectItem>
-                        <SelectItem key="weekly" value="weekly" textValue="Weekly">Weekly</SelectItem>
-                        <SelectItem key="monthly" value="monthly" textValue="Monthly">Monthly</SelectItem>
-                        <SelectItem key="yearly" value="yearly" textValue="Yearly">Yearly</SelectItem>
+                        <SelectItem key="daily" textValue="Daily">Daily</SelectItem>
+                        <SelectItem key="weekly" textValue="Weekly">Weekly</SelectItem>
+                        <SelectItem key="monthly" textValue="Monthly">Monthly</SelectItem>
+                        <SelectItem key="yearly" textValue="Yearly">Yearly</SelectItem>
                       </Select>
                     )}
 
@@ -675,19 +687,19 @@ export default function CalendarPage() {
                         setNewEvent({...newEvent, visibility: selectedKey as 'all' | 'departments' | 'specific'});
                       }}
                     >
-                      <SelectItem key="all" value="all" textValue="Everyone">
+                      <SelectItem key="all" textValue="Everyone">
                         <div className="flex items-center gap-2">
                           <Icon icon="lucide:globe" className="w-4 h-4" />
                           <span>Everyone</span>
                         </div>
                       </SelectItem>
-                      <SelectItem key="departments" value="departments" textValue="Specific Departments">
+                      <SelectItem key="departments" textValue="Specific Departments">
                         <div className="flex items-center gap-2">
                           <Icon icon="lucide:building" className="w-4 h-4" />
                           <span>Specific Departments</span>
                         </div>
                       </SelectItem>
-                      <SelectItem key="specific" value="specific" textValue="Specific People">
+                      <SelectItem key="specific" textValue="Specific People">
                         <div className="flex items-center gap-2">
                           <Icon icon="lucide:users" className="w-4 h-4" />
                           <span>Specific People</span>
@@ -699,7 +711,7 @@ export default function CalendarPage() {
                       <Input
                         label="Departments (comma-separated)"
                         placeholder="e.g., Engineering, HR, Marketing"
-                        value={Array.isArray(newEvent.departments) ? newEvent.departments.join(', ') : ''}
+                        
                         onChange={(e) => setNewEvent({...newEvent, departments: e.target.value.split(',').map(dept => dept.trim()).filter(dept => dept)})}
                       />
                     )}
@@ -708,7 +720,7 @@ export default function CalendarPage() {
                       <Input
                         label="Email Addresses (comma-separated)"
                         placeholder="e.g., user1@company.com, user2@company.com"
-                        value={Array.isArray(newEvent.visible_to) ? newEvent.visible_to.join(', ') : ''}
+                        
                         onChange={(e) => setNewEvent({...newEvent, visible_to: e.target.value.split(',').map(email => email.trim()).filter(email => email)})}
                       />
                     )}

@@ -213,7 +213,7 @@ const EmployeeDocumentsPage: React.FC = () => {
         
         const response = await apiRequest(endpoint, {
           method,
-          body: formDataToSend,
+          body: JSON.stringify(formDataToSend),
           headers: {
             // Don't set Content-Type for FormData, let browser set it with boundary
           }
@@ -257,9 +257,9 @@ const EmployeeDocumentsPage: React.FC = () => {
     }
   };
 
-  const handleDownloadDocument = async (document: EmployeeDocument) => {
+  const handleDownloadDocument = async (doc: EmployeeDocument) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/employees/documents/${document.id}/download`, {
+      const response = await fetch(`http://localhost:8000/api/v1/employees/documents/${doc.id}/download`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
@@ -270,7 +270,7 @@ const EmployeeDocumentsPage: React.FC = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = document.document_name;
+        a.download = doc.document_name;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -281,8 +281,8 @@ const EmployeeDocumentsPage: React.FC = () => {
     }
   };
 
-  const getDocumentTypeColor = (type: string) => {
-    const colors: { [key: string]: string } = {
+  const getDocumentTypeColor = (type: string): "success" | "default" | "primary" | "secondary" | "warning" | "danger" => {
+    const colors: { [key: string]: "success" | "default" | "primary" | "secondary" | "warning" | "danger" } = {
       'contract': 'primary',
       'id_proof': 'secondary',
       'address_proof': 'success',
@@ -409,7 +409,7 @@ const EmployeeDocumentsPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
                 placeholder="Search documents..."
-                value={filters.searchQuery}
+                
                 onChange={(e) => setFilters({...filters, searchQuery: e.target.value})}
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
@@ -422,18 +422,17 @@ const EmployeeDocumentsPage: React.FC = () => {
                   setFilters({...filters, selectedEmployee: selected || "all"});
                 }}
               >
-                <SelectItem key="all" value="all" textValue="All Employees">
+                <SelectItem key="all" textValue="All Employees">
                   All Employees
                 </SelectItem>
                 {employees.map((employee) => (
                   <SelectItem 
                     key={employee.id.toString()} 
-                    value={employee.id.toString()}
                     textValue={`${employee.first_name} ${employee.last_name} (${employee.employee_id})`}
                   >
                     {employee.first_name} {employee.last_name} ({employee.employee_id})
                   </SelectItem>
-                ))}
+                )) as any}
               </Select>
               <Select
                 label="Filter by Type"
@@ -444,14 +443,14 @@ const EmployeeDocumentsPage: React.FC = () => {
                   setFilters({...filters, selectedType: selected || "all"});
                 }}
               >
-                <SelectItem key="all" value="all" textValue="All Types">
+                <SelectItem key="all" textValue="All Types">
                   All Types
                 </SelectItem>
                 {documentTypes.map((type) => (
-                  <SelectItem key={type.key} value={type.key} textValue={type.label}>
+                  <SelectItem key={type.key}  textValue={type.label}>
                     {type.label}
                   </SelectItem>
-                ))}
+                )) as any}
               </Select>
             </div>
           </CardBody>
@@ -619,7 +618,7 @@ const EmployeeDocumentsPage: React.FC = () => {
                   {employees.map((employee) => (
                     <SelectItem 
                       key={employee.id.toString()} 
-                      value={employee.id.toString()}
+                      
                       textValue={`${employee.first_name} ${employee.last_name} (${employee.employee_id})`}
                     >
                       {employee.first_name} {employee.last_name} ({employee.employee_id})
@@ -638,7 +637,7 @@ const EmployeeDocumentsPage: React.FC = () => {
                   isRequired
                 >
                   {documentTypes.map((type) => (
-                    <SelectItem key={type.key} value={type.key} textValue={type.label}>
+                    <SelectItem key={type.key}  textValue={type.label}>
                       {type.label}
                     </SelectItem>
                   ))}
@@ -647,7 +646,7 @@ const EmployeeDocumentsPage: React.FC = () => {
                 <Input
                   label="Document Name"
                   placeholder="Enter document name"
-                  value={formData.document_name}
+                  
                   onChange={(e) => setFormData({ ...formData, document_name: e.target.value })}
                   isRequired
                 />
@@ -672,7 +671,7 @@ const EmployeeDocumentsPage: React.FC = () => {
                 <Input
                   label="Expiry Date (Optional)"
                   type="date"
-                  value={formData.expiry_date}
+                  
                   onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
                 />
               </div>

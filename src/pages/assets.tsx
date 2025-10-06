@@ -35,13 +35,14 @@ import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
 import { useAssets, Asset } from "../hooks/useAssets";
 import { getDefaultAvatar } from "../utils/avatarUtils";
+import HeroSection from "../components/common/HeroSection";
 
 const categories = ["Computer", "Phone", "Tablet", "Monitor", "Printer", "Furniture", "Vehicle", "Other"];
 const statusOptions = ["available", "assigned", "maintenance", "retired"];
 
 const statusColorMap = {
   available: "success",
-  assigned: "primary",
+  assigned: "default",
   maintenance: "warning",
   retired: "danger",
 };
@@ -102,7 +103,7 @@ export default function AssetsPage() {
         purchase_price: asset.purchase_price?.toString() || "",
         assigned_to: asset.assigned_to?.toString() || "",
         location: asset.location || "",
-        status: asset.status || "available"
+        status: (asset.status || "available") as "available"
       });
     } else {
       setFormData({
@@ -134,14 +135,14 @@ export default function AssetsPage() {
         addToast({
           title: "Success",
           description: "Asset updated successfully",
-          type: "success"
+          color: "success"
         });
       } else {
         await createAsset(assetData);
         addToast({
           title: "Success",
           description: "Asset created successfully",
-          type: "success"
+          color: "success"
         });
       }
       
@@ -150,7 +151,7 @@ export default function AssetsPage() {
       addToast({
         title: "Error",
         description: "Failed to save asset",
-        type: "error"
+        color: "danger"
       });
     }
   };
@@ -162,13 +163,13 @@ export default function AssetsPage() {
         addToast({
           title: "Success",
           description: "Asset deleted successfully",
-          type: "success"
+          color: "success"
         });
       } catch (error) {
         addToast({
           title: "Error",
           description: "Failed to delete asset",
-          type: "error"
+          color: "danger"
         });
       }
     }
@@ -205,21 +206,49 @@ export default function AssetsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Assets</h1>
-          <p className="text-default-600">Manage company assets and equipment</p>
-        </div>
-        <Button
-          color="primary"
-          onPress={() => handleOpenModal(null, false)}
-          startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Assets"
+          subtitle="Asset Management"
+          description="Manage company assets and equipment efficiently. Track inventory, assignments, and maintenance schedules."
+          icon="lucide:package"
+          illustration="assets"
+          actions={[
+            {
+              label: "Add Asset",
+              icon: "lucide:plus",
+              onPress: () => handleOpenModal(null, false),
+              variant: "solid"
+            },
+            {
+              label: "Export Report",
+              icon: "lucide:download",
+              onPress: () => console.log("Export Report"),
+              variant: "bordered"
+            }
+          ]}
+        />
+
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-6"
         >
-          Add Asset
-        </Button>
-      </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Button
+                color="primary"
+                onPress={() => handleOpenModal(null, false)}
+                startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+              >
+                Add Asset
+              </Button>
+            </div>
+          </div>
 
       {/* Search and Filters */}
       <Card>
@@ -227,7 +256,7 @@ export default function AssetsPage() {
           <div className="flex gap-4 items-center">
             <Input
               placeholder="Search assets..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="max-w-sm"
@@ -306,7 +335,7 @@ export default function AssetsPage() {
                   <TableCell>
                     <Chip 
                       size="sm" 
-                      color={statusColorMap[asset.status as keyof typeof statusColorMap]}
+                      color={statusColorMap[asset.status as keyof typeof statusColorMap] as "success" | "default" | "warning" | "danger"}
                       variant="flat"
                     >
                       {asset.status.toUpperCase()}
@@ -356,6 +385,7 @@ export default function AssetsPage() {
           )}
         </CardBody>
       </Card>
+        </motion.div>
 
       {/* Asset Modal */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside">
@@ -370,7 +400,7 @@ export default function AssetsPage() {
                   <Input
                     label="Asset Name"
                     placeholder="Enter asset name"
-                    value={formData.name}
+                    
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     isRequired
                   />
@@ -383,7 +413,7 @@ export default function AssetsPage() {
                       onSelectionChange={(keys) => setFormData({...formData, category: Array.from(keys)[0] as string})}
                     >
                       {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
+                        <SelectItem key={category} >
                           {category}
                         </SelectItem>
                       ))}
@@ -396,7 +426,7 @@ export default function AssetsPage() {
                       onSelectionChange={(keys) => setFormData({...formData, status: Array.from(keys)[0] as any})}
                     >
                       {statusOptions.map((status) => (
-                        <SelectItem key={status} value={status}>
+                        <SelectItem key={status} >
                           {status.toUpperCase()}
                         </SelectItem>
                       ))}
@@ -406,7 +436,7 @@ export default function AssetsPage() {
                   <Input
                     label="Serial Number"
                     placeholder="Enter serial number"
-                    value={formData.serial_number}
+                    
                     onChange={(e) => setFormData({...formData, serial_number: e.target.value})}
                   />
                   
@@ -414,14 +444,14 @@ export default function AssetsPage() {
                     <Input
                       label="Purchase Date"
                       type="date"
-                      value={formData.purchase_date}
+                      
                       onChange={(e) => setFormData({...formData, purchase_date: e.target.value})}
                     />
                     <Input
                       label="Purchase Price"
                       type="number"
                       placeholder="0.00"
-                      value={formData.purchase_price}
+                      
                       onChange={(e) => setFormData({...formData, purchase_price: e.target.value})}
                     />
                   </div>
@@ -431,13 +461,13 @@ export default function AssetsPage() {
                       label="Assigned To (Employee ID)"
                       type="number"
                       placeholder="Employee ID"
-                      value={formData.assigned_to}
+                      
                       onChange={(e) => setFormData({...formData, assigned_to: e.target.value})}
                     />
                     <Input
                       label="Location"
                       placeholder="Enter location"
-                      value={formData.location}
+                      
                       onChange={(e) => setFormData({...formData, location: e.target.value})}
                     />
                   </div>
@@ -445,7 +475,7 @@ export default function AssetsPage() {
                   <Textarea
                     label="Description"
                     placeholder="Enter asset description"
-                    value={formData.description}
+                    
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows={3}
                   />
@@ -463,6 +493,7 @@ export default function AssetsPage() {
           )}
         </ModalContent>
       </Modal>
+      </div>
     </div>
   );
 }

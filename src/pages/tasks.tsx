@@ -28,7 +28,7 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
-import PageLayout, { PageHeader } from "../components/layout/PageLayout";
+import HeroSection from "../components/common/HeroSection";
 import { useAuth } from "../contexts/auth-context";
 import { useTaskContext } from "../contexts/task-context";
 import Papa from "papaparse";
@@ -301,31 +301,41 @@ export default function TasksPage() {
   };
 
   return (
-    <PageLayout>
-      <PageHeader
-        title="Tasks"
-        description="Manage and track your tasks"
-        icon="lucide:check-square"
-        iconColor="from-primary-500 to-secondary-500"
-        actions={
-          <>
-            <Button 
-              color="primary"
-              startContent={<Icon icon="lucide:plus" />}
-              onPress={onOpen}
-            >
-              Add Task
-            </Button>
-            <Button 
-              color="secondary"
-              startContent={<Icon icon="lucide:download" />}
-              onPress={handleExportTasks}
-            >
-              Export
-            </Button>
-          </>
-        }
-      />
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Tasks"
+          subtitle="Task Management"
+          description="Manage and track your tasks efficiently. Stay organized with our comprehensive task management system."
+          icon="lucide:check-square"
+          illustration="task"
+          actions={[
+            {
+              label: "Add Task",
+              icon: "lucide:plus",
+              onPress: onOpen,
+              variant: "solid"
+            },
+            {
+              label: "Export Tasks",
+              icon: "lucide:download",
+              onPress: handleExportTasks,
+              variant: "bordered"
+            }
+          ]}
+        />
+
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {/* Export button removed - now available in hero section */}
+          </div>
 
         {/* Filters */}
         <Card className="border-0 shadow-sm">
@@ -333,7 +343,7 @@ export default function TasksPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               <Input
                 placeholder="Search tasks..."
-                value={searchTerm}
+                
                 onChange={(e) => setSearchTerm(e.target.value)}
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
                 className="lg:col-span-2"
@@ -519,7 +529,7 @@ export default function TasksPage() {
                       <span className="text-sm font-medium text-foreground">{task.progress}%</span>
                     </div>
                     <Progress
-                      value={task.progress}
+                      
                       color={task.progress === 100 ? "success" : task.progress > 50 ? "primary" : "warning"}
                       className="h-2"
                     />
@@ -604,7 +614,7 @@ export default function TasksPage() {
                     <Input
                       label="Task Title"
                       placeholder="Enter task title"
-                      value={newTask.title}
+                      
                       onChange={(e) => setNewTask({...newTask, title: e.target.value})}
                       isRequired
                     />
@@ -612,7 +622,7 @@ export default function TasksPage() {
                     <Textarea
                       label="Description"
                       placeholder="Enter task description"
-                      value={newTask.description}
+                      
                       onChange={(e) => setNewTask({...newTask, description: e.target.value})}
                       minRows={3}
                     />
@@ -650,7 +660,7 @@ export default function TasksPage() {
                       <Input
                         label="Due Date"
                         type="date"
-                        value={newTask.dueDate}
+                        
                         onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
                         isRequired
                       />
@@ -659,7 +669,7 @@ export default function TasksPage() {
                         label="Estimated Hours"
                         type="number"
                         placeholder="Enter estimated hours"
-                        value={newTask.estimatedHours}
+                        
                         onChange={(e) => setNewTask({...newTask, estimatedHours: e.target.value})}
                       />
                       
@@ -667,7 +677,7 @@ export default function TasksPage() {
                         label="Actual Hours"
                         type="number"
                         placeholder="Enter actual hours"
-                        value={newTask.actualHours}
+                        
                         onChange={(e) => setNewTask({...newTask, actualHours: e.target.value})}
                       />
                     </div>
@@ -676,14 +686,14 @@ export default function TasksPage() {
                       <Input
                         label="Project"
                         placeholder="Enter project name"
-                        value={newTask.project}
+                        
                         onChange={(e) => setNewTask({...newTask, project: e.target.value})}
                       />
                       
                       <Input
                         label="Department"
                         placeholder="Enter department"
-                        value={newTask.department}
+                        
                         onChange={(e) => setNewTask({...newTask, department: e.target.value})}
                       />
                     </div>
@@ -691,7 +701,7 @@ export default function TasksPage() {
                     <Input
                       label="Tags"
                       placeholder="Enter tags (comma separated)"
-                      value={newTask.tags}
+                      
                       onChange={(e) => setNewTask({...newTask, tags: e.target.value})}
                     />
                   </div>
@@ -711,6 +721,8 @@ export default function TasksPage() {
             )}
           </ModalContent>
         </Modal>
-    </PageLayout>
+        </motion.div>
+      </div>
+    </div>
   );
 }

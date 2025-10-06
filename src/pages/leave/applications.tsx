@@ -99,9 +99,9 @@ export default function LeaveApplications() {
     try {
       setLoading(true);
       const [applicationsRes, leaveTypesRes, employeesRes] = await Promise.all([
-        apiRequest("GET", "/api/v1/leave/applications"),
-        apiRequest("GET", "/api/v1/leave/types"),
-        apiRequest("GET", "/api/v1/employees")
+        apiRequest("/leave/applications"),
+        apiRequest("/leave/types"),
+        apiRequest("/employees")
       ]);
 
       if (applicationsRes.success) {
@@ -154,10 +154,10 @@ export default function LeaveApplications() {
       
       const url = isEditMode 
         ? `/api/v1/leave/applications/${selectedApplication?.id}`
-        : "/api/v1/leave/applications";
+        : "/leave/applications";
       const method = isEditMode ? "PUT" : "POST";
       
-      const response = await apiRequest(method, url, formData);
+      const response = await apiRequest(url, { method, body: JSON.stringify(formData) });
       if (response.success) {
         await loadData();
         onClose();
@@ -184,8 +184,9 @@ export default function LeaveApplications() {
 
   const handleStatusChange = async (id: number, newStatus: string) => {
     try {
-      const response = await apiRequest("PUT", `/api/v1/leave/applications/${id}`, {
-        status: newStatus
+      const response = await apiRequest(`/api/v1/leave/applications/${id}`, {
+        method: "PUT",
+        body: JSON.stringify({ status: newStatus })
       });
       if (response.success) {
         await loadData();
@@ -243,7 +244,7 @@ export default function LeaveApplications() {
           <>
             <Input
               placeholder="Search applications..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
@@ -400,7 +401,7 @@ export default function LeaveApplications() {
                     isRequired
                   >
                     {employees.map((employee) => (
-                      <SelectItem key={employee.id.toString()} value={employee.id.toString()}>
+                      <SelectItem key={employee.id.toString()} >
                         {employee.first_name} {employee.last_name} ({employee.employee_id})
                       </SelectItem>
                     ))}
@@ -414,7 +415,7 @@ export default function LeaveApplications() {
                     isRequired
                   >
                     {leaveTypes.map((leaveType) => (
-                      <SelectItem key={leaveType.id.toString()} value={leaveType.id.toString()}>
+                      <SelectItem key={leaveType.id.toString()} >
                         {leaveType.name} ({leaveType.days_allowed} days)
                       </SelectItem>
                     ))}
@@ -424,7 +425,7 @@ export default function LeaveApplications() {
                     <Input
                       label="Start Date"
                       type="date"
-                      value={formData.start_date}
+                      
                       onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                       isRequired
                     />
@@ -432,7 +433,7 @@ export default function LeaveApplications() {
                     <Input
                       label="End Date"
                       type="date"
-                      value={formData.end_date}
+                      
                       onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                       isRequired
                     />
@@ -441,7 +442,7 @@ export default function LeaveApplications() {
                   <Textarea
                     label="Reason"
                     placeholder="Enter reason for leave"
-                    value={formData.reason}
+                    
                     onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                     isRequired
                   />

@@ -34,7 +34,7 @@ import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
 import { useExpenses, Expense } from "../hooks/useExpenses";
-import PageLayout, { PageHeader } from "../components/layout/PageLayout";
+import HeroSection from "../components/common/HeroSection";
 
 const categories = [
   "Travel", "Meals", "Office Supplies", "Transportation", 
@@ -45,7 +45,7 @@ const statusColorMap = {
   pending: "warning",
   approved: "success",
   rejected: "danger",
-};
+} as const;
 
 const categoryColorMap = {
   "Travel": "primary",
@@ -57,7 +57,7 @@ const categoryColorMap = {
   "Equipment": "secondary",
   "Communication": "success",
   "Other": "default",
-};
+} as const;
 
 export default function ExpensesPage() {
   const { expenses, loading, error, createExpense, updateExpense, deleteExpense } = useExpenses();
@@ -243,39 +243,68 @@ export default function ExpensesPage() {
 
   if (loading) {
     return (
-      <PageLayout>
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex justify-center items-center h-64">
           <Spinner size="lg" />
         </div>
-      </PageLayout>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <PageLayout>
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center text-danger">
           <p>Error loading expenses: {error}</p>
         </div>
-      </PageLayout>
+      </div>
     );
   }
 
   return (
-    <PageLayout>
-      <PageHeader
-        title="Expense Management"
-        description="Manage employee expenses and reimbursements"
-        actions={
-          <Button
-            color="primary"
-            startContent={<Icon icon="lucide:plus" />}
-            onPress={onOpen}
-          >
-            Add Expense
-          </Button>
-        }
-      />
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Expenses"
+          subtitle="Expense Management"
+          description="Track and manage employee expenses efficiently. Submit, approve, and monitor expense claims with detailed reporting."
+          icon="lucide:receipt"
+          illustration="expenses"
+          actions={[
+            {
+              label: "Add Expense",
+              icon: "lucide:plus",
+              onPress: () => handleOpenModal(null, false),
+              variant: "solid"
+            },
+            {
+              label: "Export Report",
+              icon: "lucide:download",
+              onPress: () => console.log("Export Report"),
+              variant: "bordered"
+            }
+          ]}
+        />
+
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Button
+                color="primary"
+                startContent={<Icon icon="lucide:plus" />}
+                onPress={onOpen}
+              >
+                Add Expense
+              </Button>
+            </div>
+          </div>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -342,32 +371,32 @@ export default function ExpensesPage() {
           <div className="flex flex-col md:flex-row gap-4">
             <Input
               placeholder="Search expenses..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" />}
               className="flex-1"
             />
             <Select
               placeholder="Status"
-              value={selectedStatus}
+              
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="w-full md:w-48"
             >
-              <SelectItem key="all" value="all">All Status</SelectItem>
-              <SelectItem key="pending" value="pending">Pending</SelectItem>
-              <SelectItem key="approved" value="approved">Approved</SelectItem>
-              <SelectItem key="rejected" value="rejected">Rejected</SelectItem>
+              <SelectItem key="all">All Status</SelectItem>
+              <SelectItem key="pending">Pending</SelectItem>
+              <SelectItem key="approved">Approved</SelectItem>
+              <SelectItem key="rejected">Rejected</SelectItem>
             </Select>
             <Select
               placeholder="Category"
-              value={selectedCategory}
+              
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="w-full md:w-48"
             >
-              <SelectItem key="all" value="all">All Categories</SelectItem>
+              <SelectItem key="all">All Categories</SelectItem>
               {categories.map(category => (
-                <SelectItem key={category} value={category}>{category}</SelectItem>
-              ))}
+                <SelectItem key={category} >{category}</SelectItem>
+              )) as any}
             </Select>
           </div>
         </CardBody>
@@ -483,6 +512,7 @@ export default function ExpensesPage() {
           )}
         </CardBody>
       </Card>
+        </motion.div>
 
       {/* Add/Edit Expense Modal */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
@@ -497,12 +527,12 @@ export default function ExpensesPage() {
                   <Select
                     label="Category"
                     placeholder="Select category"
-                    value={newExpense.category}
+                    
                     onChange={(e) => setNewExpense({...newExpense, category: e.target.value})}
                     isRequired
                   >
                     {categories.map(category => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                      <SelectItem key={category} >{category}</SelectItem>
                     ))}
                   </Select>
 
@@ -510,7 +540,7 @@ export default function ExpensesPage() {
                     label="Amount"
                     placeholder="0.00"
                     type="number"
-                    value={newExpense.amount}
+                    
                     onChange={(e) => setNewExpense({...newExpense, amount: e.target.value})}
                     startContent="$"
                     isRequired
@@ -519,26 +549,26 @@ export default function ExpensesPage() {
                   <Input
                     label="Date"
                     type="date"
-                    value={newExpense.expense_date}
+                    
                     onChange={(e) => setNewExpense({...newExpense, expense_date: e.target.value})}
                     isRequired
                   />
 
                   <Select
                     label="Currency"
-                    value={newExpense.currency}
+                    
                     onChange={(e) => setNewExpense({...newExpense, currency: e.target.value})}
                   >
-                    <SelectItem key="USD" value="USD">USD</SelectItem>
-                    <SelectItem key="EUR" value="EUR">EUR</SelectItem>
-                    <SelectItem key="GBP" value="GBP">GBP</SelectItem>
+                    <SelectItem key="USD">USD</SelectItem>
+                    <SelectItem key="EUR">EUR</SelectItem>
+                    <SelectItem key="GBP">GBP</SelectItem>
                   </Select>
 
                   <div className="md:col-span-2">
                     <Textarea
                       label="Description"
                       placeholder="Enter expense description"
-                      value={newExpense.description}
+                      
                       onChange={(e) => setNewExpense({...newExpense, description: e.target.value})}
                       isRequired
                     />
@@ -548,7 +578,7 @@ export default function ExpensesPage() {
                     <Input
                       label="Receipt Path (Optional)"
                       placeholder="Path to receipt file"
-                      value={newExpense.receipt_path}
+                      
                       onChange={(e) => setNewExpense({...newExpense, receipt_path: e.target.value})}
                     />
                   </div>
@@ -642,6 +672,7 @@ export default function ExpensesPage() {
           )}
         </ModalContent>
       </Modal>
-    </PageLayout>
+      </div>
+    </div>
   );
 }

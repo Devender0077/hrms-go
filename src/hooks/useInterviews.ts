@@ -49,7 +49,7 @@ export const useInterviews = () => {
       setError(null);
       const result = await apiRequest('/interviews', {
         method: 'POST',
-        body: interviewData,
+        body: JSON.stringify(interviewData),
       });
       await loadInterviews(); // Reload interviews after creation
       return result;
@@ -65,7 +65,7 @@ export const useInterviews = () => {
       setError(null);
       const result = await apiRequest(`/interviews/${id}`, {
         method: 'PUT',
-        body: interviewData,
+        body: JSON.stringify(interviewData),
       });
       await loadInterviews(); // Reload interviews after update
       return result;

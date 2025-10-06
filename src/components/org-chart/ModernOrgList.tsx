@@ -67,7 +67,7 @@ const ModernOrgList: React.FC<ModernOrgListProps> = ({ employees, onEmployeeClic
     }
   };
 
-  const getDepartmentColor = (department: string) => {
+  const getDepartmentColor = (department: string): "success" | "default" | "primary" | "secondary" | "warning" | "danger" => {
     const colors = {
       'HR': 'primary',
       'IT': 'secondary',
@@ -76,7 +76,7 @@ const ModernOrgList: React.FC<ModernOrgListProps> = ({ employees, onEmployeeClic
       'Operations': 'danger',
       'Sales': 'primary'
     };
-    return colors[department as keyof typeof colors] || 'default';
+    return (colors[department as keyof typeof colors] || 'default') as "success" | "default" | "primary" | "secondary" | "warning" | "danger";
   };
 
   const toggleRow = (employeeId: number) => {
@@ -159,12 +159,13 @@ const ModernOrgList: React.FC<ModernOrgListProps> = ({ employees, onEmployeeClic
                       className="w-12 h-12"
                     />
                     <Badge
-                      content=""
                       color={getStatusColor(employee.status)}
                       shape="circle"
                       size="sm"
                       className="absolute -bottom-1 -right-1"
-                    />
+                    >
+                      <div className="w-2 h-2 rounded-full" />
+                    </Badge>
                   </div>
 
                   {/* Employee Info */}

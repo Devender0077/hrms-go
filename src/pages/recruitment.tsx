@@ -391,7 +391,7 @@ import React from "react";
             <CardHeader className="flex flex-col gap-4">
               <Tabs 
                 selectedKey={activeTab} 
-                onSelectionChange={setActiveTab}
+                onSelectionChange={(key) => setActiveTab(key as string)}
                 color="primary"
                 variant="underlined"
                 classNames={{
@@ -407,7 +407,7 @@ import React from "react";
                   isClearable
                   placeholder={activeTab === "jobs" ? "Search jobs..." : "Search applications..."}
                   startContent={<Icon icon="lucide:search" className="text-default-400" />}
-                  value={searchQuery}
+                  
                   onValueChange={setSearchQuery}
                   className="w-full sm:max-w-[44%]"
                 />

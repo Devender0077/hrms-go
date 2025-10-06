@@ -1,265 +1,268 @@
-import React from "react";
-import { Card, CardBody, CardHeader, Input, Textarea, Switch, Button, Divider } from "@heroui/react";
+import React from 'react';
+import { Card, CardBody, CardHeader, Input, Textarea, Switch, Button } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface JoiningLetterSettingsProps {
-  settings: {
-    companyName: string;
-    companyAddress: string;
-    hrEmail: string;
-    hrPhone: string;
-    defaultTemplate: string;
-    autoGenerate: boolean;
-    includeReportingManager: boolean;
-    includeDepartment: boolean;
-    includeDesignation: boolean;
-    includeWorkLocation: boolean;
-    includeJoiningDate: boolean;
-    includeProbationPeriod: boolean;
-    probationPeriod: number;
-    includeCompanyPolicies: boolean;
-    includeITSetup: boolean;
-    letterheadTemplate: string;
-    useCustomLetterhead: boolean;
-    letterheadFile: File | null;
-  };
+  settings: Record<string, any>;
   onSettingsChange: (field: string, value: any) => void;
 }
 
 export default function JoiningLetterSettings({ settings, onSettingsChange }: JoiningLetterSettingsProps) {
   return (
     <div className="space-y-6">
+      {/* Template Settings */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Company Information</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:user-plus" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Joining Letter Template</h3>
+          </div>
         </CardHeader>
         <CardBody className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
+              label="Header Title"
+              
+              onChange={(e) => onSettingsChange('template', {
+                ...settings.template,
+                header: e.target.value
+              })}
+              placeholder="JOINING LETTER"
+              startContent={<Icon icon="lucide:type" className="text-default-400" />}
+            />
+
+            <Input
               label="Company Name"
-              placeholder="Enter company name"
-              value={settings.companyName}
-              onChange={(e) => onSettingsChange("companyName", e.target.value)}
-            />
-            <Input
-              label="HR Email"
-              placeholder="hr@company.com"
-              value={settings.hrEmail}
-              onChange={(e) => onSettingsChange("hrEmail", e.target.value)}
-            />
-            <Input
-              label="HR Phone"
-              placeholder="+1 (555) 123-4567"
-              value={settings.hrPhone}
-              onChange={(e) => onSettingsChange("hrPhone", e.target.value)}
-            />
-            <Input
-              label="Probation Period (months)"
-              type="number"
-              placeholder="3"
-              value={settings.probationPeriod.toString()}
-              onChange={(e) => onSettingsChange("probationPeriod", parseInt(e.target.value))}
+              
+              onChange={(e) => onSettingsChange('template', {
+                ...settings.template,
+                companyName: e.target.value
+              })}
+              placeholder="Your Company Name"
+              startContent={<Icon icon="lucide:building" className="text-default-400" />}
             />
           </div>
+
           <Textarea
             label="Company Address"
-            placeholder="Enter complete company address"
-            value={settings.companyAddress}
-            onChange={(e) => onSettingsChange("companyAddress", e.target.value)}
-            minRows={3}
-          />
-        </CardBody>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <h3 className="text-lg font-semibold">Letterhead Configuration</h3>
-        </CardHeader>
-        <CardBody className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Use Custom Letterhead</span>
-                <span className="text-xs text-default-500">Upload a custom letterhead template or use auto-generated one</span>
-              </div>
-              <Switch
-                isSelected={settings.useCustomLetterhead}
-                onValueChange={(value) => onSettingsChange("useCustomLetterhead", value)}
-              />
-            </div>
             
-            {settings.useCustomLetterhead ? (
-              <div className="space-y-4">
-                <div className="border-2 border-dashed border-divider rounded-lg p-6 text-center">
-                  <input
-                    type="file"
-                    accept=".docx,.doc,.pdf"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        onSettingsChange("letterheadFile", file);
-                      }
-                    }}
-                    className="hidden"
-                    id="joining-letterhead-upload"
-                  />
-                  <label htmlFor="joining-letterhead-upload" className="cursor-pointer">
-                    <div className="text-default-500 mb-2">
-                      <svg className="mx-auto h-12 w-12" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </div>
-                    <p className="text-sm text-default-600">
-                      Click to upload letterhead template
-                    </p>
-                    <p className="text-xs text-default-500 mt-1">
-                      Supports .docx, .doc, .pdf files
-                    </p>
-                  </label>
-                </div>
-                {settings.letterheadFile && (
-                  <div className="p-3 bg-success-50 rounded-lg">
-                    <p className="text-sm text-success-800">
-                      ✓ Uploaded: {settings.letterheadFile.name}
-                    </p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="p-4 bg-primary-50 rounded-lg">
-                <h4 className="text-sm font-medium text-primary-900 mb-2">Auto-Generated Letterhead</h4>
-                <p className="text-xs text-primary-700">
-                  We'll automatically generate a professional letterhead using your company logo and branding information.
-                </p>
-              </div>
-            )}
+            onChange={(e) => onSettingsChange('template', {
+              ...settings.template,
+              companyAddress: e.target.value
+            })}
+            placeholder="123 Business Street, City, State 12345"
+            startContent={<Icon icon="lucide:map-pin" className="text-default-400" />}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Company Phone"
+              
+              onChange={(e) => onSettingsChange('template', {
+                ...settings.template,
+                companyPhone: e.target.value
+              })}
+              placeholder="+1 (555) 123-4567"
+              startContent={<Icon icon="lucide:phone" className="text-default-400" />}
+            />
+
+            <Input
+              label="Company Email"
+              
+              onChange={(e) => onSettingsChange('template', {
+                ...settings.template,
+                companyEmail: e.target.value
+              })}
+              placeholder="hr@company.com"
+              startContent={<Icon icon="lucide:mail" className="text-default-400" />}
+            />
           </div>
         </CardBody>
       </Card>
 
+      {/* Content Settings */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Template Configuration</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:edit" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Letter Content</h3>
+          </div>
         </CardHeader>
         <CardBody className="space-y-4">
-          <div className="mb-4">
-            <h4 className="text-sm font-medium text-foreground mb-2">Available Variables</h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
-              <span className="bg-content2 px-2 py-1 rounded">[EMPLOYEE_NAME]</span>
-              <span className="bg-content2 px-2 py-1 rounded">[POSITION]</span>
-              <span className="bg-content2 px-2 py-1 rounded">[DEPARTMENT]</span>
-              <span className="bg-content2 px-2 py-1 rounded">[JOINING_DATE]</span>
-              <span className="bg-content2 px-2 py-1 rounded">[MANAGER_NAME]</span>
-              <span className="bg-content2 px-2 py-1 rounded">[WORK_LOCATION]</span>
-              <span className="bg-content2 px-2 py-1 rounded">[PROBATION_PERIOD]</span>
-              <span className="bg-content2 px-2 py-1 rounded">[COMPANY_NAME]</span>
-              <span className="bg-content2 px-2 py-1 rounded">[HR_EMAIL]</span>
-            </div>
-          </div>
           <Textarea
-            label="Default Template"
-            placeholder="Enter default joining letter template"
-            value={settings.defaultTemplate}
-            onChange={(e) => onSettingsChange("defaultTemplate", e.target.value)}
-            minRows={12}
+            label="Greeting"
+            
+            onChange={(e) => onSettingsChange('content', {
+              ...settings.content,
+              greeting: e.target.value
+            })}
+            placeholder="Dear [EMPLOYEE_NAME],"
+            description="Use [EMPLOYEE_NAME] as placeholder"
+            startContent={<Icon icon="lucide:user" className="text-default-400" />}
+          />
+
+          <Textarea
+            label="Introduction"
+            
+            onChange={(e) => onSettingsChange('content', {
+              ...settings.content,
+              introduction: e.target.value
+            })}
+            placeholder="Welcome to [COMPANY_NAME]! We are excited to have you join our team."
+            description="Use [COMPANY_NAME] as placeholder"
+            startContent={<Icon icon="lucide:message-square" className="text-default-400" />}
+          />
+
+          <Textarea
+            label="Job Details"
+            
+            onChange={(e) => onSettingsChange('content', {
+              ...settings.content,
+              details: e.target.value.split('\n').filter(detail => detail.trim())
+            })}
+            placeholder="Position: [POSITION]&#10;Department: [DEPARTMENT]&#10;Joining Date: [JOINING_DATE]&#10;Employee ID: [EMPLOYEE_ID]&#10;Reporting To: [MANAGER_NAME]&#10;Work Location: [WORK_LOCATION]"
+            description="Enter each detail on a new line. Use placeholders like [POSITION], [DEPARTMENT], [JOINING_DATE], [EMPLOYEE_ID], [MANAGER_NAME], [WORK_LOCATION]"
+            startContent={<Icon icon="lucide:briefcase" className="text-default-400" />}
+          />
+
+          <Textarea
+            label="Policies & Requirements"
+            
+            onChange={(e) => onSettingsChange('content', {
+              ...settings.content,
+              policies: e.target.value.split('\n').filter(policy => policy.trim())
+            })}
+            placeholder="Please review our employee handbook&#10;Complete all required onboarding forms&#10;Attend orientation session on [ORIENTATION_DATE]&#10;Bring required documents on your first day"
+            description="Enter each policy on a new line. Use [ORIENTATION_DATE] as placeholder"
+            startContent={<Icon icon="lucide:file-text" className="text-default-400" />}
+          />
+
+          <Textarea
+            label="Closing"
+            
+            onChange={(e) => onSettingsChange('content', {
+              ...settings.content,
+              closing: e.target.value
+            })}
+            placeholder="We look forward to a successful journey together..."
+            startContent={<Icon icon="lucide:handshake" className="text-default-400" />}
+          />
+
+          <Textarea
+            label="Signature"
+            
+            onChange={(e) => onSettingsChange('content', {
+              ...settings.content,
+              signature: e.target.value
+            })}
+            placeholder="Welcome aboard!\n[HR_MANAGER_NAME]\nHuman Resources Manager"
+            description="Use [HR_MANAGER_NAME] as placeholder"
+            startContent={<Icon icon="lucide:pen-tool" className="text-default-400" />}
           />
         </CardBody>
       </Card>
 
+      {/* Automation Settings */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Content Settings</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:zap" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Automation Settings</h3>
+          </div>
         </CardHeader>
-        <CardBody className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Auto-generate joining letters</span>
-                <span className="text-xs text-default-500">Automatically generate joining letters when employees are added</span>
-              </div>
-              <Switch
-                isSelected={settings.autoGenerate}
-                onValueChange={(value) => onSettingsChange("autoGenerate", value)}
-              />
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Auto Generate</p>
+              <p className="text-xs text-default-500">Automatically generate joining letters for new employees</p>
             </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Include reporting manager details</span>
-                <span className="text-xs text-default-500">Add reporting manager information to the letter</span>
-              </div>
-              <Switch
-                isSelected={settings.includeReportingManager}
-                onValueChange={(value) => onSettingsChange("includeReportingManager", value)}
-              />
+            <Switch
+              isSelected={settings.automation?.autoGenerate === true || settings.automation?.autoGenerate === 'true'}
+              onValueChange={(value) => onSettingsChange('automation', {
+                ...settings.automation,
+                autoGenerate: value
+              })}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Send Email</p>
+              <p className="text-xs text-default-500">Automatically send joining letter via email</p>
             </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Include department information</span>
-                <span className="text-xs text-default-500">Add department details to the letter</span>
-              </div>
-              <Switch
-                isSelected={settings.includeDepartment}
-                onValueChange={(value) => onSettingsChange("includeDepartment", value)}
-              />
+            <Switch
+              isSelected={settings.automation?.sendEmail === true || settings.automation?.sendEmail === 'true'}
+              onValueChange={(value) => onSettingsChange('automation', {
+                ...settings.automation,
+                sendEmail: value
+              })}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Generate on Joining</p>
+              <p className="text-xs text-default-500">Generate joining letter when employee joins</p>
             </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Include designation details</span>
-                <span className="text-xs text-default-500">Add job designation information</span>
-              </div>
-              <Switch
-                isSelected={settings.includeDesignation}
-                onValueChange={(value) => onSettingsChange("includeDesignation", value)}
-              />
+            <Switch
+              isSelected={settings.automation?.generateOnJoining === true || settings.automation?.generateOnJoining === 'true'}
+              onValueChange={(value) => onSettingsChange('automation', {
+                ...settings.automation,
+                generateOnJoining: value
+              })}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Include Documents</p>
+              <p className="text-xs text-default-500">Include required documents list in joining letter</p>
             </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Include work location</span>
-                <span className="text-xs text-default-500">Add work location details</span>
-              </div>
-              <Switch
-                isSelected={settings.includeWorkLocation}
-                onValueChange={(value) => onSettingsChange("includeWorkLocation", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Include joining date</span>
-                <span className="text-xs text-default-500">Add joining date information</span>
-              </div>
-              <Switch
-                isSelected={settings.includeJoiningDate}
-                onValueChange={(value) => onSettingsChange("includeJoiningDate", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Include probation period details</span>
-                <span className="text-xs text-default-500">Add probation period information</span>
-              </div>
-              <Switch
-                isSelected={settings.includeProbationPeriod}
-                onValueChange={(value) => onSettingsChange("includeProbationPeriod", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Include company policies reference</span>
-                <span className="text-xs text-default-500">Reference company policies in the letter</span>
-              </div>
-              <Switch
-                isSelected={settings.includeCompanyPolicies}
-                onValueChange={(value) => onSettingsChange("includeCompanyPolicies", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Include IT setup instructions</span>
-                <span className="text-xs text-default-500">Add IT setup and access information</span>
-              </div>
-              <Switch
-                isSelected={settings.includeITSetup}
-                onValueChange={(value) => onSettingsChange("includeITSetup", value)}
-              />
+            <Switch
+              isSelected={settings.automation?.includeDocuments === true || settings.automation?.includeDocuments === 'true'}
+              onValueChange={(value) => onSettingsChange('automation', {
+                ...settings.automation,
+                includeDocuments: value
+              })}
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Preview and Actions */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:eye" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Preview & Actions</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex gap-3">
+            <Button color="primary" variant="flat" startContent={<Icon icon="lucide:eye" />}>
+              Preview Template
+            </Button>
+            <Button color="secondary" variant="flat" startContent={<Icon icon="lucide:download" />}>
+              Download Sample
+            </Button>
+            <Button color="success" variant="flat" startContent={<Icon icon="lucide:save" />}>
+              Save Template
+            </Button>
+          </div>
+          
+          <div className="bg-default-50 p-4 rounded-lg">
+            <h4 className="font-medium text-foreground mb-2">Available Placeholders:</h4>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-sm text-default-600">
+              <span>[EMPLOYEE_NAME]</span>
+              <span>[POSITION]</span>
+              <span>[DEPARTMENT]</span>
+              <span>[JOINING_DATE]</span>
+              <span>[EMPLOYEE_ID]</span>
+              <span>[MANAGER_NAME]</span>
+              <span>[WORK_LOCATION]</span>
+              <span>[COMPANY_NAME]</span>
+              <span>[HR_MANAGER_NAME]</span>
+              <span>[ORIENTATION_DATE]</span>
             </div>
           </div>
         </CardBody>

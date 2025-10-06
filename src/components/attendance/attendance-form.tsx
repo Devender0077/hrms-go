@@ -11,6 +11,15 @@ import React from "react";
     import { motion } from "framer-motion";
     import { format } from "date-fns";
     
+    interface AttendanceFormData {
+      employee_id: string;
+      date: string;
+      check_in: string;
+      check_out: string;
+      status: string;
+      note: string;
+    }
+
     interface AttendanceFormProps {
       employees: any[];
       onSubmit: () => void;
@@ -23,7 +32,7 @@ import React from "react";
       onCancel
     }) => {
       const [isLoading, setIsLoading] = React.useState(false);
-      const [formData, setFormData] = React.useState({
+      const [formData, setFormData] = React.useState<AttendanceFormData>({
         employee_id: '',
         date: format(new Date(), 'yyyy-MM-dd'),
         check_in: '',
@@ -32,7 +41,7 @@ import React from "react";
         note: ''
       });
       
-      const [errors, setErrors] = React.useState({});
+      const [errors, setErrors] = React.useState<Partial<AttendanceFormData>>({});
       
       const handleChange = (field, value) => {
         setFormData({
@@ -50,7 +59,7 @@ import React from "react";
       };
       
       const validate = () => {
-        const newErrors = {};
+        const newErrors: Partial<AttendanceFormData> = {};
         
         if (!formData.employee_id) newErrors.employee_id = 'Employee is required';
         if (!formData.date) newErrors.date = 'Date is required';
@@ -116,7 +125,7 @@ import React from "react";
               className="rounded-lg"
             >
               {employees.map((emp) => (
-                <SelectItem key={emp.id} value={emp.id}>
+                <SelectItem key={emp.id}>
                   {emp.first_name} {emp.last_name} ({emp.employee_id})
                 </SelectItem>
               ))}
@@ -125,7 +134,7 @@ import React from "react";
             <Input
               label="Date"
               type="date"
-              value={formData.date}
+              
               onChange={(e) => handleChange('date', e.target.value)}
               isInvalid={!!errors.date}
               errorMessage={errors.date}
@@ -143,10 +152,10 @@ import React from "react";
               isRequired
               className="rounded-lg"
             >
-              <SelectItem key="present" value="present">Present</SelectItem>
-              <SelectItem key="absent" value="absent">Absent</SelectItem>
-              <SelectItem key="late" value="late">Late</SelectItem>
-              <SelectItem key="leave" value="leave">On Leave</SelectItem>
+              <SelectItem key="present">Present</SelectItem>
+              <SelectItem key="absent">Absent</SelectItem>
+              <SelectItem key="late">Late</SelectItem>
+              <SelectItem key="leave">On Leave</SelectItem>
             </Select>
             
             {(formData.status === 'present' || formData.status === 'late') && (
@@ -154,7 +163,7 @@ import React from "react";
                 <Input
                   label="Check-in Time"
                   type="time"
-                  value={formData.check_in}
+                  
                   onChange={(e) => handleChange('check_in', e.target.value)}
                   isInvalid={!!errors.check_in}
                   errorMessage={errors.check_in}
@@ -165,7 +174,7 @@ import React from "react";
                 <Input
                   label="Check-out Time"
                   type="time"
-                  value={formData.check_out}
+                  
                   onChange={(e) => handleChange('check_out', e.target.value)}
                   className="rounded-lg"
                 />
@@ -175,7 +184,7 @@ import React from "react";
             <Textarea
               label="Note"
               placeholder="Add a note (optional)"
-              value={formData.note}
+              
               onValueChange={(value) => handleChange('note', value)}
               className="rounded-lg"
             />

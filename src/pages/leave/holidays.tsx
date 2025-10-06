@@ -71,7 +71,7 @@ export default function Holidays() {
   const loadHolidays = async () => {
     try {
       setLoading(true);
-      const response = await apiRequest("GET", "/api/v1/leave/holidays");
+      const response = await apiRequest("/leave/holidays");
       if (response.success) {
         setHolidays(response.data || []);
       }
@@ -116,10 +116,10 @@ export default function Holidays() {
       
       const url = isEditMode 
         ? `/api/v1/leave/holidays/${selectedHoliday?.id}`
-        : "/api/v1/leave/holidays";
+        : "/leave/holidays";
       const method = isEditMode ? "PUT" : "POST";
       
-      const response = await apiRequest(method, url, formData);
+      const response = await apiRequest(url, { method, body: JSON.stringify(formData) });
       if (response.success) {
         await loadHolidays();
         onClose();
@@ -212,7 +212,7 @@ export default function Holidays() {
           <>
             <Input
               placeholder="Search holidays..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
@@ -225,10 +225,10 @@ export default function Holidays() {
             >
               <SelectItem key="all">All Types</SelectItem>
               {holidayTypes.map((type) => (
-                <SelectItem key={type.key} value={type.key}>
+                <SelectItem key={type.key} >
                   {type.label}
                 </SelectItem>
-              ))}
+              )) as any}
             </Select>
             <Button
               color="primary"
@@ -350,7 +350,7 @@ export default function Holidays() {
                   <Input
                     label="Holiday Name"
                     placeholder="Enter holiday name"
-                    value={formData.name}
+                    
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     isRequired
                   />
@@ -358,7 +358,7 @@ export default function Holidays() {
                   <Input
                     label="Date"
                     type="date"
-                    value={formData.date}
+                    
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     isRequired
                   />
@@ -371,7 +371,7 @@ export default function Holidays() {
                     isRequired
                   >
                     {holidayTypes.map((type) => (
-                      <SelectItem key={type.key} value={type.key}>
+                      <SelectItem key={type.key} >
                         {type.label}
                       </SelectItem>
                     ))}
@@ -380,7 +380,7 @@ export default function Holidays() {
                   <Textarea
                     label="Description"
                     placeholder="Enter holiday description"
-                    value={formData.description}
+                    
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                   

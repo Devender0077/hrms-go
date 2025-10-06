@@ -46,7 +46,7 @@ export const useDepartments = () => {
       addToast({
         title: 'Error',
         description: 'Failed to load departments',
-        type: 'error',
+        color: 'danger',
       });
     } finally {
       setLoading(false);
@@ -86,7 +86,7 @@ export const useDepartments = () => {
         addToast({
           title: 'Success',
           description: 'Department added successfully',
-          type: 'success',
+          color: 'success',
         });
         return response.data;
       }
@@ -95,7 +95,7 @@ export const useDepartments = () => {
       addToast({
         title: 'Error',
         description: 'Failed to add department',
-        type: 'error',
+        color: 'danger',
       });
       throw err;
     }
@@ -115,7 +115,7 @@ export const useDepartments = () => {
         addToast({
           title: 'Success',
           description: 'Department updated successfully',
-          type: 'success',
+          color: 'success',
         });
         return response.data;
       }
@@ -124,7 +124,7 @@ export const useDepartments = () => {
       addToast({
         title: 'Error',
         description: 'Failed to update department',
-        type: 'error',
+        color: 'danger',
       });
       throw err;
     }
@@ -140,14 +140,14 @@ export const useDepartments = () => {
       addToast({
         title: 'Success',
         description: 'Department deleted successfully',
-        type: 'success',
+        color: 'success',
       });
     } catch (err) {
       console.error('Error deleting department:', err);
       addToast({
         title: 'Error',
         description: 'Failed to delete department',
-        type: 'error',
+        color: 'danger',
       });
       throw err;
     }

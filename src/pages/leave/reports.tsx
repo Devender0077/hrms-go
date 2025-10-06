@@ -396,7 +396,7 @@ export default function LeaveReports() {
                                 <TableCell>
                                   <div className="flex items-center gap-2">
                                     <Progress
-                                      value={parseFloat(report.utilization_percentage.toString())}
+                                      
                                       color={getUtilizationColor(report.utilization_percentage) as any}
                                       className="w-16"
                                       size="sm"
@@ -473,7 +473,7 @@ export default function LeaveReports() {
                               <TableCell>
                                 <div className="flex items-center gap-2">
                                   <Progress
-                                    value={parseFloat(report.utilization_percentage.toString())}
+                                    
                                     color={getUtilizationColor(report.utilization_percentage) as any}
                                     className="w-16"
                                     size="sm"

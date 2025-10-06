@@ -31,7 +31,7 @@ const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
         <div className="flex flex-col lg:flex-row gap-4">
           <Input
             placeholder="Search attendance records..."
-            value={searchQuery}
+            
             onChange={(e) => setSearchQuery(e.target.value)}
             startContent={<Icon icon="lucide:search" className="text-default-400" />}
             className="flex-1"
@@ -57,7 +57,7 @@ const AttendanceFilters: React.FC<AttendanceFiltersProps> = ({
           <Input
             type="date"
             placeholder="Select Date"
-            value={selectedDate}
+            
             onChange={(e) => setSelectedDate(e.target.value)}
             className="w-full lg:w-48"
           />

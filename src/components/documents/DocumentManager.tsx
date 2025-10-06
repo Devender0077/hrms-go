@@ -48,7 +48,14 @@ export default function DocumentManager({ companyBranding }: DocumentManagerProp
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedDocumentType, setSelectedDocumentType] = useState<string>("");
   const [selectedEmployee, setSelectedEmployee] = useState<any>(null);
-  const [documentData, setDocumentData] = useState<DocumentData>({});
+  const [documentData, setDocumentData] = useState<DocumentData>({
+    position: '',
+    department: '',
+    startDate: '',
+    companyName: '',
+    hrEmail: '',
+    hrPhone: ''
+  });
   const [isGenerating, setIsGenerating] = useState(false);
 
   // Sample employees data - in real app, this would come from API
@@ -286,7 +293,7 @@ HR Manager
                     }}
                   >
                     {getDataForDocumentType(selectedDocumentType).map((employee) => (
-                      <SelectItem key={employee.id} value={employee.id}>
+                      <SelectItem key={employee.id}>
                         {employee.name} - {employee.position}
                       </SelectItem>
                     ))}
@@ -296,7 +303,7 @@ HR Manager
                     <Input
                       label="Salary"
                       placeholder="Enter salary amount"
-                      value={documentData.salary || ""}
+                      
                       onChange={(e) => setDocumentData(prev => ({ ...prev, salary: e.target.value }))}
                     />
                   )}
@@ -304,7 +311,7 @@ HR Manager
                   <Input
                     label="Start Date"
                     type="date"
-                    value={documentData.startDate || ""}
+                    
                     onChange={(e) => setDocumentData(prev => ({ ...prev, startDate: e.target.value }))}
                   />
 
@@ -312,7 +319,7 @@ HR Manager
                     <Input
                       label="End Date"
                       type="date"
-                      value={documentData.endDate || ""}
+                      
                       onChange={(e) => setDocumentData(prev => ({ ...prev, endDate: e.target.value }))}
                     />
                   )}

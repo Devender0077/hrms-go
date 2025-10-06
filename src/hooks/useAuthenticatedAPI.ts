@@ -46,7 +46,27 @@ export const useAuthenticatedAPI = () => {
     }
   }, [user, authLoading, isAuthenticated]);
 
+  const apiRequest = useCallback(async (url: string, options: RequestInit = {}) => {
+    return makeAuthenticatedRequest(async () => {
+      const method = options.method || 'GET';
+      
+      switch (method.toUpperCase()) {
+        case 'GET':
+          return httpClient.get(url);
+        case 'POST':
+          return httpClient.post(url, options.body ? JSON.parse(options.body as string) : {});
+        case 'PUT':
+          return httpClient.put(url, options.body ? JSON.parse(options.body as string) : {});
+        case 'DELETE':
+          return httpClient.delete(url);
+        default:
+          throw new Error(`Unsupported HTTP method: ${method}`);
+      }
+    });
+  }, [makeAuthenticatedRequest]);
+
   return {
+    apiRequest,
     makeAuthenticatedRequest,
     isAuthenticated: isAuthenticated(),
     isLoading: authLoading,

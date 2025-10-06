@@ -1,138 +1,156 @@
-import React from "react";
-import { Input, Select, SelectItem, CheckboxGroup, Checkbox, Divider } from "@heroui/react";
-import { Icon } from "@iconify/react";
+import React from 'react';
+import { Card, CardBody, CardHeader, Input, Select, SelectItem, Switch } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface LocalizationSettingsProps {
-  settings: {
-    defaultLanguage: string;
-    supportedLanguages: string[];
-    timezone: string;
-    dateFormat: string;
-    timeFormat: string;
-    currency: string;
-    currencySymbol: string;
-    numberFormat: string;
-    firstDayOfWeek: string;
-    businessDays: string[];
-    workingHours: {
-      start: string;
-      end: string;
-    };
-  };
+  settings: Record<string, any>;
   onSettingsChange: (field: string, value: any) => void;
 }
 
 export default function LocalizationSettings({ settings, onSettingsChange }: LocalizationSettingsProps) {
+  const languages = [
+    { key: 'en', label: 'English' },
+    { key: 'es', label: 'Spanish' },
+    { key: 'fr', label: 'French' },
+    { key: 'de', label: 'German' },
+    { key: 'zh', label: 'Chinese' },
+  ];
+
+  const timezones = [
+    { key: 'America/New_York', label: 'Eastern Time (ET)' },
+    { key: 'America/Chicago', label: 'Central Time (CT)' },
+    { key: 'America/Denver', label: 'Mountain Time (MT)' },
+    { key: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
+    { key: 'Europe/London', label: 'London (GMT)' },
+    { key: 'Europe/Paris', label: 'Paris (CET)' },
+    { key: 'Asia/Tokyo', label: 'Tokyo (JST)' },
+    { key: 'Asia/Shanghai', label: 'Shanghai (CST)' },
+  ];
+
+  const currencies = [
+    { key: 'USD', label: 'US Dollar ($)' },
+    { key: 'EUR', label: 'Euro (€)' },
+    { key: 'GBP', label: 'British Pound (£)' },
+    { key: 'JPY', label: 'Japanese Yen (¥)' },
+    { key: 'CNY', label: 'Chinese Yuan (¥)' },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-primary-100 rounded-lg">
-          <Icon icon="lucide:globe" className="text-primary-600 text-lg" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Localization Settings</h2>
-          <p className="text-default-600">Configure language, timezone, and regional preferences</p>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Select
-          label="Default Language"
-          selectedKeys={[settings.defaultLanguage]}
-          onSelectionChange={(keys) => onSettingsChange("defaultLanguage", Array.from(keys)[0])}
-        >
-          <SelectItem key="en" value="en">English</SelectItem>
-          <SelectItem key="es" value="es">Spanish</SelectItem>
-          <SelectItem key="fr" value="fr">French</SelectItem>
-          <SelectItem key="de" value="de">German</SelectItem>
-          <SelectItem key="zh" value="zh">Chinese</SelectItem>
-        </Select>
-        <Select
-          label="Timezone"
-          selectedKeys={[settings.timezone]}
-          onSelectionChange={(keys) => onSettingsChange("timezone", Array.from(keys)[0])}
-        >
-          <SelectItem key="America/New_York" value="America/New_York">Eastern Time</SelectItem>
-          <SelectItem key="America/Chicago" value="America/Chicago">Central Time</SelectItem>
-          <SelectItem key="America/Denver" value="America/Denver">Mountain Time</SelectItem>
-          <SelectItem key="America/Los_Angeles" value="America/Los_Angeles">Pacific Time</SelectItem>
-          <SelectItem key="Europe/London" value="Europe/London">London</SelectItem>
-          <SelectItem key="Europe/Paris" value="Europe/Paris">Paris</SelectItem>
-          <SelectItem key="Asia/Tokyo" value="Asia/Tokyo">Tokyo</SelectItem>
-        </Select>
-        <Select
-          label="Date Format"
-          selectedKeys={[settings.dateFormat]}
-          onSelectionChange={(keys) => onSettingsChange("dateFormat", Array.from(keys)[0])}
-        >
-          <SelectItem key="MM/DD/YYYY" value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
-          <SelectItem key="DD/MM/YYYY" value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
-          <SelectItem key="YYYY-MM-DD" value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
-        </Select>
-        <Select
-          label="Time Format"
-          selectedKeys={[settings.timeFormat]}
-          onSelectionChange={(keys) => onSettingsChange("timeFormat", Array.from(keys)[0])}
-        >
-          <SelectItem key="12h" value="12h">12 Hour</SelectItem>
-          <SelectItem key="24h" value="24h">24 Hour</SelectItem>
-        </Select>
-        <Select
-          label="Currency"
-          selectedKeys={[settings.currency]}
-          onSelectionChange={(keys) => onSettingsChange("currency", Array.from(keys)[0])}
-        >
-          <SelectItem key="USD" value="USD">USD - US Dollar</SelectItem>
-          <SelectItem key="EUR" value="EUR">EUR - Euro</SelectItem>
-          <SelectItem key="GBP" value="GBP">GBP - British Pound</SelectItem>
-          <SelectItem key="JPY" value="JPY">JPY - Japanese Yen</SelectItem>
-          <SelectItem key="CAD" value="CAD">CAD - Canadian Dollar</SelectItem>
-        </Select>
-        <Input
-          label="Currency Symbol"
-          value={settings.currencySymbol}
-          onValueChange={(value) => onSettingsChange("currencySymbol", value)}
-        />
-      </div>
-
-      <Divider />
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Business Hours</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input
-            label="Start Time"
-            type="time"
-            value={settings.workingHours.start}
-            onValueChange={(value) => onSettingsChange("workingHours", { ...settings.workingHours, start: value })}
-          />
-          <Input
-            label="End Time"
-            type="time"
-            value={settings.workingHours.end}
-            onValueChange={(value) => onSettingsChange("workingHours", { ...settings.workingHours, end: value })}
-          />
-        </div>
-      </div>
-
-      <Divider />
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Business Days</h3>
-        <CheckboxGroup
-          value={settings.businessDays}
-          onValueChange={(value) => onSettingsChange("businessDays", value)}
-          orientation="horizontal"
-        >
-          <Checkbox value="monday">Monday</Checkbox>
-          <Checkbox value="tuesday">Tuesday</Checkbox>
-          <Checkbox value="wednesday">Wednesday</Checkbox>
-          <Checkbox value="thursday">Thursday</Checkbox>
-          <Checkbox value="friday">Friday</Checkbox>
-          <Checkbox value="saturday">Saturday</Checkbox>
-          <Checkbox value="sunday">Sunday</Checkbox>
-        </CheckboxGroup>
-      </div>
+    <div className="space-y-4 sm:space-y-6">
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+              <Icon icon="lucide:globe" className="text-primary-600 dark:text-primary-400 text-xl" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground">Localization Settings</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4 sm:space-y-6">
+          <Select
+            label="Default Language"
+            selectedKeys={settings.defaultLanguage ? [settings.defaultLanguage] : ['en']}
+            onSelectionChange={(keys) => onSettingsChange('defaultLanguage', Array.from(keys)[0])}
+            placeholder="Select default language"
+            startContent={<Icon icon="lucide:languages" className="text-default-400" />}
+          >
+            {languages.map((lang) => (
+              <SelectItem key={lang.key}>
+                {lang.label}
+              </SelectItem>
+            ))}
+          </Select>
+          
+          <Select
+            label="Timezone"
+            selectedKeys={settings.timezone ? [settings.timezone] : ['America/New_York']}
+            onSelectionChange={(keys) => onSettingsChange('timezone', Array.from(keys)[0])}
+            placeholder="Select timezone"
+            startContent={<Icon icon="lucide:clock" className="text-default-400" />}
+          >
+            {timezones.map((tz) => (
+              <SelectItem key={tz.key} >
+                {tz.label}
+              </SelectItem>
+            ))}
+          </Select>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              label="Date Format"
+              selectedKeys={settings.dateFormat ? [settings.dateFormat] : ['MM/DD/YYYY']}
+              onSelectionChange={(keys) => onSettingsChange('dateFormat', Array.from(keys)[0])}
+              placeholder="Select date format"
+            >
+              <SelectItem key="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+              <SelectItem key="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+              <SelectItem key="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+            </Select>
+            
+            <Select
+              label="Time Format"
+              selectedKeys={settings.timeFormat ? [settings.timeFormat] : ['12h']}
+              onSelectionChange={(keys) => onSettingsChange('timeFormat', Array.from(keys)[0])}
+              placeholder="Select time format"
+            >
+              <SelectItem key="12h">12 Hour (AM/PM)</SelectItem>
+              <SelectItem key="24h">24 Hour</SelectItem>
+            </Select>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              label="Currency"
+              selectedKeys={settings.currency ? [settings.currency] : ['USD']}
+              onSelectionChange={(keys) => onSettingsChange('currency', Array.from(keys)[0])}
+              placeholder="Select currency"
+              startContent={<Icon icon="lucide:dollar-sign" className="text-default-400" />}
+            >
+              {currencies.map((currency) => (
+                <SelectItem key={currency.key} >
+                  {currency.label}
+                </SelectItem>
+              ))}
+            </Select>
+            
+            <Input
+              label="Currency Symbol"
+              
+              onChange={(e) => onSettingsChange('currencySymbol', e.target.value)}
+              placeholder="Enter currency symbol"
+              startContent={<Icon icon="lucide:hash" className="text-default-400" />}
+            />
+          </div>
+          
+          <Select
+            label="First Day of Week"
+            selectedKeys={settings.firstDayOfWeek ? [settings.firstDayOfWeek] : ['sunday']}
+            onSelectionChange={(keys) => onSettingsChange('firstDayOfWeek', Array.from(keys)[0])}
+            placeholder="Select first day of week"
+          >
+            <SelectItem key="sunday">Sunday</SelectItem>
+            <SelectItem key="monday">Monday</SelectItem>
+          </Select>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Working Hours Start"
+              type="time"
+              
+              onChange={(e) => onSettingsChange('workingHours', { ...settings.workingHours, start: e.target.value })}
+              startContent={<Icon icon="lucide:clock" className="text-default-400" />}
+            />
+            
+            <Input
+              label="Working Hours End"
+              type="time"
+              
+              onChange={(e) => onSettingsChange('workingHours', { ...settings.workingHours, end: e.target.value })}
+              startContent={<Icon icon="lucide:clock" className="text-default-400" />}
+            />
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }

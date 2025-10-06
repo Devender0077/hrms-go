@@ -8,7 +8,11 @@ import {
 import { Spinner } from "@heroui/react";
 import { motion } from "framer-motion";
 import { useAuth } from "./contexts/auth-context";
+import { useSettings } from "./contexts/settings-context";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DynamicPageTitle from "./components/common/DynamicPageTitle";
+import MaintenanceMode from "./components/common/MaintenanceMode";
+import DebugMode from "./components/common/DebugMode";
 
 // Auth Pages
 import Login from "./pages/auth/login";
@@ -29,7 +33,6 @@ import Leave from "./pages/leave";
 
 // User Management Pages
 import RolesPage from "./pages/users/roles";
-import PermissionsPage from "./pages/users/permissions";
 
 // Employee Management Pages
 import EmployeeDocumentsPage from "./pages/employees/documents";
@@ -66,14 +69,13 @@ import Assets from "./pages/assets";
 import AssetAssignments from "./pages/asset-assignments";
 import Users from "./pages/users";
 import AuditLogs from "./pages/audit-logs";
-import OrganizationChart from "./pages/organization/org-chart-unicef";
+import OrganizationChart from "./pages/organization/org-chart";
 import Settings from "./pages/settings";
 import Profile from "./pages/profile";
 import Roles from "./pages/roles";
 import Calendar from "./pages/calendar";
 import Tasks from "./pages/tasks";
 import Recruitment from "./pages/recruitment";
-import LeaveManagement from "./pages/leave-management";
 import LeaveApplications from "./pages/leave/applications";
 import LeaveTypes from "./pages/leave/types";
 import LeaveBalances from "./pages/leave/balances";
@@ -82,6 +84,16 @@ import Holidays from "./pages/leave/holidays";
 import LeaveReports from "./pages/leave/reports";
 import HRSystemSetup from "./pages/hr-system-setup";
 import Documents from "./pages/document-management/documents";
+import Trips from "./pages/trips";
+import Announcements from "./pages/announcements";
+import Meetings from "./pages/meetings";
+import TrainingPrograms from "./pages/training/programs";
+import Awards from "./pages/employee-lifecycle/awards";
+import Promotions from "./pages/employee-lifecycle/promotions";
+import TimeEntries from "./pages/time-tracking/entries";
+import MediaLibrary from "./pages/media-library";
+import SettingsTest from "./pages/settings-test";
+import SettingsComprehensiveTest from "./pages/settings-comprehensive-test";
 
 // Layout Components
 import DashboardLayout from "./layouts/dashboard-layout";
@@ -89,6 +101,7 @@ import DashboardLayout from "./layouts/dashboard-layout";
 
 export default function App() {
   const { loading } = useAuth();
+  const { getSiteName, loading: settingsLoading } = useSettings();
   const [appLoading, setAppLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -99,6 +112,14 @@ export default function App() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Update main page title when settings load
+  React.useEffect(() => {
+    if (!loading && !appLoading && !settingsLoading) {
+      const siteName = getSiteName();
+      document.title = `${siteName} - Human Resource Management System`;
+    }
+  }, [loading, appLoading, settingsLoading, getSiteName]);
 
   if (loading || appLoading) {
     return (
@@ -117,7 +138,9 @@ export default function App() {
 
   return (
     <Router>
-      <Routes>
+      <MaintenanceMode>
+        <DebugMode>
+          <Routes>
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -189,7 +212,7 @@ export default function App() {
           path="/dashboard/employees"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
               <Employees />
@@ -201,7 +224,7 @@ export default function App() {
           path="/dashboard/employees/documents"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <EmployeeDocumentsPage />
@@ -213,7 +236,7 @@ export default function App() {
           path="/dashboard/employees/salaries"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <EmployeeSalaryManagementPage />
@@ -225,7 +248,7 @@ export default function App() {
           path="/dashboard/employees/contracts"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <EmployeeContractsPage />
@@ -239,7 +262,7 @@ export default function App() {
           path="/dashboard/employees/:id"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
               <EmployeeDetails />
@@ -253,7 +276,7 @@ export default function App() {
           path="/dashboard/departments"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
               <Departments />
@@ -265,7 +288,7 @@ export default function App() {
           path="/dashboard/designations"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
               <Designations />
@@ -277,7 +300,7 @@ export default function App() {
           path="/dashboard/branches"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Branches />
@@ -291,22 +314,10 @@ export default function App() {
           path="/dashboard/users/roles"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin"]}
+              requiredPermissions={["super_admin", "company_admin"]}
             >
               <DashboardLayout>
                 <RolesPage />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/users/permissions"
-          element={
-            <ProtectedRoute
-              roles={["super_admin", "company_admin"]}
-            >
-              <DashboardLayout>
-                <PermissionsPage />
               </DashboardLayout>
             </ProtectedRoute>
           }
@@ -337,7 +348,7 @@ export default function App() {
           path="/dashboard/timekeeping/shifts"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Shifts />
@@ -349,7 +360,7 @@ export default function App() {
           path="/dashboard/timekeeping/policies"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Policies />
@@ -361,7 +372,7 @@ export default function App() {
           path="/dashboard/timekeeping/records"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Records />
@@ -373,7 +384,7 @@ export default function App() {
           path="/dashboard/timekeeping/regulations"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Regulations />
@@ -385,7 +396,7 @@ export default function App() {
           path="/dashboard/timekeeping/regularization"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager", "employee"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager", "employee"]}
             >
               <DashboardLayout>
                 <Regularization />
@@ -401,16 +412,6 @@ export default function App() {
             <ProtectedRoute requiredPermissions={["leave.view"]}>
               <DashboardLayout>
               <Leave />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/leave-management"
-          element={
-            <ProtectedRoute requiredPermissions={["leave.view"]}>
-              <DashboardLayout>
-                <LeaveManagement />
               </DashboardLayout>
             </ProtectedRoute>
           }
@@ -433,7 +434,7 @@ export default function App() {
           path="/dashboard/payroll"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "finance_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "finance_manager"]}
             >
               <DashboardLayout>
               <Payroll />
@@ -445,7 +446,7 @@ export default function App() {
           path="/dashboard/payroll/salary-components"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
               <SalaryComponentsPage />
@@ -457,7 +458,7 @@ export default function App() {
           path="/dashboard/payroll/employee-salaries"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
               <EmployeeSalariesPage />
@@ -469,7 +470,7 @@ export default function App() {
           path="/dashboard/payroll/payslips"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
               <PayslipsPage />
@@ -483,7 +484,7 @@ export default function App() {
           path="/dashboard/reports/income-expense"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "finance_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "finance_manager"]}
             >
               <DashboardLayout>
                 <IncomeExpenseReport />
@@ -495,7 +496,7 @@ export default function App() {
           path="/dashboard/reports/monthly-attendance"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <MonthlyAttendanceReport />
@@ -507,7 +508,7 @@ export default function App() {
           path="/dashboard/reports/leave"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <LeaveReport />
@@ -519,7 +520,7 @@ export default function App() {
           path="/dashboard/reports/account-statement"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "finance_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "finance_manager"]}
             >
               <DashboardLayout>
                 <AccountStatementReport />
@@ -531,7 +532,7 @@ export default function App() {
           path="/dashboard/reports/payroll"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "finance_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "finance_manager"]}
             >
               <DashboardLayout>
                 <PayrollReport />
@@ -543,7 +544,7 @@ export default function App() {
           path="/dashboard/reports/timesheet"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <TimesheetReport />
@@ -557,7 +558,7 @@ export default function App() {
           path="/dashboard/jobs"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Jobs />
@@ -571,7 +572,7 @@ export default function App() {
           path="/dashboard/candidates"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Candidates />
@@ -585,7 +586,7 @@ export default function App() {
           path="/dashboard/interviews"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Interviews />
@@ -599,7 +600,7 @@ export default function App() {
           path="/dashboard/goals"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager", "manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager", "manager"]}
             >
               <DashboardLayout>
                 <Goals />
@@ -613,7 +614,7 @@ export default function App() {
           path="/dashboard/reviews"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager", "manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager", "manager"]}
             >
               <DashboardLayout>
                 <Reviews />
@@ -627,7 +628,7 @@ export default function App() {
           path="/dashboard/assets"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Assets />
@@ -641,7 +642,7 @@ export default function App() {
           path="/dashboard/asset-assignments"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <AssetAssignments />
@@ -655,7 +656,7 @@ export default function App() {
           path="/dashboard/users"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin"]}
+              requiredPermissions={["super_admin", "company_admin"]}
             >
               <DashboardLayout>
                 <Users />
@@ -669,7 +670,7 @@ export default function App() {
           path="/dashboard/audit-logs"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin"]}
+              requiredPermissions={["super_admin", "company_admin"]}
             >
               <DashboardLayout>
                 <AuditLogs />
@@ -694,7 +695,7 @@ export default function App() {
         <Route
           path="/dashboard/roles"
           element={
-            <ProtectedRoute roles={["super_admin", "company_admin"]}>
+            <ProtectedRoute requiredPermissions={["super_admin", "company_admin"]}>
               <DashboardLayout>
                 <Roles />
               </DashboardLayout>
@@ -706,7 +707,7 @@ export default function App() {
         <Route
           path="/dashboard/settings"
           element={
-            <ProtectedRoute roles={["super_admin", "company_admin"]}>
+            <ProtectedRoute requiredPermissions={["super_admin", "company_admin"]}>
               <DashboardLayout>
               <Settings />
               </DashboardLayout>
@@ -731,7 +732,7 @@ export default function App() {
           path="/dashboard/recruitment"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin", "hr_manager"]}
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
             >
               <DashboardLayout>
                 <Recruitment />
@@ -807,7 +808,7 @@ export default function App() {
           path="/dashboard/hr-system-setup"
           element={
             <ProtectedRoute
-              roles={["super_admin", "company_admin"]}
+              requiredPermissions={["super_admin", "company_admin"]}
             >
               <DashboardLayout>
                 <HRSystemSetup />
@@ -828,10 +829,125 @@ export default function App() {
           }
         />
 
+        {/* Communication Routes */}
+        <Route
+          path="/dashboard/trips"
+          element={
+            <ProtectedRoute requiredPermissions={["trips.view"]}>
+              <DashboardLayout>
+                <Trips />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/announcements"
+          element={
+            <ProtectedRoute requiredPermissions={["announcements.view"]}>
+              <DashboardLayout>
+                <Announcements />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/meetings"
+          element={
+            <ProtectedRoute requiredPermissions={["meetings.view"]}>
+              <DashboardLayout>
+                <Meetings />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Training Routes */}
+        <Route
+          path="/dashboard/training/programs"
+          element={
+            <ProtectedRoute requiredPermissions={["training.view"]}>
+              <DashboardLayout>
+                <TrainingPrograms />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Employee Lifecycle Routes */}
+        <Route
+          path="/dashboard/employee-lifecycle/awards"
+          element={
+            <ProtectedRoute requiredPermissions={["employee_lifecycle.view"]}>
+              <DashboardLayout>
+                <Awards />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/employee-lifecycle/promotions"
+          element={
+            <ProtectedRoute requiredPermissions={["employee_lifecycle.view"]}>
+              <DashboardLayout>
+                <Promotions />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Time Tracking Routes */}
+        <Route
+          path="/dashboard/time-tracking/entries"
+          element={
+            <ProtectedRoute requiredPermissions={["time_tracking.view"]}>
+              <DashboardLayout>
+                <TimeEntries />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        
+        {/* Media & Content Routes */}
+        <Route
+          path="/dashboard/media-library"
+          element={
+            <ProtectedRoute requiredPermissions={["media.view"]}>
+              <DashboardLayout>
+                <MediaLibrary />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Settings Test Routes */}
+        <Route
+          path="/dashboard/settings-test"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <SettingsTest />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/settings-comprehensive-test"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <SettingsComprehensiveTest />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         {/* Default Route */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+          </Routes>
+        </DebugMode>
+      </MaintenanceMode>
     </Router>
   );
 }

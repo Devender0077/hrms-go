@@ -33,6 +33,7 @@ import React, { useState, useMemo } from "react";
     import { Icon } from "@iconify/react";
     import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
+import { PayrollHeroSection } from "../components/common/HeroSection";
 
 // Enhanced payroll interface
 interface PayrollRecord {
@@ -543,63 +544,37 @@ const paymentMethods = [
       };
       
       return (
-    <div className="min-h-screen bg-content2 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-          {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
-              <Icon icon="lucide:credit-card" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Payroll</h1>
-              <p className="text-default-600 mt-1">Manage employee salaries and payslips</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              color="primary" 
-              variant="flat"
-              startContent={<Icon icon="lucide:credit-card" />} 
-              onPress={handleProcessPayroll}
-              isLoading={isProcessing}
-              className="font-medium"
-            >
-                Process Payroll
-              </Button>
-            <Dropdown>
-              <DropdownTrigger>
-                <Button 
-                  variant="flat" 
-                  startContent={<Icon icon="lucide:download" />}
-                  isLoading={isExporting}
-                  className="font-medium"
-                >
-                Export
-              </Button>
-              </DropdownTrigger>
-              <DropdownMenu>
-                <DropdownItem
-                  key="csv"
-                  startContent={<Icon icon="lucide:file-text" />}
-                  onPress={handleExportCSV}
-                >
-                  Export as CSV
-                </DropdownItem>
-                <DropdownItem
-                  key="pdf"
-                  startContent={<Icon icon="lucide:file-pdf" />}
-                  onPress={handleExportPDF}
-                >
-                  Export as PDF
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-            </div>
-          </div>
-          
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <PayrollHeroSection
+          title="Payroll Management"
+          subtitle="Salary Processing & Payments"
+          description="Manage employee salaries, process payments, and generate comprehensive payroll reports. Streamline your payroll operations with automated calculations and secure payment processing."
+          actions={[
+            {
+              label: "Process Payroll",
+              icon: "lucide:credit-card",
+              onPress: handleProcessPayroll,
+              isLoading: isProcessing
+            },
+            {
+              label: "Export Report",
+              icon: "lucide:download",
+              onPress: handleExportCSV,
+              variant: "bordered",
+              isLoading: isExporting
+            }
+          ]}
+        />
+
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4"
+        >
             <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
               <Card className="shadow-sm">
                 <CardBody className="flex flex-row items-center gap-4">
@@ -637,18 +612,18 @@ const paymentMethods = [
                   <div>
                     <p className="text-default-500">Pending</p>
                   <h3 className="text-2xl font-bold">{stats.pending}</h3>
-                </div>
-              </CardBody>
-            </Card>
-          </motion.div>
-          
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="shadow-sm">
-              <CardBody className="flex flex-row items-center gap-4">
+                  </div>
+                </CardBody>
+              </Card>
+            </motion.div>
+            
+            <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
+              <Card className="shadow-sm">
+                <CardBody className="flex flex-row items-center gap-4">
                 <div className="p-3 rounded-full bg-primary/10">
                   <Icon icon="lucide:loader" className="text-2xl text-primary" />
-                </div>
-                <div>
+                  </div>
+                  <div>
                   <p className="text-default-500">Processing</p>
                   <h3 className="text-2xl font-bold">{stats.processing}</h3>
                   </div>
@@ -661,7 +636,7 @@ const paymentMethods = [
                 <CardBody className="flex flex-row items-center gap-4">
                   <div className="p-3 rounded-full bg-danger/10">
                   <Icon icon="lucide:x-circle" className="text-2xl text-danger" />
-                </div>
+          </div>
                 <div>
                   <p className="text-default-500">Failed</p>
                   <h3 className="text-2xl font-bold">{stats.failed}</h3>
@@ -671,7 +646,7 @@ const paymentMethods = [
           </motion.div>
           
           <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="shadow-sm">
+          <Card className="shadow-sm">
               <CardBody className="flex flex-row items-center gap-4">
                 <div className="p-3 rounded-full bg-success-100">
                   <Icon icon="lucide:dollar-sign" className="text-2xl text-success-600" />
@@ -683,15 +658,20 @@ const paymentMethods = [
                 </CardBody>
               </Card>
             </motion.div>
-          </div>
+        </motion.div>
           
         {/* Filters */}
-        <Card className="border-0 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Card className="border-0 shadow-sm">
           <CardBody className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Input
                 placeholder="Search employees..."
-                value={searchQuery}
+                
                 onChange={(e) => setSearchQuery(e.target.value)}
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
@@ -724,14 +704,20 @@ const paymentMethods = [
               <div className="flex items-end">
                 <div className="text-sm text-default-600">
                   Showing {filteredPayroll.length} of {payrollList.length} records
-                </div>
               </div>
+                  </div>
             </div>
           </CardBody>
-        </Card>
+          </Card>
+        </motion.div>
 
         {/* Payroll Table */}
-        <Card className="border-0 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
               <Icon icon="lucide:table" className="text-success-600 text-xl" />
@@ -763,9 +749,9 @@ const paymentMethods = [
                           <p className="font-medium text-foreground">{payroll.employeeName}</p>
                           <p className="text-sm text-default-500">{payroll.employeeId}</p>
                           <p className="text-xs text-default-400">{payroll.department}</p>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
+                      </TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium text-foreground">{payroll.month} {payroll.year}</p>
@@ -840,6 +826,7 @@ const paymentMethods = [
             )}
             </CardBody>
           </Card>
+        </motion.div>
           
           {/* Payslip Modal */}
         <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="4xl">
@@ -862,24 +849,24 @@ const paymentMethods = [
                       <div className="space-y-6">
                       {/* Header */}
                       <div className="flex justify-between items-start p-4 bg-content1 rounded-lg">
-                        <div>
+                          <div>
                           <h4 className="text-lg font-semibold text-foreground">Payslip Details</h4>
-                          <p className="text-sm">Payslip #: PS-{selectedPayroll.id.toString().padStart(4, '0')}</p>
-                          <p className="text-sm">Date: {selectedPayroll.paymentDate || 'Pending'}</p>
-                        </div>
+                            <p className="text-sm">Payslip #: PS-{selectedPayroll.id.toString().padStart(4, '0')}</p>
+                            <p className="text-sm">Date: {selectedPayroll.paymentDate || 'Pending'}</p>
+                          </div>
                         <div className="text-right">
                           <Avatar src={selectedPayroll.avatar} size="lg" />
+                          </div>
                         </div>
-                      </div>
-
+                        
                       {/* Employee Info */}
                       <div className="p-4 border border-default-300 rounded-lg">
                         <h5 className="font-semibold text-foreground mb-3">Employee Information</h5>
                         <div className="grid grid-cols-2 gap-4">
-                          <div>
+                            <div>
                             <span className="text-default-500 text-sm">Name:</span>
                             <p className="font-medium">{selectedPayroll.employeeName}</p>
-                          </div>
+                            </div>
                           <div>
                             <span className="text-default-500 text-sm">Employee ID:</span>
                             <p className="font-medium">{selectedPayroll.employeeId}</p>
@@ -888,7 +875,7 @@ const paymentMethods = [
                             <span className="text-default-500 text-sm">Department:</span>
                             <p className="font-medium">{selectedPayroll.department}</p>
                         </div>
-                            <div>
+                          <div>
                             <span className="text-default-500 text-sm">Designation:</span>
                             <p className="font-medium">{selectedPayroll.designation}</p>
                             </div>
@@ -916,7 +903,7 @@ const paymentMethods = [
                               <div className="flex justify-between">
                                 <span>Medical Allowance</span>
                               <span>{formatCurrency(selectedPayroll.allowances.medical)}</span>
-                            </div>
+                              </div>
                             <div className="flex justify-between">
                               <span>Other Allowances</span>
                               <span>{formatCurrency(selectedPayroll.allowances.other)}</span>
@@ -944,8 +931,8 @@ const paymentMethods = [
                               <div className="flex justify-between">
                                 <span>Income Tax</span>
                               <span>{formatCurrency(selectedPayroll.deductions.tax)}</span>
-                            </div>
-                            <div className="flex justify-between">
+                              </div>
+                              <div className="flex justify-between">
                               <span>Insurance</span>
                               <span>{formatCurrency(selectedPayroll.deductions.insurance)}</span>
                               </div>
@@ -961,11 +948,11 @@ const paymentMethods = [
                             <div className="flex justify-between font-semibold">
                                 <span>Total Deductions</span>
                               <span>{formatCurrency(Object.values(selectedPayroll.deductions).reduce((sum, val) => sum + val, 0))}</span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-
+                        
                       {/* Net Salary */}
                       <div className="p-4 bg-success-50 rounded-lg">
                         <div className="flex justify-between items-center">

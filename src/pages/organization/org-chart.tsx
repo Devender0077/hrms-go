@@ -33,6 +33,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import PageLayout, { PageHeader } from "../../components/layout/PageLayout";
 import { useAuth } from "../../contexts/auth-context";
 import { apiRequest } from "../../services/api-service";
+import ModernOrgChart from "../../components/org-chart/ModernOrgChart";
 
 // Employee interface
 interface Employee {
@@ -65,12 +66,6 @@ const OrganizationChartPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<"chart" | "list">("chart");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("all");
-  const [zoomLevel, setZoomLevel] = useState(100);
-  const [panX, setPanX] = useState(0);
-  const [panY, setPanY] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const chartRef = useRef<HTMLDivElement>(null);
   
   const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
 
@@ -326,71 +321,174 @@ const OrganizationChartPage: React.FC = () => {
     return undefined;
   };
 
-  // Pan and zoom handlers
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.button === 0) {
-      setIsDragging(true);
-      setDragStart({ x: e.clientX - panX, y: e.clientY - panY });
-      e.preventDefault();
+      
+      const handleExportChart = () => {
+    try {
+      // Create CSV data
+      const csvData = filteredEmployees.map(employee => ({
+        'Employee ID': `EMP${employee.id.toString().padStart(3, '0')}`,
+        'First Name': employee.first_name,
+        'Last Name': employee.last_name,
+        'Email': employee.email,
+        'Phone': employee.phone || 'N/A',
+        'Department': employee.department_name || 'N/A',
+        'Designation': employee.designation_name || 'N/A',
+        'Manager': employee.manager_name || 'N/A',
+        'Status': employee.status || 'Unknown',
+        'Join Date': employee.joining_date ? new Date(employee.joining_date).toLocaleDateString() : 'N/A',
+        'Shift': employee.shift_name || 'N/A'
+      }));
+
+      // Convert to CSV
+      const headers = Object.keys(csvData[0] || {});
+      const csvContent = [
+        headers.join(','),
+        ...csvData.map(row => headers.map(header => `"${row[header as keyof typeof row]}"`).join(','))
+      ].join('\n');
+
+      // Create and download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `organization_chart_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('Organization chart exported successfully');
+    } catch (error) {
+      console.error('Error exporting organization chart:', error);
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging) {
-      setPanX(e.clientX - dragStart.x);
-      setPanY(e.clientY - dragStart.y);
-      e.preventDefault();
-    }
+  const handleRefreshData = () => {
+    loadData();
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  // Use useEffect to add wheel event listener directly to DOM
-  useEffect(() => {
-    const chartElement = chartRef.current;
-    if (!chartElement) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -10 : 10;
-      setZoomLevel(prev => Math.max(50, Math.min(200, prev + delta)));
-    };
-
-    // Add event listener with passive: false to allow preventDefault
-    chartElement.addEventListener('wheel', handleWheel, { passive: false });
-
-    return () => {
-      chartElement.removeEventListener('wheel', handleWheel);
-    };
-  }, []);
-
-  const handleResetView = () => {
-    setZoomLevel(100);
-    setPanX(0);
-    setPanY(0);
+  // Transform employees data for ModernOrgChart component
+  const transformEmployeesForChart = (employees: Employee[]) => {
+    return employees.map(emp => ({
+      id: emp.id,
+      name: `${emp.first_name} ${emp.last_name}`,
+      position: emp.designation_name || 'No Position',
+      department: emp.department_name || 'No Department',
+      email: emp.email || '',
+      phone: emp.phone || '',
+      avatar: emp.profile_photo || '',
+      employeeId: `EMP${emp.id.toString().padStart(3, '0')}`,
+      reportsTo: emp.manager_id || null,
+      status: emp.status || 'Unknown',
+      joinDate: emp.joining_date || '',
+      directReports: [] // Will be populated by the chart component
+    }));
   };
 
         return (
-    <PageLayout>
-      <PageHeader
-        title="Organization Chart"
-        description="Visualize your company's structure and employee hierarchy"
-        icon="lucide:network"
-        actions={
-          <div className="flex items-center gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-foreground">{employees.length}</div>
-              <div className="text-sm text-default-500 font-medium">Total Employees</div>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-500 via-purple-600 to-pink-600 p-6 sm:p-8 text-white mb-6"
+        >
+          {/* Background decorative elements */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute top-1/2 -left-20 w-24 h-24 bg-white/5 rounded-full blur-lg"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+            {/* Text Content */}
+            <div className="flex-1">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-white/20 rounded-xl">
+                    <Icon icon="lucide:network" className="text-white text-2xl" />
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+                    Organization Chart
+                  </h1>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-foreground">{filteredEmployees.length}</div>
-              <div className="text-sm text-default-500 font-medium">Filtered</div>
+                <p className="text-white/90 text-sm sm:text-base mb-6 max-w-lg">
+                  Visualize your company's structure and employee hierarchy. Explore relationships, understand reporting structures, and navigate your organizational network with interactive charts.
+                </p>
+                <div className="flex flex-wrap gap-3">
+              <Button 
+                    color="default"
+                    variant="solid"
+                    size="sm"
+                    className="bg-white/20 backdrop-blur-sm text-white border-white/30"
+                    startContent={<Icon icon="lucide:download" className="w-4 h-4" />}
+                onPress={handleExportChart}
+              >
+                    Export Chart
+                  </Button>
+                  <Button 
+                    color="default"
+                    variant="bordered"
+                    size="sm"
+                    className="border-white/30 text-white hover:bg-white/10"
+                    startContent={<Icon icon="lucide:refresh-cw" className="w-4 h-4" />}
+                    onPress={handleRefreshData}
+                  >
+                    Refresh Data
+              </Button>
+                </div>
+              </motion.div>
+            </div>
+            
+            {/* Statistics */}
+            <div className="flex-shrink-0">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20"
+              >
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-white">{employees.length}</div>
+                    <div className="text-sm text-white/80 font-medium">Total Employees</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-white">{filteredEmployees.length}</div>
+                    <div className="text-sm text-white/80 font-medium">Filtered</div>
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </div>
-        }
-      />
+          
+          {/* Floating particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 bg-white/40 rounded-full"
+                style={{
+                  left: `${10 + i * 12}%`,
+                  top: `${20 + (i % 4) * 15}%`,
+                }}
+                animate={{
+                  y: [0, -15, 0],
+                  opacity: [0.4, 0.8, 0.4],
+                }}
+                transition={{
+                  duration: 2 + i * 0.3,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                }}
+              />
+            ))}
+          </div>
+        </motion.div>
 
         {/* Enhanced Controls */}
         <motion.div
@@ -404,7 +502,7 @@ const OrganizationChartPage: React.FC = () => {
                 <div className="flex-1 max-w-md w-full">
                   <Input
                     placeholder="Search employees by name, email, or department..."
-                    value={searchQuery}
+                    
                     onChange={(e) => setSearchQuery(e.target.value)}
                     startContent={<Icon icon="lucide:search" className="w-5 h-5 text-default-400" />}
                     variant="bordered"
@@ -437,11 +535,11 @@ const OrganizationChartPage: React.FC = () => {
                       color={viewMode === 'chart' ? 'primary' : 'default'}
                       variant={viewMode === 'chart' ? 'solid' : 'bordered'}
                       onPress={() => setViewMode('chart')}
-                      startContent={<Icon icon="lucide:git-branch" className="w-4 h-4" />}
+                      startContent={<Icon icon="lucide:network" className="w-4 h-4" />}
                       size="lg"
                       className="rounded-xl font-semibold"
                     >
-                      Tree View
+                      Chart View
                 </Button>
                 <Button 
                       color={viewMode === 'list' ? 'primary' : 'default'}
@@ -484,71 +582,22 @@ const OrganizationChartPage: React.FC = () => {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h3 className="text-2xl font-bold text-foreground">Organization Tree</h3>
-                        <p className="text-default-600 mt-1">Click and drag to navigate • Scroll to zoom • Click employee cards for details</p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={() => setZoomLevel(Math.max(50, zoomLevel - 10))}
-                          startContent={<Icon icon="lucide:zoom-out" className="w-4 h-4" />}
-                          className="rounded-lg"
-                        >
-                          Zoom Out
-                        </Button>
-                        <span className="text-sm text-default-600 min-w-[3rem] text-center font-semibold">{zoomLevel}%</span>
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={() => setZoomLevel(Math.min(200, zoomLevel + 10))}
-                          startContent={<Icon icon="lucide:zoom-in" className="w-4 h-4" />}
-                          className="rounded-lg"
-                        >
-                          Zoom In
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={handleResetView}
-                          startContent={<Icon icon="lucide:rotate-ccw" className="w-4 h-4" />}
-                          className="rounded-lg"
-                        >
-                          Reset
-                        </Button>
+                        <h3 className="text-2xl font-bold text-foreground">Organization Chart</h3>
+                        <p className="text-default-600 mt-1">Interactive organizational hierarchy • Click employee cards for details</p>
                       </div>
                     </div>
                     
-                    <div 
-                      className="overflow-auto border border-default-300 rounded-2xl p-8 relative bg-gradient-to-br from-gray-50 to-white"
-                      ref={chartRef}
-                      onMouseDown={handleMouseDown}
-                      onMouseMove={handleMouseMove}
-                      onMouseUp={handleMouseUp}
-                      onMouseLeave={handleMouseUp}
-                      style={{ 
-                        cursor: isDragging ? 'grabbing' : 'grab',
-                        userSelect: 'none',
-                        minHeight: '500px'
-                      }}
-                    >
-                      <div 
-                        className="transition-transform duration-200 ease-out"
-                        style={{ 
-                          transform: `translate(${panX}px, ${panY}px) scale(${zoomLevel / 100})`,
-                          transformOrigin: 'top left'
+                    <div className="min-h-[500px]">
+                      <ModernOrgChart 
+                        employees={transformEmployeesForChart(filteredEmployees)} 
+                        onEmployeeClick={(employee) => {
+                          // Find the original employee data
+                          const originalEmployee = filteredEmployees.find(emp => emp.id === employee.id);
+                          if (originalEmployee) {
+                            handleViewEmployee(originalEmployee);
+                          }
                         }}
-                      >
-                        {renderTreeView(filteredEmployees)}
-                      </div>
-                      
-                      {/* Enhanced zoom indicator */}
-                      <div className="absolute top-6 right-6 bg-content1/95 backdrop-blur-sm rounded-xl px-4 py-3 shadow-lg border border-default-300">
-                        <div className="flex items-center gap-3 text-sm text-default-600">
-                          <Icon icon="lucide:zoom-in" className="w-4 h-4" />
-                          <span className="font-semibold">{zoomLevel}%</span>
-                        </div>
-                      </div>
+                      />
                     </div>
                   </div>
                 ) : (
@@ -734,7 +783,8 @@ const OrganizationChartPage: React.FC = () => {
               )}
             </ModalContent>
           </Modal>
-    </PageLayout>
+      </div>
+    </div>
       );
 };
 

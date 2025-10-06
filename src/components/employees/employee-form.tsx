@@ -246,7 +246,7 @@ import React from "react";
               <Input
                 label="First Name"
                 placeholder="Enter first name"
-                value={formData.first_name}
+                
                 onValueChange={(value) => handleChange('first_name', value)}
                 isInvalid={!!errors.first_name}
                 errorMessage={errors.first_name}
@@ -257,7 +257,7 @@ import React from "react";
               <Input
                 label="Last Name"
                 placeholder="Enter last name"
-                value={formData.last_name}
+                
                 onValueChange={(value) => handleChange('last_name', value)}
                 isInvalid={!!errors.last_name}
                 errorMessage={errors.last_name}
@@ -269,7 +269,7 @@ import React from "react";
                 label="Email"
                 placeholder="Enter email address"
                 type="email"
-                value={formData.email}
+                
                 onValueChange={(value) => handleChange('email', value)}
                 isInvalid={!!errors.email}
                 errorMessage={errors.email}
@@ -280,7 +280,7 @@ import React from "react";
               <Input
                 label="Phone"
                 placeholder="Enter phone number"
-                value={formData.phone}
+                
                 onValueChange={(value) => handleChange('phone', value)}
                 className="rounded-lg"
               />
@@ -288,7 +288,7 @@ import React from "react";
               <Input
                 label="Employee ID"
                 placeholder="Enter employee ID"
-                value={formData.employee_id}
+                
                 onValueChange={(value) => handleChange('employee_id', value)}
                 isInvalid={!!errors.employee_id}
                 errorMessage={errors.employee_id}
@@ -300,7 +300,7 @@ import React from "react";
                 label="Date of Birth"
                 placeholder="Select date of birth"
                 type="date"
-                value={formData.date_of_birth}
+                
                 onChange={(e) => handleChange('date_of_birth', e.target.value)}
                 className="rounded-lg"
               />
@@ -471,11 +471,11 @@ import React from "react";
                 className="rounded-lg"
                 aria-label="Employment Type"
               >
-                <SelectItem key="full_time" value="full_time">Full Time</SelectItem>
-                <SelectItem key="part_time" value="part_time">Part Time</SelectItem>
-                <SelectItem key="contract" value="contract">Contract</SelectItem>
-                <SelectItem key="intern" value="intern">Intern</SelectItem>
-                <SelectItem key="consultant" value="consultant">Consultant</SelectItem>
+                <SelectItem key="full_time">Full Time</SelectItem>
+                <SelectItem key="part_time">Part Time</SelectItem>
+                <SelectItem key="contract">Contract</SelectItem>
+                <SelectItem key="intern">Intern</SelectItem>
+                <SelectItem key="consultant">Consultant</SelectItem>
               </Select>
               
               <Select
@@ -506,7 +506,7 @@ import React from "react";
                 label="Joining Date"
                 placeholder="Select joining date"
                 type="date"
-                value={formData.joining_date}
+                
                 onChange={(e) => handleChange('joining_date', e.target.value)}
                 isInvalid={!!errors.joining_date}
                 errorMessage={errors.joining_date}
@@ -535,7 +535,7 @@ import React from "react";
                     <SelectItem key={emp.id.toString()} textValue={`${emp.first_name} ${emp.last_name} (${emp.employee_id})`}>
                       {emp.first_name} {emp.last_name} ({emp.employee_id})
                     </SelectItem>
-                  ))
+                  )) as any
                 }
               </Select>
             </div>
@@ -551,7 +551,7 @@ import React from "react";
               <Textarea
                 label="Address"
                 placeholder="Enter address"
-                value={formData.address}
+                
                 onValueChange={(value) => handleChange('address', value)}
                 className="rounded-lg"
               />
@@ -561,7 +561,7 @@ import React from "react";
               <Input
                 label="City"
                 placeholder="Enter city"
-                value={formData.city}
+                
                 onValueChange={(value) => handleChange('city', value)}
                 className="rounded-lg"
               />
@@ -569,7 +569,7 @@ import React from "react";
               <Input
                 label="State/Province"
                 placeholder="Enter state/province"
-                value={formData.state}
+                
                 onValueChange={(value) => handleChange('state', value)}
                 className="rounded-lg"
               />
@@ -577,7 +577,7 @@ import React from "react";
               <Input
                 label="Country"
                 placeholder="Enter country"
-                value={formData.country}
+                
                 onValueChange={(value) => handleChange('country', value)}
                 className="rounded-lg"
               />
@@ -585,7 +585,7 @@ import React from "react";
               <Input
                 label="ZIP/Postal Code"
                 placeholder="Enter ZIP/postal code"
-                value={formData.zip_code}
+                
                 onValueChange={(value) => handleChange('zip_code', value)}
                 className="rounded-lg"
               />
@@ -602,7 +602,7 @@ import React from "react";
               <Input
                 label="Bank Name"
                 placeholder="Enter bank name"
-                value={formData.bank_name}
+                
                 onValueChange={(value) => handleChange('bank_name', value)}
                 className="rounded-lg"
               />
@@ -610,7 +610,7 @@ import React from "react";
               <Input
                 label="Account Number"
                 placeholder="Enter account number"
-                value={formData.bank_account_number}
+                
                 onValueChange={(value) => handleChange('bank_account_number', value)}
                 className="rounded-lg"
               />
@@ -618,7 +618,7 @@ import React from "react";
               <Input
                 label="Routing Number"
                 placeholder="Enter routing number"
-                value={formData.bank_routing_number}
+                
                 onValueChange={(value) => handleChange('bank_routing_number', value)}
                 className="rounded-lg"
               />
@@ -626,7 +626,7 @@ import React from "react";
               <Input
                 label="SWIFT Code"
                 placeholder="Enter SWIFT code"
-                value={formData.bank_swift_code}
+                
                 onValueChange={(value) => handleChange('bank_swift_code', value)}
                 className="rounded-lg"
               />
@@ -636,7 +636,7 @@ import React from "react";
               <Textarea
                 label="Bank Address"
                 placeholder="Enter bank address"
-                value={formData.bank_address}
+                
                 onValueChange={(value) => handleChange('bank_address', value)}
                 className="rounded-lg"
               />
@@ -670,7 +670,7 @@ import React from "react";
                       label="Temporary Password (Optional)"
                       placeholder="Leave empty for random password"
                       type="password"
-                      value={formData.temp_password}
+                      
                       onValueChange={(value) => handleChange('temp_password', value)}
                       className="rounded-lg"
                       description="If left empty, a random password will be generated and sent to the employee's email"

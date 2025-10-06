@@ -25,6 +25,7 @@ import {
   useDisclosure
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import HeroSection from "../common/HeroSection";
 import {
   AreaChart,
   Area,
@@ -113,56 +114,48 @@ export default function CompanyAdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-content1/50 p-6">
+    <div className="min-h-screen bg-background p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-success-500 to-primary-600 rounded-xl">
-              <Icon icon="lucide:building-2" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Company Admin Dashboard</h1>
-              <p className="text-default-600 mt-1">Manage your organization and employees</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              color="primary" 
-              variant="flat"
-              startContent={<Icon icon="lucide:user-plus" />}
-              className="font-medium"
-            >
-              Add Employee
-            </Button>
-            <Button 
-              color="secondary" 
-              variant="flat"
-              startContent={<Icon icon="lucide:bar-chart" />}
-              className="font-medium"
-            >
-              View Reports
-            </Button>
-          </div>
-        </div>
+        {/* Hero Section */}
+        <HeroSection
+          title="Company Admin Dashboard"
+          subtitle="Manage Your Organization"
+          description="Monitor your company's HR operations, track performance metrics, and oversee employee activities from this comprehensive dashboard."
+          icon="lucide:building-2"
+          illustration="dashboard"
+          actions={[
+            {
+              label: "Quick Reports",
+              icon: "lucide:bar-chart-3",
+              onPress: () => console.log("Quick reports"),
+              variant: "bordered"
+            },
+            {
+              label: "Export Data",
+              icon: "lucide:download",
+              onPress: () => console.log("Export data"),
+              variant: "flat"
+            }
+          ]}
+        />
 
         {/* Key Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardBody className="p-6">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow bg-content1 dark:bg-content1">
+              <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Total Employees</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{companyStats.totalEmployees}</p>
-                    <p className="text-success-600 text-sm mt-1">+{companyStats.newHires} new hires</p>
+                    <p className="text-default-500 text-xs sm:text-sm font-medium">Total Employees</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{companyStats.totalEmployees}</p>
+                    <p className="text-success-600 text-xs sm:text-sm mt-1">+{companyStats.newHires} new hires</p>
                   </div>
-                  <div className="p-3 bg-primary-100 rounded-xl">
-                    <Icon icon="lucide:users" className="text-primary-600 text-2xl" />
+                  <div className="p-2 sm:p-3 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
+                    <Icon icon="lucide:users" className="text-primary-600 text-xl sm:text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -174,16 +167,16 @@ export default function CompanyAdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardBody className="p-6">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow bg-content1 dark:bg-content1">
+              <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Attendance Rate</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{companyStats.attendanceRate}%</p>
-                    <p className="text-success-600 text-sm mt-1">+2.1% from last month</p>
+                    <p className="text-default-500 text-xs sm:text-sm font-medium">Attendance Rate</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{companyStats.attendanceRate}%</p>
+                    <p className="text-success-600 text-xs sm:text-sm mt-1">+2.1% from last month</p>
                   </div>
-                  <div className="p-3 bg-success-100 rounded-xl">
-                    <Icon icon="lucide:user-check" className="text-success-600 text-2xl" />
+                  <div className="p-2 sm:p-3 bg-success-100 dark:bg-success-900/30 rounded-xl">
+                    <Icon icon="lucide:user-check" className="text-success-600 text-xl sm:text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -195,16 +188,16 @@ export default function CompanyAdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardBody className="p-6">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow bg-content1 dark:bg-content1">
+              <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Pending Approvals</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{companyStats.pendingApprovals}</p>
-                    <p className="text-warning-600 text-sm mt-1">Requires attention</p>
+                    <p className="text-default-500 text-xs sm:text-sm font-medium">Pending Approvals</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{companyStats.pendingApprovals}</p>
+                    <p className="text-warning-600 text-xs sm:text-sm mt-1">Requires attention</p>
                   </div>
-                  <div className="p-3 bg-warning-100 rounded-xl">
-                    <Icon icon="lucide:clock" className="text-warning-600 text-2xl" />
+                  <div className="p-2 sm:p-3 bg-warning-100 dark:bg-warning-900/30 rounded-xl">
+                    <Icon icon="lucide:clock" className="text-warning-600 text-xl sm:text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -216,16 +209,16 @@ export default function CompanyAdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardBody className="p-6">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow bg-content1 dark:bg-content1">
+              <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Departments</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{companyStats.departmentCount}</p>
-                    <p className="text-primary-600 text-sm mt-1">Active departments</p>
+                    <p className="text-default-500 text-xs sm:text-sm font-medium">Departments</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{companyStats.departmentCount}</p>
+                    <p className="text-primary-600 text-xs sm:text-sm mt-1">Active departments</p>
                   </div>
-                  <div className="p-3 bg-secondary-100 rounded-xl">
-                    <Icon icon="lucide:building" className="text-secondary-600 text-2xl" />
+                  <div className="p-2 sm:p-3 bg-secondary-100 dark:bg-secondary-900/30 rounded-xl">
+                    <Icon icon="lucide:building" className="text-secondary-600 text-xl sm:text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -346,7 +339,7 @@ export default function CompanyAdminDashboard() {
                         <span className="text-sm font-semibold text-foreground">{dept.utilization}%</span>
                       </div>
                       <Progress 
-                        value={dept.utilization} 
+                         
                         color={dept.utilization > 90 ? "success" : dept.utilization > 80 ? "warning" : "danger"}
                         className="h-2"
                       />

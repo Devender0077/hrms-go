@@ -380,7 +380,7 @@ const RegulationsPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-4">
             <Input
               placeholder="Search regulations..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
@@ -592,7 +592,7 @@ const RegulationsPage: React.FC = () => {
                     <Input
                       label="Regulation Title"
                       placeholder="Enter regulation title"
-                      value={formData.title}
+                      
                       onChange={(e) => setFormData({...formData, title: e.target.value})}
                       isRequired
                     />
@@ -632,7 +632,7 @@ const RegulationsPage: React.FC = () => {
                   <Textarea
                     label="Description"
                     placeholder="Enter regulation description"
-                    value={formData.description}
+                    
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows={3}
                   />
@@ -641,14 +641,14 @@ const RegulationsPage: React.FC = () => {
                     <Input
                       label="Effective Date"
                       type="date"
-                      value={formData.effective_date}
+                      
                       onChange={(e) => setFormData({...formData, effective_date: e.target.value})}
                       isRequired
                     />
                     <Input
                       label="Expiry Date (Optional)"
                       type="date"
-                      value={formData.expiry_date}
+                      
                       onChange={(e) => setFormData({...formData, expiry_date: e.target.value})}
                     />
                   </div>
@@ -656,7 +656,7 @@ const RegulationsPage: React.FC = () => {
                   <Textarea
                     label="Penalty Description (Optional)"
                     placeholder="Describe penalties for non-compliance"
-                    value={formData.penalty_description}
+                    
                     onChange={(e) => setFormData({...formData, penalty_description: e.target.value})}
                     rows={2}
                   />
@@ -664,7 +664,7 @@ const RegulationsPage: React.FC = () => {
                   <Textarea
                     label="Compliance Requirements (Optional)"
                     placeholder="Describe compliance requirements"
-                    value={formData.compliance_requirements}
+                    
                     onChange={(e) => setFormData({...formData, compliance_requirements: e.target.value})}
                     rows={2}
                   />
@@ -712,7 +712,7 @@ const RegulationsPage: React.FC = () => {
                     <Input
                       label="Regulation Title"
                       placeholder="Enter regulation title"
-                      value={formData.title}
+                      
                       onChange={(e) => setFormData({...formData, title: e.target.value})}
                       isRequired
                     />
@@ -752,7 +752,7 @@ const RegulationsPage: React.FC = () => {
                   <Textarea
                     label="Description"
                     placeholder="Enter regulation description"
-                    value={formData.description}
+                    
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows={3}
                   />
@@ -761,14 +761,14 @@ const RegulationsPage: React.FC = () => {
                     <Input
                       label="Effective Date"
                       type="date"
-                      value={formData.effective_date}
+                      
                       onChange={(e) => setFormData({...formData, effective_date: e.target.value})}
                       isRequired
                     />
                     <Input
                       label="Expiry Date (Optional)"
                       type="date"
-                      value={formData.expiry_date}
+                      
                       onChange={(e) => setFormData({...formData, expiry_date: e.target.value})}
                     />
                   </div>
@@ -776,7 +776,7 @@ const RegulationsPage: React.FC = () => {
                   <Textarea
                     label="Penalty Description (Optional)"
                     placeholder="Describe penalties for non-compliance"
-                    value={formData.penalty_description}
+                    
                     onChange={(e) => setFormData({...formData, penalty_description: e.target.value})}
                     rows={2}
                   />
@@ -784,7 +784,7 @@ const RegulationsPage: React.FC = () => {
                   <Textarea
                     label="Compliance Requirements (Optional)"
                     placeholder="Describe compliance requirements"
-                    value={formData.compliance_requirements}
+                    
                     onChange={(e) => setFormData({...formData, compliance_requirements: e.target.value})}
                     rows={2}
                   />

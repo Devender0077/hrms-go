@@ -88,9 +88,9 @@ export default function LeaveBalances() {
     try {
       setLoading(true);
       const [balancesRes, leaveTypesRes, employeesRes] = await Promise.all([
-        apiRequest("GET", "/api/v1/leave/balances"),
-        apiRequest("GET", "/api/v1/leave/types"),
-        apiRequest("GET", "/api/v1/employees")
+        apiRequest("/leave/balances"),
+        apiRequest("/leave/types"),
+        apiRequest("/employees")
       ]);
 
       if (balancesRes.success) {
@@ -141,10 +141,10 @@ export default function LeaveBalances() {
       
       const url = isEditMode 
         ? `/api/v1/leave/balances/${selectedBalance?.id}`
-        : "/api/v1/leave/balances";
+        : "/leave/balances";
       const method = isEditMode ? "PUT" : "POST";
       
-      const response = await apiRequest(method, url, formData);
+      const response = await apiRequest(url, { method, body: JSON.stringify(formData) });
       if (response.success) {
         await loadData();
         onClose();
@@ -224,7 +224,7 @@ export default function LeaveBalances() {
           <>
             <Input
               placeholder="Search balances..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
@@ -237,10 +237,10 @@ export default function LeaveBalances() {
             >
               <SelectItem key="all">All Years</SelectItem>
               {generateYearOptions().map((year) => (
-                <SelectItem key={year} value={year}>
+                <SelectItem key={year} >
                   {year}
                 </SelectItem>
-              ))}
+              )) as any}
             </Select>
             <Button
               color="primary"
@@ -296,7 +296,7 @@ export default function LeaveBalances() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Progress
-                        value={getUsagePercentage(balance.used_days, balance.total_days)}
+                        
                         color={getUsageColor(balance.used_days, balance.total_days)}
                         className="w-20"
                       />
@@ -365,7 +365,7 @@ export default function LeaveBalances() {
                     isRequired
                   >
                     {employees.map((employee) => (
-                      <SelectItem key={employee.id.toString()} value={employee.id.toString()}>
+                      <SelectItem key={employee.id.toString()} >
                         {employee.first_name} {employee.last_name} ({employee.employee_id})
                       </SelectItem>
                     ))}
@@ -379,7 +379,7 @@ export default function LeaveBalances() {
                     isRequired
                   >
                     {leaveTypes.map((leaveType) => (
-                      <SelectItem key={leaveType.id.toString()} value={leaveType.id.toString()}>
+                      <SelectItem key={leaveType.id.toString()} >
                         {leaveType.name} ({leaveType.days_allowed} days)
                       </SelectItem>
                     ))}
@@ -388,7 +388,7 @@ export default function LeaveBalances() {
                   <Input
                     label="Year"
                     type="number"
-                    value={formData.year}
+                    
                     onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                     isRequired
                   />
@@ -397,7 +397,7 @@ export default function LeaveBalances() {
                     <Input
                       label="Total Days"
                       type="number"
-                      value={formData.total_days.toString()}
+                      
                       onChange={(e) => setFormData({ ...formData, total_days: parseInt(e.target.value) || 0 })}
                       isRequired
                     />
@@ -405,7 +405,7 @@ export default function LeaveBalances() {
                     <Input
                       label="Used Days"
                       type="number"
-                      value={formData.used_days.toString()}
+                      
                       onChange={(e) => setFormData({ ...formData, used_days: parseInt(e.target.value) || 0 })}
                       isRequired
                     />

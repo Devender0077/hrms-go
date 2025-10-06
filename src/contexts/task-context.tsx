@@ -58,8 +58,13 @@ interface TaskProviderProps {
 export const TaskProvider: React.FC<TaskProviderProps> = ({ children }) => {
   const taskData = useTasks();
 
+  const contextValue = {
+    ...taskData,
+    refreshTasks: taskData.loadTasks
+  };
+
   return (
-    <TaskContext.Provider value={taskData}>
+    <TaskContext.Provider value={contextValue}>
       {children}
     </TaskContext.Provider>
   );

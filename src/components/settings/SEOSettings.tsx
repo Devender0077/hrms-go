@@ -1,213 +1,323 @@
-import React from "react";
-import { Card, CardBody, CardHeader, Input, Textarea, Switch, Button, Divider } from "@heroui/react";
+import React from 'react';
+import { Card, CardBody, CardHeader, Input, Textarea, Switch, Button } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface SEOSettingsProps {
-  settings: {
-    siteTitle: string;
-    siteDescription: string;
-    siteKeywords: string;
-    siteUrl: string;
-    siteLogo: string;
-    favicon: string;
-    ogImage: string;
-    twitterHandle: string;
-    facebookAppId: string;
-    googleAnalyticsId: string;
-    googleTagManagerId: string;
-    facebookPixelId: string;
-    enableSitemap: boolean;
-    enableRobotsTxt: boolean;
-    enableMetaTags: boolean;
-    enableOpenGraph: boolean;
-    enableTwitterCards: boolean;
-    enableSchemaMarkup: boolean;
-    enableCanonicalUrls: boolean;
-    enableBreadcrumbs: boolean;
-  };
+  settings: Record<string, any>;
   onSettingsChange: (field: string, value: any) => void;
 }
 
 export default function SEOSettings({ settings, onSettingsChange }: SEOSettingsProps) {
   return (
     <div className="space-y-6">
+      {/* Meta Tags */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Basic SEO Information</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:search" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Meta Tags</h3>
+          </div>
         </CardHeader>
         <CardBody className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              label="Site Title"
-              placeholder="Enter site title"
-              value={settings.siteTitle}
-              onChange={(e) => onSettingsChange("siteTitle", e.target.value)}
-            />
-            <Input
-              label="Site URL"
-              placeholder="https://yourdomain.com"
-              value={settings.siteUrl}
-              onChange={(e) => onSettingsChange("siteUrl", e.target.value)}
-            />
-            <Input
-              label="Site Logo URL"
-              placeholder="https://yourdomain.com/logo.png"
-              value={settings.siteLogo}
-              onChange={(e) => onSettingsChange("siteLogo", e.target.value)}
-            />
-            <Input
-              label="Favicon URL"
-              placeholder="https://yourdomain.com/favicon.ico"
-              value={settings.favicon}
-              onChange={(e) => onSettingsChange("favicon", e.target.value)}
-            />
-            <Input
-              label="OG Image URL"
-              placeholder="https://yourdomain.com/og-image.png"
-              value={settings.ogImage}
-              onChange={(e) => onSettingsChange("ogImage", e.target.value)}
-            />
-            <Input
-              label="Twitter Handle"
-              placeholder="@yourcompany"
-              value={settings.twitterHandle}
-              onChange={(e) => onSettingsChange("twitterHandle", e.target.value)}
-            />
-          </div>
-          <Textarea
-            label="Site Description"
-            placeholder="Enter site description for SEO"
-            value={settings.siteDescription}
-            onChange={(e) => onSettingsChange("siteDescription", e.target.value)}
-            minRows={3}
-          />
           <Input
-            label="Site Keywords"
-            placeholder="hr, human resources, management, employee"
-            value={settings.siteKeywords}
-            onChange={(e) => onSettingsChange("siteKeywords", e.target.value)}
+            label="Meta Title"
+            
+            onChange={(e) => onSettingsChange('metaTitle', e.target.value)}
+            placeholder="Enter meta title"
+            description="Recommended length: 50-60 characters"
+            startContent={<Icon icon="lucide:type" className="text-default-400" />}
+          />
+
+          <Textarea
+            label="Meta Description"
+            
+            onChange={(e) => onSettingsChange('metaDescription', e.target.value)}
+            placeholder="Enter meta description"
+            description="Recommended length: 150-160 characters"
+            startContent={<Icon icon="lucide:file-text" className="text-default-400" />}
+          />
+
+          <Textarea
+            label="Meta Keywords"
+            
+            onChange={(e) => onSettingsChange('metaKeywords', e.target.value)}
+            placeholder="Enter meta keywords separated by commas"
+            description="Separate keywords with commas"
+            startContent={<Icon icon="lucide:tags" className="text-default-400" />}
+          />
+
+          <Input
+            label="Canonical URL"
+            
+            onChange={(e) => onSettingsChange('canonicalUrl', e.target.value)}
+            placeholder="https://hrms.company.com"
+            startContent={<Icon icon="lucide:link" className="text-default-400" />}
           />
         </CardBody>
       </Card>
 
+      {/* Open Graph Tags */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Analytics & Tracking</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:share-2" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Open Graph Tags</h3>
+          </div>
         </CardHeader>
         <CardBody className="space-y-4">
+          <Input
+            label="OG Title"
+            
+            onChange={(e) => onSettingsChange('ogTitle', e.target.value)}
+            placeholder="Enter Open Graph title"
+            startContent={<Icon icon="lucide:type" className="text-default-400" />}
+          />
+
+          <Textarea
+            label="OG Description"
+            
+            onChange={(e) => onSettingsChange('ogDescription', e.target.value)}
+            placeholder="Enter Open Graph description"
+            startContent={<Icon icon="lucide:file-text" className="text-default-400" />}
+          />
+
+          <Input
+            label="OG Image URL"
+            
+            onChange={(e) => onSettingsChange('ogImage', e.target.value)}
+            placeholder="https://company.com/og-image.png"
+            description="Recommended size: 1200x630 pixels"
+            startContent={<Icon icon="lucide:image" className="text-default-400" />}
+          />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Google Analytics ID"
-              placeholder="GA-XXXXXXXXX-X"
-              value={settings.googleAnalyticsId}
-              onChange={(e) => onSettingsChange("googleAnalyticsId", e.target.value)}
+              label="OG Type"
+              
+              onChange={(e) => onSettingsChange('ogType', e.target.value)}
+              placeholder="website"
+              startContent={<Icon icon="lucide:globe" className="text-default-400" />}
             />
+
             <Input
-              label="Google Tag Manager ID"
-              placeholder="GTM-XXXXXXX"
-              value={settings.googleTagManagerId}
-              onChange={(e) => onSettingsChange("googleTagManagerId", e.target.value)}
-            />
-            <Input
-              label="Facebook Pixel ID"
-              placeholder="123456789012345"
-              value={settings.facebookPixelId}
-              onChange={(e) => onSettingsChange("facebookPixelId", e.target.value)}
-            />
-            <Input
-              label="Facebook App ID"
-              placeholder="123456789012345"
-              value={settings.facebookAppId}
-              onChange={(e) => onSettingsChange("facebookAppId", e.target.value)}
+              label="OG Site Name"
+              
+              onChange={(e) => onSettingsChange('ogSiteName', e.target.value)}
+              placeholder="HRMS Pro"
+              startContent={<Icon icon="lucide:building" className="text-default-400" />}
             />
           </div>
         </CardBody>
       </Card>
 
+      {/* Twitter Cards */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">SEO Features</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:twitter" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Twitter Cards</h3>
+          </div>
         </CardHeader>
-        <CardBody className="space-y-6">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Enable XML Sitemap</span>
-                <span className="text-xs text-default-500">Generate XML sitemap for search engines</span>
-              </div>
-              <Switch
-                isSelected={settings.enableSitemap}
-                onValueChange={(value) => onSettingsChange("enableSitemap", value)}
-              />
+        <CardBody className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Twitter Card Type"
+              
+              onChange={(e) => onSettingsChange('twitterCard', e.target.value)}
+              placeholder="summary_large_image"
+              startContent={<Icon icon="lucide:credit-card" className="text-default-400" />}
+            />
+
+            <Input
+              label="Twitter Site"
+              
+              onChange={(e) => onSettingsChange('twitterSite', e.target.value)}
+              placeholder="@company"
+              startContent={<Icon icon="lucide:at-sign" className="text-default-400" />}
+            />
+          </div>
+
+          <Input
+            label="Twitter Creator"
+            
+            onChange={(e) => onSettingsChange('twitterCreator', e.target.value)}
+            placeholder="@company"
+            startContent={<Icon icon="lucide:user" className="text-default-400" />}
+          />
+        </CardBody>
+      </Card>
+
+      {/* Analytics */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:bar-chart" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Analytics & Tracking</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <Input
+            label="Google Analytics ID"
+            
+            onChange={(e) => onSettingsChange('analytics', {
+              ...settings.analytics,
+              googleAnalytics: e.target.value
+            })}
+            placeholder="GA-XXXXXXXXX-X"
+            startContent={<Icon icon="lucide:activity" className="text-default-400" />}
+          />
+
+          <Input
+            label="Google Tag Manager ID"
+            
+            onChange={(e) => onSettingsChange('analytics', {
+              ...settings.analytics,
+              googleTagManager: e.target.value
+            })}
+            placeholder="GTM-XXXXXXX"
+            startContent={<Icon icon="lucide:tag" className="text-default-400" />}
+          />
+
+          <Input
+            label="Facebook Pixel ID"
+            
+            onChange={(e) => onSettingsChange('analytics', {
+              ...settings.analytics,
+              facebookPixel: e.target.value
+            })}
+            placeholder="123456789012345"
+            startContent={<Icon icon="lucide:facebook" className="text-default-400" />}
+          />
+        </CardBody>
+      </Card>
+
+      {/* Sitemap & Robots */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:sitemap" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Sitemap & Robots</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <Input
+            label="Sitemap URL"
+            
+            onChange={(e) => onSettingsChange('sitemapUrl', e.target.value)}
+            placeholder="https://hrms.company.com/sitemap.xml"
+            startContent={<Icon icon="lucide:map" className="text-default-400" />}
+          />
+
+          <Textarea
+            label="Robots.txt Content"
+            
+            onChange={(e) => onSettingsChange('robotsTxt', e.target.value)}
+            placeholder="User-agent: *\nAllow: /"
+            description="Enter robots.txt content"
+            startContent={<Icon icon="lucide:bot" className="text-default-400" />}
+          />
+        </CardBody>
+      </Card>
+
+      {/* SEO Settings */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:settings" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">SEO Settings</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable SEO</p>
+              <p className="text-xs text-default-500">Enable SEO optimization features</p>
             </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Enable robots.txt</span>
-                <span className="text-xs text-default-500">Generate robots.txt file for crawlers</span>
-              </div>
-              <Switch
-                isSelected={settings.enableRobotsTxt}
-                onValueChange={(value) => onSettingsChange("enableRobotsTxt", value)}
-              />
+            <Switch
+              isSelected={settings.enableSEO === true || settings.enableSEO === 'true'}
+              onValueChange={(value) => onSettingsChange('enableSEO', value)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Auto Generate Sitemap</p>
+              <p className="text-xs text-default-500">Automatically generate sitemap</p>
             </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Enable meta tags</span>
-                <span className="text-xs text-default-500">Add meta description and keywords</span>
-              </div>
-              <Switch
-                isSelected={settings.enableMetaTags}
-                onValueChange={(value) => onSettingsChange("enableMetaTags", value)}
-              />
+            <Switch
+              isSelected={settings.autoGenerateSitemap === true || settings.autoGenerateSitemap === 'true'}
+              onValueChange={(value) => onSettingsChange('autoGenerateSitemap', value)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Structured Data</p>
+              <p className="text-xs text-default-500">Enable JSON-LD structured data</p>
             </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Enable Open Graph tags</span>
-                <span className="text-xs text-default-500">Add Open Graph meta tags for social sharing</span>
-              </div>
-              <Switch
-                isSelected={settings.enableOpenGraph}
-                onValueChange={(value) => onSettingsChange("enableOpenGraph", value)}
-              />
+            <Switch
+              isSelected={settings.enableStructuredData === true || settings.enableStructuredData === 'true'}
+              onValueChange={(value) => onSettingsChange('enableStructuredData', value)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Breadcrumbs</p>
+              <p className="text-xs text-default-500">Enable breadcrumb navigation for SEO</p>
             </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Enable Twitter Cards</span>
-                <span className="text-xs text-default-500">Add Twitter Card meta tags</span>
+            <Switch
+              isSelected={settings.enableBreadcrumbs === true || settings.enableBreadcrumbs === 'true'}
+              onValueChange={(value) => onSettingsChange('enableBreadcrumbs', value)}
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Actions */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:zap" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">SEO Actions</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex gap-3">
+            <Button color="primary" variant="flat" startContent={<Icon icon="lucide:search" />}>
+              Test SEO
+            </Button>
+            <Button color="secondary" variant="flat" startContent={<Icon icon="lucide:download" />}>
+              Generate Sitemap
+            </Button>
+            <Button color="success" variant="flat" startContent={<Icon icon="lucide:save" />}>
+              Save Settings
+            </Button>
+          </div>
+          
+          <div className="bg-default-50 p-4 rounded-lg">
+            <h4 className="font-medium text-foreground mb-2">SEO Checklist:</h4>
+            <div className="space-y-2 text-sm text-default-600">
+              <div className="flex items-center gap-2">
+                <Icon icon="lucide:check" className="text-success-500" />
+                <span>Meta title and description configured</span>
               </div>
-              <Switch
-                isSelected={settings.enableTwitterCards}
-                onValueChange={(value) => onSettingsChange("enableTwitterCards", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Enable Schema markup</span>
-                <span className="text-xs text-default-500">Add structured data markup</span>
+              <div className="flex items-center gap-2">
+                <Icon icon="lucide:check" className="text-success-500" />
+                <span>Open Graph tags set up</span>
               </div>
-              <Switch
-                isSelected={settings.enableSchemaMarkup}
-                onValueChange={(value) => onSettingsChange("enableSchemaMarkup", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Enable canonical URLs</span>
-                <span className="text-xs text-default-500">Add canonical URL tags to prevent duplicate content</span>
+              <div className="flex items-center gap-2">
+                <Icon icon="lucide:check" className="text-success-500" />
+                <span>Twitter Cards configured</span>
               </div>
-              <Switch
-                isSelected={settings.enableCanonicalUrls}
-                onValueChange={(value) => onSettingsChange("enableCanonicalUrls", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Enable breadcrumbs</span>
-                <span className="text-xs text-default-500">Add breadcrumb navigation for better UX</span>
+              <div className="flex items-center gap-2">
+                <Icon icon="lucide:check" className="text-success-500" />
+                <span>Analytics tracking enabled</span>
               </div>
-              <Switch
-                isSelected={settings.enableBreadcrumbs}
-                onValueChange={(value) => onSettingsChange("enableBreadcrumbs", value)}
-              />
+              <div className="flex items-center gap-2">
+                <Icon icon="lucide:check" className="text-success-500" />
+                <span>Sitemap and robots.txt configured</span>
+              </div>
             </div>
           </div>
         </CardBody>

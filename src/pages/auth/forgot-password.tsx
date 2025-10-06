@@ -82,7 +82,7 @@ export default function ForgotPassword() {
                   label="Email"
                   placeholder="Enter your email"
                   type="email"
-                  value={email}
+                  
                   onValueChange={setEmail}
                   startContent={
                     <Icon icon="lucide:mail" className="text-default-400" />

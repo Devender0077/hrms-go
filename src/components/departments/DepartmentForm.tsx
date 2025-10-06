@@ -43,7 +43,7 @@ const DepartmentForm: React.FC<DepartmentFormProps> = ({
       <Input
         label="Department Name"
         placeholder="Enter department name"
-        value={formData.name}
+        
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
         isRequired
         aria-label="Department Name"
@@ -63,7 +63,7 @@ const DepartmentForm: React.FC<DepartmentFormProps> = ({
         aria-label="Branch"
       >
         {branches.map((branch) => (
-          <SelectItem key={branch.id.toString()} value={branch.id.toString()} textValue={branch.name}>
+          <SelectItem key={branch.id.toString()} textValue={branch.name}>
             {branch.name}
           </SelectItem>
         ))}
@@ -72,7 +72,7 @@ const DepartmentForm: React.FC<DepartmentFormProps> = ({
       <Textarea
         label="Description"
         placeholder="Enter department description"
-        value={formData.description}
+        
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
         aria-label="Description"

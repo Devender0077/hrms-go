@@ -410,7 +410,7 @@ const SalaryComponentsPage: React.FC = () => {
               <Input
                 label="Search"
                 placeholder="Search by name or code..."
-                value={filters.searchQuery}
+                
                 onChange={(e) => setFilters({...filters, searchQuery: e.target.value})}
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
@@ -423,13 +423,13 @@ const SalaryComponentsPage: React.FC = () => {
                   setFilters({...filters, selectedType: selected || "all"});
                 }}
               >
-                <SelectItem key="all" value="all" textValue="All Types">
+                <SelectItem key="all" textValue="All Types">
                   All Types
                 </SelectItem>
-                <SelectItem key="earning" value="earning" textValue="Earnings">
+                <SelectItem key="earning" textValue="Earnings">
                   Earnings
                 </SelectItem>
-                <SelectItem key="deduction" value="deduction" textValue="Deductions">
+                <SelectItem key="deduction" textValue="Deductions">
                   Deductions
                 </SelectItem>
               </Select>
@@ -442,13 +442,13 @@ const SalaryComponentsPage: React.FC = () => {
                   setFilters({...filters, selectedStatus: selected || "all"});
                 }}
               >
-                <SelectItem key="all" value="all" textValue="All Status">
+                <SelectItem key="all" textValue="All Status">
                   All Status
                 </SelectItem>
-                <SelectItem key="active" value="active" textValue="Active">
+                <SelectItem key="active" textValue="Active">
                   Active
                 </SelectItem>
-                <SelectItem key="inactive" value="inactive" textValue="Inactive">
+                <SelectItem key="inactive" textValue="Inactive">
                   Inactive
                 </SelectItem>
               </Select>
@@ -620,14 +620,14 @@ const SalaryComponentsPage: React.FC = () => {
                   <Input
                     label="Component Name"
                     placeholder="Enter component name"
-                    value={formData.name}
+                    
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     isRequired
                   />
                   <Input
                     label="Component Code"
                     placeholder="Enter component code"
-                    value={formData.code}
+                    
                     onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                   />
                 </div>
@@ -635,7 +635,7 @@ const SalaryComponentsPage: React.FC = () => {
                 <Input
                   label="Description"
                   placeholder="Enter component description"
-                  value={formData.description}
+                  
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 />
                 
@@ -650,10 +650,10 @@ const SalaryComponentsPage: React.FC = () => {
                     }}
                     isRequired
                   >
-                    <SelectItem key="earning" value="earning" textValue="Earning">
+                    <SelectItem key="earning" textValue="Earning">
                       Earning
                     </SelectItem>
-                    <SelectItem key="deduction" value="deduction" textValue="Deduction">
+                    <SelectItem key="deduction" textValue="Deduction">
                       Deduction
                     </SelectItem>
                   </Select>
@@ -668,13 +668,13 @@ const SalaryComponentsPage: React.FC = () => {
                     }}
                     isRequired
                   >
-                    <SelectItem key="fixed" value="fixed" textValue="Fixed Amount">
+                    <SelectItem key="fixed" textValue="Fixed Amount">
                       Fixed Amount
                     </SelectItem>
-                    <SelectItem key="percentage" value="percentage" textValue="Percentage of Basic">
+                    <SelectItem key="percentage" textValue="Percentage of Basic">
                       Percentage of Basic
                     </SelectItem>
-                    <SelectItem key="formula" value="formula" textValue="Formula">
+                    <SelectItem key="formula" textValue="Formula">
                       Formula
                     </SelectItem>
                   </Select>
@@ -685,7 +685,7 @@ const SalaryComponentsPage: React.FC = () => {
                     label="Default Amount"
                     type="number"
                     placeholder="Enter default amount"
-                    value={formData.default_amount.toString()}
+                    
                     onChange={(e) => setFormData({ ...formData, default_amount: parseFloat(e.target.value) || 0 })}
                     startContent="$"
                   />
@@ -697,7 +697,7 @@ const SalaryComponentsPage: React.FC = () => {
                       label="Percentage"
                       type="number"
                       placeholder="Enter percentage"
-                      value={formData.default_amount.toString()}
+                      
                       onChange={(e) => setFormData({ ...formData, default_amount: parseFloat(e.target.value) || 0 })}
                       endContent="%"
                     />
@@ -707,9 +707,9 @@ const SalaryComponentsPage: React.FC = () => {
                       selectedKeys={formData.percentage_of ? [formData.percentage_of] : []}
                       onSelectionChange={(keys) => setFormData({ ...formData, percentage_of: Array.from(keys)[0] as string })}
                     >
-                      <SelectItem key="basic_salary" value="basic_salary">Basic Salary</SelectItem>
-                      <SelectItem key="gross_salary" value="gross_salary">Gross Salary</SelectItem>
-                      <SelectItem key="net_salary" value="net_salary">Net Salary</SelectItem>
+                      <SelectItem key="basic_salary">Basic Salary</SelectItem>
+                      <SelectItem key="gross_salary">Gross Salary</SelectItem>
+                      <SelectItem key="net_salary">Net Salary</SelectItem>
                     </Select>
                   </div>
                 )}
@@ -718,7 +718,7 @@ const SalaryComponentsPage: React.FC = () => {
                   <Input
                     label="Formula"
                     placeholder="Enter calculation formula (e.g., basic_salary * 0.1)"
-                    value={formData.formula}
+                    
                     onChange={(e) => setFormData({ ...formData, formula: e.target.value })}
                   />
                 )}
@@ -777,7 +777,7 @@ const SalaryComponentsPage: React.FC = () => {
                   label="Sort Order"
                   type="number"
                   placeholder="Enter sort order"
-                  value={formData.sort_order.toString()}
+                  
                   onChange={(e) => setFormData({ ...formData, sort_order: parseInt(e.target.value) || 0 })}
                 />
               </div>

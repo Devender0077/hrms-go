@@ -43,7 +43,7 @@ export default function EmailVerification() {
         >
           <Card className="shadow-lg rounded-xl">
             <CardBody className="flex flex-col items-center py-8 gap-4">
-              <Spinner size="lg" color="primary" variant="solid" />
+              <Spinner size="lg" color="primary" />
               <h2 className="text-xl font-bold">Verifying Email</h2>
               <p className="text-center text-default-500">
                 Please wait while we verify your email address...

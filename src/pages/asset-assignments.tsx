@@ -454,7 +454,7 @@ export default function AssetAssignments() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Input
                 placeholder="Search assignments..."
-                value={searchQuery}
+                
                 onChange={(e) => setSearchQuery(e.target.value)}
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
@@ -479,7 +479,7 @@ export default function AssetAssignments() {
                 <SelectItem key="all">All Departments</SelectItem>
                 {departments.map(dept => (
                   <SelectItem key={dept}>{dept}</SelectItem>
-                ))}
+                )) as any}
               </Select>
               <div className="flex items-end">
                 <div className="text-sm text-default-600">
@@ -669,13 +669,13 @@ export default function AssetAssignments() {
                 <Input
                   label="Assigned By *"
                   placeholder="e.g., Sarah Johnson"
-                  value={newAssignment.assignedBy || ""}
+                  
                   onChange={(e) => setNewAssignment(prev => ({ ...prev, assignedBy: e.target.value }))}
                 />
                 <Input
                   label="Assigned Date"
                   type="date"
-                  value={newAssignment.assignedDate || ""}
+                  
                   onChange={(e) => setNewAssignment(prev => ({ ...prev, assignedDate: e.target.value }))}
                 />
                 <Select
@@ -703,7 +703,7 @@ export default function AssetAssignments() {
               <Textarea
                 label="Notes"
                 placeholder="Enter assignment notes"
-                value={newAssignment.notes || ""}
+                
                 onChange={(e) => setNewAssignment(prev => ({ ...prev, notes: e.target.value }))}
                 minRows={3}
               />
@@ -734,7 +734,7 @@ export default function AssetAssignments() {
                   <Input
                     label="Return Date"
                     type="date"
-                    value={returnData.returnDate}
+                    
                     onChange={(e) => setReturnData(prev => ({ ...prev, returnDate: e.target.value }))}
                   />
                   <Select
@@ -751,7 +751,7 @@ export default function AssetAssignments() {
                   <Textarea
                     label="Return Notes"
                     placeholder="Enter return notes"
-                    value={returnData.returnNotes}
+                    
                     onChange={(e) => setReturnData(prev => ({ ...prev, returnNotes: e.target.value }))}
                     minRows={3}
                   />

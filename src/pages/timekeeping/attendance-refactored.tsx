@@ -17,6 +17,7 @@ import {
   Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/auth-context";
 import { useAttendance, AttendanceRecord } from "../../hooks/useAttendance";
 import AttendanceTable from "../../components/attendance/AttendanceTable";
@@ -24,6 +25,7 @@ import CheckInOut from "../../components/attendance/CheckInOut";
 import AttendanceFilters from "../../components/attendance/AttendanceFilters";
 import AttendanceViewModal from "../../components/attendance/AttendanceViewModal";
 import IPDisplay from "../../components/attendance/IPDisplay";
+import HeroSection from "../../components/common/HeroSection";
 
 const AttendancePage: React.FC = () => {
   const { user } = useAuth();
@@ -187,48 +189,84 @@ const AttendancePage: React.FC = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Attendance Management</h1>
-          <p className="text-default-600 mt-2">
-            Track employee attendance, check-in/out times, and work hours
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Icon icon="lucide:clock" className="text-4xl text-primary-600" />
-        </div>
-      </div>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Attendance Management"
+          subtitle="Track & Monitor Employee Time"
+          description="Track employee attendance, check-in/out times, and work hours. Monitor productivity and ensure accurate time tracking across your organization."
+          icon="lucide:clock"
+          illustration="attendance"
+          actions={[
+            {
+              label: "Export Report",
+              icon: "lucide:download",
+              onPress: () => console.log("Export Report"),
+              color: "primary" as const
+            },
+            {
+              label: "View Calendar",
+              icon: "lucide:calendar",
+              onPress: () => console.log("View Calendar"),
+              variant: "bordered" as const
+            }
+          ]}
+        />
 
-      {/* IP Address Display - Only for Super Admin */}
-      {user?.role === 'super_admin' && <IPDisplay />}
+        {/* IP Address Display - Only for Super Admin */}
+        {user?.role === 'super_admin' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <IPDisplay />
+          </motion.div>
+        )}
 
-      {/* Check In/Out */}
-      <CheckInOut
-        onCheckIn={handleCheckIn}
-        onCheckOut={handleCheckOut}
-        isCheckingIn={isCheckingIn}
-        isCheckingOut={isCheckingOut}
-        canCheckIn={canCheckIn}
-        canCheckOut={canCheckOut}
-      />
+        {/* Check In/Out */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <CheckInOut
+            onCheckIn={handleCheckIn}
+            onCheckOut={handleCheckOut}
+            isCheckingIn={isCheckingIn}
+            isCheckingOut={isCheckingOut}
+            canCheckIn={canCheckIn}
+            canCheckOut={canCheckOut}
+          />
+        </motion.div>
 
-      {/* Filters */}
-      <AttendanceFilters
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-        selectedDate={selectedDate}
-        setSelectedDate={setSelectedDate}
-        filterDate={filterDate}
-        onApplyDateFilter={handleApplyDateFilter}
-        onClearFilters={handleClearFilters}
-      />
+        {/* Filters */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <AttendanceFilters
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedStatus={selectedStatus}
+            setSelectedStatus={setSelectedStatus}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            filterDate={filterDate}
+            onApplyDateFilter={handleApplyDateFilter}
+            onClearFilters={handleClearFilters}
+          />
+        </motion.div>
 
-      {/* Attendance Table */}
-      <Card className="border-0 shadow-sm">
+        {/* Attendance Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <Card className="border-0 shadow-sm">
         <CardHeader className="pb-3">
           <div className="flex items-center gap-3">
             <Icon icon="lucide:table" className="text-success-600 text-xl" />
@@ -261,90 +299,91 @@ const AttendancePage: React.FC = () => {
               />
             </div>
           )}
-        </CardBody>
-      </Card>
+            </CardBody>
+          </Card>
+        </motion.div>
 
-      {/* View Modal */}
-      <AttendanceViewModal
-        isOpen={isViewOpen}
-        onClose={onViewClose}
-        record={selectedRecord}
-      />
+        {/* Modals */}
+        <AttendanceViewModal
+          isOpen={isViewOpen}
+          onClose={onViewClose}
+          record={selectedRecord}
+        />
 
-      {/* Edit Modal */}
-      <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} size="lg">
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Edit Attendance Record
-              </ModalHeader>
-              <ModalBody>
-                {editingRecord && (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+        <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} size="lg">
+          <ModalContent>
+            {(onClose) => (
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  Edit Attendance Record
+                </ModalHeader>
+                <ModalBody>
+                  {editingRecord && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm font-medium text-default-700">Check In Time</label>
+                          <Input
+                            type="datetime-local"
+                            
+                            onChange={(e) => setEditingRecord({...editingRecord, check_in: e.target.value})}
+                            size="sm"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm font-medium text-default-700">Check Out Time</label>
+                          <Input
+                            type="datetime-local"
+                            
+                            onChange={(e) => setEditingRecord({...editingRecord, check_out: e.target.value})}
+                            size="sm"
+                          />
+                        </div>
+                      </div>
+
                       <div>
-                        <label className="text-sm font-medium text-default-700">Check In Time</label>
+                        <label className="text-sm font-medium text-default-700">Status</label>
+                        <Select
+                          selectedKeys={[editingRecord.status]}
+                          onSelectionChange={(keys) => {
+                            const selected = Array.from(keys)[0] as string;
+                            setEditingRecord({...editingRecord, status: selected as any});
+                          }}
+                          size="sm"
+                        >
+                          <SelectItem key="present">Present</SelectItem>
+                          <SelectItem key="late">Late</SelectItem>
+                          <SelectItem key="absent">Absent</SelectItem>
+                          <SelectItem key="leave">On Leave</SelectItem>
+                          <SelectItem key="half-day">Half Day</SelectItem>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="text-sm font-medium text-default-700">Note</label>
                         <Input
-                          type="datetime-local"
-                          value={editingRecord.check_in ? new Date(editingRecord.check_in).toISOString().slice(0, 16) : ''}
-                          onChange={(e) => setEditingRecord({...editingRecord, check_in: e.target.value})}
+                          
+                          onChange={(e) => setEditingRecord({...editingRecord, note: e.target.value})}
+                          placeholder="Add a note..."
                           size="sm"
                         />
                       </div>
-                      <div>
-                        <label className="text-sm font-medium text-default-700">Check Out Time</label>
-                        <Input
-                          type="datetime-local"
-                          value={editingRecord.check_out ? new Date(editingRecord.check_out).toISOString().slice(0, 16) : ''}
-                          onChange={(e) => setEditingRecord({...editingRecord, check_out: e.target.value})}
-                          size="sm"
-                        />
-                      </div>
                     </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-default-700">Status</label>
-                      <Select
-                        selectedKeys={[editingRecord.status]}
-                        onSelectionChange={(keys) => {
-                          const selected = Array.from(keys)[0] as string;
-                          setEditingRecord({...editingRecord, status: selected as any});
-                        }}
-                        size="sm"
-                      >
-                        <SelectItem key="present">Present</SelectItem>
-                        <SelectItem key="late">Late</SelectItem>
-                        <SelectItem key="absent">Absent</SelectItem>
-                        <SelectItem key="leave">On Leave</SelectItem>
-                        <SelectItem key="half-day">Half Day</SelectItem>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="text-sm font-medium text-default-700">Note</label>
-                      <Input
-                        value={editingRecord.note || ''}
-                        onChange={(e) => setEditingRecord({...editingRecord, note: e.target.value})}
-                        placeholder="Add a note..."
-                        size="sm"
-                      />
-                    </div>
-                  </div>
-                )}
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
-                  Cancel
-                </Button>
-                <Button color="primary" onPress={handleUpdateRecord}>
-                  Save Changes
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
+                  )}
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="danger" variant="light" onPress={onClose}>
+                    Cancel
+                  </Button>
+                  <Button color="primary" onPress={handleUpdateRecord}>
+                    Save Changes
+                  </Button>
+                </ModalFooter>
+              </>
+            )}
+          </ModalContent>
+        </Modal>
+      </div>
     </div>
   );
 };

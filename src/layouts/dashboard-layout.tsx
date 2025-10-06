@@ -22,6 +22,8 @@ import React, { useState, useEffect } from "react";
     import { getDefaultAvatar } from "../utils/avatarUtils";
     import Sidebar from "../components/sidebar";
     import MobileSidebar from "../components/mobile-sidebar";
+    import SearchBar from "../components/common/SearchBar";
+    import NotificationDropdown from "../components/common/NotificationDropdown";
     
     interface DashboardLayoutProps {
       children: React.ReactNode;
@@ -52,10 +54,10 @@ import React, { useState, useEffect } from "react";
           if (user?.id) {
             try {
               const userId = parseInt(user.id);
-              const profile = await employeeAPI.getByUserId(userId);
-              if (profile) {
-                setProfilePhoto(profile.profile_photo);
-                setUserGender(profile.gender || 'male');
+              const response = await employeeAPI.getByUserId(userId);
+              if (response && response.data) {
+                setProfilePhoto(response.data.profile_photo);
+                setUserGender(response.data.gender || 'male');
               }
             } catch (error) {
               console.error('Error fetching user profile:', error);
@@ -78,9 +80,10 @@ import React, { useState, useEffect } from "react";
           
           {/* Main Content */}
           <div className="flex flex-col flex-1 overflow-hidden">
-            {/* Top Navbar */}
-            <Navbar maxWidth="full" className="shadow-sm border-b border-divider">
-              <NavbarContent className="sm:flex gap-4" justify="start">
+            {/* Enhanced Top Navbar */}
+            <Navbar maxWidth="full" className="shadow-sm border-b border-divider px-4 lg:px-6">
+              <NavbarContent className="gap-4" justify="start">
+                {/* Sidebar Toggle */}
                 <Button 
                   isIconOnly 
                   variant="light" 
@@ -99,17 +102,37 @@ import React, { useState, useEffect } from "react";
                 >
                   <Icon icon="lucide:menu" className="text-xl" />
                 </Button>
+
+                {/* Search Bar */}
+                <div className="hidden md:block flex-1 max-w-md">
+                  <SearchBar 
+                    placeholder="Search employees, tasks, settings..."
+                    className="w-full"
+                  />
+                </div>
               </NavbarContent>
               
-              <NavbarContent justify="end">
-                {/* Theme Toggle Button */}
+              <NavbarContent justify="end" className="gap-4">
+                {/* Mobile Search Button */}
+                <NavbarItem className="md:hidden">
+                  <Button 
+                    isIconOnly 
+                    variant="light" 
+                    aria-label="Search"
+                    className="rounded-lg p-2"
+                  >
+                    <Icon icon="lucide:search" className="text-xl" />
+                  </Button>
+                </NavbarItem>
+
+                {/* Theme Toggle */}
                 <NavbarItem>
                   <Button 
                     isIconOnly 
                     variant="light" 
                     onPress={toggleTheme}
                     aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-                    className="rounded-lg"
+                    className="rounded-lg p-2"
                   >
                     <Icon 
                       icon={theme === 'light' ? 'lucide:moon' : 'lucide:sun'} 
@@ -118,94 +141,66 @@ import React, { useState, useEffect } from "react";
                   </Button>
                 </NavbarItem>
                 
+                {/* Enhanced Notifications */}
+                <NavbarItem>
+                  <NotificationDropdown />
+                </NavbarItem>
+                
+                {/* User Profile Dropdown */}
                 <NavbarItem>
                   <Dropdown placement="bottom-end">
                     <DropdownTrigger>
-                      <Badge content="5" color="danger">
-                        <Button isIconOnly variant="light" aria-label="Notifications" className="rounded-lg">
-                          <Icon icon="lucide:bell" className="text-xl" />
-                        </Button>
-                      </Badge>
+                      <Avatar
+                        isBordered
+                        as="button"
+                        className="transition-transform ml-2"
+                        color="primary"
+                        name={user?.name || "User"}
+                        size="sm"
+                        src={profilePhoto ? `http://localhost:8000/uploads/profiles/${profilePhoto}` : getDefaultAvatar(userGender, parseInt(user?.id || '1'))}
+                      />
                     </DropdownTrigger>
-                    <DropdownMenu aria-label="Notifications" variant="flat">
-                      <DropdownItem key="header" className="h-14 gap-2">
-                        <p className="font-semibold">Notifications</p>
-                        <p className="text-sm text-default-500">5 unread messages</p>
+                    <DropdownMenu aria-label="Profile Actions" variant="flat">
+                      <DropdownItem key="profile" className="h-14 gap-2">
+                        <p className="font-semibold">Signed in as</p>
+                        <p className="font-semibold">{user?.email || "user@example.com"}</p>
+                        <p className="text-xs text-default-500 capitalize">{user?.role?.replace("_", " ") || "User"}</p>
                       </DropdownItem>
-                      <DropdownItem key="notif1" startContent={<Icon icon="lucide:user-plus" />}>
-                        New employee John Smith joined
+                      <DropdownItem 
+                        key="my-profile" 
+                        startContent={<Icon icon="lucide:user" />}
+                        onPress={() => navigate("/dashboard/profile")}
+                      >
+                        My Profile
                       </DropdownItem>
-                      <DropdownItem key="notif2" startContent={<Icon icon="lucide:calendar" />}>
-                        Team meeting in 30 minutes
+                      <DropdownItem 
+                        key="settings" 
+                        startContent={<Icon icon="lucide:settings" />}
+                        onPress={() => navigate("/dashboard/settings")}
+                      >
+                        Settings
                       </DropdownItem>
-                      <DropdownItem key="notif3" startContent={<Icon icon="lucide:file-text" />}>
-                        Leave request from Sarah Johnson
+                      <DropdownItem 
+                        key="help_and_feedback" 
+                        startContent={<Icon icon="lucide:help-circle" />}
+                        onPress={() => {
+                          // Add help & feedback functionality
+                          console.log("Help & Feedback clicked");
+                        }}
+                      >
+                        Help & Feedback
                       </DropdownItem>
-                      <DropdownItem key="notif4" startContent={<Icon icon="lucide:alert-circle" />}>
-                        System maintenance scheduled
-                      </DropdownItem>
-                      <DropdownItem key="notif5" startContent={<Icon icon="lucide:check-circle" />}>
-                        Payroll processed successfully
-                      </DropdownItem>
-                      <DropdownItem key="view-all" className="text-center">
-                        View All Notifications
+                      <DropdownItem 
+                        key="logout" 
+                        color="danger" 
+                        startContent={<Icon icon="lucide:log-out" />}
+                        onPress={handleLogout}
+                      >
+                        Log Out
                       </DropdownItem>
                     </DropdownMenu>
                   </Dropdown>
                 </NavbarItem>
-                
-                <Dropdown placement="bottom-end">
-                  <DropdownTrigger>
-                    <Avatar
-                      isBordered
-                      as="button"
-                      className="transition-transform"
-                      color="primary"
-                      name={user?.name || "User"}
-                      size="sm"
-                      src={profilePhoto ? `http://localhost:8000/uploads/profiles/${profilePhoto}` : getDefaultAvatar(userGender, parseInt(user?.id || '1'))}
-                    />
-                  </DropdownTrigger>
-                  <DropdownMenu aria-label="Profile Actions" variant="flat">
-                    <DropdownItem key="profile" className="h-14 gap-2">
-                      <p className="font-semibold">Signed in as</p>
-                      <p className="font-semibold">{user?.email || "user@example.com"}</p>
-                      <p className="text-xs text-default-500 capitalize">{user?.role?.replace("_", " ") || "User"}</p>
-                    </DropdownItem>
-                    <DropdownItem 
-                      key="my-profile" 
-                      startContent={<Icon icon="lucide:user" />}
-                      onPress={() => navigate("/dashboard/profile")}
-                    >
-                      My Profile
-                    </DropdownItem>
-                    <DropdownItem 
-                      key="settings" 
-                      startContent={<Icon icon="lucide:settings" />}
-                      onPress={() => navigate("/dashboard/settings")}
-                    >
-                      Settings
-                    </DropdownItem>
-                    <DropdownItem 
-                      key="help_and_feedback" 
-                      startContent={<Icon icon="lucide:help-circle" />}
-                      onPress={() => {
-                        // Add help & feedback functionality
-                        console.log("Help & Feedback clicked");
-                      }}
-                    >
-                      Help & Feedback
-                    </DropdownItem>
-                    <DropdownItem 
-                      key="logout" 
-                      color="danger" 
-                      startContent={<Icon icon="lucide:log-out" />}
-                      onPress={handleLogout}
-                    >
-                      Log Out
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
               </NavbarContent>
             </Navbar>
             
@@ -227,7 +222,7 @@ import React, { useState, useEffect } from "react";
                 </div>
                 <div className="flex items-center space-x-4">
                   <span>Developed with ❤️ by</span>
-                  <span className="font-semibold text-primary">HRMS Development Team</span>
+                  <span className="font-semibold text-primary">Devender</span>
                 </div>
               </div>
             </footer>

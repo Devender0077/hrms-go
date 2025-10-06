@@ -4,6 +4,7 @@ import { HeroUIProvider, ToastProvider } from "@heroui/react"
 import { AuthProvider } from "./contexts/auth-context";
 import { TaskProvider } from "./contexts/task-context";
 import { ThemeProvider } from "./contexts/theme-context";
+import { SettingsProvider } from "./contexts/settings-context";
 import App from './App.tsx'
 import './index.css'
     
@@ -12,10 +13,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <ThemeProvider>
       <HeroUIProvider>
         <AuthProvider>
-          <TaskProvider>
-            <ToastProvider />
-            <App />
-          </TaskProvider>
+          <SettingsProvider>
+            <TaskProvider>
+              <ToastProvider />
+              <App />
+            </TaskProvider>
+          </SettingsProvider>
         </AuthProvider>
       </HeroUIProvider>
     </ThemeProvider>

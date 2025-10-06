@@ -1,13 +1,14 @@
 // Create authentication context for global state management
-    import React, { createContext, useContext, useState, useEffect } from 'react';
-    import AuthService, { User, LoginCredentials, RegistrationData } from '../services/auth-service';
-    import { addToast } from '@heroui/react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import AuthService, { User, LoginCredentials, RegistrationData } from '../services/auth-service';
+import { addToast } from '@heroui/react';
+import TokenManager from '../utils/token-manager';
     
     // Auth context interface
     interface AuthContextType {
       user: User | null;
       loading: boolean;
-      login: (credentials: LoginCredentials) => Promise<void>;
+      login: (credentials: LoginCredentials) => Promise<User>;
       loginWithFace: (faceData: any) => Promise<void>;
       register: (data: RegistrationData) => Promise<void>;
       logout: () => void;
@@ -23,7 +24,7 @@
     const AuthContext = createContext<AuthContextType>({
       user: null,
       loading: true,
-      login: async () => {},
+      login: async () => ({} as User),
       loginWithFace: async () => {},
       register: async () => {},
       logout: () => {},
@@ -47,8 +48,19 @@
       useEffect(() => {
         const initAuth = async () => {
           try {
+            // Check if tokens are valid before getting user
+            if (!TokenManager.isTokenValid()) {
+              TokenManager.clearAuthData();
+              setLoading(false);
+              return;
+            }
+            
             const currentUser = AuthService.getCurrentUser();
-            setUser(currentUser);
+            if (currentUser) {
+              setUser(currentUser);
+            } else {
+              TokenManager.clearAuthData();
+            }
           } catch (error) {
             console.error('Auth initialization error:', error);
           } finally {

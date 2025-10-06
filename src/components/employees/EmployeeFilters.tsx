@@ -37,7 +37,7 @@ const EmployeeFiltersComponent: React.FC<EmployeeFiltersProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Input
             placeholder="Search employees..."
-            value={filters.searchQuery}
+            
             onChange={(e) => handleFilterChange('searchQuery', e.target.value)}
             startContent={<Icon icon="lucide:search" className="text-default-400" />}
             aria-label="Search employees"
@@ -50,10 +50,10 @@ const EmployeeFiltersComponent: React.FC<EmployeeFiltersProps> = ({
             onSelectionChange={(keys) => handleFilterChange('selectedDepartment', Array.from(keys)[0] as string)}
             aria-label="Filter by department"
           >
-            <SelectItem key="all" value="all">All Departments</SelectItem>
+            <SelectItem key="all">All Departments</SelectItem>
             {departments.map(dept => (
-              <SelectItem key={dept.name} value={dept.name}>{dept.name}</SelectItem>
-            ))}
+              <SelectItem key={dept.name}>{dept.name}</SelectItem>
+            )) as any}
           </Select>
           
           <Select
@@ -64,10 +64,10 @@ const EmployeeFiltersComponent: React.FC<EmployeeFiltersProps> = ({
             aria-label="Filter by status"
           >
             {statusOptions.map(status => (
-              <SelectItem key={status.key} value={status.key}>
+              <SelectItem key={status.key}>
                 {status.label}
               </SelectItem>
-            ))}
+            )) as any}
           </Select>
           
           <Select
@@ -77,10 +77,10 @@ const EmployeeFiltersComponent: React.FC<EmployeeFiltersProps> = ({
             onSelectionChange={(keys) => handleFilterChange('selectedBranch', Array.from(keys)[0] as string)}
             aria-label="Filter by branch"
           >
-            <SelectItem key="all" value="all">All Branches</SelectItem>
+            <SelectItem key="all">All Branches</SelectItem>
             {branches.map(branch => (
-              <SelectItem key={branch.name} value={branch.name}>{branch.name}</SelectItem>
-            ))}
+              <SelectItem key={branch.name}>{branch.name}</SelectItem>
+            )) as any}
           </Select>
         </div>
       </CardBody>

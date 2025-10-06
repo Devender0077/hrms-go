@@ -46,7 +46,7 @@ export const useGoals = () => {
       setError(null);
       const result = await apiRequest('/goals', {
         method: 'POST',
-        body: goalData,
+        body: JSON.stringify(goalData),
       });
       await loadGoals(); // Reload goals after creation
       return result;
@@ -62,7 +62,7 @@ export const useGoals = () => {
       setError(null);
       const result = await apiRequest(`/goals/${id}`, {
         method: 'PUT',
-        body: goalData,
+        body: JSON.stringify(goalData),
       });
       await loadGoals(); // Reload goals after update
       return result;

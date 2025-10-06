@@ -67,6 +67,17 @@ const AuthService = {
   // Login with face recognition
   loginWithFace: async (faceData: any): Promise<User> => {
     try {
+      // Demo mode - if faceData has success property, it's from our demo
+      if (faceData.success && faceData.user && faceData.token) {
+        // Store token in localStorage (face login implies remember me)
+        localStorage.setItem("authToken", faceData.token);
+        sessionStorage.setItem("authToken", faceData.token);
+        localStorage.setItem("user", JSON.stringify(faceData.user));
+        
+        return faceData.user;
+      }
+      
+      // Real API call for production
       const response = await api.auth.loginWithFace(faceData);
       const { token, user } = response;
 

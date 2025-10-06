@@ -280,7 +280,7 @@ const RegularizationPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-4">
             <Input
               placeholder="Search requests..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
@@ -314,7 +314,7 @@ const RegularizationPage: React.FC = () => {
                 <SelectItem key={employee.id.toString()}>
                   {employee.first_name} {employee.last_name} ({employee.employee_id})
                 </SelectItem>
-              ))}
+              )) as any}
             </Select>
           </div>
         </CardBody>
@@ -464,7 +464,7 @@ const RegularizationPage: React.FC = () => {
                     <Input
                       label="Attendance Date"
                       type="date"
-                      value={formData.attendance_date}
+                      
                       onChange={(e) => setFormData({...formData, attendance_date: e.target.value})}
                       isRequired
                     />
@@ -489,13 +489,13 @@ const RegularizationPage: React.FC = () => {
                     <Input
                       label="Current Check In"
                       type="time"
-                      value={formData.current_check_in}
+                      
                       onChange={(e) => setFormData({...formData, current_check_in: e.target.value})}
                     />
                     <Input
                       label="Current Check Out"
                       type="time"
-                      value={formData.current_check_out}
+                      
                       onChange={(e) => setFormData({...formData, current_check_out: e.target.value})}
                     />
                   </div>
@@ -504,13 +504,13 @@ const RegularizationPage: React.FC = () => {
                     <Input
                       label="Requested Check In"
                       type="time"
-                      value={formData.requested_check_in}
+                      
                       onChange={(e) => setFormData({...formData, requested_check_in: e.target.value})}
                     />
                     <Input
                       label="Requested Check Out"
                       type="time"
-                      value={formData.requested_check_out}
+                      
                       onChange={(e) => setFormData({...formData, requested_check_out: e.target.value})}
                     />
                   </div>
@@ -518,7 +518,7 @@ const RegularizationPage: React.FC = () => {
                   <Textarea
                     label="Reason"
                     placeholder="Explain why this correction is needed"
-                    value={formData.reason}
+                    
                     onChange={(e) => setFormData({...formData, reason: e.target.value})}
                     rows={3}
                     isRequired
@@ -672,7 +672,7 @@ const RegularizationPage: React.FC = () => {
                   <Textarea
                     label="Review Notes"
                     placeholder="Add your review comments"
-                    value={reviewData.review_notes}
+                    
                     onChange={(e) => setReviewData({...reviewData, review_notes: e.target.value})}
                     rows={4}
                   />

@@ -1,191 +1,122 @@
-import React from "react";
-import { Input, Select, SelectItem, Divider } from "@heroui/react";
-import { Icon } from "@iconify/react";
+import React from 'react';
+import { Card, CardBody, CardHeader, Input, Textarea } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface CompanySettingsProps {
-  settings: {
-    companyName: string;
-    companyAddress: string;
-    companyCity: string;
-    companyState: string;
-    companyZipCode: string;
-    companyCountry: string;
-    companyPhone: string;
-    companyEmail: string;
-    companyWebsite: string;
-    companyLogo: string;
-    registrationNumber: string;
-    taxNumber: string;
-    industry: string;
-    companySize: string;
-    foundedYear: string;
-    socialMedia: {
-      linkedin: string;
-      twitter: string;
-      facebook: string;
-      instagram: string;
-    };
-  };
+  settings: Record<string, any>;
   onSettingsChange: (field: string, value: any) => void;
 }
 
 export default function CompanySettings({ settings, onSettingsChange }: CompanySettingsProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-primary-100 rounded-lg">
-          <Icon icon="lucide:building" className="text-primary-600 text-lg" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Company Information</h2>
-          <p className="text-default-600">Manage your company details and branding</p>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Input
-          label="Company Name"
-          placeholder="Enter company name"
-          value={settings.companyName}
-          onValueChange={(value) => onSettingsChange("companyName", value)}
-        />
-        <Input
-          label="Company Email"
-          type="email"
-          placeholder="Enter company email"
-          value={settings.companyEmail}
-          onValueChange={(value) => onSettingsChange("companyEmail", value)}
-        />
-        <Input
-          label="Company Phone"
-          placeholder="Enter company phone"
-          value={settings.companyPhone}
-          onValueChange={(value) => onSettingsChange("companyPhone", value)}
-        />
-        <Input
-          label="Company Website"
-          placeholder="https://company.com"
-          value={settings.companyWebsite}
-          onValueChange={(value) => onSettingsChange("companyWebsite", value)}
-        />
-        <Input
-          label="Registration Number"
-          placeholder="Enter registration number"
-          value={settings.registrationNumber}
-          onValueChange={(value) => onSettingsChange("registrationNumber", value)}
-        />
-        <Input
-          label="Tax Number"
-          placeholder="Enter tax number"
-          value={settings.taxNumber}
-          onValueChange={(value) => onSettingsChange("taxNumber", value)}
-        />
-        <Select
-          label="Industry"
-          selectedKeys={[settings.industry]}
-          onSelectionChange={(keys) => onSettingsChange("industry", Array.from(keys)[0])}
-        >
-          <SelectItem key="technology" value="technology">Technology</SelectItem>
-          <SelectItem key="healthcare" value="healthcare">Healthcare</SelectItem>
-          <SelectItem key="finance" value="finance">Finance</SelectItem>
-          <SelectItem key="education" value="education">Education</SelectItem>
-          <SelectItem key="retail" value="retail">Retail</SelectItem>
-          <SelectItem key="manufacturing" value="manufacturing">Manufacturing</SelectItem>
-          <SelectItem key="consulting" value="consulting">Consulting</SelectItem>
-          <SelectItem key="other" value="other">Other</SelectItem>
-        </Select>
-        <Select
-          label="Company Size"
-          selectedKeys={[settings.companySize]}
-          onSelectionChange={(keys) => onSettingsChange("companySize", Array.from(keys)[0])}
-        >
-          <SelectItem key="1-10" value="1-10">1-10 employees</SelectItem>
-          <SelectItem key="11-50" value="11-50">11-50 employees</SelectItem>
-          <SelectItem key="51-200" value="51-200">51-200 employees</SelectItem>
-          <SelectItem key="201-500" value="201-500">201-500 employees</SelectItem>
-          <SelectItem key="500+" value="500+">500+ employees</SelectItem>
-        </Select>
-        <Input
-          label="Founded Year"
-          placeholder="2020"
-          value={settings.foundedYear}
-          onValueChange={(value) => onSettingsChange("foundedYear", value)}
-        />
-      </div>
-
-      <Divider />
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Company Address</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="space-y-4 sm:space-y-6">
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+              <Icon icon="lucide:building" className="text-primary-600 dark:text-primary-400 text-xl" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground">Company Information</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4 sm:space-y-6">
           <Input
-            label="Address"
+            label="Company Name"
+            value={settings.company_name || ''}
+            onChange={(e) => onSettingsChange('companyName', e.target.value)}
+            placeholder="Enter company name"
+            startContent={<Icon icon="lucide:building-2" className="text-default-400" />}
+          />
+          
+          <Textarea
+            label="Company Address"
+            value={settings.company_address || ''}
+            onChange={(e) => onSettingsChange('companyAddress', e.target.value)}
             placeholder="Enter company address"
-            value={settings.companyAddress}
-            onValueChange={(value) => onSettingsChange("companyAddress", value)}
+            rows={3}
+            startContent={<Icon icon="lucide:map-pin" className="text-default-400" />}
           />
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="City"
+              value={settings.companyCity || ''}
+              onChange={(e) => onSettingsChange('companyCity', e.target.value)}
+              placeholder="Enter city"
+              startContent={<Icon icon="lucide:building-2" className="text-default-400" />}
+            />
+            
+            <Input
+              label="State"
+              value={settings.companyState || ''}
+              onChange={(e) => onSettingsChange('companyState', e.target.value)}
+              placeholder="Enter state"
+              startContent={<Icon icon="lucide:map" className="text-default-400" />}
+            />
+            
+            <Input
+              label="ZIP Code"
+              value={settings.companyZipCode || ''}
+              onChange={(e) => onSettingsChange('companyZipCode', e.target.value)}
+              placeholder="Enter ZIP code"
+              startContent={<Icon icon="lucide:hash" className="text-default-400" />}
+            />
+            
+            <Input
+              label="Country"
+              value={settings.companyCountry || ''}
+              onChange={(e) => onSettingsChange('companyCountry', e.target.value)}
+              placeholder="Enter country"
+              startContent={<Icon icon="lucide:globe" className="text-default-400" />}
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Phone Number"
+              value={settings.company_phone || ''}
+              onChange={(e) => onSettingsChange('companyPhone', e.target.value)}
+              placeholder="Enter phone number"
+              startContent={<Icon icon="lucide:phone" className="text-default-400" />}
+            />
+            
+            <Input
+              label="Email Address"
+              type="email"
+              value={settings.company_email || ''}
+              onChange={(e) => onSettingsChange('companyEmail', e.target.value)}
+              placeholder="Enter email address"
+              startContent={<Icon icon="lucide:mail" className="text-default-400" />}
+            />
+          </div>
+          
           <Input
-            label="City"
-            placeholder="Enter city"
-            value={settings.companyCity}
-            onValueChange={(value) => onSettingsChange("companyCity", value)}
+            label="Website"
+            value={settings.companyWebsite || ''}
+            onChange={(e) => onSettingsChange('companyWebsite', e.target.value)}
+            placeholder="Enter website URL"
+            startContent={<Icon icon="lucide:globe" className="text-default-400" />}
           />
-          <Input
-            label="State/Province"
-            placeholder="Enter state or province"
-            value={settings.companyState}
-            onValueChange={(value) => onSettingsChange("companyState", value)}
-          />
-          <Input
-            label="ZIP/Postal Code"
-            placeholder="Enter ZIP or postal code"
-            value={settings.companyZipCode}
-            onValueChange={(value) => onSettingsChange("companyZipCode", value)}
-          />
-          <Input
-            label="Country"
-            placeholder="Enter country"
-            value={settings.companyCountry}
-            onValueChange={(value) => onSettingsChange("companyCountry", value)}
-          />
-        </div>
-      </div>
-
-      <Divider />
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Social Media Links</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Input
-            label="LinkedIn"
-            placeholder="https://linkedin.com/company/yourcompany"
-            value={settings.socialMedia.linkedin}
-            onValueChange={(value) => onSettingsChange("socialMedia", { ...settings.socialMedia, linkedin: value })}
-            startContent={<Icon icon="lucide:linkedin" className="text-primary-600" />}
-          />
-          <Input
-            label="Twitter"
-            placeholder="https://twitter.com/yourcompany"
-            value={settings.socialMedia.twitter}
-            onValueChange={(value) => onSettingsChange("socialMedia", { ...settings.socialMedia, twitter: value })}
-            startContent={<Icon icon="lucide:twitter" className="text-primary-400" />}
-          />
-          <Input
-            label="Facebook"
-            placeholder="https://facebook.com/yourcompany"
-            value={settings.socialMedia.facebook}
-            onValueChange={(value) => onSettingsChange("socialMedia", { ...settings.socialMedia, facebook: value })}
-            startContent={<Icon icon="lucide:facebook" className="text-primary-600" />}
-          />
-          <Input
-            label="Instagram"
-            placeholder="https://instagram.com/yourcompany"
-            value={settings.socialMedia.instagram}
-            onValueChange={(value) => onSettingsChange("socialMedia", { ...settings.socialMedia, instagram: value })}
-            startContent={<Icon icon="lucide:instagram" className="text-pink-600" />}
-          />
-        </div>
-      </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="Registration Number"
+              value={settings.registrationNumber || ''}
+              onChange={(e) => onSettingsChange('registrationNumber', e.target.value)}
+              placeholder="Enter registration number"
+              startContent={<Icon icon="lucide:file-text" className="text-default-400" />}
+            />
+            
+            <Input
+              label="Tax Number"
+              value={settings.taxNumber || ''}
+              onChange={(e) => onSettingsChange('taxNumber', e.target.value)}
+              placeholder="Enter tax number"
+              startContent={<Icon icon="lucide:receipt" className="text-default-400" />}
+            />
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }

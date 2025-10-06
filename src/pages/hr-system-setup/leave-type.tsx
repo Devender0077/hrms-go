@@ -222,7 +222,7 @@ import React from "react";
                 isClearable
                 placeholder="Search leave types..."
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
-                value={searchQuery}
+                
                 onValueChange={setSearchQuery}
                 className="w-full sm:max-w-[44%]"
               />
@@ -237,7 +237,7 @@ import React from "react";
                       isCompact
                       showControls
                       showShadow
-                      color="primary" variant="solid"
+                      color="primary" variant="flat"
                       page={page}
                       total={pages}
                       onChange={(page) => setPage(page)}
@@ -342,7 +342,7 @@ import React from "react";
                       <Input
                         label="Leave Type Name"
                         placeholder="Enter leave type name"
-                        value={formData.name}
+                        
                         onValueChange={(value) => handleInputChange("name", value)}
                         isReadOnly={!isEditing && selectedLeaveType}
                         isRequired
@@ -352,7 +352,7 @@ import React from "react";
                         label="Days Allowed"
                         placeholder="Enter number of days"
                         type="number"
-                        value={formData.days}
+                        
                         onValueChange={(value) => handleInputChange("days", value)}
                         isReadOnly={!isEditing && selectedLeaveType}
                         isRequired

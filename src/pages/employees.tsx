@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Button, Spinner, useDisclosure } from "@heroui/react";
     import { Icon } from "@iconify/react";
+import { motion } from "framer-motion";
 import { useEmployees } from "../hooks/useEmployees";
 import { Employee, EmployeeFilters, EmployeeFormData } from "../types/employee";
 import EmployeeStats from "../components/employees/EmployeeStats";
@@ -8,6 +9,7 @@ import EmployeeFiltersComponent from "../components/employees/EmployeeFilters";
 import EmployeeTable from "../components/employees/EmployeeTable";
 import EmployeeModals from "../components/employees/EmployeeModals";
 import ChangePasswordModal from "../components/employees/ChangePasswordModal";
+import HeroSection from "../components/common/HeroSection";
 
 export default function EmployeesPage() {
   const {
@@ -113,10 +115,10 @@ export default function EmployeesPage() {
   // Loading state
   if (loading || !Array.isArray(employees)) {
     return (
-      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
-          <Spinner size="lg" />
-          <p className="text-default-600 mt-4">Loading employees...</p>
+          <Spinner size="lg" color="primary" />
+          <p className="text-default-500 dark:text-default-400 mt-4 text-sm sm:text-base">Loading employees...</p>
         </div>
       </div>
     );
@@ -125,12 +127,12 @@ export default function EmployeesPage() {
   // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-content1/50 flex items-center justify-center">
-        <div className="text-center">
-          <Icon icon="lucide:alert-circle" className="w-16 h-16 text-danger mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-foreground mb-2">Error Loading Employees</h2>
-          <p className="text-default-600 mb-4">{error}</p>
-          <Button color="primary" onPress={() => window.location.reload()}>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <Icon icon="lucide:alert-circle" className="w-12 h-12 sm:w-16 sm:h-16 text-danger mx-auto mb-4" />
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Error Loading Employees</h2>
+          <p className="text-default-500 dark:text-default-400 mb-4 text-sm sm:text-base">{error}</p>
+          <Button color="primary" onPress={() => window.location.reload()} className="font-medium">
             Try Again
           </Button>
         </div>
@@ -139,55 +141,72 @@ export default function EmployeesPage() {
   }
       
       return (
-    <div className="min-h-screen bg-content2 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-          {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
-              <Icon icon="lucide:users" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Employee Management</h1>
-              <p className="text-default-600 mt-1">Manage your organization's employees</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              color="primary" 
-              variant="flat"
-              startContent={<Icon icon="lucide:plus" />} 
-              onPress={onAddOpen}
-              className="font-medium"
-            >
-                Add Employee
-              </Button>
-          </div>
-        </div>
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Employee Management"
+          subtitle="Workforce Management"
+          description="Manage your organization's workforce with comprehensive employee data, performance tracking, and streamlined HR processes."
+          icon="lucide:users"
+          illustration="employee"
+          actions={[
+            {
+              label: "Add Employee",
+              icon: "lucide:plus",
+              onPress: onAddOpen,
+              variant: "solid"
+            },
+            {
+              label: "Export Data",
+              icon: "lucide:download",
+              onPress: () => {},
+              variant: "bordered"
+            }
+          ]}
+        />
 
         {/* Statistics */}
-        <EmployeeStats stats={stats} />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <EmployeeStats stats={stats} />
+        </motion.div>
 
         {/* Filters */}
-        <EmployeeFiltersComponent
-          filters={filters}
-          onFiltersChange={setFilters}
-          departments={departments}
-          branches={branches}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <EmployeeFiltersComponent
+            filters={filters}
+            onFiltersChange={setFilters}
+            departments={departments}
+            branches={branches}
+          />
+        </motion.div>
 
         {/* Employee Table */}
-        <EmployeeTable
-          employees={paginatedEmployees}
-          onView={handleViewEmployee}
-          onEdit={handleEditEmployeeClick}
-          onDelete={handleDeleteEmployee}
-          onChangePassword={handleChangePassword}
-          onToggleStatus={handleToggleStatus}
-          currentPage={page}
-          totalPages={totalPages}
-          onPageChange={setPage}
-        />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <EmployeeTable
+            employees={paginatedEmployees}
+            onView={handleViewEmployee}
+            onEdit={handleEditEmployeeClick}
+            onDelete={handleDeleteEmployee}
+            onChangePassword={handleChangePassword}
+            onToggleStatus={handleToggleStatus}
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </motion.div>
 
         {/* Modals */}
         <EmployeeModals

@@ -72,7 +72,7 @@ export default function LeaveTypes() {
   const loadLeaveTypes = async () => {
     try {
       setLoading(true);
-      const response = await apiRequest("GET", "/api/v1/leave/types");
+      const response = await apiRequest("/leave/types");
       if (response.success) {
         setLeaveTypes(response.data || []);
       }
@@ -113,10 +113,13 @@ export default function LeaveTypes() {
       
       const url = isEditMode 
         ? `/api/v1/leave/types/${selectedLeaveType?.id}`
-        : "/api/v1/leave/types";
+        : "/leave/types";
       const method = isEditMode ? "PUT" : "POST";
       
-      const response = await apiRequest(method, url, formData);
+      const response = await apiRequest(url, {
+        method: method,
+        body: formData
+      });
       if (response.success) {
         await loadLeaveTypes();
         onClose();
@@ -131,7 +134,9 @@ export default function LeaveTypes() {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this leave type?")) {
       try {
-        const response = await apiRequest("DELETE", `/api/v1/leave/types/${id}`);
+        const response = await apiRequest(`/api/v1/leave/types/${id}`, {
+          method: "DELETE"
+        });
         if (response.success) {
           await loadLeaveTypes();
         }
@@ -181,7 +186,7 @@ export default function LeaveTypes() {
           <>
             <Input
               placeholder="Search leave types..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
@@ -293,7 +298,7 @@ export default function LeaveTypes() {
                   <Input
                     label="Leave Type Name"
                     placeholder="Enter leave type name"
-                    value={formData.name}
+                    
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     isRequired
                   />
@@ -302,7 +307,7 @@ export default function LeaveTypes() {
                     label="Days Allowed"
                     type="number"
                     placeholder="Enter number of days"
-                    value={formData.days_allowed.toString()}
+                    
                     onChange={(e) => setFormData({ ...formData, days_allowed: parseInt(e.target.value) || 0 })}
                     isRequired
                   />

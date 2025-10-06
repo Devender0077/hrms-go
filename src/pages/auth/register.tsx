@@ -71,7 +71,7 @@ export default function Register() {
           "Registration successful! Please check your email for verification.",
         color: "success",
       });
-      navigate.push("/login");
+      navigate("/login");
     }, 1500);
   };
 
@@ -111,7 +111,7 @@ export default function Register() {
               <Input
                 label="First Name"
                 placeholder="Enter your first name"
-                value={firstName}
+                
                 onValueChange={setFirstName}
                 startContent={
                   <Icon icon="lucide:user" className="text-default-400" />
@@ -122,7 +122,7 @@ export default function Register() {
               <Input
                 label="Last Name"
                 placeholder="Enter your last name"
-                value={lastName}
+                
                 onValueChange={setLastName}
                 startContent={
                   <Icon icon="lucide:user" className="text-default-400" />
@@ -135,7 +135,7 @@ export default function Register() {
               label="Email"
               placeholder="Enter your email"
               type="email"
-              value={email}
+              
               onValueChange={setEmail}
               startContent={
                 <Icon icon="lucide:mail" className="text-default-400" />
@@ -148,7 +148,7 @@ export default function Register() {
                 label="Password"
                 placeholder="Create a password"
                 type="password"
-                value={password}
+                
                 onValueChange={setPassword}
                 startContent={
                   <Icon icon="lucide:lock" className="text-default-400" />
@@ -160,7 +160,7 @@ export default function Register() {
                 label="Confirm Password"
                 placeholder="Confirm your password"
                 type="password"
-                value={confirmPassword}
+                
                 onValueChange={setConfirmPassword}
                 startContent={
                   <Icon icon="lucide:lock" className="text-default-400" />
@@ -176,10 +176,10 @@ export default function Register() {
               onChange={(e) => setUserType(e.target.value)}
               className="rounded-lg"
             >
-              <SelectItem key="employee" value="employee">
+              <SelectItem key="employee">
                 Employee
               </SelectItem>
-              <SelectItem key="company_admin" value="company_admin">
+              <SelectItem key="company_admin">
                 Company Admin
               </SelectItem>
             </Select>
@@ -188,7 +188,7 @@ export default function Register() {
               <Input
                 label="Company Name"
                 placeholder="Enter your company name"
-                value={companyName}
+                
                 onValueChange={setCompanyName}
                 startContent={
                   <Icon icon="lucide:briefcase" className="text-default-400" />

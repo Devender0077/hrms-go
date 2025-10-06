@@ -1,116 +1,82 @@
-import React from "react";
-import { Button, Card, CardBody, CardHeader, Input, Switch } from "@heroui/react";
-import { Icon } from "@iconify/react";
-
-interface ApiKey {
-  id: number;
-  name: string;
-  key: string;
-  created: string;
-  lastUsed: string;
-}
+import React from 'react';
+import { Card, CardBody, CardHeader, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface ApiManagementProps {
-  settings: {
-    apiEnabled: boolean;
-    rateLimit: number;
-    webhookUrl: string;
-    webhookSecret: string;
-    apiKeys: ApiKey[];
-  };
+  settings: Record<string, any>;
   onSettingsChange: (field: string, value: any) => void;
   onCreateApiKey: () => void;
   onDeleteApiKey: (id: number) => void;
 }
 
-export default function ApiManagement({ settings, onSettingsChange, onCreateApiKey, onDeleteApiKey }: ApiManagementProps) {
+export default function ApiManagement({ settings, onCreateApiKey, onDeleteApiKey }: ApiManagementProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary-100 rounded-lg">
-            <Icon icon="lucide:code" className="text-primary-600 text-lg" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold">API Management</h2>
-            <p className="text-default-600">Manage API keys and webhook configuration</p>
-          </div>
-        </div>
-        <Button
-          color="primary"
-          startContent={<Icon icon="lucide:key" />}
-          onPress={onCreateApiKey}
-        >
-          Create API Key
-        </Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <h3 className="text-lg font-semibold">API Configuration</h3>
-          </CardHeader>
-          <CardBody className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium">API Access</p>
-                <p className="text-sm text-default-500">Enable API access for external applications</p>
+    <div className="space-y-4 sm:space-y-6">
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between w-full gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+                <Icon icon="lucide:code" className="text-primary-600 dark:text-primary-400 text-xl" />
               </div>
-              <Switch
-                isSelected={settings.apiEnabled}
-                onValueChange={(value) => onSettingsChange("apiEnabled", value)}
-              />
+              <h3 className="text-lg font-semibold text-foreground">API Management</h3>
             </div>
-            <Input
-              label="Rate Limit (requests/hour)"
-              type="number"
-              value={settings.rateLimit.toString()}
-              onValueChange={(value) => onSettingsChange("rateLimit", parseInt(value))}
-            />
-            <Input
-              label="Webhook URL"
-              placeholder="https://your-domain.com/webhook"
-              value={settings.webhookUrl}
-              onValueChange={(value) => onSettingsChange("webhookUrl", value)}
-            />
-            <Input
-              label="Webhook Secret"
-              type="password"
-              placeholder="Enter webhook secret"
-              value={settings.webhookSecret}
-              onValueChange={(value) => onSettingsChange("webhookSecret", value)}
-            />
-          </CardBody>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <h3 className="text-lg font-semibold">API Keys</h3>
-          </CardHeader>
-          <CardBody>
-            <div className="space-y-3">
-              {settings.apiKeys.map((key) => (
-                <div key={key.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <p className="font-medium">{key.name}</p>
-                    <p className="text-sm text-default-500">{key.key}</p>
-                    <p className="text-xs text-default-400">Created: {key.created} | Last used: {key.lastUsed}</p>
-                  </div>
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                    color="danger"
-                    onPress={() => onDeleteApiKey(key.id)}
-                  >
-                    <Icon icon="lucide:trash-2" />
-                  </Button>
-                </div>
+            <Button
+              color="primary"
+              onPress={onCreateApiKey}
+              startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+              className="font-medium"
+              size="sm"
+            >
+              Create API Key
+            </Button>
+          </div>
+        </CardHeader>
+        <CardBody>
+          <Table aria-label="API Keys table">
+            <TableHeader>
+              <TableColumn>NAME</TableColumn>
+              <TableColumn>API KEY</TableColumn>
+              <TableColumn>CREATED</TableColumn>
+              <TableColumn>LAST USED</TableColumn>
+              <TableColumn>ACTIONS</TableColumn>
+            </TableHeader>
+            <TableBody>
+              {settings.apiKeys?.map((key: any) => (
+                <TableRow key={key.id}>
+                  <TableCell>{key.name}</TableCell>
+                  <TableCell>
+                    <code className="text-xs bg-default-100 dark:bg-default-200 px-2 py-1 rounded font-mono">
+                      {key.key}
+                    </code>
+                  </TableCell>
+                  <TableCell>{key.created}</TableCell>
+                  <TableCell>
+                    <Chip
+                      size="sm"
+                      color={key.lastUsed === 'Never' ? 'default' : 'success'}
+                      variant="flat"
+                    >
+                      {key.lastUsed}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      size="sm"
+                      color="danger"
+                      variant="flat"
+                      onPress={() => onDeleteApiKey(key.id)}
+                      startContent={<Icon icon="lucide:trash-2" className="w-3 h-3" />}
+                    >
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
               ))}
-            </div>
-          </CardBody>
-        </Card>
-      </div>
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
-import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Pagination } from "@heroui/react";
+import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Pagination, Button } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
 import ReportHeader from "../../components/reports/ReportHeader";
 import ReportStats from "../../components/reports/ReportStats";
@@ -240,58 +241,196 @@ export default function PayrollReport() {
   };
 
   return (
-    <div className="min-h-screen bg-content2 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <ReportHeader
-          title="Payroll Report"
-          description="Comprehensive payroll analysis and salary distribution"
-          icon="lucide:credit-card"
-          iconColor="from-success-500 to-emerald-600"
-          onExport={handleExport}
-          onRefresh={handleRefresh}
-          isExporting={isExporting}
-          isRefreshing={isRefreshing}
-        />
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-info-500 via-info-600 to-cyan-600 p-6 sm:p-8 text-white mb-6"
+        >
+          {/* Background decorative elements */}
+          <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute top-1/2 -left-20 w-24 h-24 bg-white/5 rounded-full blur-lg"></div>
+          
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+            {/* Text Content */}
+            <div className="flex-1">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-white/20 rounded-xl">
+                    <Icon icon="lucide:credit-card" className="text-white text-2xl" />
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold">
+                    Payroll Report
+                  </h1>
+                </div>
+                <p className="text-white/90 text-sm sm:text-base mb-6 max-w-lg">
+                  Comprehensive payroll analysis and salary distribution. Track employee compensation, analyze trends, and generate detailed financial reports.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button
+                    color="default"
+                    variant="solid"
+                    size="sm"
+                    className="bg-white/20 backdrop-blur-sm text-white border-white/30"
+                    startContent={<Icon icon="lucide:download" className="w-4 h-4" />}
+                    onPress={handleExport}
+                    isLoading={isExporting}
+                  >
+                    Export Report
+                  </Button>
+                  <Button
+                    color="default"
+                    variant="bordered"
+                    size="sm"
+                    className="border-white/30 text-white hover:bg-white/10"
+                    startContent={<Icon icon="lucide:refresh-cw" className="w-4 h-4" />}
+                    onPress={handleRefresh}
+                    isLoading={isRefreshing}
+                  >
+                    Refresh Data
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
+            
+            {/* Illustration */}
+            <motion.div
+              className="flex-shrink-0"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="relative">
+                {/* Main illustration container */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                  <div className="flex flex-col items-center space-y-4">
+                    {/* Report elements */}
+                    <div className="flex items-center space-x-3">
+                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Icon icon="lucide:bar-chart" className="text-white text-xl" />
+                      </div>
+                      <div className="w-16 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Icon icon="lucide:pie-chart" className="text-white text-xl" />
+                      </div>
+                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <Icon icon="lucide:trending-up" className="text-white text-xl" />
+                      </div>
+                    </div>
+                    
+                    {/* Connection lines */}
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-0.5 bg-white/30"></div>
+                      <div className="w-2 h-2 bg-white/40 rounded-full"></div>
+                      <div className="w-8 h-0.5 bg-white/30"></div>
+                    </div>
+                    
+                    {/* Bottom elements */}
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                        <Icon icon="lucide:file-text" className="text-white text-lg" />
+                      </div>
+                      <div className="w-14 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                        <Icon icon="lucide:calculator" className="text-white text-lg" />
+                      </div>
+                      <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                        <Icon icon="lucide:download" className="text-white text-lg" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Floating elements */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                  <Icon icon="lucide:sparkles" className="text-white text-xs" />
+                </div>
+                <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-white/20 rounded-full flex items-center justify-center">
+                  <Icon icon="lucide:zap" className="text-white text-xs" />
+                </div>
+              </div>
+            </motion.div>
+          </div>
+          
+          {/* Floating particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(8)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 bg-white/40 rounded-full"
+                style={{
+                  left: `${10 + i * 12}%`,
+                  top: `${20 + (i % 4) * 15}%`,
+                }}
+                animate={{
+                  y: [0, -15, 0],
+                  opacity: [0.4, 0.8, 0.4],
+                }}
+                transition={{
+                  duration: 2 + i * 0.3,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                }}
+              />
+            ))}
+          </div>
+        </motion.div>
         
         {/* Statistics */}
-        <ReportStats stats={stats} />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <ReportStats stats={stats} />
+        </motion.div>
 
         {/* Filters */}
-        <Card className="border-0 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Card className="border-0 shadow-sm">
           <CardBody className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <input
                 placeholder="Search..."
-                value={searchQuery}
+                
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <select
-                value={selectedDepartment}
+                
                 onChange={(e) => setSelectedDepartment(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
+                  <option key={dept} >{dept}</option>
                 ))}
               </select>
               <select
-                value={selectedPayPeriod}
+                
                 onChange={(e) => setSelectedPayPeriod(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {payPeriods.map(period => (
-                  <option key={period} value={period}>{period}</option>
+                  <option key={period} >{period}</option>
                 ))}
               </select>
               <select
-                value={selectedStatus}
+                
                 onChange={(e) => setSelectedStatus(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {statuses.map(status => (
-                  <option key={status} value={status}>{status}</option>
+                  <option key={status} >{status}</option>
                 ))}
               </select>
               <div className="flex items-end">
@@ -301,10 +440,16 @@ export default function PayrollReport() {
               </div>
             </div>
           </CardBody>
-        </Card>
+          </Card>
+        </motion.div>
 
         {/* Data Table */}
-        <Card className="border-0 shadow-sm">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+        >
+          <Card className="border-0 shadow-sm">
           <CardHeader className="pb-3">
             <div className="flex items-center gap-3">
               <Icon icon="lucide:table" className="text-success-600 text-xl" />
@@ -407,7 +552,8 @@ export default function PayrollReport() {
               </div>
             )}
           </CardBody>
-        </Card>
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

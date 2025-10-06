@@ -82,7 +82,62 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
             <TableColumn>STATUS</TableColumn>
             <TableColumn>ACTIONS</TableColumn>
           </TableHeader>
-          <TableBody emptyContent="No employees found">
+          <TableBody emptyContent={
+            <div className="flex flex-col items-center justify-center py-12 px-6">
+              {/* Illustration */}
+              <div className="relative mb-6">
+                <div className="w-32 h-32 bg-gradient-to-br from-primary-100 to-secondary-100 dark:from-primary-900/30 dark:to-secondary-900/30 rounded-2xl flex items-center justify-center shadow-lg">
+                  <div className="flex flex-col items-center space-y-2">
+                    {/* Team illustration */}
+                    <div className="flex items-end space-x-1">
+                      <div className="w-6 h-8 bg-primary-500 rounded-sm"></div>
+                      <div className="w-8 h-10 bg-primary-600 rounded-sm"></div>
+                      <div className="w-6 h-8 bg-primary-500 rounded-sm"></div>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+                      <div className="w-1 h-1 bg-primary-300 rounded-full"></div>
+                      <div className="w-2 h-2 bg-primary-400 rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Floating elements */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-warning-100 dark:bg-warning-900/30 rounded-full flex items-center justify-center">
+                  <Icon icon="lucide:user-plus" className="text-warning-600 text-xs" />
+                </div>
+                <div className="absolute -bottom-2 -left-2 w-6 h-6 bg-success-100 dark:bg-success-900/30 rounded-full flex items-center justify-center">
+                  <Icon icon="lucide:users" className="text-success-600 text-xs" />
+                </div>
+              </div>
+              
+              {/* Text content */}
+              <h3 className="text-lg font-semibold text-foreground mb-2">No employees found</h3>
+              <p className="text-default-500 text-center max-w-sm mb-4">
+                Get started by adding your first employee to the system. You can import from CSV or add manually.
+              </p>
+              
+              {/* Action buttons */}
+              <div className="flex gap-3">
+                <Button
+                  color="primary"
+                  variant="flat"
+                  size="sm"
+                  startContent={<Icon icon="lucide:user-plus" className="w-4 h-4" />}
+                >
+                  Add Employee
+                </Button>
+                <Button
+                  color="default"
+                  variant="flat"
+                  size="sm"
+                  startContent={<Icon icon="lucide:upload" className="w-4 h-4" />}
+                >
+                  Import CSV
+                </Button>
+              </div>
+            </div>
+          }>
             {employees.map((employee) => (
               <TableRow key={employee.id}>
                 <TableCell>
@@ -123,10 +178,10 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <div className="flex items-center gap-2">
                     <Icon icon="lucide:clock" className="text-default-400 text-sm" />
                     <div>
-                      <span className="text-sm">{employee.shift_name || 'N/A'}</span>
-                      {employee.shift_name && (
+                      <span className="text-sm">{(employee as any).shift_name || 'N/A'}</span>
+                      {(employee as any).shift_name && (
                         <p className="text-xs text-default-400">
-                          {employee.shift_start_time} - {employee.shift_end_time}
+                          {(employee as any).shift_start_time} - {(employee as any).shift_end_time}
                         </p>
                       )}
                     </div>

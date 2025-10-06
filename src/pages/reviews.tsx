@@ -35,14 +35,14 @@ import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
 import { usePerformanceReviews, PerformanceReview } from "../hooks/usePerformanceReviews";
-import PageLayout, { PageHeader } from "../components/layout/PageLayout";
+import HeroSection from "../components/common/HeroSection";
 
 const statusColorMap = {
   "draft": "default",
   "in_progress": "primary",
   "completed": "success",
   "cancelled": "danger",
-};
+} as const;
 
 const ratingColorMap = {
   1: "danger",
@@ -273,20 +273,24 @@ export default function ReviewsPage() {
   }
 
   return (
-    <PageLayout>
-      <PageHeader
-        title="Performance Reviews"
-        description="Manage employee performance reviews and evaluations"
-        actions={
-          <Button
-            color="primary"
-            startContent={<Icon icon="lucide:plus" />}
-            onPress={onOpen}
-          >
-            Add Review
-          </Button>
-        }
-      />
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Performance Reviews"
+          subtitle="Employee Evaluation & Assessment"
+          description="Manage employee performance reviews and evaluations. Track progress, set goals, and provide constructive feedback to drive employee growth and development."
+          icon="lucide:star"
+          illustration="performance"
+          actions={[
+            {
+              label: "Add Review",
+              icon: "lucide:plus",
+              onPress: onOpen,
+              variant: "solid"
+            }
+          ]}
+        />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -353,22 +357,22 @@ export default function ReviewsPage() {
           <div className="flex flex-col md:flex-row gap-4">
             <Input
               placeholder="Search reviews..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" />}
               className="flex-1"
             />
             <Select
               placeholder="Status"
-              value={selectedStatus}
+              
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="w-full md:w-48"
             >
-              <SelectItem key="all" value="all">All Status</SelectItem>
-              <SelectItem key="draft" value="draft">Draft</SelectItem>
-              <SelectItem key="in_progress" value="in_progress">In Progress</SelectItem>
-              <SelectItem key="completed" value="completed">Completed</SelectItem>
-              <SelectItem key="cancelled" value="cancelled">Cancelled</SelectItem>
+              <SelectItem key="all">All Status</SelectItem>
+              <SelectItem key="draft">Draft</SelectItem>
+              <SelectItem key="in_progress">In Progress</SelectItem>
+              <SelectItem key="completed">Completed</SelectItem>
+              <SelectItem key="cancelled">Cancelled</SelectItem>
             </Select>
           </div>
         </CardBody>
@@ -506,7 +510,7 @@ export default function ReviewsPage() {
                   <Input
                     label="Employee ID"
                     type="number"
-                    value={newReview.employee_id.toString()}
+                    
                     onChange={(e) => setNewReview({...newReview, employee_id: parseInt(e.target.value)})}
                     isRequired
                   />
@@ -514,7 +518,7 @@ export default function ReviewsPage() {
                   <Input
                     label="Reviewer ID"
                     type="number"
-                    value={newReview.reviewer_id.toString()}
+                    
                     onChange={(e) => setNewReview({...newReview, reviewer_id: parseInt(e.target.value)})}
                     isRequired
                   />
@@ -522,7 +526,7 @@ export default function ReviewsPage() {
                   <Input
                     label="Review Period Start"
                     type="date"
-                    value={newReview.review_period_start}
+                    
                     onChange={(e) => setNewReview({...newReview, review_period_start: e.target.value})}
                     isRequired
                   />
@@ -530,7 +534,7 @@ export default function ReviewsPage() {
                   <Input
                     label="Review Period End"
                     type="date"
-                    value={newReview.review_period_end}
+                    
                     onChange={(e) => setNewReview({...newReview, review_period_end: e.target.value})}
                     isRequired
                   />
@@ -541,66 +545,66 @@ export default function ReviewsPage() {
                       <div>
                         <label className="text-sm text-default-500">Overall</label>
                         <Select
-                          value={newReview.overall_rating.toString()}
+                          
                           onChange={(e) => setNewReview({...newReview, overall_rating: parseInt(e.target.value)})}
                         >
                           {[1,2,3,4,5].map(rating => (
-                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                            <SelectItem key={rating} >{rating}</SelectItem>
                           ))}
                         </Select>
                       </div>
                       <div>
                         <label className="text-sm text-default-500">Goals</label>
                         <Select
-                          value={newReview.goals_rating.toString()}
+                          
                           onChange={(e) => setNewReview({...newReview, goals_rating: parseInt(e.target.value)})}
                         >
                           {[1,2,3,4,5].map(rating => (
-                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                            <SelectItem key={rating} >{rating}</SelectItem>
                           ))}
                         </Select>
                       </div>
                       <div>
                         <label className="text-sm text-default-500">Skills</label>
                         <Select
-                          value={newReview.skills_rating.toString()}
+                          
                           onChange={(e) => setNewReview({...newReview, skills_rating: parseInt(e.target.value)})}
                         >
                           {[1,2,3,4,5].map(rating => (
-                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                            <SelectItem key={rating} >{rating}</SelectItem>
                           ))}
                         </Select>
                       </div>
                       <div>
                         <label className="text-sm text-default-500">Teamwork</label>
                         <Select
-                          value={newReview.teamwork_rating.toString()}
+                          
                           onChange={(e) => setNewReview({...newReview, teamwork_rating: parseInt(e.target.value)})}
                         >
                           {[1,2,3,4,5].map(rating => (
-                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                            <SelectItem key={rating} >{rating}</SelectItem>
                           ))}
                         </Select>
                       </div>
                       <div>
                         <label className="text-sm text-default-500">Communication</label>
                         <Select
-                          value={newReview.communication_rating.toString()}
+                          
                           onChange={(e) => setNewReview({...newReview, communication_rating: parseInt(e.target.value)})}
                         >
                           {[1,2,3,4,5].map(rating => (
-                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                            <SelectItem key={rating} >{rating}</SelectItem>
                           ))}
                         </Select>
                       </div>
                       <div>
                         <label className="text-sm text-default-500">Leadership</label>
                         <Select
-                          value={newReview.leadership_rating.toString()}
+                          
                           onChange={(e) => setNewReview({...newReview, leadership_rating: parseInt(e.target.value)})}
                         >
                           {[1,2,3,4,5].map(rating => (
-                            <SelectItem key={rating} value={rating.toString()}>{rating}</SelectItem>
+                            <SelectItem key={rating} >{rating}</SelectItem>
                           ))}
                         </Select>
                       </div>
@@ -611,7 +615,7 @@ export default function ReviewsPage() {
                     <Textarea
                       label="Comments"
                       placeholder="Enter overall comments"
-                      value={newReview.comments}
+                      
                       onChange={(e) => setNewReview({...newReview, comments: e.target.value})}
                     />
                   </div>
@@ -620,7 +624,7 @@ export default function ReviewsPage() {
                     <Textarea
                       label="Strengths"
                       placeholder="Enter employee strengths"
-                      value={newReview.strengths}
+                      
                       onChange={(e) => setNewReview({...newReview, strengths: e.target.value})}
                     />
                   </div>
@@ -629,7 +633,7 @@ export default function ReviewsPage() {
                     <Textarea
                       label="Areas for Improvement"
                       placeholder="Enter areas for improvement"
-                      value={newReview.areas_for_improvement}
+                      
                       onChange={(e) => setNewReview({...newReview, areas_for_improvement: e.target.value})}
                     />
                   </div>
@@ -638,7 +642,7 @@ export default function ReviewsPage() {
                     <Textarea
                       label="Development Plan"
                       placeholder="Enter development plan"
-                      value={newReview.development_plan}
+                      
                       onChange={(e) => setNewReview({...newReview, development_plan: e.target.value})}
                     />
                   </div>
@@ -783,6 +787,7 @@ export default function ReviewsPage() {
           )}
         </ModalContent>
       </Modal>
-    </PageLayout>
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   Card,
   CardBody,
@@ -84,16 +84,50 @@ export default function EmployeeSalariesPage() {
   const rowsPerPage = 10;
 
   // Fetch employee salaries
-  const { data: employeeSalaries = [], loading, error, refetch } = useAuthenticatedAPI<EmployeeSalary[]>(
-    '/api/v1/payroll/employee-salaries',
-    'GET'
-  );
+  const [employeeSalaries, setEmployeeSalaries] = useState<EmployeeSalary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  const { apiRequest } = useAuthenticatedAPI();
+  
+  const fetchEmployeeSalaries = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await apiRequest('/api/v1/payroll/employee-salaries');
+      if (response.success) {
+        setEmployeeSalaries(response.data || []);
+      } else {
+        setError('Failed to fetch employee salaries');
+      }
+    } catch (err) {
+      setError('Error fetching employee salaries');
+      console.error('Error fetching employee salaries:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiRequest]);
+  
+  useEffect(() => {
+    fetchEmployeeSalaries();
+  }, [fetchEmployeeSalaries]);
 
   // Fetch employees for dropdown
-  const { data: employees = [] } = useAuthenticatedAPI<Employee[]>(
-    '/api/v1/employees',
-    'GET'
-  );
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  
+  const fetchEmployees = useCallback(async () => {
+    try {
+      const response = await apiRequest('/api/v1/employees');
+      if (response.success) {
+        setEmployees(response.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching employees:', err);
+    }
+  }, [apiRequest]);
+  
+  useEffect(() => {
+    fetchEmployees();
+  }, [fetchEmployees]);
 
   // Filter employee salaries
   const filteredSalaries = useMemo(() => {
@@ -174,7 +208,7 @@ export default function EmployeeSalariesPage() {
       });
 
       if (response.ok) {
-        await refetch();
+        await fetchEmployeeSalaries();
         onOpenChange();
         setFormData({
           employee_id: "",
@@ -207,7 +241,7 @@ export default function EmployeeSalariesPage() {
         });
 
         if (response.ok) {
-          await refetch();
+          await fetchEmployeeSalaries();
         } else {
           console.error('Failed to delete employee salary');
         }
@@ -303,7 +337,7 @@ export default function EmployeeSalariesPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Input
               placeholder="Search employees..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="max-w-sm"
@@ -464,7 +498,7 @@ export default function EmployeeSalariesPage() {
                       label="Basic Salary"
                       type="number"
                       placeholder="Enter basic salary"
-                      value={formData.basic_salary.toString()}
+                      
                       onChange={(e) => setFormData({ ...formData, basic_salary: parseFloat(e.target.value) || 0 })}
                       startContent={<span className="text-default-400">$</span>}
                       isRequired
@@ -488,7 +522,7 @@ export default function EmployeeSalariesPage() {
                     <Input
                       label="Effective Date"
                       type="date"
-                      value={formData.effective_date}
+                      
                       onChange={(e) => setFormData({ ...formData, effective_date: e.target.value })}
                       isRequired
                     />
@@ -496,7 +530,7 @@ export default function EmployeeSalariesPage() {
                     <Input
                       label="End Date"
                       type="date"
-                      value={formData.end_date}
+                      
                       onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                     />
                   </div>
@@ -509,14 +543,14 @@ export default function EmployeeSalariesPage() {
                     <Input
                       label="Bank Name"
                       placeholder="Enter bank name"
-                      value={formData.bank_name}
+                      
                       onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
                     />
 
                     <Input
                       label="Account Number"
                       placeholder="Enter account number"
-                      value={formData.account_number}
+                      
                       onChange={(e) => setFormData({ ...formData, account_number: e.target.value })}
                     />
                   </div>
@@ -524,7 +558,7 @@ export default function EmployeeSalariesPage() {
                   <Input
                     label="Account Name"
                     placeholder="Enter account holder name"
-                    value={formData.account_name}
+                    
                     onChange={(e) => setFormData({ ...formData, account_name: e.target.value })}
                   />
                 </div>

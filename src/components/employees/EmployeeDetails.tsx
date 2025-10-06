@@ -95,23 +95,23 @@ const EmployeeDetails: React.FC<EmployeeDetailsProps> = ({ employee }) => {
           <div>
             <span className="text-default-500 text-sm">Employment Type</span>
             <p className="font-medium capitalize">
-              {employee.employment_type ? employee.employment_type.replace('_', ' ') : 'N/A'}
+              {(employee as any).employment_type ? (employee as any).employment_type.replace('_', ' ') : 'N/A'}
             </p>
           </div>
           <div>
             <span className="text-default-500 text-sm">Attendance Policy</span>
             <p className="font-medium">
-              {employee.attendance_policy_name || 'N/A'}
+              {(employee as any).attendance_policy_name || 'N/A'}
             </p>
           </div>
           <div>
             <span className="text-default-500 text-sm">Shift</span>
             <p className="font-medium">
-              {employee.shift_name || 'N/A'}
+              {(employee as any).shift_name || 'N/A'}
             </p>
-            {employee.shift_name && (
+            {(employee as any).shift_name && (
               <p className="text-xs text-default-400 mt-1">
-                {employee.shift_start_time} - {employee.shift_end_time}
+                {(employee as any).shift_start_time} - {(employee as any).shift_end_time}
               </p>
             )}
           </div>
@@ -124,23 +124,23 @@ const EmployeeDetails: React.FC<EmployeeDetailsProps> = ({ employee }) => {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <span className="text-default-500 text-sm">Bank Name</span>
-            <p className="font-medium">{employee.bank_name || 'N/A'}</p>
+            <p className="font-medium">{(employee as any).bank_name || 'N/A'}</p>
           </div>
           <div>
             <span className="text-default-500 text-sm">Account Number</span>
-            <p className="font-medium">{employee.bank_account_number || 'N/A'}</p>
+            <p className="font-medium">{(employee as any).bank_account_number || 'N/A'}</p>
           </div>
           <div>
             <span className="text-default-500 text-sm">Routing Number</span>
-            <p className="font-medium">{employee.bank_routing_number || 'N/A'}</p>
+            <p className="font-medium">{(employee as any).bank_routing_number || 'N/A'}</p>
           </div>
           <div>
             <span className="text-default-500 text-sm">SWIFT Code</span>
-            <p className="font-medium">{employee.bank_swift_code || 'N/A'}</p>
+            <p className="font-medium">{(employee as any).bank_swift_code || 'N/A'}</p>
           </div>
           <div className="col-span-2">
             <span className="text-default-500 text-sm">Bank Address</span>
-            <p className="font-medium">{employee.bank_address || 'N/A'}</p>
+            <p className="font-medium">{(employee as any).bank_address || 'N/A'}</p>
           </div>
         </div>
       </div>

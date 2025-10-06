@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   Card,
   CardBody,
@@ -62,10 +62,32 @@ export default function PayslipsPage() {
   const rowsPerPage = 10;
 
   // Fetch payslips
-  const { data: payslips = [], loading, error, refetch } = useAuthenticatedAPI<Payslip[]>(
-    '/api/v1/payroll/payslips',
-    'GET'
-  );
+  const [payslips, setPayslips] = useState<Payslip[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  const { apiRequest } = useAuthenticatedAPI();
+  
+  const fetchPayslips = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await apiRequest('/api/v1/payroll/payslips');
+      if (response.success) {
+        setPayslips(response.data || []);
+      } else {
+        setError('Failed to fetch payslips');
+      }
+    } catch (err) {
+      setError('Error fetching payslips');
+      console.error('Error fetching payslips:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiRequest]);
+  
+  useEffect(() => {
+    fetchPayslips();
+  }, [fetchPayslips]);
 
   // Filter payslips
   const filteredPayslips = useMemo(() => {
@@ -117,7 +139,7 @@ export default function PayslipsPage() {
       });
 
       if (response.ok) {
-        await refetch();
+        await fetchPayslips();
       } else {
         console.error('Failed to approve payslip');
       }
@@ -141,7 +163,7 @@ export default function PayslipsPage() {
       });
 
       if (response.ok) {
-        await refetch();
+        await fetchPayslips();
       } else {
         console.error('Failed to mark payslip as paid');
       }
@@ -280,7 +302,7 @@ export default function PayslipsPage() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Input
               placeholder="Search payslips..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="max-w-sm"

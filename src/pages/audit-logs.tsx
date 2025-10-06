@@ -1,114 +1,34 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Pagination, Button, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Textarea, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
+import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Pagination, Button, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Textarea, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Spinner } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/react";
-import Papa from "papaparse";
+import { useAuthenticatedAPI } from "../hooks/useAuthenticatedAPI";
+import HeroSection from "../components/common/HeroSection";
 
 // Audit log interface
 interface AuditLog {
   id: number;
-  logId: string;
-  userId: string;
-  userName: string;
-  userEmail: string;
+  log_id: string;
+  user_id: number;
+  user_name: string;
+  user_email: string;
   action: string;
   resource: string;
-  resourceId: string;
+  resource_id: string;
   details: string;
-  ipAddress: string;
-  userAgent: string;
-  timestamp: string;
+  ip_address: string;
+  user_agent: string;
+  created_at: string;
   status: "success" | "failed" | "warning";
   severity: "low" | "medium" | "high" | "critical";
   department: string;
   location: string;
-  sessionId: string;
+  session_id: string;
   changes?: Record<string, any>;
-  oldValues?: Record<string, any>;
-  newValues?: Record<string, any>;
+  old_values?: Record<string, any>;
+  new_values?: Record<string, any>;
 }
 
-// Generate realistic audit logs
-const generateAuditLogs = (): AuditLog[] => {
-  const actions = [
-    "LOGIN", "LOGOUT", "CREATE", "UPDATE", "DELETE", "VIEW", "EXPORT", "IMPORT", 
-    "APPROVE", "REJECT", "ASSIGN", "UNASSIGN", "SCHEDULE", "CANCEL", "RESET_PASSWORD",
-    "CHANGE_ROLE", "UPDATE_PROFILE", "UPLOAD_FILE", "DOWNLOAD_FILE", "SEND_EMAIL"
-  ];
-  
-  const resources = [
-    "USER", "EMPLOYEE", "DEPARTMENT", "JOB", "CANDIDATE", "INTERVIEW", "REVIEW", 
-    "GOAL", "ATTENDANCE", "LEAVE", "PAYROLL", "EXPENSE", "REPORT", "SETTINGS", 
-    "ROLE", "PERMISSION", "DOCUMENT", "NOTIFICATION", "CALENDAR", "TASK"
-  ];
-  
-  const users = [
-    { name: "John Smith", email: "john.smith@company.com", department: "IT" },
-    { name: "Sarah Johnson", email: "sarah.johnson@company.com", department: "HR" },
-    { name: "Mike Wilson", email: "mike.wilson@company.com", department: "Finance" },
-    { name: "Lisa Anderson", email: "lisa.anderson@company.com", department: "Marketing" },
-    { name: "David Chen", email: "david.chen@company.com", department: "Operations" },
-    { name: "Emily Davis", email: "emily.davis@company.com", department: "Sales" },
-    { name: "Tom Johnson", email: "tom.johnson@company.com", department: "IT" },
-    { name: "Amy Rodriguez", email: "amy.rodriguez@company.com", department: "HR" }
-  ];
-  
-  const statuses: ("success" | "failed" | "warning")[] = ["success", "failed", "warning"];
-  const severities: ("low" | "medium" | "high" | "critical")[] = ["low", "medium", "high", "critical"];
-  
-  const logs: AuditLog[] = [];
-  const now = new Date();
-  
-  for (let i = 0; i < 100; i++) {
-    const user = users[Math.floor(Math.random() * users.length)];
-    const action = actions[Math.floor(Math.random() * actions.length)];
-    const resource = resources[Math.floor(Math.random() * resources.length)];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const severity = severities[Math.floor(Math.random() * severities.length)];
-    
-    // Generate timestamp within last 30 days
-    const daysAgo = Math.floor(Math.random() * 30);
-    const hoursAgo = Math.floor(Math.random() * 24);
-    const minutesAgo = Math.floor(Math.random() * 60);
-    const timestamp = new Date(now.getTime() - (daysAgo * 24 * 60 * 60 * 1000) - (hoursAgo * 60 * 60 * 1000) - (minutesAgo * 60 * 1000));
-    
-    const log: AuditLog = {
-      id: i + 1,
-      logId: `LOG-${String(i + 1).padStart(6, '0')}`,
-      userId: `USER-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-      userName: user.name,
-      userEmail: user.email,
-      action,
-      resource,
-      resourceId: `${resource}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
-      details: `${action} operation performed on ${resource.toLowerCase()}`,
-      ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-      userAgent: `Mozilla/5.0 (${Math.random() > 0.5 ? 'Windows' : 'Mac'}) AppleWebKit/537.36`,
-      timestamp: timestamp.toISOString(),
-      status,
-      severity,
-      department: user.department,
-      location: `${Math.random() > 0.5 ? 'Office' : 'Remote'}`,
-      sessionId: `SESS-${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-      changes: Math.random() > 0.7 ? {
-        field1: "old_value",
-        field2: "new_value"
-      } : undefined,
-      oldValues: Math.random() > 0.8 ? {
-        name: "Old Name",
-        status: "inactive"
-      } : undefined,
-      newValues: Math.random() > 0.8 ? {
-        name: "New Name",
-        status: "active"
-      } : undefined
-    };
-    
-    logs.push(log);
-  }
-  
-  return logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-};
 
 const statusColorMap = {
   success: "success",
@@ -134,6 +54,7 @@ const departments = [
 ];
 
 export default function AuditLogs() {
+  const { apiRequest } = useAuthenticatedAPI();
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -145,129 +66,148 @@ export default function AuditLogs() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalLogs, setTotalLogs] = useState(0);
+  const [stats, setStats] = useState({
+    total_logs: 0,
+    success_logs: 0,
+    failed_logs: 0,
+    critical_logs: 0,
+    today_logs: 0
+  });
   
   const rowsPerPage = 15;
   
   // Load audit logs on component mount
   useEffect(() => {
-    setAuditLogs(generateAuditLogs());
-  }, []);
-  
-  // Filter audit logs
-  const filteredLogs = useMemo(() => {
-    return auditLogs.filter(log => {
-      const matchesSearch = 
-        log.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.userEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.resource.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.details.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.ipAddress.includes(searchQuery);
-      
-      const matchesStatus = selectedStatus === "all" || log.status === selectedStatus;
-      const matchesSeverity = selectedSeverity === "all" || log.severity === selectedSeverity;
-      const matchesDepartment = selectedDepartment === "all" || log.department === selectedDepartment;
-      const matchesAction = selectedAction === "all" || log.action === selectedAction;
-      
-      return matchesSearch && matchesStatus && matchesSeverity && matchesDepartment && matchesAction;
-    });
-  }, [auditLogs, searchQuery, selectedStatus, selectedSeverity, selectedDepartment, selectedAction]);
-  
-  // Paginate filtered logs
-  const paginatedLogs = useMemo(() => {
-    const startIndex = (page - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    return filteredLogs.slice(startIndex, endIndex);
-  }, [filteredLogs, page]);
+    fetchAuditLogs();
+    fetchStats();
+  }, [page, searchQuery, selectedStatus, selectedSeverity, selectedDepartment, selectedAction]);
 
-  // Calculate statistics
-  const stats = useMemo(() => {
-    const totalLogs = auditLogs.length;
-    const successLogs = auditLogs.filter(l => l.status === "success").length;
-    const failedLogs = auditLogs.filter(l => l.status === "failed").length;
-    const criticalLogs = auditLogs.filter(l => l.severity === "critical").length;
-    const todayLogs = auditLogs.filter(l => {
-      const logDate = new Date(l.timestamp);
-      const today = new Date();
-      return logDate.toDateString() === today.toDateString();
-    }).length;
-    
+  // Fetch audit logs from API
+  const fetchAuditLogs = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      params.append('page', page.toString());
+      params.append('limit', rowsPerPage.toString());
+      
+      if (searchQuery) params.append('search', searchQuery);
+      if (selectedStatus !== 'all') params.append('status', selectedStatus);
+      if (selectedSeverity !== 'all') params.append('severity', selectedSeverity);
+      if (selectedDepartment !== 'all') params.append('department', selectedDepartment);
+      if (selectedAction !== 'all') params.append('action', selectedAction);
+      
+      const response = await apiRequest(`/audit-logs?${params.toString()}`, { method: 'GET' });
+      
+      if (response.success) {
+        setAuditLogs(response.data);
+        setTotalPages(response.pagination.pages);
+        setTotalLogs(response.pagination.total);
+      }
+    } catch (error) {
+      console.error('Error fetching audit logs:', error);
+      addToast({
+        title: "Error",
+        description: "Failed to fetch audit logs",
+        color: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch statistics
+  const fetchStats = async () => {
+    try {
+      const response = await apiRequest('/audit-logs/stats', { method: 'GET' });
+      if (response.success) {
+        setStats(response.data);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  // Calculate statistics for display
+  const statsDisplay = useMemo(() => {
     return [
       {
         label: "Total Logs",
-        value: totalLogs,
+        value: stats.total_logs,
         icon: "lucide:file-text",
         color: "text-primary-600",
         bgColor: "bg-primary-100"
       },
       {
         label: "Success",
-        value: successLogs,
+        value: stats.success_logs,
         icon: "lucide:check-circle",
         color: "text-success-600",
         bgColor: "bg-success-100"
       },
       {
         label: "Failed",
-        value: failedLogs,
+        value: stats.failed_logs,
         icon: "lucide:x-circle",
         color: "text-danger-600",
         bgColor: "bg-danger-100"
       },
       {
         label: "Critical",
-        value: criticalLogs,
+        value: stats.critical_logs,
         icon: "lucide:alert-triangle",
         color: "text-warning-600",
         bgColor: "bg-warning-100"
       },
       {
         label: "Today",
-        value: todayLogs,
+        value: stats.today_logs,
         icon: "lucide:calendar",
         color: "text-secondary-600",
         bgColor: "bg-secondary-100"
       }
     ];
-  }, [auditLogs]);
+  }, [stats]);
 
   // Handle export CSV
   const handleExportCSV = async () => {
     setIsExporting(true);
     try {
-      const csvData = filteredLogs.map(log => ({
-        "Log ID": log.logId,
-        "User": log.userName,
-        "Email": log.userEmail,
-        "Action": log.action,
-        "Resource": log.resource,
-        "Resource ID": log.resourceId,
-        "Details": log.details,
-        "Status": log.status,
-        "Severity": log.severity,
-        "IP Address": log.ipAddress,
-        "Department": log.department,
-        "Location": log.location,
-        "Timestamp": new Date(log.timestamp).toLocaleString(),
-        "Session ID": log.sessionId
-      }));
-
-      const csv = Papa.unparse(csvData);
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.setAttribute('href', url);
-      link.setAttribute('download', `audit_logs_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const params = new URLSearchParams();
       
-      addToast({
-        title: "Export Successful",
-        description: "Audit logs have been exported successfully.",
-        color: "success",
+      if (searchQuery) params.append('search', searchQuery);
+      if (selectedStatus !== 'all') params.append('status', selectedStatus);
+      if (selectedSeverity !== 'all') params.append('severity', selectedSeverity);
+      if (selectedDepartment !== 'all') params.append('department', selectedDepartment);
+      if (selectedAction !== 'all') params.append('action', selectedAction);
+      
+      const response = await fetch(`http://localhost:8000/api/v1/audit-logs/export?${params.toString()}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('authToken') || sessionStorage.getItem('authToken')}`
+        }
       });
+      
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `audit_logs_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        addToast({
+          title: "Export Successful",
+          description: "Audit logs have been exported successfully.",
+          color: "success",
+        });
+      } else {
+        throw new Error('Export failed');
+      }
     } catch (error) {
       addToast({
         title: "Export Failed",
@@ -283,12 +223,8 @@ export default function AuditLogs() {
   const handleRefreshLogs = async () => {
     setIsRefreshing(true);
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Generate new logs (in real app, this would fetch from API)
-      const newLogs = generateAuditLogs();
-      setAuditLogs(newLogs);
+      await fetchAuditLogs();
+      await fetchStats();
       
       addToast({
         title: "Logs Refreshed",
@@ -314,42 +250,34 @@ export default function AuditLogs() {
   return (
     <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
-              <Icon icon="lucide:shield-check" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Audit Logs</h1>
-              <p className="text-default-600 mt-1">Monitor system activities and security events</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              variant="flat" 
-              startContent={<Icon icon="lucide:refresh-cw" />}
-              onPress={handleRefreshLogs}
-              isLoading={isRefreshing}
-              className="font-medium"
-            >
-              Refresh
-            </Button>
-            <Button 
-              variant="flat" 
-              startContent={<Icon icon="lucide:download" />}
-              onPress={handleExportCSV}
-              isLoading={isExporting}
-              className="font-medium"
-            >
-              Export CSV
-            </Button>
-          </div>
-        </div>
+        {/* Hero Section */}
+        <HeroSection
+          title="Audit Logs"
+          subtitle="Security & Activity Monitoring"
+          description="Monitor system activities and security events. Track user actions, system changes, and maintain comprehensive audit trails for compliance and security purposes."
+          icon="lucide:shield-check"
+          illustration="audit"
+          actions={[
+            {
+              label: "Refresh",
+              icon: "lucide:refresh-cw",
+              onPress: handleRefreshLogs,
+              variant: "flat" as const,
+              isLoading: isRefreshing
+            },
+            {
+              label: "Export CSV",
+              icon: "lucide:download",
+              onPress: handleExportCSV,
+              variant: "flat" as const,
+              isLoading: isExporting
+            }
+          ]}
+        />
         
         {/* Statistics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {stats.map((stat, index) => (
+          {statsDisplay.map((stat, index) => (
             <Card key={index} className="shadow-sm">
               <CardBody className="flex flex-row items-center gap-4">
                 <div className={`p-3 rounded-full ${stat.bgColor}`}>
@@ -370,7 +298,7 @@ export default function AuditLogs() {
             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
               <Input
                 placeholder="Search logs..."
-                value={searchQuery}
+                
                 onChange={(e) => setSearchQuery(e.target.value)}
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
@@ -406,7 +334,7 @@ export default function AuditLogs() {
                 <SelectItem key="all">All Departments</SelectItem>
                 {departments.map(dept => (
                   <SelectItem key={dept}>{dept}</SelectItem>
-                ))}
+                )) as any}
               </Select>
               <Select
                 label="Action"
@@ -417,11 +345,11 @@ export default function AuditLogs() {
                 <SelectItem key="all">All Actions</SelectItem>
                 {uniqueActions.map(action => (
                   <SelectItem key={action}>{action}</SelectItem>
-                ))}
+                )) as any}
               </Select>
               <div className="flex items-end">
                 <div className="text-sm text-default-600">
-                  Showing {filteredLogs.length} of {auditLogs.length} logs
+                  Showing {auditLogs.length} of {totalLogs} logs
                 </div>
               </div>
             </div>
@@ -440,103 +368,112 @@ export default function AuditLogs() {
             </div>
           </CardHeader>
           <CardBody className="pt-0">
-            <Table aria-label="Audit logs table">
-              <TableHeader>
-                <TableColumn>USER</TableColumn>
-                <TableColumn>ACTION</TableColumn>
-                <TableColumn>RESOURCE</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>SEVERITY</TableColumn>
-                <TableColumn>IP ADDRESS</TableColumn>
-                <TableColumn>TIMESTAMP</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {paginatedLogs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar 
-                          name={log.userName}
-                          size="sm"
-                        />
-                        <div>
-                          <p className="font-medium text-foreground">{log.userName}</p>
-                          <p className="text-sm text-default-500">{log.userEmail}</p>
-                          <p className="text-xs text-default-400">{log.department}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium text-foreground">{log.action}</p>
-                        <p className="text-sm text-default-500 max-w-xs truncate">{log.details}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium text-foreground">{log.resource}</p>
-                        <p className="text-sm text-default-500">{log.resourceId}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        size="sm"
-                        color={statusColorMap[log.status] as any}
-                        variant="flat"
-                      >
-                        {log.status}
-                      </Chip>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        size="sm"
-                        color={severityColorMap[log.severity] as any}
-                        variant="flat"
-                      >
-                        {log.severity}
-                      </Chip>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="text-sm font-medium">{log.ipAddress}</p>
-                        <p className="text-xs text-default-500">{log.location}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="text-sm font-medium">{new Date(log.timestamp).toLocaleDateString()}</p>
-                        <p className="text-xs text-default-500">{new Date(log.timestamp).toLocaleTimeString()}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="flat"
-                          onPress={() => {
-                            setSelectedLog(log);
-                            setIsViewModalOpen(true);
-                          }}
-                        >
-                          <Icon icon="lucide:eye" className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            
-            {filteredLogs.length > rowsPerPage && (
-              <div className="flex justify-center mt-4">
-                <Pagination
-                  total={Math.ceil(filteredLogs.length / rowsPerPage)}
-                  page={page}
-                  onChange={setPage}
-                  showControls
-                />
+            {loading ? (
+              <div className="flex justify-center items-center py-8">
+                <Spinner size="lg" />
               </div>
+            ) : (
+              <>
+                <Table aria-label="Audit logs table">
+                  <TableHeader>
+                    <TableColumn>USER</TableColumn>
+                    <TableColumn>ACTION</TableColumn>
+                    <TableColumn>RESOURCE</TableColumn>
+                    <TableColumn>STATUS</TableColumn>
+                    <TableColumn>SEVERITY</TableColumn>
+                    <TableColumn>IP ADDRESS</TableColumn>
+                    <TableColumn>TIMESTAMP</TableColumn>
+                    <TableColumn>ACTIONS</TableColumn>
+                  </TableHeader>
+                  <TableBody>
+                    {auditLogs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar 
+                            name={log.user_name}
+                            size="sm"
+                          />
+                          <div>
+                            <p className="font-medium text-foreground">{log.user_name}</p>
+                            <p className="text-sm text-default-500">{log.user_email}</p>
+                            <p className="text-xs text-default-400">{log.department}</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium text-foreground">{log.action}</p>
+                          <p className="text-sm text-default-500 max-w-xs truncate">{log.details}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium text-foreground">{log.resource}</p>
+                          <p className="text-sm text-default-500">{log.resource_id}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          size="sm"
+                          color={statusColorMap[log.status] as any}
+                          variant="flat"
+                        >
+                          {log.status}
+                        </Chip>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          size="sm"
+                          color={severityColorMap[log.severity] as any}
+                          variant="flat"
+                        >
+                          {log.severity}
+                        </Chip>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="text-sm font-medium">{log.ip_address}</p>
+                          <p className="text-xs text-default-500">{log.location}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="text-sm font-medium">{new Date(log.created_at).toLocaleDateString()}</p>
+                          <p className="text-xs text-default-500">{new Date(log.created_at).toLocaleTimeString()}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant="flat"
+                            onPress={() => {
+                              setSelectedLog(log);
+                              setIsViewModalOpen(true);
+                            }}
+                          >
+                            <Icon icon="lucide:eye" className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-4">
+                  <Pagination
+                    total={totalPages}
+                    page={page}
+                    onChange={setPage}
+                    showControls
+                  />
+                </div>
+              )}
+              </>
             )}
           </CardBody>
         </Card>
@@ -550,12 +487,12 @@ export default function AuditLogs() {
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
                     <Avatar 
-                      name={selectedLog.userName}
+                      name={selectedLog.user_name}
                       size="lg"
                     />
                     <div>
-                      <h3 className="text-xl font-bold">{selectedLog.userName}</h3>
-                      <p className="text-default-600">{selectedLog.userEmail}</p>
+                      <h3 className="text-xl font-bold">{selectedLog.user_name}</h3>
+                      <p className="text-default-600">{selectedLog.user_email}</p>
                       <p className="text-default-600">{selectedLog.department} • {selectedLog.location}</p>
                     </div>
                   </div>
@@ -565,7 +502,7 @@ export default function AuditLogs() {
                       <h4 className="font-semibold mb-2">Action Details</h4>
                       <p><strong>Action:</strong> {selectedLog.action}</p>
                       <p><strong>Resource:</strong> {selectedLog.resource}</p>
-                      <p><strong>Resource ID:</strong> {selectedLog.resourceId}</p>
+                      <p><strong>Resource ID:</strong> {selectedLog.resource_id}</p>
                       <p><strong>Details:</strong> {selectedLog.details}</p>
                     </div>
                     
@@ -581,15 +518,15 @@ export default function AuditLogs() {
                           {selectedLog.severity}
                         </Chip>
                       </p>
-                      <p><strong>IP Address:</strong> {selectedLog.ipAddress}</p>
-                      <p><strong>Session ID:</strong> {selectedLog.sessionId}</p>
+                      <p><strong>IP Address:</strong> {selectedLog.ip_address}</p>
+                      <p><strong>Session ID:</strong> {selectedLog.session_id}</p>
                     </div>
                   </div>
                   
                   <div>
                     <h4 className="font-semibold mb-2">Timestamp</h4>
-                    <p><strong>Date & Time:</strong> {new Date(selectedLog.timestamp).toLocaleString()}</p>
-                    <p><strong>User Agent:</strong> {selectedLog.userAgent}</p>
+                    <p><strong>Date & Time:</strong> {new Date(selectedLog.created_at).toLocaleString()}</p>
+                    <p><strong>User Agent:</strong> {selectedLog.user_agent}</p>
                   </div>
                   
                   {selectedLog.changes && (
@@ -603,23 +540,23 @@ export default function AuditLogs() {
                     </div>
                   )}
                   
-                  {selectedLog.oldValues && (
+                  {selectedLog.old_values && (
                     <div>
                       <h4 className="font-semibold mb-2">Previous Values</h4>
                       <div className="bg-content1 p-4 rounded-lg">
                         <pre className="text-sm text-default-700">
-                          {JSON.stringify(selectedLog.oldValues, null, 2)}
+                          {JSON.stringify(selectedLog.old_values, null, 2)}
                         </pre>
                       </div>
                     </div>
                   )}
                   
-                  {selectedLog.newValues && (
+                  {selectedLog.new_values && (
                     <div>
                       <h4 className="font-semibold mb-2">New Values</h4>
                       <div className="bg-content1 p-4 rounded-lg">
                         <pre className="text-sm text-default-700">
-                          {JSON.stringify(selectedLog.newValues, null, 2)}
+                          {JSON.stringify(selectedLog.new_values, null, 2)}
                         </pre>
                       </div>
                     </div>

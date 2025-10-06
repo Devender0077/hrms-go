@@ -330,7 +330,7 @@ const RecordsPage: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
             <Input
               placeholder="Search employees..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
             />
@@ -342,12 +342,12 @@ const RecordsPage: React.FC = () => {
                 setSelectedEmployee(selected);
               }}
             >
-              <SelectItem key="all" value="all">All Employees</SelectItem>
+              <SelectItem key="all">All Employees</SelectItem>
               {employees.map((emp) => (
-                <SelectItem key={emp.id.toString()} value={emp.id.toString()}>
+                <SelectItem key={emp.id.toString()} >
                   {emp.first_name} {emp.last_name} ({emp.employee_id})
                 </SelectItem>
-              ))}
+              )) as any}
             </Select>
             <Select
               placeholder="Department"
@@ -357,12 +357,12 @@ const RecordsPage: React.FC = () => {
                 setSelectedDepartment(selected);
               }}
             >
-              <SelectItem key="all" value="all">All Departments</SelectItem>
+              <SelectItem key="all">All Departments</SelectItem>
               {departments.map((dept) => (
-                <SelectItem key={dept.name} value={dept.name}>
+                <SelectItem key={dept.name} >
                   {dept.name}
                 </SelectItem>
-              ))}
+              )) as any}
             </Select>
             <Select
               placeholder="Status"
@@ -372,31 +372,31 @@ const RecordsPage: React.FC = () => {
                 setSelectedStatus(selected);
               }}
             >
-              <SelectItem key="all" value="all">All Status</SelectItem>
-              <SelectItem key="present" value="present">Present</SelectItem>
-              <SelectItem key="late" value="late">Late</SelectItem>
-              <SelectItem key="absent" value="absent">Absent</SelectItem>
-              <SelectItem key="leave" value="leave">Leave</SelectItem>
-              <SelectItem key="half-day" value="half-day">Half Day</SelectItem>
+              <SelectItem key="all">All Status</SelectItem>
+              <SelectItem key="present">Present</SelectItem>
+              <SelectItem key="late">Late</SelectItem>
+              <SelectItem key="absent">Absent</SelectItem>
+              <SelectItem key="leave">Leave</SelectItem>
+              <SelectItem key="half-day">Half Day</SelectItem>
             </Select>
             <Input
               type="date"
               placeholder="Specific Date"
-              value={selectedDate}
+              
               onChange={(e) => setSelectedDate(e.target.value)}
             />
             <div className="flex gap-2">
               <Input
                 type="date"
                 placeholder="From Date"
-                value={fromDate}
+                
                 onChange={(e) => setFromDate(e.target.value)}
                 label="From"
               />
               <Input
                 type="date"
                 placeholder="To Date"
-                value={toDate}
+                
                 onChange={(e) => setToDate(e.target.value)}
                 label="To"
               />
@@ -659,7 +659,7 @@ const RecordsPage: React.FC = () => {
                         <label className="text-sm font-medium text-default-700">Check In</label>
                         <Input
                           type="datetime-local"
-                          value={formData.check_in}
+                          
                           onChange={(e) => setFormData({...formData, check_in: e.target.value})}
                           size="sm"
                         />
@@ -668,7 +668,7 @@ const RecordsPage: React.FC = () => {
                         <label className="text-sm font-medium text-default-700">Check Out</label>
                         <Input
                           type="datetime-local"
-                          value={formData.check_out}
+                          
                           onChange={(e) => setFormData({...formData, check_out: e.target.value})}
                           size="sm"
                         />
@@ -686,11 +686,11 @@ const RecordsPage: React.FC = () => {
                           }}
                           size="sm"
                         >
-                          <SelectItem key="present" value="present">Present</SelectItem>
-                          <SelectItem key="late" value="late">Late</SelectItem>
-                          <SelectItem key="absent" value="absent">Absent</SelectItem>
-                          <SelectItem key="leave" value="leave">Leave</SelectItem>
-                          <SelectItem key="half-day" value="half-day">Half Day</SelectItem>
+                          <SelectItem key="present">Present</SelectItem>
+                          <SelectItem key="late">Late</SelectItem>
+                          <SelectItem key="absent">Absent</SelectItem>
+                          <SelectItem key="leave">Leave</SelectItem>
+                          <SelectItem key="half-day">Half Day</SelectItem>
                         </Select>
                       </div>
                       <div>
@@ -698,7 +698,7 @@ const RecordsPage: React.FC = () => {
                         <Input
                           type="number"
                           step="0.1"
-                          value={formData.work_hours.toString()}
+                          
                           onChange={(e) => setFormData({...formData, work_hours: parseFloat(e.target.value) || 0})}
                           size="sm"
                         />
@@ -708,7 +708,7 @@ const RecordsPage: React.FC = () => {
                     <div>
                       <label className="text-sm font-medium text-default-700">Note</label>
                       <Input
-                        value={formData.note}
+                        
                         onChange={(e) => setFormData({...formData, note: e.target.value})}
                         placeholder="Add notes..."
                         size="sm"

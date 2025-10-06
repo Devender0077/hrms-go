@@ -372,7 +372,7 @@ const PoliciesPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-4">
             <Input
               placeholder="Search policies..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
@@ -386,10 +386,10 @@ const PoliciesPage: React.FC = () => {
               }}
               className="w-full lg:w-48"
             >
-              <SelectItem key="all" value="all">All Types</SelectItem>
-              <SelectItem key="general" value="general">General</SelectItem>
-              <SelectItem key="department" value="department">Department</SelectItem>
-              <SelectItem key="employee" value="employee">Employee</SelectItem>
+              <SelectItem key="all">All Types</SelectItem>
+              <SelectItem key="general">General</SelectItem>
+              <SelectItem key="department">Department</SelectItem>
+              <SelectItem key="employee">Employee</SelectItem>
             </Select>
             <Select
               placeholder="Status"
@@ -400,9 +400,9 @@ const PoliciesPage: React.FC = () => {
               }}
               className="w-full lg:w-48"
             >
-              <SelectItem key="all" value="all">All Status</SelectItem>
-              <SelectItem key="active" value="active">Active</SelectItem>
-              <SelectItem key="inactive" value="inactive">Inactive</SelectItem>
+              <SelectItem key="all">All Status</SelectItem>
+              <SelectItem key="active">Active</SelectItem>
+              <SelectItem key="inactive">Inactive</SelectItem>
             </Select>
           </div>
         </CardBody>
@@ -545,7 +545,7 @@ const PoliciesPage: React.FC = () => {
                     <Input
                       label="Policy Name"
                       placeholder="Enter policy name"
-                      value={formData.name}
+                      
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                       isRequired
                     />
@@ -558,16 +558,16 @@ const PoliciesPage: React.FC = () => {
                       }}
                       isRequired
                     >
-                      <SelectItem key="general" value="general">General</SelectItem>
-                      <SelectItem key="department" value="department">Department</SelectItem>
-                      <SelectItem key="employee" value="employee">Employee</SelectItem>
+                      <SelectItem key="general">General</SelectItem>
+                      <SelectItem key="department">Department</SelectItem>
+                      <SelectItem key="employee">Employee</SelectItem>
                     </Select>
                   </div>
 
                   <Textarea
                     label="Description"
                     placeholder="Enter policy description"
-                    value={formData.description}
+                    
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows={3}
                   />
@@ -583,7 +583,7 @@ const PoliciesPage: React.FC = () => {
                       }}
                     >
                       {departments.map((dept) => (
-                        <SelectItem key={dept.id.toString()} value={dept.id.toString()}>
+                        <SelectItem key={dept.id.toString()} >
                           {dept.name}
                         </SelectItem>
                       ))}
@@ -601,7 +601,7 @@ const PoliciesPage: React.FC = () => {
                       }}
                     >
                       {employees.map((emp) => (
-                        <SelectItem key={emp.id.toString()} value={emp.id.toString()}>
+                        <SelectItem key={emp.id.toString()} >
                           {emp.first_name} {emp.last_name} ({emp.employee_id})
                         </SelectItem>
                       ))}
@@ -615,21 +615,21 @@ const PoliciesPage: React.FC = () => {
                       label="Late Arrival Penalty ($)"
                       type="number"
                       step="0.01"
-                      value={formData.late_arrival_penalty.toString()}
+                      
                       onChange={(e) => setFormData({...formData, late_arrival_penalty: parseFloat(e.target.value) || 0})}
                     />
                     <Input
                       label="Early Departure Penalty ($)"
                       type="number"
                       step="0.01"
-                      value={formData.early_departure_penalty.toString()}
+                      
                       onChange={(e) => setFormData({...formData, early_departure_penalty: parseFloat(e.target.value) || 0})}
                     />
                     <Input
                       label="Absent Penalty ($)"
                       type="number"
                       step="0.01"
-                      value={formData.absent_penalty.toString()}
+                      
                       onChange={(e) => setFormData({...formData, absent_penalty: parseFloat(e.target.value) || 0})}
                     />
                   </div>
@@ -639,14 +639,14 @@ const PoliciesPage: React.FC = () => {
                       label="Overtime Rate"
                       type="number"
                       step="0.1"
-                      value={formData.overtime_rate.toString()}
+                      
                       onChange={(e) => setFormData({...formData, overtime_rate: parseFloat(e.target.value) || 1.5})}
                     />
                     <Input
                       label="Max Overtime Hours"
                       type="number"
                       step="0.5"
-                      value={formData.max_overtime_hours.toString()}
+                      
                       onChange={(e) => setFormData({...formData, max_overtime_hours: parseFloat(e.target.value) || 4})}
                     />
                   </div>
@@ -679,7 +679,7 @@ const PoliciesPage: React.FC = () => {
                     <Input
                       label="Policy Name"
                       placeholder="Enter policy name"
-                      value={formData.name}
+                      
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
                       isRequired
                     />
@@ -692,16 +692,16 @@ const PoliciesPage: React.FC = () => {
                       }}
                       isRequired
                     >
-                      <SelectItem key="general" value="general">General</SelectItem>
-                      <SelectItem key="department" value="department">Department</SelectItem>
-                      <SelectItem key="employee" value="employee">Employee</SelectItem>
+                      <SelectItem key="general">General</SelectItem>
+                      <SelectItem key="department">Department</SelectItem>
+                      <SelectItem key="employee">Employee</SelectItem>
                     </Select>
                   </div>
 
                   <Textarea
                     label="Description"
                     placeholder="Enter policy description"
-                    value={formData.description}
+                    
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows={3}
                   />
@@ -717,7 +717,7 @@ const PoliciesPage: React.FC = () => {
                       }}
                     >
                       {departments.map((dept) => (
-                        <SelectItem key={dept.id.toString()} value={dept.id.toString()}>
+                        <SelectItem key={dept.id.toString()} >
                           {dept.name}
                         </SelectItem>
                       ))}
@@ -735,7 +735,7 @@ const PoliciesPage: React.FC = () => {
                       }}
                     >
                       {employees.map((emp) => (
-                        <SelectItem key={emp.id.toString()} value={emp.id.toString()}>
+                        <SelectItem key={emp.id.toString()} >
                           {emp.first_name} {emp.last_name} ({emp.employee_id})
                         </SelectItem>
                       ))}
@@ -749,21 +749,21 @@ const PoliciesPage: React.FC = () => {
                       label="Late Arrival Penalty ($)"
                       type="number"
                       step="0.01"
-                      value={formData.late_arrival_penalty.toString()}
+                      
                       onChange={(e) => setFormData({...formData, late_arrival_penalty: parseFloat(e.target.value) || 0})}
                     />
                     <Input
                       label="Early Departure Penalty ($)"
                       type="number"
                       step="0.01"
-                      value={formData.early_departure_penalty.toString()}
+                      
                       onChange={(e) => setFormData({...formData, early_departure_penalty: parseFloat(e.target.value) || 0})}
                     />
                     <Input
                       label="Absent Penalty ($)"
                       type="number"
                       step="0.01"
-                      value={formData.absent_penalty.toString()}
+                      
                       onChange={(e) => setFormData({...formData, absent_penalty: parseFloat(e.target.value) || 0})}
                     />
                   </div>
@@ -773,14 +773,14 @@ const PoliciesPage: React.FC = () => {
                       label="Overtime Rate"
                       type="number"
                       step="0.1"
-                      value={formData.overtime_rate.toString()}
+                      
                       onChange={(e) => setFormData({...formData, overtime_rate: parseFloat(e.target.value) || 1.5})}
                     />
                     <Input
                       label="Max Overtime Hours"
                       type="number"
                       step="0.5"
-                      value={formData.max_overtime_hours.toString()}
+                      
                       onChange={(e) => setFormData({...formData, max_overtime_hours: parseFloat(e.target.value) || 4})}
                     />
                   </div>

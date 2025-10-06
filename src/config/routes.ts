@@ -14,7 +14,7 @@ import Employees from "../pages/employees";
 import Departments from "../pages/organization/departments";
 import Designations from "../pages/organization/designations";
 import Branches from "../pages/organization/branches";
-import OrganizationChart from "../pages/organization-chart";
+import OrganizationChart from "../pages/organization/org-chart";
 import TimekeepingAttendance from "../pages/timekeeping/attendance";
 import Shifts from "../pages/timekeeping/shifts";
 import Policies from "../pages/timekeeping/policies";
@@ -33,10 +33,12 @@ import Expenses from "../pages/expenses";
 import Roles from "../pages/roles";
 import Settings from "../pages/settings";
 import Profile from "../pages/profile";
-import Reports from "../pages/reports";
+// import Reports from "../pages/reports"; // Page not found
 
 // Import layouts
-import DashboardLayout from "../components/layouts/DashboardLayout";
+import DashboardLayout from "../layouts/dashboard-layout";
+
+import React from 'react';
 
 // Route configurations
 export const protectedRoutes: RouteConfig[] = [
@@ -198,7 +200,7 @@ export const protectedRoutes: RouteConfig[] = [
   },
   {
     path: "/dashboard/reports",
-    component: Reports,
+    component: () => React.createElement('div', null, 'Reports page not implemented'),
     requiredPermissions: ["reports.view"],
     layout: DashboardLayout
   }

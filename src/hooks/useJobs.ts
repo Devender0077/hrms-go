@@ -49,7 +49,7 @@ export const useJobs = () => {
       setError(null);
       const result = await apiRequest('/jobs', {
         method: 'POST',
-        body: jobData,
+        body: JSON.stringify(jobData),
       });
       await loadJobs(); // Reload jobs after creation
       return result;
@@ -65,7 +65,7 @@ export const useJobs = () => {
       setError(null);
       const result = await apiRequest(`/jobs/${id}`, {
         method: 'PUT',
-        body: jobData,
+        body: JSON.stringify(jobData),
       });
       await loadJobs(); // Reload jobs after update
       return result;

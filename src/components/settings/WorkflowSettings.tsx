@@ -1,161 +1,255 @@
-import React from "react";
-import { Input, Select, SelectItem, Divider } from "@heroui/react";
-import { Icon } from "@iconify/react";
+import React from 'react';
+import { Card, CardBody, CardHeader, Switch, Input, Select, SelectItem } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface WorkflowSettingsProps {
-  settings: {
-    leaveApprovalWorkflow: string;
-    expenseApprovalWorkflow: string;
-    recruitmentWorkflow: string;
-    autoApprovalLimit: number;
-    escalationDays: number;
-    reminderFrequency: string;
-    approvalDeadline: number;
-  };
+  settings: Record<string, any>;
   onSettingsChange: (field: string, value: any) => void;
 }
 
 export default function WorkflowSettings({ settings, onSettingsChange }: WorkflowSettingsProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-primary-100 rounded-lg">
-          <Icon icon="lucide:workflow" className="text-primary-600 text-lg" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Workflow Settings</h2>
-          <p className="text-default-600">Configure approval workflows and automation</p>
-        </div>
-      </div>
-      
-      <div className="space-y-6">
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Approval Workflows</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Select
-              label="Leave Approval Workflow"
-              selectedKeys={[settings.leaveApprovalWorkflow]}
-              onSelectionChange={(keys) => onSettingsChange("leaveApprovalWorkflow", Array.from(keys)[0])}
-            >
-              <SelectItem key="manager" value="manager">Direct Manager</SelectItem>
-              <SelectItem key="hr" value="hr">HR Department</SelectItem>
-              <SelectItem key="both" value="both">Manager + HR</SelectItem>
-              <SelectItem key="auto" value="auto">Auto Approval</SelectItem>
-            </Select>
-            
-            <Select
-              label="Expense Approval Workflow"
-              selectedKeys={[settings.expenseApprovalWorkflow]}
-              onSelectionChange={(keys) => onSettingsChange("expenseApprovalWorkflow", Array.from(keys)[0])}
-            >
-              <SelectItem key="manager" value="manager">Direct Manager</SelectItem>
-              <SelectItem key="finance" value="finance">Finance Department</SelectItem>
-              <SelectItem key="both" value="both">Manager + Finance</SelectItem>
-              <SelectItem key="auto" value="auto">Auto Approval</SelectItem>
-            </Select>
-            
-            <Select
-              label="Recruitment Workflow"
-              selectedKeys={[settings.recruitmentWorkflow]}
-              onSelectionChange={(keys) => onSettingsChange("recruitmentWorkflow", Array.from(keys)[0])}
-            >
-              <SelectItem key="hr" value="hr">HR Department</SelectItem>
-              <SelectItem key="manager" value="manager">Hiring Manager</SelectItem>
-              <SelectItem key="both" value="both">HR + Manager</SelectItem>
-              <SelectItem key="committee" value="committee">Hiring Committee</SelectItem>
-            </Select>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Leave Approval Workflow */}
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+              <Icon icon="lucide:calendar-x" className="text-primary-600 dark:text-primary-400 text-xl" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground">Leave Approval Workflow</h3>
           </div>
-        </div>
-
-        <Divider />
-
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Auto Approval Settings</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Input
-              label="Auto Approval Limit ($)"
-              type="number"
-              placeholder="100"
-              value={settings.autoApprovalLimit.toString()}
-              onValueChange={(value) => onSettingsChange("autoApprovalLimit", parseInt(value))}
-              description="Expenses under this amount will be auto-approved"
-            />
-            
-            <Input
-              label="Approval Deadline (days)"
-              type="number"
-              placeholder="5"
-              value={settings.approvalDeadline.toString()}
-              onValueChange={(value) => onSettingsChange("approvalDeadline", parseInt(value))}
-              description="Number of days to approve requests"
+        </CardHeader>
+        <CardBody className="space-y-4 sm:space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-default-50 dark:bg-default-100/50 rounded-lg">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground">Auto Approve Leave Requests</p>
+              <p className="text-xs text-default-500 dark:text-default-400">Automatically approve leave requests under specified conditions</p>
+            </div>
+            <Switch
+              isSelected={settings.leaveApproval?.autoApprove === true || settings.leaveApproval?.autoApprove === 'true'}
+              onValueChange={(value) => onSettingsChange('leaveApproval', {
+                ...settings.leaveApproval,
+                autoApprove: value
+              })}
+              color="primary"
             />
           </div>
-        </div>
 
-        <Divider />
+          {settings.leaveApproval?.autoApprove && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Input
+                label="Max Auto-Approve Days"
+                type="number"
+                
+                onChange={(e) => onSettingsChange('leaveApproval', {
+                  ...settings.leaveApproval,
+                  maxAutoApproveDays: parseInt(e.target.value) || 1
+                })}
+                placeholder="1"
+                startContent={<Icon icon="lucide:calendar-days" className="text-default-400" />}
+              />
+            </div>
+          )}
 
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Escalation Settings</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Input
-              label="Escalation Days"
-              type="number"
-              placeholder="3"
-              value={settings.escalationDays.toString()}
-              onValueChange={(value) => onSettingsChange("escalationDays", parseInt(value))}
-              description="Days before escalating to next level"
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Require Manager Approval</p>
+              <p className="text-xs text-default-500">All leave requests must be approved by direct manager</p>
+            </div>
+            <Switch
+              isSelected={settings.leaveApproval?.requireManagerApproval === true || settings.leaveApproval?.requireManagerApproval === 'true'}
+              onValueChange={(value) => onSettingsChange('leaveApproval', {
+                ...settings.leaveApproval,
+                requireManagerApproval: value
+              })}
             />
-            
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Require HR Approval</p>
+              <p className="text-xs text-default-500">All leave requests must be approved by HR department</p>
+            </div>
+            <Switch
+              isSelected={settings.leaveApproval?.requireHRApproval === true || settings.leaveApproval?.requireHRApproval === 'true'}
+              onValueChange={(value) => onSettingsChange('leaveApproval', {
+                ...settings.leaveApproval,
+                requireHRApproval: value
+              })}
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Attendance Approval Workflow */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:clock" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Attendance Approval Workflow</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Auto Approve Attendance</p>
+              <p className="text-xs text-default-500">Automatically approve attendance records within tolerance</p>
+            </div>
+            <Switch
+              isSelected={settings.attendanceApproval?.autoApprove === true || settings.attendanceApproval?.autoApprove === 'true'}
+              onValueChange={(value) => onSettingsChange('attendanceApproval', {
+                ...settings.attendanceApproval,
+                autoApprove: value
+              })}
+            />
+          </div>
+
+          {settings.attendanceApproval?.autoApprove && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Tolerance Minutes"
+                type="number"
+                
+                onChange={(e) => onSettingsChange('attendanceApproval', {
+                  ...settings.attendanceApproval,
+                  toleranceMinutes: parseInt(e.target.value) || 15
+                })}
+                placeholder="15"
+                startContent={<Icon icon="lucide:clock" className="text-default-400" />}
+              />
+            </div>
+          )}
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Require Manager Approval</p>
+              <p className="text-xs text-default-500">Attendance corrections require manager approval</p>
+            </div>
+            <Switch
+              isSelected={settings.attendanceApproval?.requireManagerApproval === true || settings.attendanceApproval?.requireManagerApproval === 'true'}
+              onValueChange={(value) => onSettingsChange('attendanceApproval', {
+                ...settings.attendanceApproval,
+                requireManagerApproval: value
+              })}
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Expense Approval Workflow */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:receipt" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Expense Approval Workflow</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Auto Approve Expenses</p>
+              <p className="text-xs text-default-500">Automatically approve expenses under specified amount</p>
+            </div>
+            <Switch
+              isSelected={settings.expenseApproval?.autoApprove === true || settings.expenseApproval?.autoApprove === 'true'}
+              onValueChange={(value) => onSettingsChange('expenseApproval', {
+                ...settings.expenseApproval,
+                autoApprove: value
+              })}
+            />
+          </div>
+
+          {settings.expenseApproval?.autoApprove && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                label="Max Auto-Approve Amount"
+                type="number"
+                
+                onChange={(e) => onSettingsChange('expenseApproval', {
+                  ...settings.expenseApproval,
+                  maxAutoApproveAmount: parseFloat(e.target.value) || 100
+                })}
+                placeholder="100"
+                startContent={<Icon icon="lucide:dollar-sign" className="text-default-400" />}
+              />
+            </div>
+          )}
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Require Manager Approval</p>
+              <p className="text-xs text-default-500">All expenses require manager approval</p>
+            </div>
+            <Switch
+              isSelected={settings.expenseApproval?.requireManagerApproval === true || settings.expenseApproval?.requireManagerApproval === 'true'}
+              onValueChange={(value) => onSettingsChange('expenseApproval', {
+                ...settings.expenseApproval,
+                requireManagerApproval: value
+              })}
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* General Workflow Settings */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:settings" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">General Workflow Settings</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Select
-              label="Reminder Frequency"
-              selectedKeys={[settings.reminderFrequency]}
-              onSelectionChange={(keys) => onSettingsChange("reminderFrequency", Array.from(keys)[0])}
+              label="Default Approval Timeout"
+              placeholder="Select timeout period"
+              selectedKeys={settings.defaultApprovalTimeout ? [settings.defaultApprovalTimeout] : ['7']}
+              onSelectionChange={(keys) => onSettingsChange('defaultApprovalTimeout', Array.from(keys)[0])}
             >
-              <SelectItem key="daily" value="daily">Daily</SelectItem>
-              <SelectItem key="twice_daily" value="twice_daily">Twice Daily</SelectItem>
-              <SelectItem key="weekly" value="weekly">Weekly</SelectItem>
-              <SelectItem key="custom" value="custom">Custom</SelectItem>
+              <SelectItem key="1">1 Day</SelectItem>
+              <SelectItem key="3">3 Days</SelectItem>
+              <SelectItem key="7">7 Days</SelectItem>
+              <SelectItem key="14">14 Days</SelectItem>
+              <SelectItem key="30">30 Days</SelectItem>
+            </Select>
+
+            <Select
+              label="Escalation Level"
+              placeholder="Select escalation level"
+              selectedKeys={settings.escalationLevel ? [settings.escalationLevel] : ['manager']}
+              onSelectionChange={(keys) => onSettingsChange('escalationLevel', Array.from(keys)[0])}
+            >
+              <SelectItem key="manager">Manager</SelectItem>
+              <SelectItem key="hr">HR Department</SelectItem>
+              <SelectItem key="admin">Administrator</SelectItem>
             </Select>
           </div>
-        </div>
 
-        <Divider />
-
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Workflow Rules</h3>
-          <div className="space-y-4">
-            <div className="p-4 bg-content1 rounded-lg">
-              <h4 className="font-medium mb-2">Leave Request Rules</h4>
-              <ul className="text-sm text-default-600 space-y-1">
-                <li>• Requests under 3 days: Auto-approved for employees with good attendance</li>
-                <li>• Requests over 7 days: Require manager and HR approval</li>
-                <li>• Emergency leave: Can be approved by any manager</li>
-                <li>• Holiday requests: First come, first served basis</li>
-              </ul>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Email Notifications</p>
+              <p className="text-xs text-default-500">Send email notifications for workflow actions</p>
             </div>
-            
-            <div className="p-4 bg-content1 rounded-lg">
-              <h4 className="font-medium mb-2">Expense Claim Rules</h4>
-              <ul className="text-sm text-default-600 space-y-1">
-                <li>• Expenses under $50: Auto-approved</li>
-                <li>• Expenses $50-$500: Manager approval required</li>
-                <li>• Expenses over $500: Finance department approval required</li>
-                <li>• Travel expenses: Require pre-approval for amounts over $200</li>
-              </ul>
-            </div>
-            
-            <div className="p-4 bg-content1 rounded-lg">
-              <h4 className="font-medium mb-2">Recruitment Rules</h4>
-              <ul className="text-sm text-default-600 space-y-1">
-                <li>• Junior positions: HR screening + Hiring manager interview</li>
-                <li>• Senior positions: HR + Manager + Team lead interviews</li>
-                <li>• Executive positions: Full hiring committee review</li>
-                <li>• Internal transfers: Manager approval only</li>
-              </ul>
-            </div>
+            <Switch
+              isSelected={settings.enableEmailNotifications === true || settings.enableEmailNotifications === 'true'}
+              onValueChange={(value) => onSettingsChange('enableEmailNotifications', value)}
+            />
           </div>
-        </div>
-      </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable SMS Notifications</p>
+              <p className="text-xs text-default-500">Send SMS notifications for urgent approvals</p>
+            </div>
+            <Switch
+              isSelected={settings.enableSMSNotifications === true || settings.enableSMSNotifications === 'true'}
+              onValueChange={(value) => onSettingsChange('enableSMSNotifications', value)}
+            />
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }

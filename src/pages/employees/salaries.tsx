@@ -148,9 +148,11 @@ const EmployeeSalariesPage: React.FC = () => {
     const totalSalaries = salaries.length;
     const activeSalaries = salaries.filter(s => s.status === 'active').length;
     const totalPayroll = salaries.reduce((sum, s) => {
-      const earnings = s.components.filter(c => c.component_type === 'earning').reduce((sum, c) => sum + c.amount, 0);
-      const deductions = s.components.filter(c => c.component_type === 'deduction').reduce((sum, c) => sum + c.amount, 0);
-      return sum + s.basic_salary + earnings - deductions;
+      // Handle cases where components might be undefined or null
+      const components = s.components || [];
+      const earnings = components.filter(c => c.component_type === 'earning').reduce((sum, c) => sum + (c.amount || 0), 0);
+      const deductions = components.filter(c => c.component_type === 'deduction').reduce((sum, c) => sum + (c.amount || 0), 0);
+      return sum + (s.basic_salary || 0) + earnings - deductions;
     }, 0);
     const averageSalary = totalSalaries > 0 ? totalPayroll / totalSalaries : 0;
 
@@ -252,7 +254,7 @@ const EmployeeSalariesPage: React.FC = () => {
         : '/employees/salaries';
       const method = editingSalary ? 'PUT' : 'POST';
       
-      const response = await apiRequest(url, method, salaryData);
+      const response = await apiRequest(url, { method, body: JSON.stringify(salaryData) });
       if (response.success) {
         await fetchSalaries();
         onClose();
@@ -280,9 +282,12 @@ const EmployeeSalariesPage: React.FC = () => {
   const handleToggleStatus = async (salary: EmployeeSalary) => {
     try {
       const newStatus = salary.status === 'active' ? 'inactive' : 'active';
-      const response = await apiRequest(`/employees/salaries/${salary.id}`, 'PUT', {
-        ...salary,
-        status: newStatus
+      const response = await apiRequest(`/employees/salaries/${salary.id}`, { 
+        method: 'PUT', 
+        body: JSON.stringify({
+          ...salary,
+          status: newStatus
+        })
       });
       if (response.success) {
         await fetchSalaries();
@@ -293,13 +298,13 @@ const EmployeeSalariesPage: React.FC = () => {
   };
 
   const handleAddComponent = (component: SalaryComponent) => {
-    const existingIndex = formData.components.findIndex(c => c.component_id === component.id);
+    const existingIndex = (formData.components || []).findIndex(c => c.component_id === component.id);
     if (existingIndex >= 0) {
       // Update existing component
-      const updatedComponents = [...formData.components];
+      const updatedComponents = [...(formData.components || [])];
       updatedComponents[existingIndex] = {
         ...updatedComponents[existingIndex],
-        amount: parseFloat(component.default_amount) || 0
+        amount: parseFloat(component.default_amount?.toString() || '0') || 0
       };
       setFormData({ ...formData, components: updatedComponents });
     } else {
@@ -308,23 +313,23 @@ const EmployeeSalariesPage: React.FC = () => {
         component_id: component.id,
         component_name: component.name,
         component_type: component.type,
-        amount: parseFloat(component.default_amount) || 0,
+        amount: parseFloat(component.default_amount?.toString() || '0') || 0,
         is_taxable: component.is_taxable,
         is_mandatory: component.is_mandatory
       };
-      setFormData({ ...formData, components: [...formData.components, newComponent] });
+      setFormData({ ...formData, components: [...(formData.components || []), newComponent] });
     }
   };
 
   const handleUpdateComponentAmount = (componentId: number, amount: number) => {
-    const updatedComponents = formData.components.map(c => 
+    const updatedComponents = (formData.components || []).map(c => 
       c.component_id === componentId ? { ...c, amount } : c
     );
     setFormData({ ...formData, components: updatedComponents });
   };
 
   const handleRemoveComponent = (componentId: number) => {
-    const updatedComponents = formData.components.filter(c => c.component_id !== componentId);
+    const updatedComponents = (formData.components || []).filter(c => c.component_id !== componentId);
     setFormData({ ...formData, components: updatedComponents });
   };
 
@@ -344,19 +349,21 @@ const EmployeeSalariesPage: React.FC = () => {
   };
 
   const calculateNetSalary = (salary: EmployeeSalary) => {
-    const earnings = salary.components.filter(c => c.component_type === 'earning').reduce((sum, c) => sum + c.amount, 0);
-    const deductions = salary.components.filter(c => c.component_type === 'deduction').reduce((sum, c) => sum + c.amount, 0);
-    return salary.basic_salary + earnings - deductions;
+    const components = salary.components || [];
+    const earnings = components.filter(c => c.component_type === 'earning').reduce((sum, c) => sum + (c.amount || 0), 0);
+    const deductions = components.filter(c => c.component_type === 'deduction').reduce((sum, c) => sum + (c.amount || 0), 0);
+    return (salary.basic_salary || 0) + earnings - deductions;
   };
 
   const calculateFormNetSalary = () => {
-    const earnings = formData.components.filter(c => c.component_type === 'earning').reduce((sum, c) => sum + c.amount, 0);
-    const deductions = formData.components.filter(c => c.component_type === 'deduction').reduce((sum, c) => sum + c.amount, 0);
-    return parseFloat(formData.basic_salary) + earnings - deductions;
+    const components = formData.components || [];
+    const earnings = components.filter(c => c.component_type === 'earning').reduce((sum, c) => sum + (c.amount || 0), 0);
+    const deductions = components.filter(c => c.component_type === 'deduction').reduce((sum, c) => sum + (c.amount || 0), 0);
+    return parseFloat(formData.basic_salary || '0') + earnings - deductions;
   };
 
   const availableComponents = salaryComponents.filter(component => 
-    component.is_active && !formData.components.some(c => c.component_id === component.id)
+    component.is_active && !(formData.components || []).some(c => c.component_id === component.id)
   );
 
   if (loading) {
@@ -468,7 +475,7 @@ const EmployeeSalariesPage: React.FC = () => {
               <Input
                 label="Search"
                 placeholder="Search by employee name or ID..."
-                value={filters.searchQuery}
+                
                 onChange={(e) => setFilters({...filters, searchQuery: e.target.value})}
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
@@ -481,18 +488,17 @@ const EmployeeSalariesPage: React.FC = () => {
                   setFilters({...filters, selectedEmployee: selected || "all"});
                 }}
               >
-                <SelectItem key="all" value="all" textValue="All Employees">
+                <SelectItem key="all" textValue="All Employees">
                   All Employees
                 </SelectItem>
                 {employees.map((employee) => (
                   <SelectItem 
                     key={employee.id.toString()} 
-                    value={employee.id.toString()}
                     textValue={`${employee.first_name} ${employee.last_name} (${employee.employee_id})`}
                   >
                     {employee.first_name} {employee.last_name} ({employee.employee_id})
                   </SelectItem>
-                ))}
+                )) as any}
               </Select>
               <Select
                 label="Filter by Status"
@@ -503,13 +509,13 @@ const EmployeeSalariesPage: React.FC = () => {
                   setFilters({...filters, selectedStatus: selected || "all"});
                 }}
               >
-                <SelectItem key="all" value="all" textValue="All Statuses">
+                <SelectItem key="all" textValue="All Statuses">
                   All Statuses
                 </SelectItem>
-                <SelectItem key="active" value="active" textValue="Active">
+                <SelectItem key="active" textValue="Active">
                   Active
                 </SelectItem>
-                <SelectItem key="inactive" value="inactive" textValue="Inactive">
+                <SelectItem key="inactive" textValue="Inactive">
                   Inactive
                 </SelectItem>
               </Select>
@@ -553,7 +559,7 @@ const EmployeeSalariesPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {salary.components.slice(0, 2).map((component) => (
+                        {(salary.components || []).slice(0, 2).map((component) => (
                           <Badge
                             key={component.component_id}
                             content={formatCurrency(component.amount)}
@@ -570,9 +576,9 @@ const EmployeeSalariesPage: React.FC = () => {
                             </Chip>
                           </Badge>
                         ))}
-                        {salary.components.length > 2 && (
+                        {(salary.components || []).length > 2 && (
                           <Chip size="sm" variant="flat" color="default">
-                            +{salary.components.length - 2} more
+                            +{(salary.components || []).length - 2} more
                           </Chip>
                         )}
                       </div>
@@ -591,7 +597,7 @@ const EmployeeSalariesPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Icon icon="lucide:calendar" className="text-default-400" size={16} />
+                        <Icon icon="lucide:calendar" className="text-default-400 w-4 h-4" />
                         {new Date(salary.effective_date).toLocaleDateString()}
                       </div>
                     </TableCell>
@@ -692,7 +698,7 @@ const EmployeeSalariesPage: React.FC = () => {
                     {employees.map((employee) => (
                       <SelectItem 
                         key={employee.id.toString()} 
-                        value={employee.id.toString()}
+                        
                         textValue={`${employee.first_name} ${employee.last_name} (${employee.employee_id})`}
                       >
                         {employee.first_name} {employee.last_name} ({employee.employee_id})
@@ -711,7 +717,7 @@ const EmployeeSalariesPage: React.FC = () => {
                       label="Basic Salary"
                       placeholder="Enter basic salary"
                       type="number"
-                      value={formData.basic_salary}
+                      
                       onChange={(e) => setFormData({ ...formData, basic_salary: e.target.value })}
                       startContent="$"
                       isRequired
@@ -752,7 +758,7 @@ const EmployeeSalariesPage: React.FC = () => {
                         {availableComponents.map((component) => (
                           <SelectItem 
                             key={component.id.toString()} 
-                            value={component.id.toString()}
+                            
                             textValue={component.name}
                           >
                             {component.name} ({component.type}) - {formatCurrency(component.default_amount)}
@@ -763,10 +769,10 @@ const EmployeeSalariesPage: React.FC = () => {
                   )}
 
                   {/* Selected Components */}
-                  {formData.components.length > 0 && (
+                  {(formData.components || []).length > 0 && (
                     <div className="space-y-3">
                       <h4 className="font-medium">Selected Components:</h4>
-                      {formData.components.map((component) => (
+                      {(formData.components || []).map((component) => (
                         <div key={component.component_id} className="flex items-center gap-3 p-3 bg-content2 rounded-lg">
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
@@ -791,7 +797,7 @@ const EmployeeSalariesPage: React.FC = () => {
                           </div>
                           <Input
                             type="number"
-                            value={component.amount.toString()}
+                            
                             onChange={(e) => handleUpdateComponentAmount(component.component_id, parseFloat(e.target.value) || 0)}
                             startContent="$"
                             size="sm"
@@ -834,7 +840,7 @@ const EmployeeSalariesPage: React.FC = () => {
                   <Input
                     label="Effective Date"
                     type="date"
-                    value={formData.effective_date}
+                    
                     onChange={(e) => setFormData({ ...formData, effective_date: e.target.value })}
                     isRequired
                   />
@@ -910,12 +916,12 @@ const EmployeeSalariesPage: React.FC = () => {
                   <Divider />
 
                   {/* Salary Components */}
-                  {selectedSalary.components.length > 0 && (
+                  {(selectedSalary.components || []).length > 0 && (
                     <>
                       <div>
                         <h3 className="text-lg font-semibold mb-3">Salary Components</h3>
                         <div className="space-y-3">
-                          {selectedSalary.components.map((component) => (
+                          {(selectedSalary.components || []).map((component) => (
                             <div key={component.component_id} className="flex items-center justify-between p-3 bg-content2 rounded-lg">
                               <div className="flex items-center gap-3">
                                 <Chip
@@ -1031,7 +1037,7 @@ const EmployeeSalariesPage: React.FC = () => {
                           <span>Basic Salary</span>
                           <span className="font-semibold text-success-600">+{formatCurrency(selectedSalary.basic_salary)}</span>
                         </div>
-                        {selectedSalary.components.filter(c => c.component_type === 'earning').map((component) => (
+                        {(selectedSalary.components || []).filter(c => c.component_type === 'earning').map((component) => (
                           <div key={component.component_id} className="flex justify-between items-center p-2 bg-success-50 dark:bg-success-900/20 rounded">
                             <span>{component.component_name}</span>
                             <span className="font-semibold text-success-600">+{formatCurrency(component.amount)}</span>
@@ -1041,11 +1047,11 @@ const EmployeeSalariesPage: React.FC = () => {
                     </div>
 
                     {/* Deductions */}
-                    {selectedSalary.components.filter(c => c.component_type === 'deduction').length > 0 && (
+                    {(selectedSalary.components || []).filter(c => c.component_type === 'deduction').length > 0 && (
                       <div className="mb-4">
                         <h4 className="font-medium text-danger-600 mb-2">Deductions</h4>
                         <div className="space-y-2">
-                          {selectedSalary.components.filter(c => c.component_type === 'deduction').map((component) => (
+                          {(selectedSalary.components || []).filter(c => c.component_type === 'deduction').map((component) => (
                             <div key={component.component_id} className="flex justify-between items-center p-2 bg-danger-50 dark:bg-danger-900/20 rounded">
                               <span>{component.component_name}</span>
                               <span className="font-semibold text-danger-600">-{formatCurrency(component.amount)}</span>

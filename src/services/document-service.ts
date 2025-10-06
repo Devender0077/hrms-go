@@ -48,7 +48,7 @@ class DocumentService {
   private baseUrl: string;
 
   constructor() {
-    this.baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+    this.baseUrl = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8000/api';
   }
 
   /**
@@ -199,7 +199,7 @@ class DocumentService {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        body: formData,
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
@@ -350,6 +350,7 @@ class DocumentService {
         employeeName,
         position,
         department,
+        startDate: new Date().toISOString().split('T')[0],
         companyName: branding.companyName,
         hrEmail: branding.email,
         hrPhone: branding.phone,

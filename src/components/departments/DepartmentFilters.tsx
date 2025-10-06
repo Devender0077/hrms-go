@@ -33,7 +33,7 @@ const DepartmentFilters: React.FC<DepartmentFiltersProps> = ({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <Input
             placeholder="Search departments..."
-            value={searchQuery}
+            
             onChange={(e) => setSearchQuery(e.target.value)}
             startContent={<Icon icon="lucide:search" className="text-default-400" />}
             className="max-w-xs"

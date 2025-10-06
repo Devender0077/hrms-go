@@ -268,35 +268,35 @@ export default function TimesheetReport() {
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <input
                 placeholder="Search..."
-                value={searchQuery}
+                
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <select
-                value={selectedDepartment}
+                
                 onChange={(e) => setSelectedDepartment(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
+                  <option key={dept} >{dept}</option>
                 ))}
               </select>
               <select
-                value={selectedProject}
+                
                 onChange={(e) => setSelectedProject(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {projects.map(project => (
-                  <option key={project} value={project}>{project}</option>
+                  <option key={project} >{project}</option>
                 ))}
               </select>
               <select
-                value={selectedStatus}
+                
                 onChange={(e) => setSelectedStatus(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {statuses.map(status => (
-                  <option key={status} value={status}>{status}</option>
+                  <option key={status} >{status}</option>
                 ))}
               </select>
               <div className="flex items-end">

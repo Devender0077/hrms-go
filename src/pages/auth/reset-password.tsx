@@ -74,7 +74,7 @@ export default function ResetPassword() {
   // Redirect to login if no token is provided
   React.useEffect(() => {
     if (!token) {
-      navigate.push("/login");
+        navigate("/login");
     }
   }, [token, navigate]);
 
@@ -115,7 +115,7 @@ export default function ResetPassword() {
                   label="New Password"
                   placeholder="Enter new password"
                   type="password"
-                  value={password}
+                  
                   onValueChange={setPassword}
                   startContent={
                     <Icon icon="lucide:lock" className="text-default-400" />
@@ -127,7 +127,7 @@ export default function ResetPassword() {
                   label="Confirm Password"
                   placeholder="Confirm new password"
                   type="password"
-                  value={confirmPassword}
+                  
                   onValueChange={setConfirmPassword}
                   startContent={
                     <Icon icon="lucide:lock" className="text-default-400" />
@@ -170,7 +170,7 @@ export default function ResetPassword() {
                   </p>
                   <Button
                     color="primary"
-                    onPress={() => navigate.push("/login")}
+                    onPress={() => navigate("/login")}
                     className="rounded-lg"
                   >
                     Back to Login

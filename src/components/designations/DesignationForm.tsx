@@ -43,7 +43,7 @@ const DesignationForm: React.FC<DesignationFormProps> = ({
       <Input
         label="Designation Name"
         placeholder="Enter designation name"
-        value={formData.name}
+        
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
         isRequired
         aria-label="Designation Name"
@@ -63,7 +63,7 @@ const DesignationForm: React.FC<DesignationFormProps> = ({
         aria-label="Department"
       >
         {departments.map((dept) => (
-          <SelectItem key={dept.id.toString()} value={dept.id.toString()} textValue={dept.name}>
+          <SelectItem key={dept.id.toString()} textValue={dept.name}>
             {dept.name}
           </SelectItem>
         ))}
@@ -72,7 +72,7 @@ const DesignationForm: React.FC<DesignationFormProps> = ({
       <Textarea
         label="Description"
         placeholder="Enter designation description"
-        value={formData.description}
+        
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         rows={3}
         aria-label="Description"

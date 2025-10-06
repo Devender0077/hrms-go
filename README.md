@@ -1,326 +1,343 @@
-# 🏢 HRMS GO - Human Resource Management System
+# 🏢 HRMS HUI v1 - Enterprise HR Management System
 
-A comprehensive, modern Human Resource Management System built with React, TypeScript, and HeroUI. This system provides complete HR functionality from employee onboarding to performance management with a clean, production-ready codebase.
+A comprehensive, modern Human Resource Management System built with React, TypeScript, Node.js, and MySQL. Features a modular architecture, role-based access control, and a beautiful responsive UI.
 
 ## ✨ Features
 
-### 🎯 Core HR Management
-- **Employee Management** - Complete employee lifecycle management with reporting hierarchy
-- **Department & Designation Management** - Organizational structure management
-- **Branch Management** - Multi-location support
-- **User Management** - Role-based access control with granular permissions
-- **Organization Chart** - Interactive organizational hierarchy with modern UI components
+### 🎯 Core HR Modules
+- **Employee Management** - Complete employee lifecycle management
+- **User Management** - Role-based access control with permissions
+- **Organization Chart** - Interactive hierarchical organization view
+- **Leave Management** - Comprehensive leave tracking and approval workflows
+- **Attendance & Timekeeping** - Time tracking with shift management
+- **Payroll Processing** - Salary management and payslip generation
+- **Recruitment** - Job postings, candidate management, and interviews
+- **Task Management** - Project and task assignment system
+- **Performance Reviews** - Goal setting and performance evaluation
+- **Asset Management** - Company asset tracking and assignments
+- **Expense Management** - Employee expense tracking and approval
+- **Document Management** - Centralized document storage and management
+- **Calendar & Events** - Company calendar with event management
+- **Reports & Analytics** - Comprehensive reporting dashboard
 
-### ⏰ Time & Attendance
-- **Attendance Tracking** - Location-based check-in/out with IP tracking
-- **Leave Management** - Comprehensive leave request and approval system
-- **Timesheet Management** - Project-based time tracking
-- **Holiday Management** - Company holiday calendar
-- **Shift Management** - Flexible shift scheduling and assignments
-- **Attendance Policies** - Configurable attendance rules and regulations
+### 🎨 Modern UI/UX
+- **Responsive Design** - Works perfectly on desktop, tablet, and mobile
+- **Dark/Light Mode** - Beautiful theme switching with system preference detection
+- **Modern Components** - Built with HeroUI and TailwindCSS
+- **Animations** - Smooth transitions and micro-interactions
+- **Accessibility** - WCAG compliant with keyboard navigation support
 
-### 💰 Payroll & Finance
-- **Payroll Management** - Complete payroll processing with PDF generation
-- **Salary Components** - Flexible salary component management (earnings, deductions)
-- **Employee Salaries** - Individual salary management with component calculations
-- **Payslips** - Automated payslip generation and distribution
-- **Expense Management** - Employee expense claims and approvals
-- **Financial Reports** - Income vs Expense, Account statements
+### 🏗️ Technical Architecture
+- **Modular Backend** - 17 focused route modules with clean separation
+- **Modular Database** - Schema split into 8 domain-specific files
+- **Migration System** - Comprehensive database migration management
+- **API-First Design** - RESTful APIs with proper error handling
+- **Type Safety** - Full TypeScript implementation
+- **Security** - JWT authentication, role-based permissions, audit logging
 
-### 🎯 Recruitment
-- **Job Postings** - Job creation and management
-- **Candidate Management** - Application tracking and resume management
-- **Interview Scheduling** - Interview calendar and feedback system
-- **Recruitment Dashboard** - Complete recruitment pipeline
-
-### 📊 Performance Management
-- **Goal Setting** - Employee goal tracking and milestones
-- **Performance Reviews** - Comprehensive review system
-- **360-Degree Feedback** - Multi-source performance evaluation
-- **Performance Analytics** - Performance metrics and insights
-
-### 🏢 Asset Management
-- **Asset Tracking** - Complete asset inventory management
-- **Asset Assignments** - Employee asset assignments and tracking
-- **Maintenance Scheduling** - Asset maintenance and warranty tracking
-- **Asset Reports** - Asset utilization and depreciation reports
-
-### 📋 Reports & Analytics
-- **Income vs Expense Reports** - Financial performance analysis
-- **Monthly Attendance Reports** - Attendance patterns and trends
-- **Leave Reports** - Leave utilization and patterns
-- **Payroll Reports** - Salary and compensation analysis
-- **Timesheet Reports** - Project time tracking and productivity
-- **Account Statements** - Financial transaction history
-
-### ⚙️ System Administration
-- **Settings Management** - Comprehensive system configuration
-- **Role & Permission Management** - Granular access control
-- **Audit Logging** - Complete system activity tracking
-- **Document Management** - Company document and policy management
-- **HR System Setup** - System configuration and setup
-
-### 🔐 Security & Compliance
-- **Role-Based Access Control** - Granular permission system
-- **Audit Trail** - Complete activity logging
-- **Data Encryption** - Secure data handling
-- **Compliance Reporting** - Regulatory compliance features
-
-## 🛠️ Technology Stack
-
-### Frontend
-- **React 18** - Modern React with hooks and functional components
-- **TypeScript** - Type-safe development
-- **HeroUI** - Modern UI component library with custom theme
-- **Tailwind CSS** - Utility-first CSS framework
-- **Framer Motion** - Smooth animations and transitions
-- **React Router** - Client-side routing
-- **React Context** - State management
-
-### Backend
-- **Node.js** - Server-side JavaScript runtime
-- **Express.js** - Web application framework
-- **MySQL** - Relational database management
-- **JWT** - JSON Web Token authentication
-- **bcrypt** - Password hashing
-
-### Development Tools
-- **Vite** - Fast build tool and development server
-- **ESLint** - Code linting and quality
-- **Prettier** - Code formatting
-- **TypeScript** - Static type checking
-
-### Libraries & Integrations
-- **Iconify** - Comprehensive icon library
-- **Papa Parse** - CSV parsing and generation
-- **jsPDF** - PDF generation
-- **html2canvas** - HTML to canvas conversion
-- **Recharts** - Data visualization and charts
-- **React Org Chart** - Organization chart visualization
-
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn package manager
-- MySQL database
-- Git
+- Node.js 18+ 
+- MySQL 8.0+
+- npm or yarn
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Devender0077/hrms-go.git
-   cd hrms-go
+   git clone <repository-url>
+   cd hrms_hui_v1
    ```
 
 2. **Install dependencies**
    ```bash
+   # Frontend dependencies
    npm install
-   # or
-   yarn install
+   
+   # Backend dependencies
+   cd src/backend
+   npm install
+   cd ../..
    ```
 
 3. **Database Setup**
-   - Create a MySQL database named `hrmgo_hero`
-   - Update database credentials in `src/backend/.env`
-
-4. **Start the backend server**
    ```bash
+   # Create database
+   mysql -u root -p -e "CREATE DATABASE hrmgo_hero;"
+   
+   # Run migrations (recommended)
+   cd src/backend/migrations
+   node migration-manager.js up
+   
+   # OR load all schemas
+   cd src/database
+   node load-schemas.js load all
+   ```
+
+4. **Environment Configuration**
+   ```bash
+   # Backend environment
    cd src/backend
-   node server.js
+   cp .env.example .env
+   # Edit .env with your database credentials
    ```
 
-5. **Start the frontend development server**
+5. **Start the application**
    ```bash
+   # Start backend server
+   cd src/backend
+   npm start
+   
+   # Start frontend (in new terminal)
    npm run dev
-   # or
-   yarn dev
    ```
 
-6. **Open your browser**
-   Navigate to `http://localhost:5173`
-
-### Environment Setup
-
-Create a `.env` file in `src/backend/` directory:
-
-```env
-# Database Configuration
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=hrmgo_hero
-DB_PORT=3306
-
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key
-JWT_EXPIRES_IN=24h
-
-# Server Configuration
-PORT=8000
-NODE_ENV=development
-```
+6. **Access the application**
+   - Frontend: http://localhost:5173
+   - Backend API: http://localhost:8000
 
 ## 📁 Project Structure
 
 ```
-src/
-├── backend/              # Backend server and API
-│   ├── server.js         # Main server file
-│   ├── .env              # Environment variables
-│   └── migrations/       # Database migrations
-├── components/           # Reusable UI components
-│   ├── auth/            # Authentication components
-│   ├── dashboard/       # Dashboard components
-│   ├── employees/       # Employee management components
-│   ├── organization/    # Organization components
-│   ├── payroll/         # Payroll components
-│   ├── settings/        # Settings components
-│   └── sidebar.tsx      # Navigation sidebar
-├── contexts/            # React contexts for state management
-│   ├── auth-context.tsx
-│   ├── theme-context.tsx
-│   └── task-context.tsx
-├── hooks/               # Custom React hooks
-│   ├── useAssets.ts
-│   ├── useEmployees.ts
-│   ├── usePayroll.ts
-│   └── usePermissions.ts
-├── layouts/             # Layout components
-│   └── dashboard-layout.tsx
-├── pages/               # Page components
-│   ├── auth/            # Authentication pages
-│   ├── employees/       # Employee management pages
-│   ├── organization/    # Organization management
-│   ├── payroll/         # Payroll management
-│   ├── reports/         # Report pages
-│   └── settings/        # Settings pages
-├── services/            # API services and utilities
-│   ├── api-service.ts
-│   ├── auth-service.ts
-│   └── document-service.ts
-├── App.tsx              # Main application component
-├── main.tsx             # Application entry point
-└── index.css            # Global styles
+hrms_hui_v1/
+├── src/
+│   ├── backend/                 # Node.js backend
+│   │   ├── routes/             # 17 modular route files
+│   │   ├── migrations/         # Database migration system
+│   │   │   ├── migrations/     # 8 sequential migration files
+│   │   │   └── migration-manager.js
+│   │   └── server.js           # Main server (268 lines)
+│   ├── database/               # Database schemas
+│   │   ├── schemas/            # 8 modular schema files
+│   │   └── load-schemas.js     # Schema loading tool
+│   ├── components/             # React components
+│   ├── pages/                  # Application pages
+│   ├── hooks/                  # Custom React hooks
+│   ├── services/               # API services
+│   └── utils/                  # Utility functions
+├── Documentation/              # Comprehensive guides
+└── README.md                   # This file
 ```
 
-## 🎨 UI/UX Features
+## 🛠️ Development Tools
 
-- **Responsive Design** - Works on desktop, tablet, and mobile
-- **Light/Dark Theme** - Toggle between light and dark modes
-- **Modern UI** - Clean, professional interface with HeroUI components
-- **Interactive Charts** - Data visualization with Recharts
-- **Smooth Animations** - Framer Motion animations
-- **Accessibility** - WCAG compliant design
-- **Consistent Theming** - Unified color palette and design system
+### Database Management
+```bash
+# Check migration status
+node migration-manager.js status
 
-## 🔧 Available Scripts
+# Run pending migrations
+node migration-manager.js up
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript type checking
+# Rollback migration
+node migration-manager.js down <migration-name>
 
-## 📊 Database Schema
+# Load specific schema
+node load-schemas.js load 01_core_tables
 
-The system includes a comprehensive database schema with 70+ tables covering:
+# Load all schemas
+node load-schemas.js load all
+```
 
-- **User Management** - Users, roles, permissions
-- **Employee Data** - Complete employee information with reporting hierarchy
-- **Time Tracking** - Attendance, leave, timesheets, shifts
-- **Payroll** - Salary components, employee salaries, payslips
-- **Assets** - Asset inventory and assignments
-- **Performance** - Goals, reviews, feedback
-- **Recruitment** - Jobs, candidates, interviews
-- **System** - Settings, audit logs, notifications
+### Available Scripts
+```bash
+# Frontend
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+
+# Backend
+npm start            # Start production server
+npm run dev          # Start with nodemon
+```
+
+## 🔐 Default Credentials
+
+### Super Admin
+- **Email**: admin@hrms.com
+- **Password**: admin123
+
+### Company Admin
+- **Email**: company@hrms.com
+- **Password**: company123
+
+### Employee
+- **Email**: employee@hrms.com
+- **Password**: employee123
+
+## 📊 System Requirements
+
+### Minimum Requirements
+- **RAM**: 4GB
+- **Storage**: 2GB free space
+- **CPU**: 2 cores
+- **Browser**: Chrome 90+, Firefox 88+, Safari 14+
+
+### Recommended Requirements
+- **RAM**: 8GB+
+- **Storage**: 5GB+ free space
+- **CPU**: 4+ cores
+- **Browser**: Latest version
+
+## 🏗️ Architecture
+
+### Backend Architecture
+- **Express.js** - Web framework
+- **MySQL** - Primary database
+- **JWT** - Authentication
+- **bcrypt** - Password hashing
+- **Multer** - File uploads
+- **CORS** - Cross-origin requests
+
+### Frontend Architecture
+- **React 18** - UI framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool
+- **HeroUI** - Component library
+- **TailwindCSS** - Styling
+- **Framer Motion** - Animations
+- **React Router** - Navigation
+
+### Database Architecture
+- **Modular Schema** - 8 domain-specific files
+- **Migration System** - Version-controlled changes
+- **Foreign Keys** - Data integrity
+- **Indexes** - Performance optimization
+- **Audit Logging** - Change tracking
+
+## 🔧 Configuration
+
+### Environment Variables
+```env
+# Database
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=hrmgo_hero
+
+# JWT
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=24h
+
+# Server
+PORT=8000
+NODE_ENV=development
+```
+
+### Customization
+- **Themes**: Modify `src/contexts/theme-context.tsx`
+- **API Endpoints**: Update `src/config/api-config.ts`
+- **Routes**: Modify `src/config/routes.ts`
+- **Permissions**: Update database permissions table
+
+## 📈 Performance
+
+### Optimizations
+- **Code Splitting** - Lazy loading of components
+- **Image Optimization** - WebP format with fallbacks
+- **Caching** - API response caching
+- **Database Indexing** - Optimized queries
+- **Bundle Analysis** - Regular bundle size monitoring
+
+### Monitoring
+- **Error Tracking** - Comprehensive error logging
+- **Performance Metrics** - Response time monitoring
+- **Database Monitoring** - Query performance tracking
+- **User Analytics** - Usage pattern analysis
+
+## 🧪 Testing
+
+### Test Coverage
+- **Unit Tests** - Component and utility testing
+- **Integration Tests** - API endpoint testing
+- **E2E Tests** - Full user journey testing
+- **Performance Tests** - Load and stress testing
+
+### Running Tests
+```bash
+# Frontend tests
+npm test
+
+# Backend tests
+cd src/backend
+npm test
+
+# E2E tests
+npm run test:e2e
+```
 
 ## 🚀 Deployment
 
 ### Production Build
 ```bash
+# Build frontend
 npm run build
+
+# Start production server
+cd src/backend
+npm start
 ```
 
-### Environment Variables for Production
-```env
-# Database Configuration
-DB_HOST=your_production_host
-DB_USER=your_production_user
-DB_PASSWORD=your_production_password
-DB_NAME=hrmgo_hero
-DB_PORT=3306
-
-# JWT Configuration
-JWT_SECRET=your_production_jwt_secret
-JWT_EXPIRES_IN=24h
-
-# Server Configuration
-PORT=8000
-NODE_ENV=production
+### Docker Deployment
+```bash
+# Build and run with Docker
+docker-compose up -d
 ```
 
-## 🧹 Recent Updates
+### Environment Setup
+- **Production Database** - Configure production MySQL
+- **Environment Variables** - Set production values
+- **SSL Certificate** - Configure HTTPS
+- **Domain Configuration** - Set up domain and DNS
 
-### Project Cleanup (Latest)
-- ✅ Removed 27+ unnecessary test files and documentation
-- ✅ Fixed salary components API endpoints and calculations
-- ✅ Fixed employee salaries calculations
-- ✅ Updated API request format consistency
-- ✅ Clean project structure for production readiness
-- ✅ Added new organization chart components
-- ✅ Added new custom hooks for expenses, goals, interviews, performance reviews
-- ✅ Added new payroll pages and components
-- ✅ Implemented consistent theming across all pages
+## 📚 Documentation
 
-### Key Improvements
-- **API Consistency** - Standardized API request format across all components
-- **Calculation Fixes** - Fixed salary and payroll calculations
-- **UI Consistency** - Unified theming and component styling
-- **Code Quality** - Removed test files and improved code organization
-- **Performance** - Optimized API calls and data fetching
+### Available Guides
+- **[Implementation Plan](IMPLEMENTATION_PLAN.md)** - Development roadmap
+- **[Server Refactoring Guide](SERVER_REFACTORING_GUIDE.md)** - Backend architecture
+- **[Modular Routes Complete](MODULAR_ROUTES_COMPLETE.md)** - API documentation
+- **[HR Setup Guide](HR_SETUP_COMPLETION_GUIDE.md)** - HR configuration
+- **[Migration Checklist](MIGRATION_CHECKLIST.md)** - Database migration guide
+- **[Database Setup](DATABASE_SETUP.md)** - Database configuration
+- **[Modular Database System](MODULAR_DATABASE_SYSTEM.md)** - Database architecture
+- **[Accessibility Guide](ACCESSIBILITY.md)** - Accessibility compliance
 
 ## 🤝 Contributing
 
+### Development Workflow
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
-## 📝 License
+### Code Standards
+- **TypeScript** - Strict type checking
+- **ESLint** - Code linting
+- **Prettier** - Code formatting
+- **Conventional Commits** - Commit message format
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Support
+## 🆘 Support
 
-For support and questions:
-- Create an issue in the GitHub repository
-- Contact the development team
-- Check the documentation
+### Getting Help
+- **Documentation** - Check the guides in the Documentation folder
+- **Issues** - Report bugs and request features
+- **Discussions** - Ask questions and share ideas
 
-## 🎯 Roadmap
-
-- [ ] Mobile app development
-- [ ] Advanced analytics dashboard
-- [ ] Integration with external HR systems
-- [ ] Multi-language support
-- [ ] Advanced reporting features
-- [ ] API documentation
-- [ ] Unit and integration tests
-- [ ] Performance optimization
-- [ ] Security enhancements
-
-## 🙏 Acknowledgments
-
-- HeroUI for the amazing component library
-- React team for the excellent framework
-- All contributors and testers
-- The open-source community
+### Contact
+- **Email**: support@hrms.com
+- **Documentation**: [Project Documentation](Documentation/)
+- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
 
 ---
 
-**Built with ❤️ for modern HR management**
+## 🎉 Acknowledgments
 
-*Last updated: January 2025*
+Built with ❤️ using modern web technologies and best practices. Special thanks to all contributors and the open-source community.
+
+**HRMS HUI v1** - Empowering organizations with modern HR management solutions.

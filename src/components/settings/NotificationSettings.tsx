@@ -1,217 +1,167 @@
-import React from "react";
-import { Switch, Input, CheckboxGroup, Checkbox, Divider } from "@heroui/react";
-import { Icon } from "@iconify/react";
+import React from 'react';
+import { Card, CardBody, CardHeader, Switch, CheckboxGroup, Checkbox } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface NotificationSettingsProps {
-  settings: {
-    emailNotifications: boolean;
-    smsNotifications: boolean;
-    pushNotifications: boolean;
-    inAppNotifications: boolean;
-    notificationChannels: {
-      newEmployee: string[];
-      leaveRequest: string[];
-      attendanceAlert: string[];
-      payrollProcessed: string[];
-      systemMaintenance: string[];
-    };
-    quietHours: {
-      enabled: boolean;
-      start: string;
-      end: string;
-    };
-  };
+  settings: Record<string, any>;
   onSettingsChange: (field: string, value: any) => void;
 }
 
 export default function NotificationSettings({ settings, onSettingsChange }: NotificationSettingsProps) {
+  const notificationChannels = [
+    { key: 'email', label: 'Email' },
+    { key: 'sms', label: 'SMS' },
+    { key: 'push', label: 'Push Notification' },
+    { key: 'in-app', label: 'In-App Notification' },
+  ];
+
+  const notificationTypes = [
+    { key: 'newEmployee', label: 'New Employee' },
+    { key: 'leaveRequest', label: 'Leave Request' },
+    { key: 'attendanceAlert', label: 'Attendance Alert' },
+    { key: 'payrollProcessed', label: 'Payroll Processed' },
+    { key: 'systemMaintenance', label: 'System Maintenance' },
+  ];
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-primary-100 rounded-lg">
-          <Icon icon="lucide:bell" className="text-primary-600 text-lg" />
-        </div>
-        <div>
-          <h2 className="text-xl font-semibold">Notification Settings</h2>
-          <p className="text-default-600">Configure notification preferences and channels</p>
-        </div>
-      </div>
-      
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Notification Types</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">Email Notifications</span>
-              <span className="text-xs text-default-500">Receive notifications via email</span>
+    <div className="space-y-4 sm:space-y-6">
+      <Card className="shadow-sm">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+              <Icon icon="lucide:bell" className="text-primary-600 dark:text-primary-400 text-xl" />
             </div>
-            <Switch
-              isSelected={settings.emailNotifications}
-              onValueChange={(value) => onSettingsChange("emailNotifications", value)}
-            />
+            <h3 className="text-lg font-semibold text-foreground">Notification Settings</h3>
           </div>
-          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">SMS Notifications</span>
-              <span className="text-xs text-default-500">Receive notifications via SMS</span>
+        </CardHeader>
+        <CardBody className="space-y-4 sm:space-y-6">
+          <div className="space-y-4">
+            <h4 className="text-md font-semibold text-foreground">Notification Channels</h4>
+            
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-default-50 dark:bg-default-100/50 rounded-lg">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">Email Notifications</p>
+                  <p className="text-xs text-default-500 dark:text-default-400">Send notifications via email</p>
+                </div>
+                <Switch
+                  isSelected={settings.emailNotifications === true || settings.emailNotifications === 'true'}
+                  onValueChange={(value) => onSettingsChange('emailNotifications', value)}
+                  color="primary"
+                />
+              </div>
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-default-50 dark:bg-default-100/50 rounded-lg">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">SMS Notifications</p>
+                  <p className="text-xs text-default-500 dark:text-default-400">Send notifications via SMS</p>
+                </div>
+                <Switch
+                  isSelected={settings.smsNotifications === true || settings.smsNotifications === 'true'}
+                  onValueChange={(value) => onSettingsChange('smsNotifications', value)}
+                  color="primary"
+                />
+              </div>
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-default-50 dark:bg-default-100/50 rounded-lg">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">Push Notifications</p>
+                  <p className="text-xs text-default-500 dark:text-default-400">Send push notifications to mobile devices</p>
+                </div>
+                <Switch
+                  isSelected={settings.pushNotifications === true || settings.pushNotifications === 'true'}
+                  onValueChange={(value) => onSettingsChange('pushNotifications', value)}
+                  color="primary"
+                />
+              </div>
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-default-50 dark:bg-default-100/50 rounded-lg">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">In-App Notifications</p>
+                  <p className="text-xs text-default-500 dark:text-default-400">Show notifications within the application</p>
+                </div>
+                <Switch
+                  isSelected={settings.inAppNotifications === true || settings.inAppNotifications === 'true'}
+                  onValueChange={(value) => onSettingsChange('inAppNotifications', value)}
+                  color="primary"
+                />
+              </div>
             </div>
-            <Switch
-              isSelected={settings.smsNotifications}
-              onValueChange={(value) => onSettingsChange("smsNotifications", value)}
-            />
-          </div>
-          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">Push Notifications</span>
-              <span className="text-xs text-default-500">Receive push notifications on mobile devices</span>
-            </div>
-            <Switch
-              isSelected={settings.pushNotifications}
-              onValueChange={(value) => onSettingsChange("pushNotifications", value)}
-            />
-          </div>
-          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">In-App Notifications</span>
-              <span className="text-xs text-default-500">Show notifications within the application</span>
-            </div>
-            <Switch
-              isSelected={settings.inAppNotifications}
-              onValueChange={(value) => onSettingsChange("inAppNotifications", value)}
-            />
-          </div>
-        </div>
-      </div>
-
-      <Divider />
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Notification Channels</h3>
-        <div className="space-y-6">
-          <div>
-            <p className="font-medium mb-3">New Employee</p>
-            <CheckboxGroup
-              value={settings.notificationChannels.newEmployee}
-              onValueChange={(value) => onSettingsChange("notificationChannels", { 
-                ...settings.notificationChannels, 
-                newEmployee: value 
-              })}
-              orientation="horizontal"
-            >
-              <Checkbox value="email">Email</Checkbox>
-              <Checkbox value="sms">SMS</Checkbox>
-              <Checkbox value="in-app">In-App</Checkbox>
-            </CheckboxGroup>
           </div>
           
-          <div>
-            <p className="font-medium mb-3">Leave Request</p>
-            <CheckboxGroup
-              value={settings.notificationChannels.leaveRequest}
-              onValueChange={(value) => onSettingsChange("notificationChannels", { 
-                ...settings.notificationChannels, 
-                leaveRequest: value 
-              })}
-              orientation="horizontal"
-            >
-              <Checkbox value="email">Email</Checkbox>
-              <Checkbox value="sms">SMS</Checkbox>
-              <Checkbox value="in-app">In-App</Checkbox>
-            </CheckboxGroup>
+          <div className="space-y-4">
+            <h4 className="text-md font-semibold text-foreground">Notification Types</h4>
+            
+            {notificationTypes.map((type) => (
+              <div key={type.key} className="space-y-2">
+                <p className="text-sm font-medium text-foreground">{type.label}</p>
+                <CheckboxGroup
+                  
+                  onValueChange={(value) => onSettingsChange('notificationChannels', {
+                    ...settings.notificationChannels,
+                    [type.key]: value
+                  })}
+                  className="flex flex-wrap gap-4"
+                >
+                  {notificationChannels.map((channel) => (
+                    <Checkbox key={channel.key} >
+                      {channel.label}
+                    </Checkbox>
+                  ))}
+                </CheckboxGroup>
+              </div>
+            ))}
           </div>
           
-          <div>
-            <p className="font-medium mb-3">Attendance Alert</p>
-            <CheckboxGroup
-              value={settings.notificationChannels.attendanceAlert}
-              onValueChange={(value) => onSettingsChange("notificationChannels", { 
-                ...settings.notificationChannels, 
-                attendanceAlert: value 
-              })}
-              orientation="horizontal"
-            >
-              <Checkbox value="email">Email</Checkbox>
-              <Checkbox value="sms">SMS</Checkbox>
-              <Checkbox value="in-app">In-App</Checkbox>
-            </CheckboxGroup>
-          </div>
-          
-          <div>
-            <p className="font-medium mb-3">Payroll Processed</p>
-            <CheckboxGroup
-              value={settings.notificationChannels.payrollProcessed}
-              onValueChange={(value) => onSettingsChange("notificationChannels", { 
-                ...settings.notificationChannels, 
-                payrollProcessed: value 
-              })}
-              orientation="horizontal"
-            >
-              <Checkbox value="email">Email</Checkbox>
-              <Checkbox value="sms">SMS</Checkbox>
-              <Checkbox value="in-app">In-App</Checkbox>
-            </CheckboxGroup>
-          </div>
-          
-          <div>
-            <p className="font-medium mb-3">System Maintenance</p>
-            <CheckboxGroup
-              value={settings.notificationChannels.systemMaintenance}
-              onValueChange={(value) => onSettingsChange("notificationChannels", { 
-                ...settings.notificationChannels, 
-                systemMaintenance: value 
-              })}
-              orientation="horizontal"
-            >
-              <Checkbox value="email">Email</Checkbox>
-              <Checkbox value="sms">SMS</Checkbox>
-              <Checkbox value="in-app">In-App</Checkbox>
-            </CheckboxGroup>
-          </div>
-        </div>
-      </div>
-
-      <Divider />
-
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold">Quiet Hours</h3>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-foreground">Enable Quiet Hours</span>
-              <span className="text-xs text-default-500">Disable notifications during specified hours</span>
-            </div>
-            <Switch
-              isSelected={settings.quietHours.enabled}
-              onValueChange={(value) => onSettingsChange("quietHours", { 
-                ...settings.quietHours, 
-                enabled: value 
-              })}
-            />
-          </div>
-          {settings.quietHours.enabled && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Input
-                label="Start Time"
-                type="time"
-                value={settings.quietHours.start}
-                onValueChange={(value) => onSettingsChange("quietHours", { 
-                  ...settings.quietHours, 
-                  start: value 
-                })}
-              />
-              <Input
-                label="End Time"
-                type="time"
-                value={settings.quietHours.end}
-                onValueChange={(value) => onSettingsChange("quietHours", { 
-                  ...settings.quietHours, 
-                  end: value 
+          <div className="space-y-4">
+            <h4 className="text-md font-semibold text-foreground">Quiet Hours</h4>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-foreground">Enable Quiet Hours</p>
+                <p className="text-xs text-default-500">Disable notifications during specified hours</p>
+              </div>
+              <Switch
+                isSelected={settings.quietHours?.enabled === true || settings.quietHours?.enabled === 'true'}
+                onValueChange={(value) => onSettingsChange('quietHours', {
+                  ...settings.quietHours,
+                  enabled: value
                 })}
               />
             </div>
-          )}
-        </div>
-      </div>
+            
+            {settings.quietHours?.enabled && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground">Start Time</label>
+                  <input
+                    type="time"
+                    
+                    onChange={(e) => onSettingsChange('quietHours', {
+                      ...settings.quietHours,
+                      start: e.target.value
+                    })}
+                    className="w-full mt-1 px-3 py-2 border border-default-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-foreground">End Time</label>
+                  <input
+                    type="time"
+                    
+                    onChange={(e) => onSettingsChange('quietHours', {
+                      ...settings.quietHours,
+                      end: e.target.value
+                    })}
+                    className="w-full mt-1 px-3 py-2 border border-default-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </CardBody>
+      </Card>
     </div>
   );
 }

@@ -15,15 +15,15 @@ import { motion, AnimatePresence } from "framer-motion";
 interface Employee {
   id: number;
   name: string;
-  position: string;
-  department: string;
-  email: string;
+  position?: string;
+  department?: string;
+  email?: string;
   phone?: string;
   avatar?: string;
-  employeeId: string;
+  employeeId?: string;
   reportsTo?: number | null;
-  status: string;
-  joinDate: string;
+  status?: string;
+  joinDate?: string;
   directReports: Employee[];
 }
 
@@ -41,7 +41,8 @@ const ModernOrgChart: React.FC<ModernOrgChartProps> = ({ employees, onEmployeeCl
   // Get root employees (those with no reportsTo)
   const rootEmployees = employees.filter(emp => !emp.reportsTo || emp.reportsTo === null);
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string | undefined) => {
+    if (!status) return 'default';
     switch (status.toLowerCase()) {
       case 'active': return 'success';
       case 'on_leave': return 'warning';
@@ -50,16 +51,17 @@ const ModernOrgChart: React.FC<ModernOrgChartProps> = ({ employees, onEmployeeCl
     }
   };
 
-  const getDepartmentColor = (department: string) => {
+  const getDepartmentColor = (department: string | undefined): "success" | "default" | "warning" | "danger" => {
+    if (!department) return 'default';
     const colors = {
-      'HR': 'primary',
-      'IT': 'secondary',
+      'HR': 'success',
+      'IT': 'default',
       'Finance': 'success',
       'Marketing': 'warning',
       'Operations': 'danger',
-      'Sales': 'primary'
+      'Sales': 'success'
     };
-    return colors[department as keyof typeof colors] || 'default';
+    return (colors[department as keyof typeof colors] || 'default') as "success" | "default" | "warning" | "danger";
   };
 
   const toggleNode = (employeeId: number) => {
@@ -128,12 +130,13 @@ const ModernOrgChart: React.FC<ModernOrgChartProps> = ({ employees, onEmployeeCl
                       className="w-16 h-16 text-lg font-semibold"
                     />
                     <Badge
-                      content=""
                       color={getStatusColor(employee.status)}
                       shape="circle"
                       size="sm"
                       className="absolute -bottom-1 -right-1"
-                    />
+                    >
+                      <div className="w-2 h-2 rounded-full" />
+                    </Badge>
                   </div>
 
                   {/* Employee Info */}
@@ -142,10 +145,10 @@ const ModernOrgChart: React.FC<ModernOrgChartProps> = ({ employees, onEmployeeCl
                       {employee.name}
                     </h3>
                     <p className="text-sm text-primary font-medium">
-                      {employee.position}
+                      {employee.position || 'No Position'}
                     </p>
                     <p className="text-xs text-default-500">
-                      {employee.department}
+                      {employee.department || 'No Department'}
                     </p>
                   </div>
 
@@ -156,7 +159,7 @@ const ModernOrgChart: React.FC<ModernOrgChartProps> = ({ employees, onEmployeeCl
                       color={getStatusColor(employee.status)}
                       variant="flat"
                     >
-                      {employee.status}
+                      {employee.status || 'Unknown'}
                     </Chip>
                     {hasReports && (
                       <Chip
@@ -192,7 +195,7 @@ const ModernOrgChart: React.FC<ModernOrgChartProps> = ({ employees, onEmployeeCl
             {/* Employee ID Badge */}
             <div className="absolute -top-2 -right-2">
               <Chip size="sm" variant="solid" color="primary">
-                {employee.employeeId}
+                {employee.employeeId || `ID: ${employee.id}`}
               </Chip>
             </div>
           </motion.div>

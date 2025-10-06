@@ -1,72 +1,213 @@
-// Create a new API service file to handle all API requests
+/**
+ * Enhanced API Service
+ * Provides standardized API communication with proper error handling, authentication, and TypeScript support
+ */
 
-// Base API URL - would be configured from environment variables in a real app
-const API_BASE_URL = "/api/v1"; // Use relative path with proxy
+// Base API URL - configured from environment variables
+const API_BASE_URL = import.meta.env.VITE_API_URL || "/api/v1";
+
+// API Response interface
+export interface ApiResponse<T = any> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  error?: string;
+  errors?: Record<string, string[]>;
+}
+
+// Request options interface
+export interface RequestOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  headers?: Record<string, string>;
+  body?: any;
+  timeout?: number;
+  retries?: number;
+}
+
+// Enhanced error class
+export class ApiError extends Error {
+  public status: number;
+  public errors?: Record<string, string[]>;
+
+  constructor(message: string, status: number = 500, errors?: Record<string, string[]>) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.errors = errors;
+  }
+}
 
 // Helper function to handle API responses
-const handleResponse = async (response) => {
-  if (!response.ok) {
-    // Get error message from the response body
-    const errorData = await response.json();
-    throw new Error(errorData.message || "API request failed");
-  }
-  
+const handleResponse = async <T = any>(response: Response): Promise<ApiResponse<T>> => {
   // Handle 304 Not Modified responses (cached responses)
   if (response.status === 304) {
-    // For 304 responses, we don't have a body, so we need to handle this differently
-    // We'll return a success response with empty data
-    return { success: true, data: null, message: "Data not modified (cached)" };
+    return { success: true, data: null as T, message: "Data not modified (cached)" };
   }
+
+  // Handle no content responses
+  if (response.status === 204) {
+    return { success: true, data: null as T, message: "No content" };
+  }
+
+  // Parse response body
+  let data: any;
+  const contentType = response.headers.get('content-type');
   
-  // For other successful responses, parse the JSON
-  const data = await response.json();
-  
-  // Add success field if it doesn't exist (for consistency with frontend expectations)
+  if (contentType && contentType.includes('application/json')) {
+    try {
+      data = await response.json();
+    } catch (error) {
+      throw new ApiError('Invalid JSON response', response.status);
+    }
+  } else {
+    data = await response.text();
+  }
+
+  // Handle error responses
+  if (!response.ok) {
+    // Handle 401 Unauthorized - token expired or invalid
+    if (response.status === 401) {
+      // Clear invalid tokens
+      localStorage.removeItem("authToken");
+      sessionStorage.removeItem("authToken");
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
+      
+      // Redirect to login if not already there
+      if (typeof window !== 'undefined' && !window.location.pathname.includes('/auth/login')) {
+        window.location.href = '/auth/login';
+      }
+    }
+    
+    const errorMessage = data?.message || data?.error || `HTTP ${response.status}: ${response.statusText}`;
+    throw new ApiError(errorMessage, response.status, data?.errors);
+  }
+
+  // Ensure success field exists for consistency
   if (data && typeof data === 'object' && !data.hasOwnProperty('success')) {
     data.success = true;
   }
-  
-  return data;
+
+  return data as ApiResponse<T>;
 };
 
-// Helper function to make API requests with authentication
-export const apiRequest = async (endpoint, options = {}) => {
-  // Get auth token from localStorage or sessionStorage
+// Helper function to get authentication token
+const getAuthToken = (): string | null => {
   const token = localStorage.getItem("authToken") || sessionStorage.getItem("authToken");
+  
+  if (!token) {
+    return null;
+  }
+  
+  // Check if token is expired
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Date.now() / 1000;
+    
+    // Add 5 minute buffer to prevent edge cases
+    if (payload.exp < currentTime + 300) {
+      // Token is expired or expiring soon, clear it
+      localStorage.removeItem("authToken");
+      sessionStorage.removeItem("authToken");
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
+      return null;
+    }
+  } catch (error) {
+    // Invalid token format, clear it
+    localStorage.removeItem("authToken");
+    sessionStorage.removeItem("authToken");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("user");
+    return null;
+  }
+  
+  return token;
+};
 
-  const defaultOptions = {
+// Helper function to make API requests with authentication and retry logic
+export const apiRequest = async <T = any>(
+  endpoint: string, 
+  options: RequestOptions = {}
+): Promise<ApiResponse<T>> => {
+  const {
+    method = 'GET',
+    headers = {},
+    body,
+    timeout = 10000,
+    retries = 3
+  } = options;
+
+  // Get auth token
+  const token = getAuthToken();
+
+  // Prepare request options
+  const requestOptions: RequestInit = {
+    method,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...(options.headers || {}),
+      ...headers,
     },
   };
 
-  const requestOptions = {
-    ...defaultOptions,
-    ...options,
-    headers: {
-      ...defaultOptions.headers,
-      ...(options.headers || {}),
-    },
-  };
-
-  // Handle body serialization for POST/PUT requests
-  if (options.body && (options.method === 'POST' || options.method === 'PUT' || options.method === 'PATCH')) {
-    if (typeof options.body === 'object') {
-      requestOptions.body = JSON.stringify(options.body);
+  // Handle body serialization
+  if (body) {
+    if (body instanceof FormData) {
+      // For FormData, don't set Content-Type header
+      delete (requestOptions.headers as any)['Content-Type'];
+      requestOptions.body = body;
+    } else if (typeof body === 'object') {
+      requestOptions.body = JSON.stringify(body);
     } else {
-      requestOptions.body = options.body;
+      requestOptions.body = body;
     }
   }
 
-  try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, requestOptions);
-    return handleResponse(response);
-  } catch (error) {
-    console.error("API request error:", error);
-    throw error;
+  // Add timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  requestOptions.signal = controller.signal;
+
+  let lastError: Error;
+
+  // Retry logic
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, requestOptions);
+      clearTimeout(timeoutId);
+      return await handleResponse<T>(response);
+    } catch (error) {
+      lastError = error as Error;
+      
+      // Don't retry on certain errors
+      if (error instanceof ApiError && (error.status === 401 || error.status === 403 || error.status === 404)) {
+        throw error;
+      }
+
+      // Don't retry on the last attempt
+      if (attempt === retries) {
+        break;
+      }
+
+      // Wait before retrying (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+    }
   }
+
+  clearTimeout(timeoutId);
+  
+  // Handle timeout
+  if (lastError.name === 'AbortError') {
+    throw new ApiError('Request timeout', 408);
+  }
+
+  // Handle network errors
+  if (lastError.message.includes('fetch')) {
+    throw new ApiError('Network error. Please check your connection.', 0);
+  }
+
+  throw lastError;
 };
 
 // Authentication API
@@ -74,31 +215,31 @@ export const authAPI = {
   login: (credentials) =>
     apiRequest("/auth/login", {
       method: "POST",
-      body: credentials,
+      body: JSON.stringify(credentials),
     }),
 
   loginWithFace: (faceData) =>
     apiRequest("/auth/face-login", {
       method: "POST",
-      body: faceData,
+      body: JSON.stringify(faceData),
     }),
 
   register: (userData) =>
     apiRequest("/auth/register", {
       method: "POST",
-      body: userData,
+      body: JSON.stringify(userData),
     }),
 
   forgotPassword: (email) =>
     apiRequest("/auth/forgot-password", {
       method: "POST",
-      body: { email },
+      body: JSON.stringify({ email }),
     }),
 
   resetPassword: (token, password) =>
     apiRequest("/auth/reset-password", {
       method: "POST",
-      body: { token, password },
+      body: JSON.stringify({ token, password }),
     }),
 
   verifyEmail: (token) =>
@@ -121,13 +262,13 @@ export const employeeAPI = {
   create: (employeeData) =>
     apiRequest("/employees", {
       method: "POST",
-      body: employeeData,
+      body: JSON.stringify(employeeData),
     }),
 
   update: (id, employeeData) =>
     apiRequest(`/employees/${id}`, {
       method: "PUT",
-      body: employeeData,
+      body: JSON.stringify(employeeData),
     }),
 
   delete: (id) => apiRequest(`/employees/${id}`, { method: "DELETE" }),
@@ -139,7 +280,7 @@ export const employeeAPI = {
         // Don't set Content-Type when sending FormData
         "Content-Type": undefined,
       },
-      body: formData,
+      body: JSON.stringify(formData),
     }),
 
   export: (format = "csv") =>
@@ -154,12 +295,12 @@ export const organizationAPI = {
   createBranch: (data) =>
     apiRequest("/organization/branches", {
       method: "POST",
-      body: data,
+      body: JSON.stringify(data),
     }),
   updateBranch: (id, data) =>
     apiRequest(`/organization/branches/${id}`, {
       method: "PUT",
-      body: data,
+      body: JSON.stringify(data),
     }),
   deleteBranch: (id) =>
     apiRequest(`/organization/branches/${id}`, { method: "DELETE" }),
@@ -170,12 +311,12 @@ export const organizationAPI = {
   createDepartment: (data) =>
     apiRequest("/organization/departments", {
       method: "POST",
-      body: data,
+      body: JSON.stringify(data),
     }),
   updateDepartment: (id, data) =>
     apiRequest(`/organization/departments/${id}`, {
       method: "PUT",
-      body: data,
+      body: JSON.stringify(data),
     }),
   deleteDepartment: (id) =>
     apiRequest(`/organization/departments/${id}`, { method: "DELETE" }),
@@ -186,12 +327,12 @@ export const organizationAPI = {
   createDesignation: (data) =>
     apiRequest("/organization/designations", {
       method: "POST",
-      body: data,
+      body: JSON.stringify(data),
     }),
   updateDesignation: (id, data) =>
     apiRequest(`/organization/designations/${id}`, {
       method: "PUT",
-      body: data,
+      body: JSON.stringify(data),
     }),
   deleteDesignation: (id) =>
     apiRequest(`/organization/designations/${id}`, { method: "DELETE" }),
@@ -216,7 +357,7 @@ export const documentAPI = {
         // Don't set Content-Type when sending FormData
         "Content-Type": undefined,
       },
-      body: formData,
+      body: JSON.stringify(formData),
     }),
 
   update: (id, formData) =>
@@ -226,7 +367,7 @@ export const documentAPI = {
         // Don't set Content-Type when sending FormData
         "Content-Type": undefined,
       },
-      body: formData,
+      body: JSON.stringify(formData),
     }),
 
   delete: (id) => apiRequest(`/documents/${id}`, { method: "DELETE" }),
@@ -249,13 +390,13 @@ export const attendanceAPI = {
   checkIn: (data) =>
     apiRequest("/attendance/check-in", {
       method: "POST",
-      body: data,
+      body: JSON.stringify(data),
     }),
 
   checkOut: (data) =>
     apiRequest("/attendance/check-out", {
       method: "POST",
-      body: data,
+      body: JSON.stringify(data),
     }),
 
   getEmployeeAttendance: (employeeId, params = {}) => {
@@ -270,7 +411,7 @@ export const attendanceAPI = {
         // Don't set Content-Type when sending FormData
         "Content-Type": undefined,
       },
-      body: formData,
+      body: JSON.stringify(formData),
     }),
 
   getReport: (params = {}) => {
@@ -291,13 +432,13 @@ export const leaveAPI = {
   apply: (data) =>
     apiRequest("/leaves", {
       method: "POST",
-      body: data,
+      body: JSON.stringify(data),
     }),
 
   update: (id, data) =>
     apiRequest(`/leaves/${id}`, {
       method: "PUT",
-      body: data,
+      body: JSON.stringify(data),
     }),
 
   approve: (id) => apiRequest(`/leaves/${id}/approve`, { method: "POST" }),
@@ -305,7 +446,7 @@ export const leaveAPI = {
   reject: (id, reason) =>
     apiRequest(`/leaves/${id}/reject`, {
       method: "POST",
-      body: { reason },
+      body: JSON.stringify({ reason }),
     }),
 
   cancel: (id) => apiRequest(`/leaves/${id}/cancel`, { method: "POST" }),
@@ -331,13 +472,13 @@ export const taskAPI = {
   create: (taskData) =>
     apiRequest("/tasks", {
       method: "POST",
-      body: taskData,
+      body: JSON.stringify(taskData),
     }),
 
   update: (id, taskData) =>
     apiRequest(`/tasks/${id}`, {
       method: "PUT",
-      body: taskData,
+      body: JSON.stringify(taskData),
     }),
 
   delete: (id) => apiRequest(`/tasks/${id}`, { method: "DELETE" }),
@@ -355,13 +496,13 @@ export const calendarAPI = {
   createEvent: (eventData) =>
     apiRequest("/calendar/events", {
       method: "POST",
-      body: eventData,
+      body: JSON.stringify(eventData),
     }),
 
   updateEvent: (id, eventData) =>
     apiRequest(`/calendar/events/${id}`, {
       method: "PUT",
-      body: eventData,
+      body: JSON.stringify(eventData),
     }),
 
   deleteEvent: (id) => apiRequest(`/calendar/events/${id}`, { method: "DELETE" }),
@@ -379,13 +520,13 @@ export const jobsAPI = {
   create: (jobData) =>
     apiRequest("/jobs", {
       method: "POST",
-      body: jobData,
+      body: JSON.stringify(jobData),
     }),
 
   update: (id, jobData) =>
     apiRequest(`/jobs/${id}`, {
       method: "PUT",
-      body: jobData,
+      body: JSON.stringify(jobData),
     }),
 
   delete: (id) => apiRequest(`/jobs/${id}`, { method: "DELETE" }),
@@ -403,13 +544,13 @@ export const candidatesAPI = {
   create: (candidateData) =>
     apiRequest("/candidates", {
       method: "POST",
-      body: candidateData,
+      body: JSON.stringify(candidateData),
     }),
 
   update: (id, candidateData) =>
     apiRequest(`/candidates/${id}`, {
       method: "PUT",
-      body: candidateData,
+      body: JSON.stringify(candidateData),
     }),
 
   delete: (id) => apiRequest(`/candidates/${id}`, { method: "DELETE" }),
@@ -427,13 +568,13 @@ export const assetsAPI = {
   create: (assetData) =>
     apiRequest("/assets", {
       method: "POST",
-      body: assetData,
+      body: JSON.stringify(assetData),
     }),
 
   update: (id, assetData) =>
     apiRequest(`/assets/${id}`, {
       method: "PUT",
-      body: assetData,
+      body: JSON.stringify(assetData),
     }),
 
   delete: (id) => apiRequest(`/assets/${id}`, { method: "DELETE" }),

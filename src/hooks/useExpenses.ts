@@ -45,7 +45,7 @@ export const useExpenses = () => {
       setError(null);
       const result = await apiRequest('/expenses', {
         method: 'POST',
-        body: expenseData,
+        body: JSON.stringify(expenseData),
       });
       await loadExpenses(); // Reload expenses after creation
       return result;
@@ -61,7 +61,7 @@ export const useExpenses = () => {
       setError(null);
       const result = await apiRequest(`/expenses/${id}`, {
         method: 'PUT',
-        body: expenseData,
+        body: JSON.stringify(expenseData),
       });
       await loadExpenses(); // Reload expenses after update
       return result;

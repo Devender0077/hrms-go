@@ -245,35 +245,35 @@ export default function LeaveReport() {
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <input
                 placeholder="Search..."
-                value={searchQuery}
+                
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
               <select
-                value={selectedDepartment}
+                
                 onChange={(e) => setSelectedDepartment(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {departments.map(dept => (
-                  <option key={dept} value={dept}>{dept}</option>
+                  <option key={dept} >{dept}</option>
                 ))}
               </select>
               <select
-                value={selectedLeaveType}
+                
                 onChange={(e) => setSelectedLeaveType(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {leaveTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
+                  <option key={type} >{type}</option>
                 ))}
               </select>
               <select
-                value={selectedStatus}
+                
                 onChange={(e) => setSelectedStatus(e.target.value)}
                 className="px-3 py-2 border border-divider rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {statuses.map(status => (
-                  <option key={status} value={status}>{status}</option>
+                  <option key={status} >{status}</option>
                 ))}
               </select>
               <div className="flex items-end">

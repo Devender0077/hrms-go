@@ -316,7 +316,7 @@ const ShiftsPage: React.FC = () => {
           <div className="flex flex-col lg:flex-row gap-4">
             <Input
               placeholder="Search shifts..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
@@ -330,9 +330,9 @@ const ShiftsPage: React.FC = () => {
               }}
               className="w-full lg:w-48"
             >
-              <SelectItem key="all" value="all">All Status</SelectItem>
-              <SelectItem key="active" value="active">Active</SelectItem>
-              <SelectItem key="inactive" value="inactive">Inactive</SelectItem>
+              <SelectItem key="all">All Status</SelectItem>
+              <SelectItem key="active">Active</SelectItem>
+              <SelectItem key="inactive">Inactive</SelectItem>
             </Select>
             <Button
               color="primary"
@@ -475,9 +475,9 @@ const ShiftsPage: React.FC = () => {
                   setRowsPerPage(parseInt(selected));
                 }}
               >
-                <SelectItem key="10" value="10">10</SelectItem>
-                <SelectItem key="25" value="25">25</SelectItem>
-                <SelectItem key="50" value="50">50</SelectItem>
+                <SelectItem key="10">10</SelectItem>
+                <SelectItem key="25">25</SelectItem>
+                <SelectItem key="50">50</SelectItem>
               </Select>
             </div>
             <Pagination
@@ -507,7 +507,7 @@ const ShiftsPage: React.FC = () => {
                       <Input
                         label="Shift Name"
                         placeholder="Enter shift name"
-                        value={formData.name}
+                        
                         onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                         isRequired
                       />
@@ -515,7 +515,7 @@ const ShiftsPage: React.FC = () => {
                         label="Break Duration (minutes)"
                         type="number"
                         placeholder="60"
-                        value={formData.break_duration.toString()}
+                        
                         onChange={(e) => setFormData(prev => ({ ...prev, break_duration: parseInt(e.target.value) || 0 }))}
                         isRequired
                       />
@@ -524,7 +524,7 @@ const ShiftsPage: React.FC = () => {
                     <Textarea
                       label="Description"
                       placeholder="Enter shift description"
-                      value={formData.description}
+                      
                       onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                     />
 
@@ -532,14 +532,14 @@ const ShiftsPage: React.FC = () => {
                       <Input
                         label="Start Time"
                         type="time"
-                        value={formData.start_time}
+                        
                         onChange={(e) => setFormData(prev => ({ ...prev, start_time: e.target.value }))}
                         isRequired
                       />
                       <Input
                         label="End Time"
                         type="time"
-                        value={formData.end_time}
+                        
                         onChange={(e) => setFormData(prev => ({ ...prev, end_time: e.target.value }))}
                         isRequired
                       />
@@ -550,14 +550,14 @@ const ShiftsPage: React.FC = () => {
                         label="Grace Period (minutes)"
                         type="number"
                         placeholder="15"
-                        value={formData.grace_period.toString()}
+                        
                         onChange={(e) => setFormData(prev => ({ ...prev, grace_period: parseInt(e.target.value) || 0 }))}
                       />
                       <Input
                         label="Late Threshold (minutes)"
                         type="number"
                         placeholder="30"
-                        value={formData.late_threshold.toString()}
+                        
                         onChange={(e) => setFormData(prev => ({ ...prev, late_threshold: parseInt(e.target.value) || 0 }))}
                       />
                       <Input
@@ -565,7 +565,7 @@ const ShiftsPage: React.FC = () => {
                         type="number"
                         step="0.1"
                         placeholder="1.5"
-                        value={formData.overtime_rate.toString()}
+                        
                         onChange={(e) => setFormData(prev => ({ ...prev, overtime_rate: parseFloat(e.target.value) || 1.5 }))}
                       />
                     </div>

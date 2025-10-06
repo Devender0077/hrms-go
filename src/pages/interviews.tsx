@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Pagination, Button, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Avatar, Badge, Textarea, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DatePicker, TimeInput } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { addToast } from "@heroui/react";
+import HeroSection from "../components/common/HeroSection";
 
 // Interview interface
 interface Interview {
@@ -474,36 +475,28 @@ export default function Interviews() {
   return (
     <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-600 rounded-xl">
-              <Icon icon="lucide:calendar" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Interviews</h1>
-              <p className="text-default-600 mt-1">Schedule and manage candidate interviews</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              variant="flat" 
-              startContent={<Icon icon="lucide:calendar" />}
-              onPress={() => setIsCalendarView(true)}
-              className="font-medium"
-            >
-              Calendar View
-            </Button>
-            <Button 
-              color="primary" 
-              startContent={<Icon icon="lucide:plus" />} 
-              onPress={() => setIsScheduleModalOpen(true)}
-              className="font-medium"
-            >
-              Schedule Interview
-            </Button>
-          </div>
-        </div>
+        {/* Hero Section */}
+        <HeroSection
+          title="Interviews"
+          subtitle="Candidate Assessment & Scheduling"
+          description="Schedule and manage candidate interviews. Track interview progress, coordinate with interviewers, and streamline your recruitment process."
+          icon="lucide:calendar"
+          illustration="interview"
+          actions={[
+            {
+              label: "Calendar View",
+              icon: "lucide:calendar",
+              onPress: () => setIsCalendarView(true),
+              variant: "flat" as const
+            },
+            {
+              label: "Schedule Interview",
+              icon: "lucide:plus",
+              onPress: () => setIsScheduleModalOpen(true),
+              color: "primary" as const
+            }
+          ]}
+        />
         
         {/* Statistics */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -532,7 +525,7 @@ export default function Interviews() {
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   <Input
                     placeholder="Search interviews..."
-                    value={searchQuery}
+                    
                     onChange={(e) => setSearchQuery(e.target.value)}
                     startContent={<Icon icon="lucide:search" className="text-default-400" />}
                   />
@@ -570,7 +563,7 @@ export default function Interviews() {
                     <SelectItem key="all">All Interviewers</SelectItem>
                     {interviewers.map(interviewer => (
                       <SelectItem key={interviewer}>{interviewer}</SelectItem>
-                    ))}
+                    )) as any}
                   </Select>
                   <div className="flex items-end">
                     <div className="text-sm text-default-600">
@@ -732,20 +725,20 @@ export default function Interviews() {
                 <Input
                   label="Candidate Name *"
                   placeholder="Enter candidate name"
-                  value={newInterview.candidateName || ""}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, candidateName: e.target.value }))}
                 />
                 <Input
                   label="Candidate Email"
                   type="email"
                   placeholder="Enter email address"
-                  value={newInterview.candidateEmail || ""}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, candidateEmail: e.target.value }))}
                 />
                 <Input
                   label="Candidate Phone"
                   placeholder="Enter phone number"
-                  value={newInterview.candidatePhone || ""}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, candidatePhone: e.target.value }))}
                 />
                 <Select
@@ -772,7 +765,7 @@ export default function Interviews() {
                   label="Interviewer Email"
                   type="email"
                   placeholder="Enter interviewer email"
-                  value={newInterview.interviewerEmail || ""}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, interviewerEmail: e.target.value }))}
                 />
                 <Select
@@ -790,51 +783,51 @@ export default function Interviews() {
                   label="Duration (minutes)"
                   type="number"
                   placeholder="60"
-                  value={newInterview.duration || 60}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, duration: parseInt(e.target.value) || 60 }))}
                 />
                 <Input
                   label="Scheduled Date *"
                   type="date"
-                  value={newInterview.scheduledDate || ""}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, scheduledDate: e.target.value }))}
                 />
                 <Input
                   label="Scheduled Time *"
                   type="time"
-                  value={newInterview.scheduledTime || ""}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, scheduledTime: e.target.value }))}
                 />
                 <Input
                   label="Location"
                   placeholder="Conference Room A or Video Call"
-                  value={newInterview.location || ""}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, location: e.target.value }))}
                 />
                 <Input
                   label="Meeting Link"
                   placeholder="https://meet.company.com/interview"
-                  value={newInterview.meetingLink || ""}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, meetingLink: e.target.value }))}
                 />
                 <Input
                   label="Job ID"
                   placeholder="JOB001"
-                  value={newInterview.jobId || ""}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, jobId: e.target.value }))}
                 />
                 <Input
                   label="Round"
                   type="number"
                   placeholder="1"
-                  value={newInterview.round || 1}
+                  
                   onChange={(e) => setNewInterview(prev => ({ ...prev, round: parseInt(e.target.value) || 1 }))}
                 />
               </div>
               <Textarea
                 label="Notes"
                 placeholder="Additional notes about the interview"
-                value={newInterview.notes || ""}
+                
                 onChange={(e) => setNewInterview(prev => ({ ...prev, notes: e.target.value }))}
                 minRows={3}
               />

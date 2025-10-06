@@ -1,6 +1,6 @@
-import React from "react";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Textarea } from "@heroui/react";
-import { Icon } from "@iconify/react";
+import React from 'react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Textarea } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface ApiKeyModalProps {
   isOpen: boolean;
@@ -12,50 +12,52 @@ interface ApiKeyModalProps {
   onDescriptionChange: (value: string) => void;
 }
 
-export default function ApiKeyModal({ 
-  isOpen, 
-  onOpenChange, 
-  onSave, 
-  name, 
-  description, 
-  onNameChange, 
-  onDescriptionChange 
+export default function ApiKeyModal({
+  isOpen,
+  onOpenChange,
+  onSave,
+  name,
+  description,
+  onNameChange,
+  onDescriptionChange
 }: ApiKeyModalProps) {
   return (
-    <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+    <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center" size="md">
       <ModalContent>
         {(onClose) => (
           <>
-            <ModalHeader>
+            <ModalHeader className="flex flex-col gap-1">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary-100 rounded-lg">
-                  <Icon icon="lucide:key" className="text-primary-600 text-lg" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Create API Key</h3>
-                  <p className="text-sm text-default-500">Generate a new API key for external access</p>
-                </div>
+                <Icon icon="lucide:key" className="text-primary-500 text-xl" />
+                <h3 className="text-lg font-semibold">Create New API Key</h3>
               </div>
             </ModalHeader>
             <ModalBody>
               <div className="space-y-4">
                 <Input
-                  label="Key Name"
-                  placeholder="e.g., Mobile App, Integration"
-                  value={name}
-                  onValueChange={onNameChange}
+                  label="API Key Name"
+                  placeholder="Enter a name for this API key"
+                  
+                  onChange={(e) => onNameChange(e.target.value)}
+                  startContent={<Icon icon="lucide:tag" className="text-default-400" />}
                 />
+                
                 <Textarea
                   label="Description"
-                  placeholder="Describe what this API key will be used for"
-                  value={description}
-                  onValueChange={onDescriptionChange}
+                  placeholder="Enter a description for this API key"
+                  
+                  onChange={(e) => onDescriptionChange(e.target.value)}
+                  rows={3}
                 />
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button variant="light" onPress={onClose}>Cancel</Button>
-              <Button color="primary" onPress={onSave}>Create API Key</Button>
+              <Button color="default" variant="flat" onPress={onClose}>
+                Cancel
+              </Button>
+              <Button color="primary" onPress={onSave}>
+                Create API Key
+              </Button>
             </ModalFooter>
           </>
         )}

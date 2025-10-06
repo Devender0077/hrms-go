@@ -169,7 +169,7 @@ const ContractFilters: React.FC<ContractFiltersProps> = ({ filters, onFiltersCha
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Input
             placeholder="Search by employee name or ID..."
-            value={filters.searchQuery}
+            
             onChange={(e) => onFiltersChange({ ...filters, searchQuery: e.target.value })}
             startContent={<Icon icon="lucide:search" className="text-default-400" />}
             className="max-w-full"
@@ -670,7 +670,7 @@ const EmployeeContractsPage: React.FC = () => {
                 <Input
                   label="Start Date"
                   type="date"
-                  value={formData.start_date}
+                  
                   onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                   isRequired
                 />
@@ -678,7 +678,7 @@ const EmployeeContractsPage: React.FC = () => {
                 <Input
                   label="End Date (Optional)"
                   type="date"
-                  value={formData.end_date}
+                  
                   onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                 />
               </div>
@@ -687,7 +687,7 @@ const EmployeeContractsPage: React.FC = () => {
                 label="Salary"
                 placeholder="Enter salary amount"
                 type="number"
-                value={formData.salary}
+                
                 onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
                 startContent="$"
                 isRequired
@@ -713,7 +713,7 @@ const EmployeeContractsPage: React.FC = () => {
               <Textarea
                 label="Terms & Conditions"
                 placeholder="Enter contract terms and conditions"
-                value={formData.terms}
+                
                 onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
                 rows={4}
               />

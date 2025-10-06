@@ -40,12 +40,16 @@
       id INT AUTO_INCREMENT PRIMARY KEY,
       company_id INT NOT NULL,
       name VARCHAR(255) NOT NULL,
+      code VARCHAR(50),
       location VARCHAR(255),
       address TEXT,
+      phone VARCHAR(20),
+      email VARCHAR(255),
       city VARCHAR(100),
       state VARCHAR(100),
       country VARCHAR(100),
       zip_code VARCHAR(20),
+      status ENUM('active', 'inactive') DEFAULT 'active',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
@@ -57,7 +61,10 @@
       company_id INT NOT NULL,
       branch_id INT,
       name VARCHAR(255) NOT NULL,
+      code VARCHAR(50),
       description TEXT,
+      manager_id INT,
+      status ENUM('active', 'inactive') DEFAULT 'active',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
@@ -70,7 +77,9 @@
       company_id INT NOT NULL,
       department_id INT,
       name VARCHAR(255) NOT NULL,
+      code VARCHAR(50),
       description TEXT,
+      status ENUM('active', 'inactive') DEFAULT 'active',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
@@ -145,9 +154,12 @@
       id INT AUTO_INCREMENT PRIMARY KEY,
       company_id INT NOT NULL,
       name VARCHAR(100) NOT NULL,
-      days_allowed INT NOT NULL,
+      code VARCHAR(50),
+      description TEXT,
+      days_per_year INT,
       requires_approval BOOLEAN DEFAULT TRUE,
       is_paid BOOLEAN DEFAULT TRUE,
+      status ENUM('active', 'inactive') DEFAULT 'active',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
@@ -1025,6 +1037,21 @@
     ALTER TABLE leave_applications ADD COLUMN  rejection_reason TEXT;
     ALTER TABLE leave_applications ADD FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL;
 
+    -- Enhanced Employees Table (Additional columns)
+    ALTER TABLE employees ADD COLUMN reports_to INT NULL;
+    ALTER TABLE employees ADD COLUMN profile_photo VARCHAR(255) NULL;
+    ALTER TABLE employees ADD COLUMN employment_type ENUM('full_time', 'part_time', 'contract', 'intern', 'consultant') NULL;
+    ALTER TABLE employees ADD COLUMN attendance_policy_id INT NULL;
+    ALTER TABLE employees ADD COLUMN bank_name VARCHAR(255) NULL;
+    ALTER TABLE employees ADD COLUMN bank_account_number VARCHAR(50) NULL;
+    ALTER TABLE employees ADD COLUMN bank_routing_number VARCHAR(50) NULL;
+    ALTER TABLE employees ADD COLUMN bank_swift_code VARCHAR(20) NULL;
+    ALTER TABLE employees ADD COLUMN bank_address TEXT NULL;
+    ALTER TABLE employees ADD COLUMN role VARCHAR(50) NULL;
+    ALTER TABLE employees ADD COLUMN reporting_to INT NULL;
+    ALTER TABLE employees ADD FOREIGN KEY (reports_to) REFERENCES employees(id) ON DELETE SET NULL;
+    ALTER TABLE employees ADD FOREIGN KEY (reporting_to) REFERENCES employees(id) ON DELETE SET NULL;
+
     -- Enhanced Job Applications Table
     ALTER TABLE job_applications ADD COLUMN  application_id VARCHAR(50) UNIQUE;
     ALTER TABLE job_applications ADD COLUMN  resume_path VARCHAR(500);
@@ -1467,3 +1494,805 @@
       FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
       FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
     );
+
+    -- Additional Tables for Timekeeping and Attendance Management
+
+    -- Attendance Policies Table
+    CREATE TABLE attendance_policies (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      description TEXT,
+      policy_type ENUM('general', 'department', 'employee') NULL,
+      department_id INT NULL,
+      employee_id INT NULL,
+      late_arrival_penalty DECIMAL(5,2) NULL,
+      early_departure_penalty DECIMAL(5,2) NULL,
+      absent_penalty DECIMAL(5,2) NULL,
+      overtime_rate DECIMAL(5,2) NULL,
+      max_overtime_hours DECIMAL(4,2) NULL,
+      require_approval_for_overtime BOOLEAN NULL,
+      allow_remote_work BOOLEAN NULL,
+      require_location_tracking BOOLEAN NULL,
+      auto_approve_overtime BOOLEAN NULL,
+      is_active BOOLEAN NULL,
+      company_id INT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
+      FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE SET NULL,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    );
+
+    -- Attendance Records Table
+    CREATE TABLE attendance_records (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      employee_id INT NOT NULL,
+      date DATE NOT NULL,
+      check_in TIME NULL,
+      check_out TIME NULL,
+      work_hours DECIMAL(5,2) NULL,
+      overtime_hours DECIMAL(5,2) NULL,
+      status ENUM('present', 'absent', 'late', 'partial') NULL,
+      check_in_location VARCHAR(255) NULL,
+      check_out_location VARCHAR(255) NULL,
+      check_in_ip VARCHAR(45) NULL,
+      check_out_ip VARCHAR(45) NULL,
+      check_in_device TEXT NULL,
+      check_out_device TEXT NULL,
+      company_id INT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      UNIQUE KEY unique_employee_date (employee_id, date)
+    );
+
+    -- Attendance Regulations Table
+    CREATE TABLE attendance_regulations (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      company_id INT NOT NULL,
+      name VARCHAR(100) NOT NULL,
+      description TEXT,
+      regulation_type ENUM('general', 'department', 'employee') NULL,
+      department_id INT NULL,
+      employee_id INT NULL,
+      working_hours_per_day DECIMAL(4,2) NULL,
+      working_days_per_week INT NULL,
+      break_duration_minutes INT NULL,
+      grace_period_minutes INT NULL,
+      late_penalty_amount DECIMAL(5,2) NULL,
+      absent_penalty_amount DECIMAL(5,2) NULL,
+      overtime_rate_multiplier DECIMAL(3,2) NULL,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
+      FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE SET NULL
+    );
+
+    -- Shifts Table
+    CREATE TABLE shifts (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      company_id INT NOT NULL DEFAULT 1,
+      name VARCHAR(100) NOT NULL,
+      start_time TIME NOT NULL,
+      end_time TIME NOT NULL,
+      break_duration_minutes INT DEFAULT 0,
+      working_hours DECIMAL(4,2) NOT NULL,
+      is_night_shift BOOLEAN DEFAULT FALSE,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    );
+
+    -- Shift Assignments Table
+    CREATE TABLE shift_assignments (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      employee_id INT NOT NULL,
+      shift_id INT NOT NULL,
+      start_date DATE NOT NULL,
+      end_date DATE NULL,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+      FOREIGN KEY (shift_id) REFERENCES shifts(id) ON DELETE CASCADE
+    );
+
+    -- Employee Contracts Table
+    CREATE TABLE employee_contracts (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      employee_id INT NOT NULL,
+      contract_type ENUM('full_time', 'part_time', 'contract', 'internship') NOT NULL,
+      start_date DATE NOT NULL,
+      end_date DATE NULL,
+      salary DECIMAL(10,2) NULL,
+      status ENUM('active', 'expired', 'terminated') NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+    );
+
+    -- Employee Salary Components Table
+    CREATE TABLE employee_salary_components (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      employee_salary_id INT NOT NULL,
+      salary_component_id INT NOT NULL,
+      amount DECIMAL(15,2) NOT NULL,
+      percentage DECIMAL(5,2) NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (employee_salary_id) REFERENCES employee_salaries(id) ON DELETE CASCADE,
+      FOREIGN KEY (salary_component_id) REFERENCES salary_components(id) ON DELETE CASCADE
+    );
+
+    -- Permissions Table
+    CREATE TABLE permissions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      permission_name VARCHAR(100) NOT NULL UNIQUE,
+      name VARCHAR(100) NOT NULL,
+      description TEXT,
+      module VARCHAR(50) NOT NULL,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );
+
+    -- Role Permissions Table
+    CREATE TABLE role_permissions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      role_id INT NOT NULL,
+      permission_id INT NOT NULL,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE,
+      FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE CASCADE,
+      UNIQUE KEY unique_role_permission (role_id, permission_id)
+    );
+
+    -- Payroll Runs Table
+    CREATE TABLE payroll_runs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      company_id INT NOT NULL,
+      run_id VARCHAR(50) UNIQUE,
+      month INT NOT NULL,
+      year INT NOT NULL,
+      status ENUM('draft', 'processing', 'completed', 'failed') DEFAULT 'draft',
+      total_employees INT DEFAULT 0,
+      total_amount DECIMAL(15,2) DEFAULT 0,
+      processed_at DATETIME NULL,
+      created_by INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    -- Leave Balances Table
+    CREATE TABLE leave_balances (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      employee_id INT NOT NULL,
+      leave_type_id INT NOT NULL,
+      year INT NOT NULL,
+      total_days INT NOT NULL,
+      used_days INT DEFAULT 0,
+      remaining_days INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+      FOREIGN KEY (leave_type_id) REFERENCES leave_types(id) ON DELETE CASCADE,
+      UNIQUE KEY unique_employee_leave_year (employee_id, leave_type_id, year)
+    );
+
+    -- Leave Policies Table
+    CREATE TABLE leave_policies (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      company_id INT NOT NULL,
+      name VARCHAR(100) NOT NULL,
+      description TEXT,
+      max_consecutive_days INT NULL,
+      advance_notice_days INT NULL,
+      requires_medical_certificate BOOLEAN DEFAULT FALSE,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    );
+
+    -- Leave Holidays Table
+    CREATE TABLE leave_holidays (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      company_id INT NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      date DATE NOT NULL,
+      type ENUM('national', 'religious', 'company', 'optional') DEFAULT 'national',
+      is_recurring BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+    );
+
+    -- Projects Table
+    CREATE TABLE projects (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      company_id INT NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      start_date DATE,
+      end_date DATE,
+      status ENUM('planning', 'active', 'completed', 'cancelled') DEFAULT 'planning',
+      budget DECIMAL(15,2),
+      created_by INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    -- Project Assignments Table
+    CREATE TABLE project_assignments (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      project_id INT NOT NULL,
+      employee_id INT NOT NULL,
+      role VARCHAR(100),
+      start_date DATE,
+      end_date DATE,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+      FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+    );
+
+    -- Project Tasks Table
+    CREATE TABLE project_tasks (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      project_id INT NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      assigned_to INT,
+      status ENUM('pending', 'in_progress', 'completed', 'cancelled') DEFAULT 'pending',
+      priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
+      due_date DATE,
+      created_by INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+      FOREIGN KEY (assigned_to) REFERENCES employees(id) ON DELETE SET NULL,
+      FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    -- Enhanced User Permissions Table
+    ALTER TABLE user_permissions ADD COLUMN is_active BOOLEAN NULL;
+    ALTER TABLE user_permissions ADD COLUMN permission_id INT NULL;
+    ALTER TABLE user_permissions ADD FOREIGN KEY (permission_id) REFERENCES permissions(id) ON DELETE SET NULL;
+
+    -- Additional Leave Management Tables
+
+    -- Leave Approvals Table (For Multi-level Approval)
+    CREATE TABLE leave_approvals (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      leave_application_id INT NOT NULL,
+      approver_id INT NOT NULL,
+      approval_level INT NOT NULL,
+      status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+      comments TEXT,
+      approved_at DATETIME NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (leave_application_id) REFERENCES leave_applications(id) ON DELETE CASCADE,
+      FOREIGN KEY (approver_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    -- Leave Workflows Table
+    CREATE TABLE leave_workflows (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      company_id INT NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      description TEXT,
+      leave_type_id INT NULL,
+      department_id INT NULL,
+      approval_levels JSON NOT NULL,
+      is_active BOOLEAN DEFAULT TRUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+      FOREIGN KEY (leave_type_id) REFERENCES leave_types(id) ON DELETE CASCADE,
+      FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE
+    );
+
+    -- Leave Notifications Table
+    CREATE TABLE leave_notifications (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      leave_application_id INT NOT NULL,
+      user_id INT NOT NULL,
+      notification_type ENUM('application_submitted', 'application_approved', 'application_rejected', 'application_cancelled', 'reminder') NOT NULL,
+      message TEXT NOT NULL,
+      is_read BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (leave_application_id) REFERENCES leave_applications(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    -- Enhanced Leave Types Table (Additional columns)
+    ALTER TABLE leave_types ADD COLUMN code VARCHAR(20) UNIQUE NULL;
+    ALTER TABLE leave_types ADD COLUMN description TEXT NULL;
+    ALTER TABLE leave_types ADD COLUMN max_consecutive_days INT DEFAULT 0;
+    ALTER TABLE leave_types ADD COLUMN requires_documentation BOOLEAN DEFAULT FALSE;
+    ALTER TABLE leave_types ADD COLUMN carry_forward BOOLEAN DEFAULT FALSE;
+    ALTER TABLE leave_types ADD COLUMN max_carry_forward_days INT DEFAULT 0;
+    ALTER TABLE leave_types ADD COLUMN gender_restriction ENUM('all', 'male', 'female') DEFAULT 'all';
+    ALTER TABLE leave_types ADD COLUMN min_service_days INT DEFAULT 0;
+    ALTER TABLE leave_types ADD COLUMN advance_notice_days INT DEFAULT 0;
+    ALTER TABLE leave_types ADD COLUMN color_code VARCHAR(7) DEFAULT '#3B82F6';
+    ALTER TABLE leave_types ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
+
+    -- Enhanced Leave Applications Table (Additional columns)
+    ALTER TABLE leave_applications ADD COLUMN applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+    ALTER TABLE leave_applications ADD COLUMN cancelled_at DATETIME NULL;
+    ALTER TABLE leave_applications ADD COLUMN cancellation_reason TEXT NULL;
+
+    -- Enhanced Leave Balances Table (Additional columns)
+    ALTER TABLE leave_balances ADD COLUMN total_allocated INT DEFAULT 0;
+    ALTER TABLE leave_balances ADD COLUMN total_approved INT DEFAULT 0;
+    ALTER TABLE leave_balances ADD COLUMN total_pending INT DEFAULT 0;
+    ALTER TABLE leave_balances ADD COLUMN carry_forward_from_previous INT DEFAULT 0;
+    ALTER TABLE leave_balances ADD COLUMN carry_forward_to_next INT DEFAULT 0;
+
+    -- Enhanced Leave Holidays Table (Additional columns)
+    ALTER TABLE leave_holidays ADD COLUMN recurring_pattern ENUM('yearly', 'monthly', 'weekly') NULL;
+    ALTER TABLE leave_holidays ADD COLUMN description TEXT NULL;
+    ALTER TABLE leave_holidays ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
+
+    -- Enhanced Leave Policies Table (Additional columns)
+    ALTER TABLE leave_policies ADD COLUMN policy_type ENUM('general', 'department_specific', 'employee_specific') DEFAULT 'general';
+    ALTER TABLE leave_policies ADD COLUMN department_id INT NULL;
+    ALTER TABLE leave_policies ADD COLUMN employee_id INT NULL;
+    ALTER TABLE leave_policies ADD COLUMN leave_type_id INT NOT NULL;
+    ALTER TABLE leave_policies ADD COLUMN max_days_per_year INT DEFAULT 0;
+    ALTER TABLE leave_policies ADD COLUMN max_consecutive_days INT DEFAULT 0;
+    ALTER TABLE leave_policies ADD COLUMN approval_workflow JSON NULL;
+    ALTER TABLE leave_policies ADD COLUMN effective_from DATE NOT NULL;
+    ALTER TABLE leave_policies ADD COLUMN effective_to DATE NULL;
+    ALTER TABLE leave_policies ADD COLUMN created_by INT NOT NULL;
+    ALTER TABLE leave_policies ADD FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE;
+    ALTER TABLE leave_policies ADD FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE;
+    ALTER TABLE leave_policies ADD FOREIGN KEY (leave_type_id) REFERENCES leave_types(id) ON DELETE CASCADE;
+    ALTER TABLE leave_policies ADD FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE;
+
+    -- Create Indexes for Performance
+    CREATE INDEX idx_leave_applications_employee ON leave_applications(employee_id);
+    CREATE INDEX idx_leave_applications_status ON leave_applications(status);
+    CREATE INDEX idx_leave_applications_dates ON leave_applications(start_date, end_date);
+    CREATE INDEX idx_leave_balances_employee_year ON leave_balances(employee_id, year);
+    CREATE INDEX idx_leave_approvals_application ON leave_approvals(leave_application_id);
+    CREATE INDEX idx_leave_holidays_company_date ON leave_holidays(company_id, date);
+    CREATE INDEX idx_leave_notifications_user ON leave_notifications(user_id, is_read);
+
+    -- =====================================================
+    -- INSERT DEFAULT LEAVE TYPES
+    -- =====================================================
+
+    INSERT INTO leave_types (company_id, name, code, description, days_allowed, max_consecutive_days, requires_approval, requires_documentation, is_paid, carry_forward, color_code) VALUES
+    (1, 'Annual Leave', 'AL', 'Annual vacation leave', 21, 14, TRUE, FALSE, TRUE, TRUE, '#10B981'),
+    (1, 'Sick Leave', 'SL', 'Medical leave for illness', 12, 7, TRUE, TRUE, TRUE, FALSE, '#EF4444'),
+    (1, 'Personal Leave', 'PL', 'Personal time off', 5, 3, TRUE, FALSE, FALSE, FALSE, '#8B5CF6'),
+    (1, 'Maternity Leave', 'ML', 'Maternity leave for new mothers', 90, 90, TRUE, TRUE, TRUE, FALSE, '#EC4899'),
+    (1, 'Paternity Leave', 'PTL', 'Paternity leave for new fathers', 7, 7, TRUE, FALSE, TRUE, FALSE, '#06B6D4'),
+    (1, 'Emergency Leave', 'EL', 'Emergency situations', 3, 3, FALSE, FALSE, FALSE, FALSE, '#F59E0B'),
+    (1, 'Study Leave', 'STL', 'Educational leave', 10, 5, TRUE, TRUE, FALSE, FALSE, '#6366F1'),
+    (1, 'Bereavement Leave', 'BL', 'Death in family', 3, 3, FALSE, FALSE, TRUE, FALSE, '#6B7280');
+
+    -- =====================================================
+    -- INSERT DEFAULT HOLIDAYS
+    -- =====================================================
+
+    INSERT INTO leave_holidays (company_id, name, date, type, is_recurring, description) VALUES
+    (1, 'New Year', '2024-01-01', 'national', TRUE, 'New Year Day'),
+    (1, 'Independence Day', '2024-08-15', 'national', TRUE, 'Independence Day'),
+    (1, 'Gandhi Jayanti', '2024-10-02', 'national', TRUE, 'Mahatma Gandhi Birthday'),
+    (1, 'Christmas', '2024-12-25', 'national', TRUE, 'Christmas Day'),
+    (1, 'Company Foundation Day', '2024-06-15', 'company', TRUE, 'Company Foundation Anniversary');
+
+-- =====================================================
+-- HR SETUP TABLES
+-- =====================================================
+
+-- Document Types Table
+CREATE TABLE IF NOT EXISTS document_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  is_required BOOLEAN DEFAULT FALSE,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Payslip Types Table
+CREATE TABLE IF NOT EXISTS payslip_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Allowance Options Table
+CREATE TABLE IF NOT EXISTS allowance_options (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  is_taxable BOOLEAN DEFAULT TRUE,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Loan Options Table
+CREATE TABLE IF NOT EXISTS loan_options (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  max_amount DECIMAL(15,2),
+  interest_rate DECIMAL(5,2),
+  max_duration_months INT,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Deduction Options Table
+CREATE TABLE IF NOT EXISTS deduction_options (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  is_mandatory BOOLEAN DEFAULT FALSE,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Goal Types Table
+CREATE TABLE IF NOT EXISTS goal_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Competencies Table
+CREATE TABLE IF NOT EXISTS competencies (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  category VARCHAR(100),
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Performance Types Table
+CREATE TABLE IF NOT EXISTS performance_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Training Types Table
+CREATE TABLE IF NOT EXISTS training_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Job Categories Table
+CREATE TABLE IF NOT EXISTS job_categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Job Stages Table
+CREATE TABLE IF NOT EXISTS job_stages (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  order_index INT DEFAULT 0,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Award Types Table
+CREATE TABLE IF NOT EXISTS award_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Termination Types Table
+CREATE TABLE IF NOT EXISTS termination_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  notice_period_days INT DEFAULT 30,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Expense Types Table
+CREATE TABLE IF NOT EXISTS expense_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  requires_approval BOOLEAN DEFAULT TRUE,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Income Types Table
+CREATE TABLE IF NOT EXISTS income_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  is_taxable BOOLEAN DEFAULT TRUE,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Payment Types Table
+CREATE TABLE IF NOT EXISTS payment_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- Contract Types Table
+CREATE TABLE IF NOT EXISTS contract_types (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  company_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  code VARCHAR(50),
+  description TEXT,
+  duration_months INT,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+);
+
+-- =====================================================
+-- Additional Features Tables
+-- =====================================================
+
+-- Trips table for business travel management
+CREATE TABLE IF NOT EXISTS trips (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    employee_id INT NOT NULL,
+    destination VARCHAR(255) NOT NULL,
+    purpose TEXT,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    estimated_cost DECIMAL(10,2) DEFAULT 0.00,
+    actual_cost DECIMAL(10,2) DEFAULT 0.00,
+    status ENUM('pending', 'approved', 'rejected', 'completed', 'cancelled') DEFAULT 'pending',
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+    INDEX idx_company_employee (company_id, employee_id),
+    INDEX idx_status (status),
+    INDEX idx_dates (start_date, end_date)
+);
+
+-- Announcements table for company-wide announcements
+CREATE TABLE IF NOT EXISTS announcements (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    priority ENUM('low', 'normal', 'high', 'urgent') DEFAULT 'normal',
+    target_audience ENUM('all', 'department', 'role', 'specific') DEFAULT 'all',
+    target_department_id INT NULL,
+    target_role VARCHAR(100) NULL,
+    target_user_ids JSON NULL,
+    is_published BOOLEAN DEFAULT FALSE,
+    expiry_date DATE NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (target_department_id) REFERENCES departments(id) ON DELETE SET NULL,
+    INDEX idx_company_published (company_id, is_published),
+    INDEX idx_priority (priority),
+    INDEX idx_expiry (expiry_date)
+);
+
+-- Meetings table for meeting management
+CREATE TABLE IF NOT EXISTS meetings (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    organizer_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    meeting_date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    location VARCHAR(255),
+    meeting_type ENUM('internal', 'external', 'client', 'training', 'review') DEFAULT 'internal',
+    department_id INT NULL,
+    status ENUM('scheduled', 'in_progress', 'completed', 'cancelled') DEFAULT 'scheduled',
+    meeting_link VARCHAR(500) NULL,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    FOREIGN KEY (organizer_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
+    INDEX idx_company_date (company_id, meeting_date),
+    INDEX idx_organizer (organizer_id),
+    INDEX idx_status (status)
+);
+
+-- Meeting attendees junction table
+CREATE TABLE IF NOT EXISTS meeting_attendees (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    meeting_id INT NOT NULL,
+    user_id INT NOT NULL,
+    status ENUM('invited', 'accepted', 'declined', 'tentative') DEFAULT 'invited',
+    response_date TIMESTAMP NULL,
+    attendance_status ENUM('present', 'absent', 'late') NULL,
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (meeting_id) REFERENCES meetings(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_meeting_user (meeting_id, user_id),
+    INDEX idx_user_meetings (user_id),
+    INDEX idx_attendance_status (attendance_status)
+);
+
+-- Meeting types table
+CREATE TABLE IF NOT EXISTS meeting_types (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    color VARCHAR(7) DEFAULT '#3b82f6',
+    default_duration INT DEFAULT 60,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    INDEX idx_company_status (company_id, status)
+);
+
+-- Meeting rooms table
+CREATE TABLE IF NOT EXISTS meeting_rooms (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255),
+    capacity INT DEFAULT 10,
+    equipment TEXT,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    INDEX idx_company_status (company_id, status)
+);
+
+-- Training Programs table
+CREATE TABLE IF NOT EXISTS training_programs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    duration VARCHAR(100),
+    cost DECIMAL(10,2) DEFAULT 0.00,
+    trainer VARCHAR(255),
+    status ENUM('active', 'inactive', 'completed') DEFAULT 'active',
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_company_status (company_id, status)
+);
+
+-- Training Enrollments table
+CREATE TABLE IF NOT EXISTS training_enrollments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    company_id INT NOT NULL,
+    employee_id INT NOT NULL,
+    program_id INT NOT NULL,
+    enrolled_by INT,
+    enrolled_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completion_date DATE,
+    status ENUM('enrolled', 'in_progress', 'completed', 'cancelled') DEFAULT 'enrolled',
+    grade VARCHAR(10),
+    notes TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+    FOREIGN KEY (program_id) REFERENCES training_programs(id) ON DELETE CASCADE,
+    FOREIGN KEY (enrolled_by) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_employee_program (employee_id, program_id),
+    INDEX idx_company_status (company_id, status)
+);

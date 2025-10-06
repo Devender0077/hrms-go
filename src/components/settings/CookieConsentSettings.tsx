@@ -1,246 +1,202 @@
-import React from "react";
-import { Card, CardBody, CardHeader, Input, Textarea, Switch, Button, Divider, Select, SelectItem } from "@heroui/react";
+import React from 'react';
+import { Card, CardBody, CardHeader, Switch, Input, Textarea, Select, SelectItem, Button } from '@heroui/react';
+import { Icon } from '@iconify/react';
 
 interface CookieConsentSettingsProps {
-  settings: {
-    enabled: boolean;
-    position: string;
-    message: string;
-    acceptButtonText: string;
-    declineButtonText: string;
-    learnMoreText: string;
-    learnMoreUrl: string;
-    cookiePolicyUrl: string;
-    privacyPolicyUrl: string;
-    termsOfServiceUrl: string;
-    showDeclineButton: boolean;
-    showLearnMoreButton: boolean;
-    autoAccept: boolean;
-    autoAcceptDelay: number;
-    rememberChoice: boolean;
-    cookieExpiry: number;
-    requiredCookies: string[];
-    optionalCookies: string[];
-    analyticsCookies: string[];
-    marketingCookies: string[];
-    functionalCookies: string[];
-  };
+  settings: Record<string, any>;
   onSettingsChange: (field: string, value: any) => void;
 }
 
 export default function CookieConsentSettings({ settings, onSettingsChange }: CookieConsentSettingsProps) {
-  const positionOptions = [
-    { label: "Bottom", value: "bottom" },
-    { label: "Top", value: "top" },
-    { label: "Bottom Left", value: "bottom-left" },
-    { label: "Bottom Right", value: "bottom-right" },
-    { label: "Top Left", value: "top-left" },
-    { label: "Top Right", value: "top-right" }
-  ];
-
-
-  const cookieTypes = [
-    { key: "required", label: "Required Cookies", description: "Essential for website functionality" },
-    { key: "functional", label: "Functional Cookies", description: "Enhance user experience" },
-    { key: "analytics", label: "Analytics Cookies", description: "Help us understand website usage" },
-    { key: "marketing", label: "Marketing Cookies", description: "Used for targeted advertising" }
-  ];
-
-  const handleCookieTypeChange = (type: string, value: string) => {
-    const currentCookies = settings[`${type}Cookies` as keyof typeof settings] as string[];
-    const updatedCookies = currentCookies.includes(value)
-      ? currentCookies.filter(cookie => cookie !== value)
-      : [...currentCookies, value];
-    onSettingsChange(`${type}Cookies`, updatedCookies);
-  };
-
   return (
     <div className="space-y-6">
+      {/* General Settings */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Cookie Consent Configuration</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:cookie" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Cookie Consent Settings</h3>
+          </div>
         </CardHeader>
         <CardBody className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Select
-              label="Position"
-              placeholder="Select position"
-              selectedKeys={[settings.position]}
-              onChange={(e) => onSettingsChange("position", e.target.value)}
-            >
-              {positionOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </Select>
-            <Input
-              label="Auto Accept Delay (seconds)"
-              type="number"
-              placeholder="0"
-              value={settings.autoAcceptDelay.toString()}
-              onChange={(e) => onSettingsChange("autoAcceptDelay", parseInt(e.target.value))}
-            />
-            <Input
-              label="Cookie Expiry (days)"
-              type="number"
-              placeholder="365"
-              value={settings.cookieExpiry.toString()}
-              onChange={(e) => onSettingsChange("cookieExpiry", parseInt(e.target.value))}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Cookie Consent</p>
+              <p className="text-xs text-default-500">Show cookie consent banner to users</p>
+            </div>
+            <Switch
+              isSelected={settings.enabled === true || settings.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('enabled', value)}
             />
           </div>
-          
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Enable cookie consent banner</span>
-                <span className="text-xs text-default-500">Show cookie consent banner to users</span>
-              </div>
-              <Switch
-                isSelected={settings.enabled}
-                onValueChange={(value) => onSettingsChange("enabled", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Show decline button</span>
-                <span className="text-xs text-default-500">Display decline option for users</span>
-              </div>
-              <Switch
-                isSelected={settings.showDeclineButton}
-                onValueChange={(value) => onSettingsChange("showDeclineButton", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Show learn more button</span>
-                <span className="text-xs text-default-500">Display learn more link for detailed information</span>
-              </div>
-              <Switch
-                isSelected={settings.showLearnMoreButton}
-                onValueChange={(value) => onSettingsChange("showLearnMoreButton", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Auto accept cookies</span>
-                <span className="text-xs text-default-500">Automatically accept cookies after delay</span>
-              </div>
-              <Switch
-                isSelected={settings.autoAccept}
-                onValueChange={(value) => onSettingsChange("autoAccept", value)}
-              />
-            </div>
-            <div className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-foreground">Remember user choice</span>
-                <span className="text-xs text-default-500">Remember user's cookie preferences</span>
-              </div>
-              <Switch
-                isSelected={settings.rememberChoice}
-                onValueChange={(value) => onSettingsChange("rememberChoice", value)}
-              />
-            </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Select
+              label="Banner Position"
+              placeholder="Select position"
+              selectedKeys={settings.position ? [settings.position] : ['bottom']}
+              onSelectionChange={(keys) => onSettingsChange('position', Array.from(keys)[0])}
+            >
+              <SelectItem key="top">Top</SelectItem>
+              <SelectItem key="bottom">Bottom</SelectItem>
+              <SelectItem key="top-left">Top Left</SelectItem>
+              <SelectItem key="top-right">Top Right</SelectItem>
+              <SelectItem key="bottom-left">Bottom Left</SelectItem>
+              <SelectItem key="bottom-right">Bottom Right</SelectItem>
+            </Select>
+
+            <Select
+              label="Banner Theme"
+              placeholder="Select theme"
+              selectedKeys={settings.theme ? [settings.theme] : ['light']}
+              onSelectionChange={(keys) => onSettingsChange('theme', Array.from(keys)[0])}
+            >
+              <SelectItem key="light">Light</SelectItem>
+              <SelectItem key="dark">Dark</SelectItem>
+              <SelectItem key="auto">Auto</SelectItem>
+            </Select>
           </div>
         </CardBody>
       </Card>
 
+      {/* Banner Content */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Banner Text Configuration</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:message-square" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Banner Content</h3>
+          </div>
         </CardHeader>
         <CardBody className="space-y-4">
           <Textarea
             label="Consent Message"
-            placeholder="We use cookies to enhance your experience..."
-            value={settings.message}
-            onChange={(e) => onSettingsChange("message", e.target.value)}
-            minRows={3}
+            
+            onChange={(e) => onSettingsChange('message', e.target.value)}
+            placeholder="Enter cookie consent message"
+            description="Main message displayed in the cookie banner"
+            startContent={<Icon icon="lucide:file-text" className="text-default-400" />}
           />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="Accept Button Text"
-              placeholder="Accept All"
-              value={settings.acceptButtonText}
-              onChange={(e) => onSettingsChange("acceptButtonText", e.target.value)}
+              
+              onChange={(e) => onSettingsChange('acceptButton', e.target.value)}
+              placeholder="Accept"
+              startContent={<Icon icon="lucide:check" className="text-default-400" />}
             />
+
             <Input
               label="Decline Button Text"
+              
+              onChange={(e) => onSettingsChange('declineButton', e.target.value)}
               placeholder="Decline"
-              value={settings.declineButtonText}
-              onChange={(e) => onSettingsChange("declineButtonText", e.target.value)}
-            />
-            <Input
-              label="Learn More Text"
-              placeholder="Learn More"
-              value={settings.learnMoreText}
-              onChange={(e) => onSettingsChange("learnMoreText", e.target.value)}
-            />
-            <Input
-              label="Learn More URL"
-              placeholder="https://yourdomain.com/cookies"
-              value={settings.learnMoreUrl}
-              onChange={(e) => onSettingsChange("learnMoreUrl", e.target.value)}
+              startContent={<Icon icon="lucide:x" className="text-default-400" />}
             />
           </div>
-        </CardBody>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <h3 className="text-lg font-semibold">Policy URLs</h3>
-        </CardHeader>
-        <CardBody className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
-              label="Cookie Policy URL"
-              placeholder="https://yourdomain.com/cookie-policy"
-              value={settings.cookiePolicyUrl}
-              onChange={(e) => onSettingsChange("cookiePolicyUrl", e.target.value)}
+              label="Policy Link Text"
+              
+              onChange={(e) => onSettingsChange('policyText', e.target.value)}
+              placeholder="Learn more"
+              startContent={<Icon icon="lucide:external-link" className="text-default-400" />}
             />
+
             <Input
-              label="Privacy Policy URL"
-              placeholder="https://yourdomain.com/privacy-policy"
-              value={settings.privacyPolicyUrl}
-              onChange={(e) => onSettingsChange("privacyPolicyUrl", e.target.value)}
-            />
-            <Input
-              label="Terms of Service URL"
-              placeholder="https://yourdomain.com/terms-of-service"
-              value={settings.termsOfServiceUrl}
-              onChange={(e) => onSettingsChange("termsOfServiceUrl", e.target.value)}
+              label="Policy Link URL"
+              
+              onChange={(e) => onSettingsChange('policyLink', e.target.value)}
+              placeholder="/privacy-policy"
+              startContent={<Icon icon="lucide:link" className="text-default-400" />}
             />
           </div>
         </CardBody>
       </Card>
 
+      {/* Cookie Categories */}
       <Card>
         <CardHeader>
-          <h3 className="text-lg font-semibold">Cookie Categories</h3>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:layers" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Cookie Categories</h3>
+          </div>
         </CardHeader>
-        <CardBody className="space-y-6">
-          {cookieTypes.map((type) => (
-            <div key={type.key}>
-              <h4 className="text-md font-medium mb-2">{type.label}</h4>
-              <p className="text-sm text-default-600 mb-4">{type.description}</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {settings[`${type.key}Cookies` as keyof typeof settings]?.map((cookie: string) => (
-                  <div key={cookie} className="flex items-center justify-between p-3 bg-content1 rounded-lg">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-foreground">{cookie}</span>
-                      <span className="text-xs text-default-500">Enable {cookie.toLowerCase()} cookie</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={true}
-                      onChange={() => handleCookieTypeChange(type.key, cookie)}
-                      className="w-4 h-4 text-primary-600 bg-content2 border-divider rounded focus:ring-primary-500 focus:ring-2"
-                    />
-                  </div>
-                ))}
-              </div>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Necessary Cookies</p>
+              <p className="text-xs text-default-500">Essential cookies for website functionality</p>
             </div>
-          ))}
+            <Switch
+              isSelected={settings.categories?.necessary?.enabled === true || settings.categories?.necessary?.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('categories', {
+                ...settings.categories,
+                necessary: {
+                  ...settings.categories?.necessary,
+                  enabled: value
+                }
+              })}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Analytics Cookies</p>
+              <p className="text-xs text-default-500">Help us understand website usage</p>
+            </div>
+            <Switch
+              isSelected={settings.categories?.analytics?.enabled === true || settings.categories?.analytics?.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('categories', {
+                ...settings.categories,
+                analytics: {
+                  ...settings.categories?.analytics,
+                  enabled: value
+                }
+              })}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Marketing Cookies</p>
+              <p className="text-xs text-default-500">Used for advertising and tracking</p>
+            </div>
+            <Switch
+              isSelected={settings.categories?.marketing?.enabled === true || settings.categories?.marketing?.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('categories', {
+                ...settings.categories,
+                marketing: {
+                  ...settings.categories?.marketing,
+                  enabled: value
+                }
+              })}
+            />
+          </div>
+        </CardBody>
+      </Card>
+
+      {/* Actions */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:eye" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Preview & Actions</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex gap-3">
+            <Button color="primary" variant="flat" startContent={<Icon icon="lucide:eye" />}>
+              Preview Banner
+            </Button>
+            <Button color="secondary" variant="flat" startContent={<Icon icon="lucide:test-tube" />}>
+              Test Banner
+            </Button>
+            <Button color="success" variant="flat" startContent={<Icon icon="lucide:save" />}>
+              Save Settings
+            </Button>
+          </div>
         </CardBody>
       </Card>
     </div>

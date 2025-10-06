@@ -52,7 +52,7 @@ export const usePerformanceReviews = () => {
       setError(null);
       const result = await apiRequest('/performance/reviews', {
         method: 'POST',
-        body: reviewData,
+        body: JSON.stringify(reviewData),
       });
       await loadReviews(); // Reload reviews after creation
       return result;
@@ -68,7 +68,7 @@ export const usePerformanceReviews = () => {
       setError(null);
       const result = await apiRequest(`/performance/reviews/${id}`, {
         method: 'PUT',
-        body: reviewData,
+        body: JSON.stringify(reviewData),
       });
       await loadReviews(); // Reload reviews after update
       return result;

@@ -71,7 +71,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Date</label>
                     <Input
-                      value={formatDate(record.date)}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -79,7 +79,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Employee ID</label>
                     <Input
-                      value={record.employee_id}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -91,7 +91,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Check In Time</label>
                     <Input
-                      value={formatTime(record.check_in)}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -99,7 +99,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Check Out Time</label>
                     <Input
-                      value={formatTime(record.check_out)}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -126,7 +126,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Work Hours</label>
                     <Input
-                      value={formatHours(record.work_hours)}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -134,7 +134,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Total Hours</label>
                     <Input
-                      value={formatHours(record.total_hours)}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -142,7 +142,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Overtime Hours</label>
                     <Input
-                      value={formatHours(record.overtime_hours)}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -154,7 +154,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Department</label>
                     <Input
-                      value={record.department || '-'}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -162,7 +162,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Designation</label>
                     <Input
-                      value={record.designation_name || '-'}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -174,7 +174,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Shift</label>
                     <Input
-                      value={record.shift_name}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -186,7 +186,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">IP Address</label>
                     <Input
-                      value={record.ip_address}
+                      
                       isReadOnly
                       size="sm"
                     />
@@ -210,7 +210,7 @@ const AttendanceViewModal: React.FC<AttendanceViewModalProps> = ({
                   <div>
                     <label className="text-sm font-medium text-default-700">Note</label>
                     <Input
-                      value={record.note}
+                      
                       isReadOnly
                       size="sm"
                     />

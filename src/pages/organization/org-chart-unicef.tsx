@@ -240,7 +240,7 @@ export default function OrganizationChartUnicef() {
               <div className="flex-1">
                 <Input
                   placeholder="Search employees..."
-                  value={searchQuery}
+                  
                   onValueChange={setSearchQuery}
                   startContent={<Icon icon="lucide:search" className="text-default-400" />}
                   className="max-w-md"
@@ -253,10 +253,10 @@ export default function OrganizationChartUnicef() {
                   onSelectionChange={(keys) => setSelectedDepartment(Array.from(keys)[0] as string)}
                   className="w-48"
                 >
-                  <SelectItem key="all" value="all">All Departments</SelectItem>
+                  <SelectItem key="all">All Departments</SelectItem>
                   {departments.map(dept => (
-                    <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-                  ))}
+                    <SelectItem key={dept} >{dept}</SelectItem>
+                  )) as any}
                 </Select>
                 <Tabs
                   selectedKey={viewMode}

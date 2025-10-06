@@ -25,6 +25,7 @@ import {
   useDisclosure
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import HeroSection from "../common/HeroSection";
 import {
   AreaChart,
   Area,
@@ -143,56 +144,48 @@ export default function EmployeeDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-content1/50 p-6">
+    <div className="min-h-screen bg-background p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-secondary-500 to-pink-600 rounded-xl">
-              <Icon icon="lucide:user" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Employee Dashboard</h1>
-              <p className="text-default-600 mt-1">Welcome back! Here's your overview</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              color="primary" 
-              variant="flat"
-              startContent={<Icon icon="lucide:clock" />}
-              className="font-medium"
-            >
-              Check In/Out
-            </Button>
-            <Button 
-              color="secondary" 
-              variant="flat"
-              startContent={<Icon icon="lucide:calendar" />}
-              className="font-medium"
-            >
-              Request Leave
-            </Button>
-          </div>
-        </div>
+        {/* Hero Section */}
+        <HeroSection
+          title="Employee Dashboard"
+          subtitle="Your Personal Overview"
+          description="Track your tasks, monitor your performance, and stay connected with your team. Here's your personal workspace overview."
+          icon="lucide:user"
+          illustration="dashboard"
+          actions={[
+            {
+              label: "Check In/Out",
+              icon: "lucide:clock",
+              onPress: () => console.log("Check in/out"),
+              variant: "bordered"
+            },
+            {
+              label: "Request Leave",
+              icon: "lucide:calendar",
+              onPress: () => console.log("Request leave"),
+              variant: "flat"
+            }
+          ]}
+        />
 
         {/* Key Metrics Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardBody className="p-6">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow bg-content1 dark:bg-content1">
+              <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Tasks Completed</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{employeeStats.completedTasks}/{employeeStats.totalTasks}</p>
-                    <p className="text-success-600 text-sm mt-1">67% completion rate</p>
+                    <p className="text-default-500 text-xs sm:text-sm font-medium">Tasks Completed</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{employeeStats.completedTasks}/{employeeStats.totalTasks}</p>
+                    <p className="text-success-600 text-xs sm:text-sm mt-1">67% completion rate</p>
                   </div>
-                  <div className="p-3 bg-primary-100 rounded-xl">
-                    <Icon icon="lucide:check-circle" className="text-primary-600 text-2xl" />
+                  <div className="p-2 sm:p-3 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
+                    <Icon icon="lucide:check-circle" className="text-primary-600 text-xl sm:text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -204,16 +197,16 @@ export default function EmployeeDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardBody className="p-6">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow bg-content1 dark:bg-content1">
+              <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Attendance Rate</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{employeeStats.attendanceRate}%</p>
-                    <p className="text-success-600 text-sm mt-1">Excellent attendance</p>
+                    <p className="text-default-500 text-xs sm:text-sm font-medium">Attendance Rate</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{employeeStats.attendanceRate}%</p>
+                    <p className="text-success-600 text-xs sm:text-sm mt-1">Excellent attendance</p>
                   </div>
-                  <div className="p-3 bg-success-100 rounded-xl">
-                    <Icon icon="lucide:user-check" className="text-success-600 text-2xl" />
+                  <div className="p-2 sm:p-3 bg-success-100 dark:bg-success-900/30 rounded-xl">
+                    <Icon icon="lucide:user-check" className="text-success-600 text-xl sm:text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -225,16 +218,16 @@ export default function EmployeeDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardBody className="p-6">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow bg-content1 dark:bg-content1">
+              <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Leave Balance</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{employeeStats.leaveBalance}</p>
-                    <p className="text-primary-600 text-sm mt-1">Days remaining</p>
+                    <p className="text-default-500 text-xs sm:text-sm font-medium">Leave Balance</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{employeeStats.leaveBalance}</p>
+                    <p className="text-primary-600 text-xs sm:text-sm mt-1">Days remaining</p>
                   </div>
-                  <div className="p-3 bg-warning-100 rounded-xl">
-                    <Icon icon="lucide:calendar-days" className="text-warning-600 text-2xl" />
+                  <div className="p-2 sm:p-3 bg-warning-100 dark:bg-warning-900/30 rounded-xl">
+                    <Icon icon="lucide:calendar-days" className="text-warning-600 text-xl sm:text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -246,16 +239,16 @@ export default function EmployeeDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardBody className="p-6">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow bg-content1 dark:bg-content1">
+              <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Upcoming Events</p>
-                    <p className="text-3xl font-bold text-foreground mt-1">{employeeStats.upcomingEvents}</p>
-                    <p className="text-secondary-600 text-sm mt-1">This week</p>
+                    <p className="text-default-500 text-xs sm:text-sm font-medium">Upcoming Events</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{employeeStats.upcomingEvents}</p>
+                    <p className="text-secondary-600 text-xs sm:text-sm mt-1">This week</p>
                   </div>
-                  <div className="p-3 bg-secondary-100 rounded-xl">
-                    <Icon icon="lucide:calendar" className="text-secondary-600 text-2xl" />
+                  <div className="p-2 sm:p-3 bg-secondary-100 dark:bg-secondary-900/30 rounded-xl">
+                    <Icon icon="lucide:calendar" className="text-secondary-600 text-xl sm:text-2xl" />
                   </div>
                 </div>
               </CardBody>
@@ -391,7 +384,7 @@ export default function EmployeeDashboard() {
                           <span>{task.progress}%</span>
                         </div>
                         <Progress 
-                          value={task.progress} 
+                           
                           color={task.progress === 100 ? "success" : task.progress > 50 ? "primary" : "warning"}
                           className="h-2"
                         />

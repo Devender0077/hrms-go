@@ -169,14 +169,14 @@ import React from "react";
                 isClearable
                 placeholder={searchPlaceholder}
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
-                value={searchQuery}
+                
                 onValueChange={handleSearchChange}
                 className="w-full sm:max-w-[44%]"
               />
               
               <div className="flex gap-2">
                 {/* Add any additional filters or actions here */}
-                {selectedKeys.size > 0 && (
+                {(selectedKeys === 'all' || (selectedKeys instanceof Set && selectedKeys.size > 0)) && (
                   <Button 
                     color="danger" 
                     variant="flat" 
@@ -223,7 +223,7 @@ import React from "react";
                 >
                   {column.label}
                 </TableColumn>
-              ))}
+              )) as any}
               {rowActions.length > 0 && (
                 <TableColumn align="center" style={{ width: "100px" }}>
                   Actions
@@ -240,9 +240,9 @@ import React from "react";
                 <TableRow key={item.id}>
                   {columns.map((column) => (
                     <TableCell key={`${item.id}-${column.key}`}>
-                      {column.renderCell ? column.renderCell(item) : item[column.key as keyof T]}
+                      {column.renderCell ? column.renderCell(item) : (item[column.key as keyof T] as React.ReactNode)}
                     </TableCell>
-                  ))}
+                  )) as any}
                   
                   {/* Row Actions */}
                   {rowActions.length > 0 && (

@@ -47,7 +47,7 @@ export const useCandidates = () => {
       setError(null);
       const result = await apiRequest('/candidates', {
         method: 'POST',
-        body: candidateData,
+        body: JSON.stringify(candidateData),
       });
       await loadCandidates(); // Reload candidates after creation
       return result;
@@ -63,7 +63,7 @@ export const useCandidates = () => {
       setError(null);
       const result = await apiRequest(`/candidates/${id}`, {
         method: 'PUT',
-        body: candidateData,
+        body: JSON.stringify(candidateData),
       });
       await loadCandidates(); // Reload candidates after update
       return result;

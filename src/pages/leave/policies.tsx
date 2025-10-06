@@ -88,8 +88,8 @@ export default function LeavePolicies() {
     try {
       setLoading(true);
       const [policiesRes, leaveTypesRes] = await Promise.all([
-        apiRequest("GET", "/api/v1/leave/policies"),
-        apiRequest("GET", "/api/v1/leave/types")
+        apiRequest("/leave/policies"),
+        apiRequest("/leave/types")
       ]);
 
       if (policiesRes.success) {
@@ -147,10 +147,10 @@ export default function LeavePolicies() {
       
       const url = isEditMode 
         ? `/api/v1/leave/policies/${selectedPolicy?.id}`
-        : "/api/v1/leave/policies";
+        : "/leave/policies";
       const method = isEditMode ? "PUT" : "POST";
       
-      const response = await apiRequest(method, url, formData);
+      const response = await apiRequest(url, { method, body: JSON.stringify(formData) });
       if (response.success) {
         await loadData();
         onClose();
@@ -216,7 +216,7 @@ export default function LeavePolicies() {
           <>
             <Input
               placeholder="Search policies..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="w-64"
@@ -341,7 +341,7 @@ export default function LeavePolicies() {
                   <Input
                     label="Policy Name"
                     placeholder="Enter policy name"
-                    value={formData.name}
+                    
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     isRequired
                   />
@@ -349,7 +349,7 @@ export default function LeavePolicies() {
                   <Textarea
                     label="Description"
                     placeholder="Enter policy description"
-                    value={formData.description}
+                    
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                   
@@ -361,7 +361,7 @@ export default function LeavePolicies() {
                     isRequired
                   >
                     {leaveTypes.map((leaveType) => (
-                      <SelectItem key={leaveType.id.toString()} value={leaveType.id.toString()}>
+                      <SelectItem key={leaveType.id.toString()} >
                         {leaveType.name} ({leaveType.days_allowed} days)
                       </SelectItem>
                     ))}
@@ -371,7 +371,7 @@ export default function LeavePolicies() {
                     <Input
                       label="Max Days Per Year"
                       type="number"
-                      value={formData.max_days_per_year.toString()}
+                      
                       onChange={(e) => setFormData({ ...formData, max_days_per_year: parseInt(e.target.value) || 0 })}
                       isRequired
                     />
@@ -379,7 +379,7 @@ export default function LeavePolicies() {
                     <Input
                       label="Max Consecutive Days"
                       type="number"
-                      value={formData.max_consecutive_days.toString()}
+                      
                       onChange={(e) => setFormData({ ...formData, max_consecutive_days: parseInt(e.target.value) || 0 })}
                     />
                   </div>
@@ -388,14 +388,14 @@ export default function LeavePolicies() {
                     <Input
                       label="Advance Notice Days"
                       type="number"
-                      value={formData.advance_notice_days.toString()}
+                      
                       onChange={(e) => setFormData({ ...formData, advance_notice_days: parseInt(e.target.value) || 0 })}
                     />
                     
                     <Input
                       label="Carry Forward Days"
                       type="number"
-                      value={formData.carry_forward_days.toString()}
+                      
                       onChange={(e) => setFormData({ ...formData, carry_forward_days: parseInt(e.target.value) || 0 })}
                     />
                   </div>

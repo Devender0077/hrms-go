@@ -54,7 +54,7 @@ export const useBranches = () => {
       addToast({
         title: 'Error',
         description: 'Failed to load branches',
-        type: 'error',
+        color: 'danger',
       });
     } finally {
       setLoading(false);
@@ -85,14 +85,14 @@ export const useBranches = () => {
 
   const addBranch = async (branchData: BranchFormData) => {
     try {
-      const response = await apiRequest('/organization/branches', 'POST', branchData);
+      const response = await apiRequest('/organization/branches', { method: 'POST', body: branchData });
       
       if (response && response.data) {
         setBranches(prev => [...prev, response.data]);
         addToast({
           title: 'Success',
           description: 'Branch added successfully',
-          type: 'success',
+          color: 'success',
         });
         return response.data;
       }
@@ -101,7 +101,7 @@ export const useBranches = () => {
       addToast({
         title: 'Error',
         description: 'Failed to add branch',
-        type: 'error',
+        color: 'danger',
       });
       throw err;
     }
@@ -109,7 +109,7 @@ export const useBranches = () => {
 
   const updateBranch = async (id: number, branchData: BranchFormData) => {
     try {
-      const response = await apiRequest(`/organization/branches/${id}`, 'PUT', branchData);
+      const response = await apiRequest(`/organization/branches/${id}`, { method: 'PUT', body: branchData });
       
       if (response && response.data) {
         setBranches(prev => 
@@ -118,7 +118,7 @@ export const useBranches = () => {
         addToast({
           title: 'Success',
           description: 'Branch updated successfully',
-          type: 'success',
+          color: 'success',
         });
         return response.data;
       }
@@ -127,7 +127,7 @@ export const useBranches = () => {
       addToast({
         title: 'Error',
         description: 'Failed to update branch',
-        type: 'error',
+        color: 'danger',
       });
       throw err;
     }
@@ -135,20 +135,20 @@ export const useBranches = () => {
 
   const deleteBranch = async (id: number) => {
     try {
-      await apiRequest(`/organization/branches/${id}`, 'DELETE');
+      await apiRequest(`/organization/branches/${id}`, { method: 'DELETE' });
       
       setBranches(prev => prev.filter(branch => branch.id !== id));
       addToast({
         title: 'Success',
         description: 'Branch deleted successfully',
-        type: 'success',
+        color: 'success',
       });
     } catch (err) {
       console.error('Error deleting branch:', err);
       addToast({
         title: 'Error',
         description: 'Failed to delete branch',
-        type: 'error',
+        color: 'danger',
       });
       throw err;
     }

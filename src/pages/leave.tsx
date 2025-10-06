@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { 
   Card, 
   CardBody, 
@@ -34,26 +34,31 @@ import {
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
+import { useAuthenticatedAPI } from "../hooks/useAuthenticatedAPI";
+import HeroSection from "../components/common/HeroSection";
 
 // Leave request interface
 interface LeaveRequest {
   id: number;
-  employeeId: string;
-  employeeName: string;
-  leaveType: string;
-  startDate: string;
-  endDate: string;
-  days: number;
+  application_id: string;
+  employee_id: number;
+  employee_name: string;
+  employee_code: string;
+  leave_type_id: number;
+  leave_type_name: string;
+  start_date: string;
+  end_date: string;
+  total_days: number;
   reason: string;
-  status: "pending" | "approved" | "rejected";
-  appliedDate: string;
-  approvedBy?: string;
-  approvedDate?: string;
-  avatar: string;
-  department: string;
-  rejectionReason?: string;
-  emergencyContact?: string;
-  attachments?: string[];
+  status: "pending" | "approved" | "rejected" | "cancelled";
+  created_at: string;
+  approved_by?: number;
+  approved_by_name?: string;
+  approved_at?: string;
+  rejection_reason?: string;
+  emergency_contact?: string;
+  attachment?: string;
+  department?: string;
 }
 
 // Leave balance interface
@@ -71,88 +76,14 @@ interface LeaveBalance {
   usedEmergencyLeave: number;
 }
 
-// Sample leave data
-const leaveRequests: LeaveRequest[] = [
-  {
-    id: 1,
-    employeeId: "EMP001",
-    employeeName: "Tony Reichert",
-    leaveType: "Annual Leave",
-    startDate: "2025-01-20",
-    endDate: "2025-01-25",
-    days: 5,
-    reason: "Family vacation",
-    status: "pending",
-    appliedDate: "2025-01-15",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=1",
-    department: "Executive",
-    emergencyContact: "+1-555-0123"
-  },
-  {
-    id: 2,
-    employeeId: "EMP002",
-    employeeName: "Zoey Lang",
-    leaveType: "Sick Leave",
-    startDate: "2025-01-18",
-    endDate: "2025-01-19",
-    days: 2,
-    reason: "Medical appointment",
-    status: "approved",
-    appliedDate: "2025-01-17",
-    approvedBy: "HR Manager",
-    approvedDate: "2025-01-17",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=2",
-    department: "IT"
-  },
-  {
-    id: 3,
-    employeeId: "EMP003",
-    employeeName: "Jane Doe",
-    leaveType: "Personal Leave",
-    startDate: "2025-01-22",
-    endDate: "2025-01-22",
-    days: 1,
-    reason: "Personal matters",
-    status: "rejected",
-    appliedDate: "2025-01-20",
-    approvedBy: "HR Manager",
-    approvedDate: "2025-01-20",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=3",
-    department: "Marketing",
-    rejectionReason: "Insufficient notice period"
-  },
-  {
-    id: 4,
-    employeeId: "EMP004",
-    employeeName: "William Smith",
-    leaveType: "Maternity Leave",
-    startDate: "2025-02-01",
-    endDate: "2025-05-01",
-    days: 90,
-    reason: "Maternity leave",
-    status: "approved",
-    appliedDate: "2025-01-10",
-    approvedBy: "HR Manager",
-    approvedDate: "2025-01-12",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=4",
-    department: "HR"
-  },
-  {
-    id: 5,
-    employeeId: "EMP005",
-    employeeName: "Emma Wilson",
-    leaveType: "Emergency Leave",
-    startDate: "2025-01-16",
-    endDate: "2025-01-16",
-    days: 1,
-    reason: "Family emergency",
-    status: "pending",
-    appliedDate: "2025-01-16",
-    avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=5",
-    department: "Finance",
-    emergencyContact: "+1-555-0456"
-  }
-];
+// Leave type interface
+interface LeaveType {
+  id: number;
+  name: string;
+  days_allowed: number;
+  is_paid: boolean;
+  description?: string;
+}
 
 // Sample leave balances
 const leaveBalances: LeaveBalance[] = [
@@ -190,24 +121,28 @@ const statusColorMap = {
   rejected: "danger",
 };
 
-const leaveTypes = [
-  { key: "Annual Leave", label: "Annual Leave", color: "primary" },
-  { key: "Sick Leave", label: "Sick Leave", color: "warning" },
-  { key: "Personal Leave", label: "Personal Leave", color: "secondary" },
-  { key: "Maternity Leave", label: "Maternity Leave", color: "success" },
-  { key: "Emergency Leave", label: "Emergency Leave", color: "danger" },
-  { key: "Bereavement Leave", label: "Bereavement Leave", color: "default" },
-  { key: "Study Leave", label: "Study Leave", color: "primary" }
-];
+const leaveTypeColors = {
+  "Annual Leave": "primary",
+  "Sick Leave": "warning", 
+  "Personal Leave": "secondary",
+  "Maternity Leave": "success",
+  "Emergency Leave": "danger",
+  "Bereavement Leave": "default",
+  "Study Leave": "primary"
+};
 
 export default function LeaveManagement() {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedLeaveType, setSelectedLeaveType] = useState("all");
-  const [leaveList, setLeaveList] = useState(leaveRequests);
+  const [leaveList, setLeaveList] = useState<LeaveRequest[]>([]);
+  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<LeaveRequest | null>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
+  const { apiRequest } = useAuthenticatedAPI();
   
   // Apply leave modal state
   const [newLeaveRequest, setNewLeaveRequest] = useState({
@@ -222,17 +157,49 @@ export default function LeaveManagement() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { isOpen: isApplyOpen, onOpen: onApplyOpen, onOpenChange: onApplyOpenChange } = useDisclosure();
   const rowsPerPage = 10;
+
+  // Fetch leave applications and types
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch leave applications
+        const applicationsResponse = await apiRequest('/leave/applications', { method: 'GET' });
+        if (applicationsResponse.success) {
+          setLeaveList(applicationsResponse.data);
+        }
+        
+        // Fetch leave types
+        const typesResponse = await apiRequest('/leave/types', { method: 'GET' });
+        if (typesResponse.success) {
+          setLeaveTypes(typesResponse.data);
+        }
+      } catch (error) {
+        console.error('Error fetching leave data:', error);
+        addToast({
+          title: "Error",
+          description: "Failed to load leave data",
+          color: "danger",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [apiRequest]);
   
   // Filter leave requests
   const filteredRequests = useMemo(() => {
     return leaveList.filter(request => {
       const matchesSearch = 
-        request.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        request.employeeId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        request.department.toLowerCase().includes(searchQuery.toLowerCase());
+        request.employee_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        request.employee_code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (request.department && request.department.toLowerCase().includes(searchQuery.toLowerCase()));
       
       const matchesStatus = selectedStatus === "all" || request.status === selectedStatus;
-      const matchesLeaveType = selectedLeaveType === "all" || request.leaveType === selectedLeaveType;
+      const matchesLeaveType = selectedLeaveType === "all" || request.leave_type_name === selectedLeaveType;
       
       return matchesSearch && matchesStatus && matchesLeaveType;
     });
@@ -283,50 +250,88 @@ export default function LeaveManagement() {
   };
 
   // Handle approve leave
-  const handleApproveLeave = (request: LeaveRequest) => {
-    setLeaveList(prev => 
-      prev.map(req => 
-        req.id === request.id 
-          ? { 
-              ...req, 
-              status: "approved" as const,
-              approvedBy: "HR Manager",
-              approvedDate: new Date().toISOString().split('T')[0]
-            }
-          : req
-      )
-    );
-    addToast({
-      title: "Leave Approved",
-      description: `Leave request for ${request.employeeName} has been approved.`,
-      color: "success",
-    });
+  const handleApproveLeave = async (request: LeaveRequest) => {
+    try {
+      const response = await apiRequest(`/leave/applications/${request.id}/review`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          status: 'approved',
+          comments: 'Approved by HR Manager'
+        })
+      });
+
+      if (response.success) {
+        setLeaveList(prev => 
+          prev.map(req => 
+            req.id === request.id 
+              ? { 
+                  ...req, 
+                  status: "approved" as const,
+                  approved_by_name: "HR Manager",
+                  approved_at: new Date().toISOString()
+                }
+              : req
+          )
+        );
+        addToast({
+          title: "Leave Approved",
+          description: `Leave request for ${request.employee_name} has been approved.`,
+          color: "success",
+        });
+      }
+    } catch (error) {
+      console.error('Error approving leave:', error);
+      addToast({
+        title: "Error",
+        description: "Failed to approve leave request",
+        color: "danger",
+      });
+    }
   };
 
   // Handle reject leave
-  const handleRejectLeave = (request: LeaveRequest) => {
-    setLeaveList(prev => 
-      prev.map(req => 
-        req.id === request.id 
-          ? { 
-              ...req, 
-              status: "rejected" as const,
-              approvedBy: "HR Manager",
-              approvedDate: new Date().toISOString().split('T')[0],
-              rejectionReason: "Request rejected by HR Manager"
-            }
-          : req
-      )
-    );
-    addToast({
-      title: "Leave Rejected",
-      description: `Leave request for ${request.employeeName} has been rejected.`,
-      color: "danger",
-    });
+  const handleRejectLeave = async (request: LeaveRequest) => {
+    try {
+      const response = await apiRequest(`/leave/applications/${request.id}/review`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          status: 'rejected',
+          comments: 'Request rejected by HR Manager'
+        })
+      });
+
+      if (response.success) {
+        setLeaveList(prev => 
+          prev.map(req => 
+            req.id === request.id 
+              ? { 
+                  ...req, 
+                  status: "rejected" as const,
+                  approved_by_name: "HR Manager",
+                  approved_at: new Date().toISOString(),
+                  rejection_reason: "Request rejected by HR Manager"
+                }
+              : req
+          )
+        );
+        addToast({
+          title: "Leave Rejected",
+          description: `Leave request for ${request.employee_name} has been rejected.`,
+          color: "danger",
+        });
+      }
+    } catch (error) {
+      console.error('Error rejecting leave:', error);
+      addToast({
+        title: "Error",
+        description: "Failed to reject leave request",
+        color: "danger",
+      });
+    }
   };
 
   // Handle apply leave
-  const handleApplyLeave = () => {
+  const handleApplyLeave = async () => {
     if (!newLeaveRequest.leaveType || !newLeaveRequest.startDate || !newLeaveRequest.endDate || !newLeaveRequest.reason) {
       addToast({
         title: "Missing Information",
@@ -336,41 +341,52 @@ export default function LeaveManagement() {
       return;
     }
 
-    const days = calculateDays(newLeaveRequest.startDate, newLeaveRequest.endDate);
-    
-    const newRequest: LeaveRequest = {
-      id: Date.now(),
-      employeeId: "EMP001", // In real app, this would come from auth context
-      employeeName: "Current User", // In real app, this would come from auth context
-      leaveType: newLeaveRequest.leaveType,
-      startDate: newLeaveRequest.startDate,
-      endDate: newLeaveRequest.endDate,
-      days: days,
-      reason: newLeaveRequest.reason,
-      status: "pending",
-      appliedDate: new Date().toISOString().split('T')[0],
-      avatar: "https://img.heroui.chat/image/avatar?w=150&h=150&u=1",
-      department: "Current Department", // In real app, this would come from auth context
-      emergencyContact: newLeaveRequest.emergencyContact,
-      attachments: newLeaveRequest.attachments
-    };
+    try {
+      const days = calculateDays(newLeaveRequest.startDate, newLeaveRequest.endDate);
+      
+      const response = await apiRequest('/leave/applications', {
+        method: 'POST',
+        body: JSON.stringify({
+          employee_id: 1, // In real app, this would come from auth context
+          leave_type_id: parseInt(newLeaveRequest.leaveType),
+          start_date: newLeaveRequest.startDate,
+          end_date: newLeaveRequest.endDate,
+          reason: newLeaveRequest.reason,
+          emergency_contact: newLeaveRequest.emergencyContact
+        })
+      });
 
-    setLeaveList(prev => [newRequest, ...prev]);
-    setNewLeaveRequest({
-      leaveType: "",
-      startDate: "",
-      endDate: "",
-      reason: "",
-      emergencyContact: "",
-      attachments: []
-    });
-    onApplyOpenChange();
-    
-    addToast({
-      title: "Leave Applied",
-      description: "Your leave request has been submitted successfully.",
-      color: "success",
-    });
+      if (response.success) {
+        // Refresh the leave list
+        const applicationsResponse = await apiRequest('/leave/applications', { method: 'GET' });
+        if (applicationsResponse.success) {
+          setLeaveList(applicationsResponse.data);
+        }
+        
+        setNewLeaveRequest({
+          leaveType: "",
+          startDate: "",
+          endDate: "",
+          reason: "",
+          emergencyContact: "",
+          attachments: []
+        });
+        onApplyOpenChange();
+        
+        addToast({
+          title: "Leave Applied",
+          description: "Your leave request has been submitted successfully.",
+          color: "success",
+        });
+      }
+    } catch (error) {
+      console.error('Error applying leave:', error);
+      addToast({
+        title: "Error",
+        description: "Failed to submit leave request",
+        color: "danger",
+      });
+    }
   };
 
   // Export to CSV
@@ -403,18 +419,18 @@ export default function LeaveManagement() {
     ];
     
     const rows = requests.map(request => [
-      request.employeeId,
-      request.employeeName,
+      request.employee_id,
+      request.employee_name,
       request.department,
-      request.leaveType,
-      request.startDate,
-      request.endDate,
-      request.days,
+      request.leave_type_id,
+      request.start_date,
+      request.end_date,
+      (request as any).days,
       request.reason,
       request.status,
-      request.appliedDate,
-      request.approvedBy || 'N/A',
-      request.approvedDate || 'N/A'
+      (request as any).applied_date,
+      request.approved_by || 'N/A',
+      request.approved_at || 'N/A'
     ]);
     
     return [headers, ...rows].map(row => row.join(',')).join('\n');
@@ -434,94 +450,105 @@ export default function LeaveManagement() {
   };
 
   return (
-    <div className="min-h-screen bg-content2 p-6">
+    <div className="min-h-screen bg-background p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
-              <Icon icon="lucide:calendar-off" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Leave Management</h1>
-              <p className="text-default-600 mt-1">Manage employee leave requests and approvals</p>
-            </div>
-          </div>
-          <div className="flex gap-3">
-            <Button 
-              color="primary" 
-              variant="flat"
-              startContent={<Icon icon="lucide:plus" />}
-              onPress={onApplyOpen}
-              className="font-medium"
-            >
-              Apply Leave
-            </Button>
-            <Button 
-              variant="flat" 
-              startContent={<Icon icon="lucide:download" />}
-              onPress={handleExportCSV}
-              isLoading={isExporting}
-              className="font-medium"
-            >
-              Export Report
-            </Button>
-          </div>
-        </div>
+        {/* Hero Section */}
+        <HeroSection
+          title="Leave Management"
+          subtitle="Employee Time Off"
+          description="Manage employee leave requests, track attendance, and maintain work-life balance. Streamline your leave approval process with comprehensive insights."
+          icon="lucide:calendar-off"
+          illustration="leave"
+          actions={[
+            {
+              label: "Apply Leave",
+              icon: "lucide:plus",
+              onPress: onApplyOpen,
+              variant: "solid"
+            },
+            {
+              label: "Export Report",
+              icon: "lucide:download",
+              onPress: handleExportCSV,
+              variant: "bordered",
+              isLoading: isExporting
+            }
+          ]}
+        />
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="shadow-sm">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <Icon icon="lucide:calendar-days" className="text-2xl text-primary" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <motion.div 
+            whileHover={{ y: -5 }} 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.1 }}
+          >
+            <Card className="shadow-sm bg-content1 dark:bg-content1">
+              <CardBody className="flex flex-row items-center gap-4 p-4 sm:p-6">
+                <div className="p-2 sm:p-3 rounded-full bg-primary/10 dark:bg-primary/20">
+                  <Icon icon="lucide:calendar-days" className="text-xl sm:text-2xl text-primary" />
                 </div>
                 <div>
-                  <p className="text-default-500">Total Requests</p>
-                  <h3 className="text-2xl font-bold">{stats.total}</h3>
+                  <p className="text-default-500 text-xs sm:text-sm">Total Requests</p>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">{stats.total}</h3>
                 </div>
               </CardBody>
             </Card>
           </motion.div>
-          
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="shadow-sm">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 rounded-full bg-warning/10">
-                  <Icon icon="lucide:clock" className="text-2xl text-warning" />
+
+          <motion.div 
+            whileHover={{ y: -5 }} 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.2 }}
+          >
+            <Card className="shadow-sm bg-content1 dark:bg-content1">
+              <CardBody className="flex flex-row items-center gap-4 p-4 sm:p-6">
+                <div className="p-2 sm:p-3 rounded-full bg-warning/10 dark:bg-warning/20">
+                  <Icon icon="lucide:clock" className="text-xl sm:text-2xl text-warning" />
                 </div>
                 <div>
-                  <p className="text-default-500">Pending</p>
-                  <h3 className="text-2xl font-bold">{stats.pending}</h3>
+                  <p className="text-default-500 text-xs sm:text-sm">Pending</p>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">{stats.pending}</h3>
                 </div>
               </CardBody>
             </Card>
           </motion.div>
-          
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="shadow-sm">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 rounded-full bg-success/10">
-                  <Icon icon="lucide:check-circle" className="text-2xl text-success" />
+
+          <motion.div 
+            whileHover={{ y: -5 }} 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.3 }}
+          >
+            <Card className="shadow-sm bg-content1 dark:bg-content1">
+              <CardBody className="flex flex-row items-center gap-4 p-4 sm:p-6">
+                <div className="p-2 sm:p-3 rounded-full bg-success/10 dark:bg-success/20">
+                  <Icon icon="lucide:check-circle" className="text-xl sm:text-2xl text-success" />
                 </div>
                 <div>
-                  <p className="text-default-500">Approved</p>
-                  <h3 className="text-2xl font-bold">{stats.approved}</h3>
+                  <p className="text-default-500 text-xs sm:text-sm">Approved</p>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">{stats.approved}</h3>
                 </div>
               </CardBody>
             </Card>
           </motion.div>
-          
-          <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }}>
-            <Card className="shadow-sm">
-              <CardBody className="flex flex-row items-center gap-4">
-                <div className="p-3 rounded-full bg-danger/10">
-                  <Icon icon="lucide:x-circle" className="text-2xl text-danger" />
+
+          <motion.div 
+            whileHover={{ y: -5 }} 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, delay: 0.4 }}
+          >
+            <Card className="shadow-sm bg-content1 dark:bg-content1">
+              <CardBody className="flex flex-row items-center gap-4 p-4 sm:p-6">
+                <div className="p-2 sm:p-3 rounded-full bg-danger/10 dark:bg-danger/20">
+                  <Icon icon="lucide:x-circle" className="text-xl sm:text-2xl text-danger" />
                 </div>
                 <div>
-                  <p className="text-default-500">Rejected</p>
-                  <h3 className="text-2xl font-bold">{stats.rejected}</h3>
+                  <p className="text-default-500 text-xs sm:text-sm">Rejected</p>
+                  <h3 className="text-xl sm:text-2xl font-bold text-foreground">{stats.rejected}</h3>
                 </div>
               </CardBody>
             </Card>
@@ -534,7 +561,7 @@ export default function LeaveManagement() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Input
                 placeholder="Search employees..."
-                value={searchQuery}
+                
                 onChange={(e) => setSearchQuery(e.target.value)}
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
               />
@@ -563,7 +590,7 @@ export default function LeaveManagement() {
                 onSelectionChange={(keys) => setSelectedLeaveType(Array.from(keys)[0] as string)}
                 items={[
                   { key: "all", label: "All Types" },
-                  ...leaveTypes
+                  ...leaveTypes.map(lt => ({ key: lt.name, label: lt.name }))
                 ]}
               >
                 {(item) => (
@@ -603,42 +630,48 @@ export default function LeaveManagement() {
                 <TableColumn>APPLIED DATE</TableColumn>
                 <TableColumn>ACTIONS</TableColumn>
               </TableHeader>
-              <TableBody>
+              <TableBody emptyContent={loading ? "Loading..." : "No leave requests found"}>
                 {paginatedRequests.map((request) => (
                   <TableRow key={request.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <Avatar src={request.avatar} alt={request.employeeName} size="sm" />
+                        <Avatar 
+                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${request.employee_name}`} 
+                          alt={request.employee_name} 
+                          size="sm" 
+                        />
                         <div>
-                          <p className="font-medium text-foreground">{request.employeeName}</p>
-                          <p className="text-sm text-default-500">{request.employeeId}</p>
-                          <p className="text-xs text-default-400">{request.department}</p>
+                          <p className="font-medium text-foreground">{request.employee_name}</p>
+                          <p className="text-sm text-default-500">{request.employee_code}</p>
+                          {request.department && (
+                            <p className="text-xs text-default-400">{request.department}</p>
+                          )}
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <Chip
                         size="sm"
-                        color={leaveTypes.find(t => t.key === request.leaveType)?.color as any || "default"}
+                        color={leaveTypeColors[request.leave_type_name as keyof typeof leaveTypeColors] as any || "default"}
                         variant="flat"
                       >
-                        {request.leaveType}
+                        {request.leave_type_name}
                       </Chip>
                     </TableCell>
                     <TableCell>
                       <div>
                         <p className="font-medium text-foreground">
-                          {new Date(request.startDate).toLocaleDateString()}
+                          {new Date(request.start_date).toLocaleDateString()}
                         </p>
                         <p className="text-sm text-default-500">
-                          to {new Date(request.endDate).toLocaleDateString()}
+                          to {new Date(request.end_date).toLocaleDateString()}
                         </p>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-bold text-primary-600">{request.days}</span>
+                          <span className="text-sm font-bold text-primary-600">{request.total_days}</span>
                         </div>
                         <span className="text-sm text-default-600">days</span>
                       </div>
@@ -654,7 +687,7 @@ export default function LeaveManagement() {
                     </TableCell>
                     <TableCell>
                       <p className="text-sm text-foreground">
-                        {new Date(request.appliedDate).toLocaleDateString()}
+                        {new Date(request.created_at).toLocaleDateString()}
                       </p>
                     </TableCell>
                     <TableCell>
@@ -732,11 +765,17 @@ export default function LeaveManagement() {
                     <div className="space-y-6">
                       {/* Employee Info */}
                       <div className="flex items-center gap-4 p-4 bg-content1 rounded-lg">
-                        <Avatar src={selectedRequest.avatar} alt={selectedRequest.employeeName} size="lg" />
+                        <Avatar 
+                          src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedRequest.employee_name}`} 
+                          alt={selectedRequest.employee_name} 
+                          size="lg" 
+                        />
                         <div>
-                          <h4 className="text-lg font-semibold text-foreground">{selectedRequest.employeeName}</h4>
-                          <p className="text-default-600">{selectedRequest.employeeId}</p>
-                          <p className="text-sm text-default-500">{selectedRequest.department}</p>
+                          <h4 className="text-lg font-semibold text-foreground">{selectedRequest.employee_name}</h4>
+                          <p className="text-default-600">{selectedRequest.employee_code}</p>
+                          {selectedRequest.department && (
+                            <p className="text-sm text-default-500">{selectedRequest.department}</p>
+                          )}
                         </div>
                       </div>
 
@@ -747,26 +786,26 @@ export default function LeaveManagement() {
                             <span className="text-default-500 text-sm">Leave Type</span>
                             <Chip
                               size="sm"
-                              color={leaveTypes.find(t => t.key === selectedRequest.leaveType)?.color as any || "default"}
+                              color={leaveTypeColors[selectedRequest.leave_type_name as keyof typeof leaveTypeColors] as any || "default"}
                               variant="flat"
                               className="ml-2"
                             >
-                              {selectedRequest.leaveType}
+                              {selectedRequest.leave_type_name}
                             </Chip>
                           </div>
                           <div>
                             <span className="text-default-500 text-sm">Start Date</span>
-                            <p className="font-medium">{new Date(selectedRequest.startDate).toLocaleDateString()}</p>
+                            <p className="font-medium">{new Date(selectedRequest.start_date).toLocaleDateString()}</p>
                           </div>
                           <div>
                             <span className="text-default-500 text-sm">End Date</span>
-                            <p className="font-medium">{new Date(selectedRequest.endDate).toLocaleDateString()}</p>
+                            <p className="font-medium">{new Date(selectedRequest.end_date).toLocaleDateString()}</p>
                           </div>
                           <div>
                             <span className="text-default-500 text-sm">Total Days</span>
                             <div className="flex items-center gap-2 mt-1">
                               <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                                <span className="text-lg font-bold text-primary-600">{selectedRequest.days}</span>
+                                <span className="text-lg font-bold text-primary-600">{selectedRequest.total_days}</span>
                               </div>
                               <span className="text-sm text-default-600">days</span>
                             </div>
@@ -786,18 +825,18 @@ export default function LeaveManagement() {
                           </div>
                           <div>
                             <span className="text-default-500 text-sm">Applied Date</span>
-                            <p className="font-medium">{new Date(selectedRequest.appliedDate).toLocaleDateString()}</p>
+                            <p className="font-medium">{new Date(selectedRequest.created_at).toLocaleDateString()}</p>
                           </div>
-                          {selectedRequest.approvedBy && (
+                          {selectedRequest.approved_by_name && (
                             <div>
                               <span className="text-default-500 text-sm">Approved By</span>
-                              <p className="font-medium">{selectedRequest.approvedBy}</p>
+                              <p className="font-medium">{selectedRequest.approved_by_name}</p>
                             </div>
                           )}
-                          {selectedRequest.approvedDate && (
+                          {selectedRequest.approved_at && (
                             <div>
                               <span className="text-default-500 text-sm">Approved Date</span>
-                              <p className="font-medium">{new Date(selectedRequest.approvedDate).toLocaleDateString()}</p>
+                              <p className="font-medium">{new Date(selectedRequest.approved_at).toLocaleDateString()}</p>
                             </div>
                           )}
                         </div>
@@ -810,18 +849,18 @@ export default function LeaveManagement() {
                       </div>
 
                       {/* Emergency Contact */}
-                      {selectedRequest.emergencyContact && (
+                      {selectedRequest.emergency_contact && (
                         <div>
                           <span className="text-default-500 text-sm">Emergency Contact</span>
-                          <p className="font-medium">{selectedRequest.emergencyContact}</p>
+                          <p className="font-medium">{selectedRequest.emergency_contact}</p>
                         </div>
                       )}
 
                       {/* Rejection Reason */}
-                      {selectedRequest.rejectionReason && (
+                      {selectedRequest.rejection_reason && (
                         <div>
                           <span className="text-default-500 text-sm">Rejection Reason</span>
-                          <p className="mt-1 p-3 bg-danger-50 rounded-lg text-sm text-danger-700">{selectedRequest.rejectionReason}</p>
+                          <p className="mt-1 p-3 bg-danger-50 rounded-lg text-sm text-danger-700">{selectedRequest.rejection_reason}</p>
                         </div>
                       )}
                     </div>
@@ -862,7 +901,7 @@ export default function LeaveManagement() {
                         leaveType: Array.from(keys)[0] as string
                       })}
                       isRequired
-                      items={leaveTypes}
+                      items={leaveTypes.map(lt => ({ key: lt.id.toString(), label: lt.name }))}
                     >
                       {(item) => (
                         <SelectItem key={item.key}>
@@ -875,7 +914,7 @@ export default function LeaveManagement() {
                       <Input
                         label="Start Date"
                         type="date"
-                        value={newLeaveRequest.startDate}
+                        
                         onChange={(e) => setNewLeaveRequest({
                           ...newLeaveRequest,
                           startDate: e.target.value
@@ -885,7 +924,7 @@ export default function LeaveManagement() {
                       <Input
                         label="End Date"
                         type="date"
-                        value={newLeaveRequest.endDate}
+                        
                         onChange={(e) => setNewLeaveRequest({
                           ...newLeaveRequest,
                           endDate: e.target.value
@@ -908,7 +947,7 @@ export default function LeaveManagement() {
                     <Textarea
                       label="Reason"
                       placeholder="Please provide a reason for your leave request"
-                      value={newLeaveRequest.reason}
+                      
                       onChange={(e) => setNewLeaveRequest({
                         ...newLeaveRequest,
                         reason: e.target.value
@@ -920,7 +959,7 @@ export default function LeaveManagement() {
                     <Input
                       label="Emergency Contact"
                       placeholder="Emergency contact number"
-                      value={newLeaveRequest.emergencyContact}
+                      
                       onChange={(e) => setNewLeaveRequest({
                         ...newLeaveRequest,
                         emergencyContact: e.target.value

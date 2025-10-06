@@ -46,7 +46,7 @@ export const useDesignations = () => {
       addToast({
         title: 'Error',
         description: 'Failed to load designations',
-        type: 'error',
+        color: 'danger',
       });
     } finally {
       setLoading(false);
@@ -76,14 +76,14 @@ export const useDesignations = () => {
 
   const addDesignation = async (designationData: DesignationFormData) => {
     try {
-      const response = await apiRequest('/organization/designations', 'POST', designationData);
+      const response = await apiRequest('/organization/designations', { method: 'POST', body: JSON.stringify(designationData) });
       
       if (response && response.data) {
         setDesignations(prev => [...prev, response.data]);
         addToast({
           title: 'Success',
           description: 'Designation added successfully',
-          type: 'success',
+          color: 'success',
         });
         return response.data;
       }
@@ -92,7 +92,7 @@ export const useDesignations = () => {
       addToast({
         title: 'Error',
         description: 'Failed to add designation',
-        type: 'error',
+        color: 'danger',
       });
       throw err;
     }
@@ -100,7 +100,7 @@ export const useDesignations = () => {
 
   const updateDesignation = async (id: number, designationData: DesignationFormData) => {
     try {
-      const response = await apiRequest(`/organization/designations/${id}`, 'PUT', designationData);
+      const response = await apiRequest(`/organization/designations/${id}`, { method: 'PUT', body: JSON.stringify(designationData) });
       
       if (response && response.data) {
         setDesignations(prev => 
@@ -109,7 +109,7 @@ export const useDesignations = () => {
         addToast({
           title: 'Success',
           description: 'Designation updated successfully',
-          type: 'success',
+          color: 'success',
         });
         return response.data;
       }
@@ -118,7 +118,7 @@ export const useDesignations = () => {
       addToast({
         title: 'Error',
         description: 'Failed to update designation',
-        type: 'error',
+        color: 'danger',
       });
       throw err;
     }
@@ -132,14 +132,14 @@ export const useDesignations = () => {
       addToast({
         title: 'Success',
         description: 'Designation deleted successfully',
-        type: 'success',
+        color: 'success',
       });
     } catch (err) {
       console.error('Error deleting designation:', err);
       addToast({
         title: 'Error',
         description: 'Failed to delete designation',
-        type: 'error',
+        color: 'danger',
       });
       throw err;
     }

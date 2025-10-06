@@ -50,7 +50,7 @@ const BranchForm: React.FC<BranchFormProps> = ({
         <Input
           label="Branch Name"
           placeholder="Enter branch name"
-          value={formData.name}
+          
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           isRequired
           aria-label="Branch Name"
@@ -58,7 +58,7 @@ const BranchForm: React.FC<BranchFormProps> = ({
         <Input
           label="Location"
           placeholder="Enter location"
-          value={formData.location}
+          
           onChange={(e) => setFormData({ ...formData, location: e.target.value })}
           aria-label="Location"
         />
@@ -67,7 +67,7 @@ const BranchForm: React.FC<BranchFormProps> = ({
       <Textarea
         label="Address"
         placeholder="Enter full address"
-        value={formData.address}
+        
         onChange={(e) => setFormData({ ...formData, address: e.target.value })}
         rows={3}
         aria-label="Address"
@@ -77,14 +77,14 @@ const BranchForm: React.FC<BranchFormProps> = ({
         <Input
           label="City"
           placeholder="Enter city"
-          value={formData.city}
+          
           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
           aria-label="City"
         />
         <Input
           label="State/Province"
           placeholder="Enter state/province"
-          value={formData.state}
+          
           onChange={(e) => setFormData({ ...formData, state: e.target.value })}
           aria-label="State/Province"
         />
@@ -94,14 +94,14 @@ const BranchForm: React.FC<BranchFormProps> = ({
         <Input
           label="Country"
           placeholder="Enter country"
-          value={formData.country}
+          
           onChange={(e) => setFormData({ ...formData, country: e.target.value })}
           aria-label="Country"
         />
         <Input
           label="Zip/Postal Code"
           placeholder="Enter zip/postal code"
-          value={formData.zip_code}
+          
           onChange={(e) => setFormData({ ...formData, zip_code: e.target.value })}
           aria-label="Zip/Postal Code"
         />

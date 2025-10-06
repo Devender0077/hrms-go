@@ -392,7 +392,7 @@
         
         const today = new Date();
         const expiry = new Date(expiryDate);
-        const diffTime = expiry - today;
+        const diffTime = expiry.getTime() - today.getTime();
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         
         return diffDays;
@@ -543,7 +543,7 @@
                 isClearable
                 placeholder="Search documents..."
                 startContent={<Icon icon="lucide:search" className="text-default-400" />}
-                value={searchQuery}
+                
                 onValueChange={setSearchQuery}
                 className="w-full sm:max-w-[44%]"
               />
@@ -554,12 +554,12 @@
                   onChange={(e) => setSelectedCategory(e.target.value)}
                   className="w-full sm:max-w-[200px]"
                 >
-                  <SelectItem key="all" value="all">All Categories</SelectItem>
+                  <SelectItem key="all">All Categories</SelectItem>
                   {documentCategories.map((category) => (
-                    <SelectItem key={category.name} value={category.name}>
+                    <SelectItem key={category.name} >
                       {category.name}
                     </SelectItem>
-                  ))}
+                  )) as any}
                 </Select>
                 <Select
                   placeholder="Filter by status"
@@ -567,10 +567,10 @@
                   onChange={(e) => setSelectedStatus(e.target.value)}
                   className="w-full sm:max-w-[200px]"
                 >
-                  <SelectItem key="all" value="all">All Statuses</SelectItem>
-                  <SelectItem key="active" value="active">Active</SelectItem>
-                  <SelectItem key="expiring_soon" value="expiring_soon">Expiring Soon</SelectItem>
-                  <SelectItem key="expired" value="expired">Expired</SelectItem>
+                  <SelectItem key="all">All Statuses</SelectItem>
+                  <SelectItem key="active">Active</SelectItem>
+                  <SelectItem key="expiring_soon">Expiring Soon</SelectItem>
+                  <SelectItem key="expired">Expired</SelectItem>
                 </Select>
               </div>
             </CardHeader>
@@ -737,7 +737,7 @@
                       <Input
                         label="Document Title"
                         placeholder="Enter document title"
-                        value={formData.title}
+                        
                         onValueChange={(value) => handleInputChange("title", value)}
                         isReadOnly={!isEditing && selectedDocument}
                         isRequired
@@ -753,7 +753,7 @@
                         isRequired
                       >
                         {documentCategories.map((category) => (
-                          <SelectItem key={category.name} value={category.name}>
+                          <SelectItem key={category.name} >
                             {category.name}
                           </SelectItem>
                         ))}
@@ -763,7 +763,7 @@
                         label="Expiry Date"
                         placeholder="Select expiry date"
                         type="date"
-                        value={formData.expiryDate}
+                        
                         onChange={(e) => handleInputChange("expiryDate", e.target.value)}
                         isReadOnly={!isEditing && selectedDocument}
                       />
@@ -771,7 +771,7 @@
                       <Textarea
                         label="Description"
                         placeholder="Enter document description"
-                        value={formData.description}
+                        
                         onValueChange={(value) => handleInputChange("description", value)}
                         isReadOnly={!isEditing && selectedDocument}
                         className="col-span-1 md:col-span-2"

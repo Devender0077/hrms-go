@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button, Card, CardBody, CardHeader, Spinner, useDisclosure } from "@heroui/react";
     import { Icon } from "@iconify/react";
+    import HeroSection from "../../components/common/HeroSection";
 import { useBranches, Branch } from "../../hooks/useBranches";
 import BranchStats from "../../components/branches/BranchStats";
 import BranchFilters from "../../components/branches/BranchFilters";
@@ -142,18 +143,29 @@ import BranchModals from "../../components/branches/BranchModals";
       return (
     <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-          {/* Page Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
-              <Icon icon="lucide:building" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Branches</h1>
-              <p className="text-default-600 mt-1">Manage company branches and locations</p>
-            </div>
-          </div>
-                  </div>
+        {/* Hero Section */}
+        <HeroSection
+          title="Company Branches"
+          subtitle="Manage Locations"
+          description="Manage your company branches and locations. Track employee distribution, department allocation, and organizational structure across different sites."
+          icon="lucide:building"
+          illustration="dashboard"
+          actions={[
+            {
+              label: "Add Branch",
+              icon: "lucide:plus",
+              onPress: onOpenAdd,
+              variant: "solid"
+            },
+            {
+              label: "Export Branches",
+              icon: "lucide:download",
+              onPress: handleExportBranches,
+              variant: "bordered",
+              isLoading: isExporting
+            }
+          ]}
+        />
 
         {/* Statistics Cards */}
         <BranchStats stats={stats} loading={loading} />

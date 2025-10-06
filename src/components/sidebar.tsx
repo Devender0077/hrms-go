@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 import { useAuth } from "../contexts/auth-context";
 import { useTaskContext } from "../contexts/task-context";
 import { usePermissions } from "../hooks/usePermissions";
+import { useSettings } from "../contexts/settings-context";
     
     interface SidebarProps {
       isOpen: boolean;
@@ -24,11 +25,12 @@ import { usePermissions } from "../hooks/usePermissions";
       items: NavItem[];
     }
     
-    export default function Sidebar({ isOpen }: SidebarProps) {
-      const location = useLocation();
-      const { user } = useAuth();
+export default function Sidebar({ isOpen }: SidebarProps) {
+  const location = useLocation();
+  const { user } = useAuth();
   const { taskCounts } = useTaskContext();
   const { hasAnyPermission, loading: permissionsLoading } = usePermissions();
+  const { getSiteName, getCompanyName, loading: settingsLoading } = useSettings();
       
       const navSections: NavSection[] = [
         {
@@ -91,29 +93,6 @@ import { usePermissions } from "../hooks/usePermissions";
       ]
     },
     {
-      title: "Organization",
-      items: [
-            { 
-              title: "Departments", 
-          icon: "lucide:building-2", 
-              path: "/dashboard/departments",
-          permissions: ["departments.view"]
-            },
-            { 
-              title: "Designations", 
-              icon: "lucide:briefcase", 
-              path: "/dashboard/designations",
-          permissions: ["designations.view"]
-        },
-        { 
-          title: "Branches", 
-          icon: "lucide:map-pin", 
-          path: "/dashboard/branches",
-          permissions: ["branches.view"]
-        },
-      ]
-    },
-    {
       title: "Leave Management",
       items: [
         { 
@@ -123,22 +102,10 @@ import { usePermissions } from "../hooks/usePermissions";
           permissions: ["leave.view"]
         },
         { 
-          title: "Leave Management", 
-          icon: "lucide:calendar-heart", 
-          path: "/dashboard/leave-management",
-          permissions: ["leave.view"]
-        },
-        { 
           title: "Leave Applications", 
           icon: "lucide:calendar-days", 
           path: "/dashboard/leave/applications",
           permissions: ["leave.view"]
-        },
-        { 
-          title: "Leave Types", 
-          icon: "lucide:calendar-plus", 
-          path: "/dashboard/leave/types",
-          permissions: ["leave.types.manage"]
         },
         { 
           title: "Leave Balances", 
@@ -254,6 +221,76 @@ import { usePermissions } from "../hooks/usePermissions";
           ]
         },
         {
+          title: "Training",
+          items: [
+            { 
+              title: "Training Programs", 
+              icon: "lucide:graduation-cap", 
+              path: "/dashboard/training/programs",
+          permissions: ["training.view"]
+            },
+            { 
+              title: "Training Sessions", 
+              icon: "lucide:book-open", 
+              path: "/dashboard/training/sessions",
+          permissions: ["training.view"]
+            },
+            { 
+              title: "Employee Training", 
+              icon: "lucide:user-graduate", 
+              path: "/dashboard/training/employee-training",
+          permissions: ["training.view"]
+            },
+          ]
+        },
+        {
+          title: "Employee Lifecycle",
+          items: [
+            { 
+              title: "Awards", 
+              icon: "lucide:award", 
+              path: "/dashboard/employee-lifecycle/awards",
+          permissions: ["employee_lifecycle.view"]
+            },
+            { 
+              title: "Promotions", 
+              icon: "lucide:trending-up", 
+              path: "/dashboard/employee-lifecycle/promotions",
+          permissions: ["employee_lifecycle.view"]
+            },
+            { 
+              title: "Warnings", 
+              icon: "lucide:alert-triangle", 
+              path: "/dashboard/employee-lifecycle/warnings",
+          permissions: ["employee_lifecycle.view"]
+            },
+            { 
+              title: "Resignations", 
+              icon: "lucide:user-minus", 
+              path: "/dashboard/employee-lifecycle/resignations",
+          permissions: ["employee_lifecycle.view"]
+            },
+            { 
+              title: "Terminations", 
+              icon: "lucide:user-x", 
+              path: "/dashboard/employee-lifecycle/terminations",
+          permissions: ["employee_lifecycle.view"]
+            },
+            { 
+              title: "Transfers", 
+              icon: "lucide:arrow-right-left", 
+              path: "/dashboard/employee-lifecycle/transfers",
+          permissions: ["employee_lifecycle.view"]
+            },
+            { 
+              title: "Complaints", 
+              icon: "lucide:message-square", 
+              path: "/dashboard/employee-lifecycle/complaints",
+          permissions: ["employee_lifecycle.view"]
+            },
+          ]
+        },
+        {
       title: "Finance",
       items: [
         { 
@@ -269,7 +306,7 @@ import { usePermissions } from "../hooks/usePermissions";
           permissions: ["payroll.view"]
         },
         { 
-          title: "Employee Salaries", 
+          title: "Payroll Salaries", 
           icon: "lucide:banknote", 
           path: "/dashboard/payroll/employee-salaries",
           permissions: ["payroll.view"]
@@ -285,6 +322,23 @@ import { usePermissions } from "../hooks/usePermissions";
           icon: "lucide:receipt", 
           path: "/dashboard/expenses",
           permissions: ["expenses.view"]
+        },
+      ]
+    },
+    {
+      title: "Time Tracking",
+      items: [
+        { 
+          title: "Time Entries", 
+          icon: "lucide:clock", 
+          path: "/dashboard/time-tracking/entries",
+          permissions: ["time_tracking.view"]
+        },
+        { 
+          title: "Project Time", 
+          icon: "lucide:folder-clock", 
+          path: "/dashboard/time-tracking/projects",
+          permissions: ["time_tracking.view"]
         },
       ]
     },
@@ -347,6 +401,46 @@ import { usePermissions } from "../hooks/usePermissions";
       ]
     },
     {
+      title: "Media & Content",
+      items: [
+        { 
+          title: "Media Library", 
+          icon: "lucide:image", 
+          path: "/dashboard/media-library",
+          permissions: ["media.view"]
+        },
+        { 
+          title: "Landing Page", 
+          icon: "lucide:globe", 
+          path: "/dashboard/landing-page",
+          permissions: ["landing_page.manage"]
+        },
+      ]
+    },
+    {
+      title: "Communication",
+      items: [
+        { 
+          title: "Trips", 
+          icon: "lucide:plane", 
+          path: "/dashboard/trips",
+          permissions: ["trips.view"]
+        },
+        { 
+          title: "Announcements", 
+          icon: "lucide:megaphone", 
+          path: "/dashboard/announcements",
+          permissions: ["announcements.view"]
+        },
+        { 
+          title: "Meetings", 
+          icon: "lucide:users", 
+          path: "/dashboard/meetings",
+          permissions: ["meetings.view"]
+        },
+      ]
+    },
+    {
       title: "System Setup",
       items: [
         { 
@@ -370,12 +464,6 @@ import { usePermissions } from "../hooks/usePermissions";
           title: "Roles", 
           icon: "lucide:shield-check", 
           path: "/dashboard/users/roles",
-          permissions: ["users.view"]
-        },
-        { 
-          title: "Permissions", 
-          icon: "lucide:key", 
-          path: "/dashboard/users/permissions",
           permissions: ["users.view"]
         },
             { 
@@ -433,9 +521,13 @@ import { usePermissions } from "../hooks/usePermissions";
           {/* Logo */}
       <div className="p-4 flex items-center justify-center h-16 border-b border-default-300">
             {isOpen ? (
-          <h1 className="text-xl font-bold text-foreground">HRM<span className="text-primary-600">GO</span></h1>
+          <h1 className="text-xl font-bold text-foreground truncate">
+            {settingsLoading ? 'HRMS' : (getSiteName() || 'HRMS')}
+          </h1>
             ) : (
-          <h1 className="text-xl font-bold text-primary-600">HR</h1>
+          <h1 className="text-xl font-bold text-primary-600">
+            {settingsLoading ? 'HR' : (getSiteName()?.substring(0, 2).toUpperCase() || 'HR')}
+          </h1>
             )}
       </div>
           

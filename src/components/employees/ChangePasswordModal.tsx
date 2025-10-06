@@ -142,7 +142,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                     label="New Password"
                     placeholder="Enter new password"
                     type="password"
-                    value={newPassword}
+                    
                     onValueChange={setNewPassword}
                     isInvalid={!!errors.newPassword}
                     errorMessage={errors.newPassword}
@@ -155,7 +155,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
                     label="Confirm Password"
                     placeholder="Confirm new password"
                     type="password"
-                    value={confirmPassword}
+                    
                     onValueChange={setConfirmPassword}
                     isInvalid={!!errors.confirmPassword}
                     errorMessage={errors.confirmPassword}

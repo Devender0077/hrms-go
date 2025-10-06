@@ -32,22 +32,22 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
+import HeroSection from "../components/common/HeroSection";
 import { addToast } from "@heroui/react";
 import { useCandidates, Candidate } from "../hooks/useCandidates";
 import { getDefaultAvatar } from "../utils/avatarUtils";
 
-const statusOptions = ["new", "screening", "interview", "testing", "offer", "hired", "rejected"];
+const statusOptions = ["applied", "screening", "interview", "offered", "hired", "rejected"];
 const sourceOptions = ["Company Website", "LinkedIn", "Indeed", "Referral", "Glassdoor", "Other"];
 
 const statusColorMap = {
-  new: "default",
+  applied: "default",
   screening: "primary",
   interview: "warning",
-  testing: "secondary",
-  offer: "success",
+  offered: "success",
   hired: "success",
   rejected: "danger",
-};
+} as const;
 
 export default function CandidatesPage() {
   const { candidates, loading, error, createCandidate, updateCandidate, deleteCandidate } = useCandidates();
@@ -67,7 +67,7 @@ export default function CandidatesPage() {
     resume: "",
     cover_letter: "",
     source: "",
-    status: "new" as const
+    status: "applied" as const
   });
   
   const rowsPerPage = 10;
@@ -78,7 +78,7 @@ export default function CandidatesPage() {
       const fullName = `${candidate.first_name} ${candidate.last_name}`.toLowerCase();
       return fullName.includes(searchQuery.toLowerCase()) ||
              candidate.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-             candidate.job_title?.toLowerCase().includes(searchQuery.toLowerCase());
+             (candidate as any).job_title?.toLowerCase().includes(searchQuery.toLowerCase());
     });
   }, [candidates, searchQuery]);
   
@@ -97,15 +97,15 @@ export default function CandidatesPage() {
     
     if (candidate && editing) {
       setFormData({
-        job_posting_id: candidate.job_posting_id.toString(),
+        job_posting_id: (candidate as any).job_posting_id?.toString() || "",
         first_name: candidate.first_name || "",
         last_name: candidate.last_name || "",
         email: candidate.email || "",
         phone: candidate.phone || "",
-        resume: candidate.resume || "",
-        cover_letter: candidate.cover_letter || "",
+        resume: (candidate as any).resume || "",
+        cover_letter: (candidate as any).cover_letter || "",
         source: candidate.source || "",
-        status: candidate.status || "new"
+        status: (candidate.status || "applied") as "applied"
       });
     } else {
       setFormData({
@@ -117,7 +117,7 @@ export default function CandidatesPage() {
         resume: "",
         cover_letter: "",
         source: "",
-        status: "new"
+        status: "applied"
       });
     }
     
@@ -136,14 +136,14 @@ export default function CandidatesPage() {
         addToast({
           title: "Success",
           description: "Candidate updated successfully",
-          type: "success"
+          color: "success"
         });
       } else {
         await createCandidate(candidateData);
         addToast({
           title: "Success",
           description: "Candidate added successfully",
-          type: "success"
+          color: "success"
         });
       }
       
@@ -152,7 +152,7 @@ export default function CandidatesPage() {
       addToast({
         title: "Error",
         description: "Failed to save candidate",
-        type: "error"
+        color: "danger"
       });
     }
   };
@@ -164,13 +164,13 @@ export default function CandidatesPage() {
         addToast({
           title: "Success",
           description: "Candidate deleted successfully",
-          type: "success"
+          color: "success"
         });
       } catch (error) {
         addToast({
           title: "Error",
           description: "Failed to delete candidate",
-          type: "error"
+          color: "danger"
         });
       }
     }
@@ -182,13 +182,13 @@ export default function CandidatesPage() {
       addToast({
         title: "Success",
         description: "Candidate status updated successfully",
-        type: "success"
+        color: "success"
       });
     } catch (error) {
       addToast({
         title: "Error",
         description: "Failed to update candidate status",
-        type: "error"
+        color: "danger"
       });
     }
   };
@@ -214,21 +214,43 @@ export default function CandidatesPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Candidates</h1>
-          <p className="text-default-600">Manage job applications and candidates</p>
-        </div>
-        <Button
-          color="primary"
-          onPress={() => handleOpenModal(null, false)}
-          startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Candidates"
+          subtitle="Recruitment Management"
+          description="Manage job applications and candidates efficiently. Track applications, review resumes, and manage the recruitment process."
+          icon="lucide:users"
+          illustration="recruitment"
+          actions={[
+            {
+              label: "Add Candidate",
+              icon: "lucide:plus",
+              onPress: () => handleOpenModal(null, false),
+              variant: "solid"
+            }
+          ]}
+        />
+
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-6"
         >
-          Add Candidate
-        </Button>
-      </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Button
+                color="primary"
+                onPress={() => handleOpenModal(null, false)}
+                startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+              >
+                Add Candidate
+              </Button>
+            </div>
+          </div>
 
       {/* Search and Filters */}
       <Card>
@@ -236,7 +258,7 @@ export default function CandidatesPage() {
           <div className="flex gap-4 items-center">
             <Input
               placeholder="Search candidates..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="max-w-sm"
@@ -246,7 +268,7 @@ export default function CandidatesPage() {
                 Total: {candidates.length}
               </Chip>
               <Chip color="success" variant="flat">
-                New: {candidates.filter(c => c.status === 'new').length}
+                Applied: {candidates.filter(c => c.status === 'applied').length}
               </Chip>
               <Chip color="warning" variant="flat">
                 Interview: {candidates.filter(c => c.status === 'interview').length}
@@ -293,8 +315,8 @@ export default function CandidatesPage() {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-medium">{candidate.job_title || 'N/A'}</p>
-                      <p className="text-sm text-default-500">Job ID: {candidate.job_posting_id}</p>
+                      <p className="font-medium">{(candidate as any).job_title || 'N/A'}</p>
+                      <p className="text-sm text-default-500">Job ID: {(candidate as any).job_posting_id}</p>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -355,7 +377,7 @@ export default function CandidatesPage() {
                         <DropdownItem
                           key="resume"
                           startContent={<Icon icon="lucide:file-text" className="w-4 h-4" />}
-                          onPress={() => window.open(candidate.resume, '_blank')}
+                          onPress={() => window.open((candidate as any).resume, '_blank')}
                         >
                           View Resume
                         </DropdownItem>
@@ -388,6 +410,7 @@ export default function CandidatesPage() {
           )}
         </CardBody>
       </Card>
+        </motion.div>
 
       {/* Candidate Modal */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside">
@@ -403,14 +426,14 @@ export default function CandidatesPage() {
                     <Input
                       label="First Name"
                       placeholder="Enter first name"
-                      value={formData.first_name}
+                      
                       onChange={(e) => setFormData({...formData, first_name: e.target.value})}
                       isRequired
                     />
                     <Input
                       label="Last Name"
                       placeholder="Enter last name"
-                      value={formData.last_name}
+                      
                       onChange={(e) => setFormData({...formData, last_name: e.target.value})}
                       isRequired
                     />
@@ -421,14 +444,14 @@ export default function CandidatesPage() {
                       label="Email"
                       type="email"
                       placeholder="Enter email"
-                      value={formData.email}
+                      
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
                       isRequired
                     />
                     <Input
                       label="Phone"
                       placeholder="Enter phone number"
-                      value={formData.phone}
+                      
                       onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     />
                   </div>
@@ -437,7 +460,7 @@ export default function CandidatesPage() {
                     label="Job Posting ID"
                     type="number"
                     placeholder="Enter job posting ID"
-                    value={formData.job_posting_id}
+                    
                     onChange={(e) => setFormData({...formData, job_posting_id: e.target.value})}
                     isRequired
                   />
@@ -445,7 +468,7 @@ export default function CandidatesPage() {
                   <Input
                     label="Resume URL"
                     placeholder="Enter resume URL"
-                    value={formData.resume}
+                    
                     onChange={(e) => setFormData({...formData, resume: e.target.value})}
                     isRequired
                   />
@@ -458,7 +481,7 @@ export default function CandidatesPage() {
                       onSelectionChange={(keys) => setFormData({...formData, source: Array.from(keys)[0] as string})}
                     >
                       {sourceOptions.map((source) => (
-                        <SelectItem key={source} value={source}>
+                        <SelectItem key={source} >
                           {source}
                         </SelectItem>
                       ))}
@@ -471,7 +494,7 @@ export default function CandidatesPage() {
                       onSelectionChange={(keys) => setFormData({...formData, status: Array.from(keys)[0] as any})}
                     >
                       {statusOptions.map((status) => (
-                        <SelectItem key={status} value={status}>
+                        <SelectItem key={status} >
                           {status.toUpperCase()}
                         </SelectItem>
                       ))}
@@ -481,7 +504,7 @@ export default function CandidatesPage() {
                   <Textarea
                     label="Cover Letter"
                     placeholder="Enter cover letter"
-                    value={formData.cover_letter}
+                    
                     onChange={(e) => setFormData({...formData, cover_letter: e.target.value})}
                     rows={4}
                   />
@@ -499,6 +522,7 @@ export default function CandidatesPage() {
           )}
         </ModalContent>
       </Modal>
+      </div>
     </div>
   );
 }

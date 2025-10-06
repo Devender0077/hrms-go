@@ -1,5 +1,6 @@
 import React from "react";
 import { useAuth } from "../contexts/auth-context";
+import DynamicPageTitle from "../components/common/DynamicPageTitle";
 import SuperAdminDashboard from "../components/dashboard/SuperAdminDashboard";
 import CompanyAdminDashboard from "../components/dashboard/CompanyAdminDashboard";
 import EmployeeDashboard from "../components/dashboard/EmployeeDashboard";
@@ -9,10 +10,25 @@ import EmployeeDashboard from "../components/dashboard/EmployeeDashboard";
 
   // Render role-based dashboard
   if (user?.role === 'super_admin') {
-    return <SuperAdminDashboard />;
+    return (
+      <>
+        <DynamicPageTitle pageName="Super Admin Dashboard" />
+        <SuperAdminDashboard />
+      </>
+    );
   } else if (user?.role === 'company_admin') {
-    return <CompanyAdminDashboard />;
+    return (
+      <>
+        <DynamicPageTitle pageName="Company Admin Dashboard" />
+        <CompanyAdminDashboard />
+      </>
+    );
   } else {
-    return <EmployeeDashboard />;
+    return (
+      <>
+        <DynamicPageTitle pageName="Employee Dashboard" />
+        <EmployeeDashboard />
+      </>
+    );
   }
 }

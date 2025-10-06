@@ -33,6 +33,7 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
+import HeroSection from "../components/common/HeroSection";
 import { addToast } from "@heroui/react";
 import { useJobs, Job } from "../hooks/useJobs";
 
@@ -48,7 +49,7 @@ const statusColorMap = {
   published: "success",
   closed: "warning",
   archived: "danger",
-};
+} as const;
 
 export default function JobsPage() {
   const { jobs, loading, error, createJob, updateJob, deleteJob } = useJobs();
@@ -84,7 +85,7 @@ export default function JobsPage() {
     return jobs.filter(job => {
       return job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
              job.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-             job.department_name?.toLowerCase().includes(searchQuery.toLowerCase());
+             job.department?.toLowerCase().includes(searchQuery.toLowerCase());
     });
   }, [jobs, searchQuery]);
   
@@ -108,16 +109,16 @@ export default function JobsPage() {
         requirements: job.requirements || "",
         responsibilities: job.responsibilities || "",
         location: job.location || "",
-        job_type: job.job_type || "full_time",
-        experience_min: job.experience_min?.toString() || "",
-        experience_max: job.experience_max?.toString() || "",
+        job_type: (job as any).job_type || "full_time",
+        experience_min: (job as any).experience_min?.toString() || "",
+        experience_max: (job as any).experience_max?.toString() || "",
         salary_min: job.salary_min?.toString() || "",
         salary_max: job.salary_max?.toString() || "",
-        vacancies: job.vacancies || 1,
+        vacancies: (job as any).vacancies || 1,
         closing_date: job.closing_date || "",
-        status: job.status || "draft",
-        department_id: job.department_id?.toString() || "",
-        designation_id: job.designation_id?.toString() || ""
+        status: (job.status || "draft") as "draft",
+        department_id: (job as any).department_id?.toString() || "",
+        designation_id: (job as any).designation_id?.toString() || ""
       });
     } else {
       setFormData({
@@ -159,14 +160,14 @@ export default function JobsPage() {
         addToast({
           title: "Success",
           description: "Job updated successfully",
-          type: "success"
+          color: "success"
         });
       } else {
         await createJob(jobData);
         addToast({
           title: "Success",
           description: "Job created successfully",
-          type: "success"
+          color: "success"
         });
       }
       
@@ -175,7 +176,7 @@ export default function JobsPage() {
       addToast({
         title: "Error",
         description: "Failed to save job",
-        type: "error"
+        color: "danger"
       });
     }
   };
@@ -187,13 +188,13 @@ export default function JobsPage() {
         addToast({
           title: "Success",
           description: "Job deleted successfully",
-          type: "success"
+          color: "success"
         });
       } catch (error) {
         addToast({
           title: "Error",
           description: "Failed to delete job",
-          type: "error"
+          color: "danger"
         });
       }
     }
@@ -236,21 +237,43 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Job Postings</h1>
-          <p className="text-default-600">Manage job postings and recruitment</p>
-        </div>
-        <Button
-          color="primary"
-          onPress={() => handleOpenModal(null, false)}
-          startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Job Postings"
+          subtitle="Recruitment Management"
+          description="Manage job postings and recruitment efficiently. Create, edit, and track job opportunities for your organization."
+          icon="lucide:briefcase"
+          illustration="recruitment"
+          actions={[
+            {
+              label: "Add Job",
+              icon: "lucide:plus",
+              onPress: () => handleOpenModal(null, false),
+              variant: "solid"
+            }
+          ]}
+        />
+
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-6"
         >
-          Add Job
-        </Button>
-      </div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Button
+                color="primary"
+                onPress={() => handleOpenModal(null, false)}
+                startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+              >
+                Add Job
+              </Button>
+            </div>
+          </div>
 
       {/* Search and Filters */}
       <Card>
@@ -258,7 +281,7 @@ export default function JobsPage() {
           <div className="flex gap-4 items-center">
             <Input
               placeholder="Search jobs..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               className="max-w-sm"
@@ -302,18 +325,18 @@ export default function JobsPage() {
                     <div>
                       <p className="font-semibold">{job.title}</p>
                       <p className="text-sm text-default-500">
-                        {job.vacancies} vacancy{job.vacancies !== 1 ? 'ies' : ''}
+                        {(job as any).vacancies} vacancy{(job as any).vacancies !== 1 ? 'ies' : ''}
                       </p>
                     </div>
                   </TableCell>
-                  <TableCell>{job.department_name || 'N/A'}</TableCell>
+                  <TableCell>{job.department || 'N/A'}</TableCell>
                   <TableCell>{job.location || 'Remote'}</TableCell>
                   <TableCell>
                     <Chip size="sm" variant="flat">
-                      {job.job_type.replace('_', ' ').toUpperCase()}
+                      {(job as any).job_type.replace('_', ' ').toUpperCase()}
                     </Chip>
                   </TableCell>
-                  <TableCell>{formatExperience(job.experience_min, job.experience_max)}</TableCell>
+                  <TableCell>{formatExperience((job as any).experience_min, (job as any).experience_max)}</TableCell>
                   <TableCell>{formatSalary(job.salary_min, job.salary_max)}</TableCell>
                   <TableCell>
                     <Chip 
@@ -368,6 +391,7 @@ export default function JobsPage() {
           )}
         </CardBody>
       </Card>
+        </motion.div>
 
       {/* Job Modal */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl" scrollBehavior="inside">
@@ -382,7 +406,7 @@ export default function JobsPage() {
                   <Input
                     label="Job Title"
                     placeholder="Enter job title"
-                    value={formData.title}
+                    
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     isRequired
                   />
@@ -395,7 +419,7 @@ export default function JobsPage() {
                       onSelectionChange={(keys) => setFormData({...formData, job_type: Array.from(keys)[0] as any})}
                     >
                       {jobTypes.map((type) => (
-                        <SelectItem key={type} value={type}>
+                        <SelectItem key={type} >
                           {type.replace('_', ' ').toUpperCase()}
                         </SelectItem>
                       ))}
@@ -408,7 +432,7 @@ export default function JobsPage() {
                       onSelectionChange={(keys) => setFormData({...formData, status: Array.from(keys)[0] as any})}
                     >
                       {statusOptions.map((status) => (
-                        <SelectItem key={status} value={status}>
+                        <SelectItem key={status} >
                           {status.toUpperCase()}
                         </SelectItem>
                       ))}
@@ -418,7 +442,7 @@ export default function JobsPage() {
                   <Input
                     label="Location"
                     placeholder="Enter location"
-                    value={formData.location}
+                    
                     onChange={(e) => setFormData({...formData, location: e.target.value})}
                   />
                   
@@ -427,21 +451,21 @@ export default function JobsPage() {
                       label="Min Experience (years)"
                       type="number"
                       placeholder="0"
-                      value={formData.experience_min}
+                      
                       onChange={(e) => setFormData({...formData, experience_min: e.target.value})}
                     />
                     <Input
                       label="Max Experience (years)"
                       type="number"
                       placeholder="10"
-                      value={formData.experience_max}
+                      
                       onChange={(e) => setFormData({...formData, experience_max: e.target.value})}
                     />
                     <Input
                       label="Vacancies"
                       type="number"
                       placeholder="1"
-                      value={formData.vacancies.toString()}
+                      
                       onChange={(e) => setFormData({...formData, vacancies: parseInt(e.target.value) || 1})}
                     />
                   </div>
@@ -451,14 +475,14 @@ export default function JobsPage() {
                       label="Min Salary"
                       type="number"
                       placeholder="50000"
-                      value={formData.salary_min}
+                      
                       onChange={(e) => setFormData({...formData, salary_min: e.target.value})}
                     />
                     <Input
                       label="Max Salary"
                       type="number"
                       placeholder="100000"
-                      value={formData.salary_max}
+                      
                       onChange={(e) => setFormData({...formData, salary_max: e.target.value})}
                     />
                   </div>
@@ -466,14 +490,14 @@ export default function JobsPage() {
                   <Input
                     label="Closing Date"
                     type="date"
-                    value={formData.closing_date}
+                    
                     onChange={(e) => setFormData({...formData, closing_date: e.target.value})}
                   />
                   
                   <Textarea
                     label="Description"
                     placeholder="Enter job description"
-                    value={formData.description}
+                    
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows={3}
                   />
@@ -481,7 +505,7 @@ export default function JobsPage() {
                   <Textarea
                     label="Requirements"
                     placeholder="Enter job requirements"
-                    value={formData.requirements}
+                    
                     onChange={(e) => setFormData({...formData, requirements: e.target.value})}
                     rows={3}
                   />
@@ -489,7 +513,7 @@ export default function JobsPage() {
                   <Textarea
                     label="Responsibilities"
                     placeholder="Enter job responsibilities"
-                    value={formData.responsibilities}
+                    
                     onChange={(e) => setFormData({...formData, responsibilities: e.target.value})}
                     rows={3}
                   />
@@ -507,6 +531,7 @@ export default function JobsPage() {
           )}
         </ModalContent>
       </Modal>
+      </div>
     </div>
   );
 }

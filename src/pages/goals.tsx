@@ -33,9 +33,9 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
+import HeroSection from "../components/common/HeroSection";
 import { addToast } from "@heroui/react";
 import { useGoals, Goal } from "../hooks/useGoals";
-import PageLayout, { PageHeader } from "../components/layout/PageLayout";
 
 const categories = [
   "performance", "development", "behavioral", "project", "sales", "quality"
@@ -48,14 +48,14 @@ const statusColorMap = {
   "in_progress": "primary",
   "completed": "success",
   "cancelled": "danger",
-};
+} as const;
 
 const priorityColorMap = {
   "low": "default",
   "medium": "warning",
   "high": "danger",
   "critical": "danger",
-};
+} as const;
 
 const categoryColorMap = {
   "performance": "primary",
@@ -64,7 +64,7 @@ const categoryColorMap = {
   "project": "warning",
   "sales": "danger",
   "quality": "default",
-};
+} as const;
 
 export default function GoalsPage() {
   const { goals, loading, error, createGoal, updateGoal, deleteGoal } = useGoals();
@@ -184,7 +184,8 @@ export default function GoalsPage() {
         await updateGoal(editingGoal.id, {
           ...newGoal,
           target_value: newGoal.target_value ? parseFloat(newGoal.target_value) : null,
-          current_value: parseFloat(newGoal.current_value)
+          current_value: parseFloat(newGoal.current_value),
+          priority: newGoal.priority as "low" | "medium" | "high"
         });
         addToast({
           title: "Success",
@@ -195,7 +196,8 @@ export default function GoalsPage() {
         await createGoal({
           ...newGoal,
           target_value: newGoal.target_value ? parseFloat(newGoal.target_value) : null,
-          current_value: parseFloat(newGoal.current_value)
+          current_value: parseFloat(newGoal.current_value),
+          priority: newGoal.priority as "low" | "medium" | "high"
         });
         addToast({
           title: "Success",
@@ -276,20 +278,43 @@ export default function GoalsPage() {
   }
 
   return (
-    <PageLayout>
-      <PageHeader
-        title="Goals Management"
-        description="Manage employee goals and performance objectives"
-        actions={
-          <Button
-            color="primary"
-            startContent={<Icon icon="lucide:plus" />}
-            onPress={onOpen}
-          >
-            Add Goal
-          </Button>
-        }
-      />
+    <div className="min-h-screen bg-background">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
+        {/* Hero Section */}
+        <HeroSection
+          title="Goals Management"
+          subtitle="Performance Objectives"
+          description="Manage employee goals and performance objectives efficiently. Track progress, set targets, and drive performance."
+          icon="lucide:target"
+          illustration="goal"
+          actions={[
+            {
+              label: "Add Goal",
+              icon: "lucide:plus",
+              onPress: onOpen,
+              variant: "solid"
+            }
+          ]}
+        />
+
+        {/* Main Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="space-y-6"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Button
+                color="primary"
+                startContent={<Icon icon="lucide:plus" />}
+                onPress={onOpen}
+              >
+                Add Goal
+              </Button>
+            </div>
+          </div>
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -356,44 +381,44 @@ export default function GoalsPage() {
           <div className="flex flex-col md:flex-row gap-4">
             <Input
               placeholder="Search goals..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" />}
               className="flex-1"
             />
             <Select
               placeholder="Status"
-              value={selectedStatus}
+              
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="w-full md:w-48"
             >
-              <SelectItem key="all" value="all">All Status</SelectItem>
-              <SelectItem key="not_started" value="not_started">Not Started</SelectItem>
-              <SelectItem key="in_progress" value="in_progress">In Progress</SelectItem>
-              <SelectItem key="completed" value="completed">Completed</SelectItem>
-              <SelectItem key="cancelled" value="cancelled">Cancelled</SelectItem>
+              <SelectItem key="all">All Status</SelectItem>
+              <SelectItem key="not_started">Not Started</SelectItem>
+              <SelectItem key="in_progress">In Progress</SelectItem>
+              <SelectItem key="completed">Completed</SelectItem>
+              <SelectItem key="cancelled">Cancelled</SelectItem>
             </Select>
             <Select
               placeholder="Category"
-              value={selectedCategory}
+              
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="w-full md:w-48"
             >
-              <SelectItem key="all" value="all">All Categories</SelectItem>
+              <SelectItem key="all">All Categories</SelectItem>
               {categories.map(category => (
-                <SelectItem key={category} value={category}>{category}</SelectItem>
-              ))}
+                <SelectItem key={category} >{category}</SelectItem>
+              )) as any}
             </Select>
             <Select
               placeholder="Priority"
-              value={selectedPriority}
+              
               onChange={(e) => setSelectedPriority(e.target.value)}
               className="w-full md:w-48"
             >
-              <SelectItem key="all" value="all">All Priorities</SelectItem>
+              <SelectItem key="all">All Priorities</SelectItem>
               {priorities.map(priority => (
-                <SelectItem key={priority} value={priority}>{priority}</SelectItem>
-              ))}
+                <SelectItem key={priority} >{priority}</SelectItem>
+              )) as any}
             </Select>
           </div>
         </CardBody>
@@ -467,7 +492,7 @@ export default function GoalsPage() {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Progress
-                          value={progress}
+                          
                           className="flex-1"
                           size="sm"
                           color={progress >= 100 ? "success" : progress >= 50 ? "primary" : "warning"}
@@ -533,6 +558,7 @@ export default function GoalsPage() {
           )}
         </CardBody>
       </Card>
+        </motion.div>
 
       {/* Add/Edit Goal Modal */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} size="2xl">
@@ -547,7 +573,7 @@ export default function GoalsPage() {
                   <Input
                     label="Title"
                     placeholder="Enter goal title"
-                    value={newGoal.title}
+                    
                     onChange={(e) => setNewGoal({...newGoal, title: e.target.value})}
                     isRequired
                   />
@@ -555,35 +581,35 @@ export default function GoalsPage() {
                   <Select
                     label="Category"
                     placeholder="Select category"
-                    value={newGoal.category}
+                    
                     onChange={(e) => setNewGoal({...newGoal, category: e.target.value})}
                   >
                     {categories.map(category => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
+                      <SelectItem key={category} >{category}</SelectItem>
                     ))}
                   </Select>
 
                   <Select
                     label="Priority"
-                    value={newGoal.priority}
+                    
                     onChange={(e) => setNewGoal({...newGoal, priority: e.target.value})}
                   >
                     {priorities.map(priority => (
-                      <SelectItem key={priority} value={priority}>{priority}</SelectItem>
+                      <SelectItem key={priority} >{priority}</SelectItem>
                     ))}
                   </Select>
 
                   <Input
                     label="Unit (Optional)"
                     placeholder="e.g., hours, tasks, %"
-                    value={newGoal.unit}
+                    
                     onChange={(e) => setNewGoal({...newGoal, unit: e.target.value})}
                   />
 
                   <Input
                     label="Start Date"
                     type="date"
-                    value={newGoal.start_date}
+                    
                     onChange={(e) => setNewGoal({...newGoal, start_date: e.target.value})}
                     isRequired
                   />
@@ -591,7 +617,7 @@ export default function GoalsPage() {
                   <Input
                     label="End Date"
                     type="date"
-                    value={newGoal.end_date}
+                    
                     onChange={(e) => setNewGoal({...newGoal, end_date: e.target.value})}
                     isRequired
                   />
@@ -600,7 +626,7 @@ export default function GoalsPage() {
                     label="Target Value (Optional)"
                     placeholder="0"
                     type="number"
-                    value={newGoal.target_value}
+                    
                     onChange={(e) => setNewGoal({...newGoal, target_value: e.target.value})}
                   />
 
@@ -608,7 +634,7 @@ export default function GoalsPage() {
                     label="Current Value"
                     placeholder="0"
                     type="number"
-                    value={newGoal.current_value}
+                    
                     onChange={(e) => setNewGoal({...newGoal, current_value: e.target.value})}
                   />
 
@@ -616,7 +642,7 @@ export default function GoalsPage() {
                     <Textarea
                       label="Description (Optional)"
                       placeholder="Enter goal description"
-                      value={newGoal.description}
+                      
                       onChange={(e) => setNewGoal({...newGoal, description: e.target.value})}
                     />
                   </div>
@@ -695,7 +721,7 @@ export default function GoalsPage() {
                         <p className="text-sm text-default-500">Progress</p>
                         <div className="flex items-center gap-2">
                           <Progress
-                            value={calculateProgress(selectedGoal.current_value || 0, selectedGoal.target_value || 0)}
+                            
                             className="flex-1"
                             size="sm"
                           />
@@ -743,6 +769,7 @@ export default function GoalsPage() {
           )}
         </ModalContent>
       </Modal>
-    </PageLayout>
+      </div>
+    </div>
   );
 }

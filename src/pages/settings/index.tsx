@@ -1,12 +1,24 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
     import { 
       Card, 
       CardBody, 
       CardHeader,
       Button,
-      addToast
+  Spinner
     } from "@heroui/react";
     import { Icon } from "@iconify/react";
+    import { motion } from "framer-motion";
+    import HeroSection from "../../components/common/HeroSection";
+import DynamicPageTitle from "../../components/common/DynamicPageTitle";
+import { useSettings } from "../../contexts/settings-context";
+import { useAuth } from "../../contexts/auth-context";
+import { 
+  getAccessibleSettingsCategories, 
+  getEditableSettingsCategories,
+  canViewSettingsCategory,
+  canEditSettingsCategory 
+} from "../../utils/settings-permissions";
+import SettingsPermissionWrapper from "../../components/settings/SettingsPermissionWrapper";
 
 // Import settings components
 import GeneralSettings from "../../components/settings/GeneralSettings";
@@ -31,6 +43,7 @@ import CacheSettings from "../../components/settings/CacheSettings";
 import WebhookSettings from "../../components/settings/WebhookSettings";
 import CookieConsentSettings from "../../components/settings/CookieConsentSettings";
 import ChatGPTSettings from "../../components/settings/ChatGPTSettings";
+import SettingsExportImport from "../../components/settings/SettingsExportImport";
     
     // Settings tabs configuration
     const settingsTabs = [
@@ -55,744 +68,245 @@ import ChatGPTSettings from "../../components/settings/ChatGPTSettings";
   { key: "webhook", title: "Webhook Settings", icon: "lucide:webhook", description: "Webhook endpoints and event configuration" },
   { key: "cookie-consent", title: "Cookie Consent", icon: "lucide:cookie", description: "Cookie consent banner and privacy settings" },
   { key: "chatgpt", title: "ChatGPT Integration", icon: "lucide:bot", description: "AI assistant and ChatGPT integration settings" },
+  { key: "export-import", title: "Export & Import", icon: "lucide:download", description: "Export and import settings configuration" }
     ];
     
     export default function Settings() {
-  const [activeTab, setActiveTab] = React.useState("general");
-      const [isLoading, setIsLoading] = React.useState(false);
-  const [isApiModalOpen, setIsApiModalOpen] = React.useState(false);
-  const [newApiKey, setNewApiKey] = React.useState({ name: "", description: "" });
-      
-      // Form state for different settings
-  const [generalSettings, setGeneralSettings] = React.useState({
-        siteName: "HRMGO",
-    siteDescription: "Human Resource Management System",
-    siteLogo: "",
-        favicon: "",
-        primaryColor: "#6366f1",
-        secondaryColor: "#8b5cf6",
-    rtlEnabled: false,
-    maintenanceMode: false,
-    debugMode: false,
-    autoBackup: true,
-    sessionTimeout: 30
-      });
-      
-      const [companySettings, setCompanySettings] = React.useState({
-        companyName: "HRMGO Inc.",
-        companyAddress: "123 Business Avenue, Suite 100",
-        companyCity: "New York",
-        companyState: "NY",
-        companyZipCode: "10001",
-        companyCountry: "United States",
-        companyPhone: "+1 (555) 123-4567",
-        companyEmail: "info@hrmgo.com",
-        companyWebsite: "https://hrmgo.com",
-        companyLogo: "",
-        registrationNumber: "REG123456789",
-        taxNumber: "TAX987654321",
-    industry: "Technology",
-    companySize: "51-200",
-    foundedYear: "2020",
-    socialMedia: {
-      linkedin: "",
-      twitter: "",
-      facebook: "",
-      instagram: ""
+  const { user } = useAuth();
+  const { settings, loading, saving, updateSetting, updateCategory, saveAllSettings, error } = useSettings();
+  const [activeTab, setActiveTab] = useState("general");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isApiModalOpen, setIsApiModalOpen] = useState(false);
+  const [newApiKey, setNewApiKey] = useState({ name: "", description: "" });
+  
+  // Get user role and permissions
+  const userRole = user?.role || 'employee';
+  const accessibleCategories = getAccessibleSettingsCategories(userRole);
+  const editableCategories = getEditableSettingsCategories(userRole);
+  
+  // Filter settings tabs based on user permissions
+  const filteredSettingsTabs = settingsTabs.filter(tab => 
+    accessibleCategories.includes(tab.key)
+  );
+
+  // Set default active tab to first accessible category
+  useEffect(() => {
+    if (accessibleCategories.length > 0 && !accessibleCategories.includes(activeTab)) {
+      setActiveTab(accessibleCategories[0]);
     }
-  });
+  }, [accessibleCategories, activeTab]);
 
-  const [localizationSettings, setLocalizationSettings] = React.useState({
-    defaultLanguage: "en",
-    supportedLanguages: ["en", "es", "fr", "de", "zh"],
-        timezone: "America/New_York",
-        dateFormat: "MM/DD/YYYY",
-    timeFormat: "12h",
-    currency: "USD",
-    currencySymbol: "$",
-    numberFormat: "US",
-    firstDayOfWeek: "sunday",
-    businessDays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
-    workingHours: {
-      start: "09:00",
-      end: "17:00"
+  const handleSettingsChange = async (category: string, key: string, value: any) => {
+    // Determine the correct type for the value
+    let type = 'string';
+    if (typeof value === 'boolean') {
+      type = 'boolean';
+    } else if (typeof value === 'number') {
+      type = 'number';
+    } else if (typeof value === 'object') {
+      type = 'object';
     }
-      });
-      
-      const [emailSettings, setEmailSettings] = React.useState({
-        mailDriver: "smtp",
-        mailHost: "smtp.example.com",
-        mailPort: "587",
-        mailUsername: "noreply@example.com",
-        mailPassword: "",
-        mailEncryption: "tls",
-        mailFromAddress: "noreply@example.com",
-    mailFromName: "HRMGO",
-    mailQueueEnabled: true,
-    mailRetryAttempts: 3,
-    mailTimeout: 30
-  });
+    
+    await updateSetting(category, key, value, type);
+  };
 
-  const [notificationSettings, setNotificationSettings] = React.useState({
-    emailNotifications: true,
-    smsNotifications: false,
-    pushNotifications: true,
-    inAppNotifications: true,
-    notificationChannels: {
-      newEmployee: ["email", "in-app"],
-      leaveRequest: ["email", "in-app"],
-      attendanceAlert: ["email", "sms"],
-      payrollProcessed: ["email"],
-      systemMaintenance: ["email", "in-app"]
-    },
-    quietHours: {
-      enabled: true,
-      start: "22:00",
-      end: "08:00"
-    }
-      });
-      
-      const [integrationSettings, setIntegrationSettings] = React.useState({
-        // Pusher settings
-        pusherEnabled: false,
-        pusherAppId: "",
-        pusherAppKey: "",
-        pusherAppSecret: "",
-        pusherCluster: "us2",
-        
-        // Zoom settings
-        zoomEnabled: false,
-        zoomClientId: "",
-        zoomClientSecret: "",
-        
-        // Teams settings
-        teamsEnabled: false,
-        teamsClientId: "",
-        teamsClientSecret: "",
-        
-        // Slack settings
-        slackEnabled: false,
-        slackClientId: "",
-        slackClientSecret: "",
-        
-        // Telegram settings
-        telegramEnabled: false,
-        telegramBotToken: "",
-        
-        // Twilio settings
-        twilioEnabled: false,
-        twilioSid: "",
-        twilioAuthToken: "",
-        twilioFromNumber: ""
-      });
-      
-      const [securitySettings, setSecuritySettings] = React.useState({
-        // reCAPTCHA settings
-        recaptchaEnabled: false,
-        recaptchaSiteKey: "",
-        recaptchaSecretKey: "",
-        
-        // IP restriction settings
-        ipRestrictionEnabled: false,
-        allowedIps: "",
-        
-        // 2FA settings
-        twoFactorEnabled: false,
-        twoFactorMethod: "email"
-      });
-      
-  const [workflowSettings, setWorkflowSettings] = React.useState({
-    leaveApprovalWorkflow: "manager",
-    expenseApprovalWorkflow: "finance",
-    recruitmentWorkflow: "hr",
-    autoApprovalLimit: 100,
-    escalationDays: 3,
-    reminderFrequency: "daily",
-    approvalDeadline: 5
-  });
-
-  const [reportsSettings, setReportsSettings] = React.useState({
-    autoReportGeneration: true,
-    reportFrequency: "monthly",
-    reportFormat: "pdf",
-    emailReports: true,
-    reportRetention: 365,
-    includeCharts: true,
-    includeRawData: false,
-    reportTimezone: "America/New_York"
-  });
-
-  // New settings state
-  const [offerLetterSettings, setOfferLetterSettings] = React.useState({
-    companyName: "",
-    companyAddress: "",
-    hrEmail: "",
-    hrPhone: "",
-    defaultTemplate: `Dear [CANDIDATE_NAME],
-
-We are pleased to offer you the position of [POSITION] at [COMPANY_NAME]. After careful consideration of your qualifications and experience, we believe you will be a valuable addition to our team.
-
-**Position Details:**
-- Job Title: [POSITION]
-- Department: [DEPARTMENT]
-- Reporting Manager: [MANAGER_NAME]
-- Start Date: [START_DATE]
-- Employment Type: [EMPLOYMENT_TYPE]
-
-**Compensation & Benefits:**
-- Annual Salary: [SALARY]
-- Benefits: [BENEFITS]
-- Probation Period: [PROBATION_PERIOD] months
-
-**Terms & Conditions:**
-- This offer is valid for [VALIDITY_DAYS] days from the date of this letter
-- Your employment will be subject to our standard terms and conditions
-- You will be required to complete all necessary documentation before your start date
-
-We look forward to welcoming you to our team. Please confirm your acceptance by signing and returning this letter by [ACCEPTANCE_DEADLINE].
-
-If you have any questions, please feel free to contact us.
-
-Best regards,
-[HR_MANAGER_NAME]
-Human Resources Manager
-[COMPANY_NAME]
-[HR_EMAIL] | [HR_PHONE]`,
-    autoGenerate: false,
-    includeSalary: true,
-    includeBenefits: true,
-    includeStartDate: true,
-    validityDays: 30,
-    signatureRequired: true,
-    digitalSignature: false,
-    letterheadTemplate: "",
-    useCustomLetterhead: false,
-    letterheadFile: null
-  });
-
-  const [joiningLetterSettings, setJoiningLetterSettings] = React.useState({
-    companyName: "",
-    companyAddress: "",
-    hrEmail: "",
-    hrPhone: "",
-    defaultTemplate: `Dear [EMPLOYEE_NAME],
-
-Welcome to [COMPANY_NAME]! We are excited to have you join our team as [POSITION] in the [DEPARTMENT] department.
-
-**Joining Details:**
-- Position: [POSITION]
-- Department: [DEPARTMENT]
-- Start Date: [JOINING_DATE]
-- Reporting Manager: [MANAGER_NAME]
-- Work Location: [WORK_LOCATION]
-- Probation Period: [PROBATION_PERIOD] months
-
-**Important Information:**
-- Please report to the HR department on your first day at 9:00 AM
-- Bring all required documents (ID proof, address proof, educational certificates)
-- You will receive your employee ID and system access on the first day
-- Company policies and procedures will be explained during orientation
-
-**IT Setup:**
-- Your workstation will be prepared with necessary software and tools
-- You will receive login credentials for company systems
-- IT support will be available for any technical assistance
-
-We look forward to your valuable contribution to our team.
-
-Best regards,
-[HR_MANAGER_NAME]
-Human Resources Manager
-[COMPANY_NAME]
-[HR_EMAIL] | [HR_PHONE]`,
-    autoGenerate: false,
-    includeReportingManager: true,
-    includeDepartment: true,
-    includeDesignation: true,
-    includeWorkLocation: true,
-    includeJoiningDate: true,
-    includeProbationPeriod: true,
-    probationPeriod: 3,
-    includeCompanyPolicies: true,
-    includeITSetup: true,
-    letterheadTemplate: "",
-    useCustomLetterhead: false,
-    letterheadFile: null
-  });
-
-  const [certificateSettings, setCertificateSettings] = React.useState({
-    companyName: "",
-    companyAddress: "",
-    hrEmail: "",
-    hrPhone: "",
-    defaultTemplate: `**EXPERIENCE CERTIFICATE**
-
-This is to certify that [EMPLOYEE_NAME] was employed with [COMPANY_NAME] as [POSITION] in the [DEPARTMENT] department from [START_DATE] to [END_DATE].
-
-**Employment Details:**
-- Position: [POSITION]
-- Department: [DEPARTMENT]
-- Employment Period: [START_DATE] to [END_DATE]
-- Total Duration: [DURATION]
-
-**Job Responsibilities:**
-[JOB_DESCRIPTION]
-
-**Performance & Skills:**
-- Performance Rating: [PERFORMANCE_RATING]
-- Key Skills: [SKILLS]
-- Major Projects: [PROJECTS]
-- Achievements: [ACHIEVEMENTS]
-
-During this period, [EMPLOYEE_NAME] has been found to be sincere, hardworking, and dedicated to their work. They have demonstrated excellent professional skills and contributed significantly to the organization's growth.
-
-We wish them all the best for their future endeavors and have no hesitation in recommending them for any suitable position.
-
-This certificate is issued upon request and without any prejudice.
-
-Best regards,
-[HR_MANAGER_NAME]
-Human Resources Manager
-[COMPANY_NAME]
-[HR_EMAIL] | [HR_PHONE]
-
-Date: [CERTIFICATE_DATE]`,
-    autoGenerate: false,
-    includeJobDescription: true,
-    includePerformanceRating: true,
-    includeSkills: true,
-    includeProjects: true,
-    includeAchievements: true,
-    includeDuration: true,
-    includeReasonForLeaving: false,
-    includeRecommendation: true,
-    signatureRequired: true,
-    digitalSignature: false,
-    letterheadTemplate: "",
-    useCustomLetterhead: false,
-    letterheadFile: null
-  });
-
-  const [nocSettings, setNocSettings] = React.useState({
-    companyName: "",
-    companyAddress: "",
-    hrEmail: "",
-    hrPhone: "",
-    defaultTemplate: `**NO OBJECTION CERTIFICATE**
-
-This is to certify that [EMPLOYEE_NAME] was employed with [COMPANY_NAME] as [POSITION] in the [DEPARTMENT] department.
-
-**Employee Details:**
-- Name: [EMPLOYEE_NAME]
-- Position: [POSITION]
-- Department: [DEPARTMENT]
-- Employee ID: [EMPLOYEE_ID]
-
-**Employment History:**
-- Start Date: [START_DATE]
-- Last Working Day: [LAST_WORKING_DAY]
-- Notice Period: [NOTICE_PERIOD]
-- Total Service: [TOTAL_SERVICE]
-
-**Clearance Status:**
-- All company assets returned: ✓
-- Outstanding dues cleared: ✓
-- Exit formalities completed: ✓
-- No pending obligations: ✓
-
-We have no objection to [EMPLOYEE_NAME] pursuing other opportunities and hereby issue this No Objection Certificate.
-
-This certificate is issued upon request and without any prejudice.
-
-Best regards,
-[HR_MANAGER_NAME]
-Human Resources Manager
-[COMPANY_NAME]
-[HR_EMAIL] | [HR_PHONE]
-
-Date: [NOC_DATE]`,
-    autoGenerate: false,
-    includeEmployeeDetails: true,
-    includeEmploymentHistory: true,
-    includeClearanceStatus: true,
-    includeOutstandingDues: true,
-    includeNoticePeriod: true,
-    includeLastWorkingDay: true,
-    includeReasonForLeaving: false,
-    includeRecommendation: true,
-    signatureRequired: true,
-    digitalSignature: false,
-    letterheadTemplate: "",
-    useCustomLetterhead: false,
-    letterheadFile: null
-  });
-
-  const [googleCalendarSettings, setGoogleCalendarSettings] = React.useState({
-    clientId: "",
-    clientSecret: "",
-    redirectUri: "",
-    enabled: false,
-    syncEmployees: true,
-    syncLeaveRequests: true,
-    syncMeetings: true,
-    syncInterviews: true,
-    syncEvents: true,
-    autoAccept: false,
-    reminderMinutes: 15,
-    timezone: "America/New_York",
-    workingHoursStart: "09:00",
-    workingHoursEnd: "17:00",
-    workingDays: ["monday", "tuesday", "wednesday", "thursday", "friday"]
-  });
-
-  const [seoSettings, setSeoSettings] = React.useState({
-    siteTitle: "",
-    siteDescription: "",
-    siteKeywords: "",
-    siteUrl: "",
-    siteLogo: "",
-    favicon: "",
-    ogImage: "",
-    twitterHandle: "",
-    facebookAppId: "",
-    googleAnalyticsId: "",
-    googleTagManagerId: "",
-    facebookPixelId: "",
-    enableSitemap: true,
-    enableRobotsTxt: true,
-    enableMetaTags: true,
-    enableOpenGraph: true,
-    enableTwitterCards: true,
-    enableSchemaMarkup: true,
-    enableCanonicalUrls: true,
-    enableBreadcrumbs: true
-  });
-
-  const [cacheSettings, setCacheSettings] = React.useState({
-    enabled: true,
-    driver: "redis",
-    host: "localhost",
-    port: 6379,
-    password: "",
-    database: 0,
-    prefix: "hrms_",
-    defaultTtl: 3600,
-    maxMemory: "256m",
-    enableQueryCache: true,
-    enableViewCache: true,
-    enableRouteCache: true,
-    enableConfigCache: true,
-    enableEventCache: true,
-    enableSessionCache: true,
-    enableUserCache: true,
-    enableEmployeeCache: true,
-    enableDepartmentCache: true,
-    enableAttendanceCache: true,
-    enableLeaveCache: true,
-    enablePayrollCache: true,
-    autoClearCache: true,
-    clearCacheOnUpdate: true,
-    clearCacheOnDelete: true
-  });
-
-  const [webhookSettings, setWebhookSettings] = React.useState({
-    enabled: false,
-    secret: "",
-    timeout: 30,
-    retryAttempts: 3,
-    retryDelay: 5,
-    webhooks: []
-  });
-
-  const [cookieConsentSettings, setCookieConsentSettings] = React.useState({
-    enabled: true,
-    position: "bottom",
-    theme: "light",
-    message: "We use cookies to enhance your experience on our website.",
-    acceptButtonText: "Accept All",
-    declineButtonText: "Decline",
-    learnMoreText: "Learn More",
-    learnMoreUrl: "",
-    cookiePolicyUrl: "",
-    privacyPolicyUrl: "",
-    termsOfServiceUrl: "",
-    showDeclineButton: true,
-    showLearnMoreButton: true,
-    autoAccept: false,
-    autoAcceptDelay: 0,
-    rememberChoice: true,
-    cookieExpiry: 365,
-    requiredCookies: ["session", "csrf", "auth"],
-    optionalCookies: ["analytics", "marketing", "functional"],
-    analyticsCookies: ["google_analytics", "mixpanel"],
-    marketingCookies: ["facebook_pixel", "google_ads"],
-    functionalCookies: ["preferences", "language"]
-  });
-
-  const [chatgptSettings, setChatgptSettings] = React.useState({
-    apiKey: "",
-    model: "gpt-3.5-turbo",
-    maxTokens: 1000,
-    temperature: 0.7,
-    enabled: false,
-    enableHRAssistant: true,
-    enableRecruitmentAssistant: true,
-    enablePerformanceAssistant: true,
-    enableLeaveAssistant: true,
-    enablePayrollAssistant: true,
-    enableEmployeeSupport: true,
-    enableManagerSupport: true,
-    enableAdminSupport: true,
-    autoRespond: false,
-    responseDelay: 2,
-    contextWindow: 4000,
-    enableLearning: true,
-    enableFeedback: true,
-    enableAnalytics: true,
-    enableIntegration: false,
-    webhookUrl: "",
-    webhookSecret: ""
-  });
-
-  const [apiSettings, setApiSettings] = React.useState({
-    apiEnabled: true,
-    rateLimit: 1000,
-    webhookUrl: "",
-    webhookSecret: "",
-    apiKeys: [
-      { id: 1, name: "Mobile App", key: "sk-***...***abc", created: "2024-11-01", lastUsed: "2024-12-01" },
-      { id: 2, name: "Integration", key: "sk-***...***def", created: "2024-11-15", lastUsed: "2024-11-30" }
-    ]
-  });
-
-  const [backupSettings, setBackupSettings] = React.useState({
-    autoBackup: true,
-    backupFrequency: "daily",
-    backupRetention: 30,
-    backupLocation: "cloud",
-    backupEncryption: true,
-    lastBackup: "2024-12-01 10:30:00",
-    nextBackup: "2024-12-02 10:30:00"
-  });
-
-      
-      const handleSaveSettings = () => {
+  const handleCreateApiKey = async () => {
+    try {
         setIsLoading(true);
-        
-        // Simulate API call
-        setTimeout(() => {
-          setIsLoading(false);
-          
-          addToast({
-            title: "Settings Saved",
-            description: "Your settings have been saved successfully.",
-            color: "success",
-          });
-        }, 1000);
-      };
-      
-  const handleCreateApiKey = () => {
-    if (!newApiKey.name) {
-      addToast({
-        title: "Error",
-        description: "Please enter a name for the API key.",
-        color: "danger",
-      });
-      return;
+      // TODO: Implement API key creation
+      console.log('Creating API key:', newApiKey);
+      setIsApiModalOpen(false);
+      setNewApiKey({ name: "", description: "" });
+    } catch (error) {
+      console.error('Error creating API key:', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    const newKey = {
-      id: Date.now(),
-      name: newApiKey.name,
-      key: `sk-${Math.random().toString(36).substring(2, 15)}...${Math.random().toString(36).substring(2, 15)}`,
-      created: new Date().toISOString().split('T')[0],
-      lastUsed: "Never"
-    };
-
-    setApiSettings(prev => ({
-      ...prev,
-      apiKeys: [...prev.apiKeys, newKey]
-    }));
-
-    setNewApiKey({ name: "", description: "" });
-    setIsApiModalOpen(false);
-    
-    addToast({
-      title: "API Key Created",
-      description: "New API key has been created successfully.",
-      color: "success",
-    });
   };
 
-  const handleDeleteApiKey = (id: number) => {
-    setApiSettings(prev => ({
-      ...prev,
-      apiKeys: prev.apiKeys.filter(key => key.id !== id)
-    }));
-    
-    addToast({
-      title: "API Key Deleted",
-      description: "API key has been deleted successfully.",
-      color: "success",
-    });
+  const handleDeleteApiKey = async (keyId: string | number) => {
+    try {
+      setIsLoading(true);
+      // TODO: Implement API key deletion
+      console.log('Deleting API key:', keyId);
+    } catch (error) {
+      console.error('Error deleting API key:', error);
+    } finally {
+          setIsLoading(false);
+    }
   };
 
-      
-      // Render different settings forms based on active tab
+  const handleSettingsImport = async (importedSettings: Record<string, any>) => {
+    // Persist each category to backend using global context
+    for (const [category, categorySettings] of Object.entries(importedSettings)) {
+      if (typeof categorySettings === 'object' && categorySettings !== null) {
+        await updateCategory(category, categorySettings);
+      }
+    }
+    console.log('Settings imported successfully');
+  };
+
       const renderSettingsForm = () => {
         switch (activeTab) {
       case "general":
             return (
-          <GeneralSettings 
-            settings={generalSettings} 
-            onSettingsChange={(field, value) => setGeneralSettings(prev => ({ ...prev, [field]: value }))} 
-          />
+          <SettingsPermissionWrapper userRole={userRole} category="general" action="view">
+            <GeneralSettings 
+              settings={settings.general || {}} 
+              onSettingsChange={(field, value) => handleSettingsChange('general', field, value)} 
+            />
+          </SettingsPermissionWrapper>
             );
             
           case "company":
             return (
-          <CompanySettings 
-            settings={companySettings} 
-            onSettingsChange={(field, value) => setCompanySettings(prev => ({ ...prev, [field]: value }))} 
-          />
+          <SettingsPermissionWrapper userRole={userRole} category="company" action="view">
+            <CompanySettings 
+              settings={settings.company || {}} 
+              onSettingsChange={(field, value) => handleSettingsChange('company', field, value)} 
+            />
+          </SettingsPermissionWrapper>
         );
       
       case "localization":
         return (
-          <LocalizationSettings 
-            settings={localizationSettings} 
-            onSettingsChange={(field, value) => setLocalizationSettings(prev => ({ ...prev, [field]: value }))} 
-          />
+          <SettingsPermissionWrapper userRole={userRole} category="localization" action="view">
+            <LocalizationSettings 
+              settings={settings.localization || {}} 
+              onSettingsChange={(field, value) => handleSettingsChange('localization', field, value)} 
+            />
+          </SettingsPermissionWrapper>
             );
             
           case "email":
             return (
-          <EmailSettings 
-            settings={emailSettings} 
-            onSettingsChange={(field, value) => setEmailSettings(prev => ({ ...prev, [field]: value }))} 
-          />
+          <SettingsPermissionWrapper userRole={userRole} category="email" action="view">
+            <EmailSettings 
+              settings={settings.email || {}} 
+              onSettingsChange={(field, value) => handleSettingsChange('email', field, value)} 
+            />
+          </SettingsPermissionWrapper>
         );
 
       case "notification":
         return (
           <NotificationSettings 
-            settings={notificationSettings} 
-            onSettingsChange={(field, value) => setNotificationSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.notification || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('notification', field, value)} 
           />
             );
             
           case "integration":
             return (
           <IntegrationSettings 
-            settings={integrationSettings} 
-            onSettingsChange={(field, value) => setIntegrationSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.integration || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('integration', field, value)} 
           />
-            );
-            
-          case "security":
-            return (
+        );
+        
+      case "security":
+        return (
           <SecuritySettings 
-            settings={securitySettings} 
-            onSettingsChange={(field, value) => setSecuritySettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.security || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('security', field, value)} 
           />
         );
 
       case "backup":
         return (
           <BackupSettings 
-            settings={backupSettings} 
-            onSettingsChange={(field, value) => setBackupSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.backup || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('backup', field, value)} 
           />
         );
 
       case "api":
         return (
           <ApiManagement 
-            settings={apiSettings}
-            onSettingsChange={(field, value) => setApiSettings(prev => ({ ...prev, [field]: value }))}
+            settings={settings.api || {}}
+            onSettingsChange={(field, value) => handleSettingsChange('api', field, value)}
             onCreateApiKey={() => setIsApiModalOpen(true)}
             onDeleteApiKey={handleDeleteApiKey}
           />
         );
 
-
       case "workflow":
         return (
           <WorkflowSettings 
-            settings={workflowSettings} 
-            onSettingsChange={(field, value) => setWorkflowSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.workflow || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('workflow', field, value)} 
           />
         );
 
       case "reports":
         return (
           <ReportsSettings 
-            settings={reportsSettings} 
-            onSettingsChange={(field, value) => setReportsSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.reports || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('reports', field, value)} 
           />
-            );
+        );
 
       case "offer-letter":
         return (
           <OfferLetterSettings 
-            settings={offerLetterSettings} 
-            onSettingsChange={(field, value) => setOfferLetterSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings['offer-letter'] || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('offer-letter', field, value)} 
           />
         );
 
       case "joining-letter":
         return (
           <JoiningLetterSettings 
-            settings={joiningLetterSettings} 
-            onSettingsChange={(field, value) => setJoiningLetterSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings['joining-letter'] || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('joining-letter', field, value)} 
           />
         );
 
       case "certificate":
-            return (
+        return (
           <CertificateSettings 
-            settings={certificateSettings} 
-            onSettingsChange={(field, value) => setCertificateSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.certificate || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('certificate', field, value)} 
           />
         );
 
       case "noc":
         return (
           <NOCSettings 
-            settings={nocSettings} 
-            onSettingsChange={(field, value) => setNocSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.noc || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('noc', field, value)} 
           />
         );
 
       case "google-calendar":
         return (
           <GoogleCalendarSettings 
-            settings={googleCalendarSettings} 
-            onSettingsChange={(field, value) => setGoogleCalendarSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings['google-calendar'] || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('google-calendar', field, value)} 
           />
         );
 
       case "seo":
         return (
           <SEOSettings 
-            settings={seoSettings} 
-            onSettingsChange={(field, value) => setSeoSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.seo || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('seo', field, value)} 
           />
         );
 
       case "cache":
         return (
           <CacheSettings 
-            settings={cacheSettings} 
-            onSettingsChange={(field, value) => setCacheSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.cache || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('cache', field, value)} 
           />
         );
 
       case "webhook":
         return (
           <WebhookSettings 
-            settings={webhookSettings} 
-            onSettingsChange={(field, value) => setWebhookSettings(prev => ({ ...prev, [field]: value }))}
+            settings={settings.webhook || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('webhook', field, value)}
             onAddWebhook={() => console.log("Add webhook")}
             onEditWebhook={(webhook) => console.log("Edit webhook", webhook)}
             onDeleteWebhook={(id) => console.log("Delete webhook", id)}
@@ -803,16 +317,25 @@ Date: [NOC_DATE]`,
       case "cookie-consent":
         return (
           <CookieConsentSettings 
-            settings={cookieConsentSettings} 
-            onSettingsChange={(field, value) => setCookieConsentSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings['cookie-consent'] || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('cookie-consent', field, value)} 
           />
         );
 
       case "chatgpt":
-            return (
+        return (
           <ChatGPTSettings 
-            settings={chatgptSettings} 
-            onSettingsChange={(field, value) => setChatgptSettings(prev => ({ ...prev, [field]: value }))} 
+            settings={settings.chatgpt || {}} 
+            onSettingsChange={(field, value) => handleSettingsChange('chatgpt', field, value)} 
+          />
+        );
+
+      case "export-import":
+            return (
+          <SettingsExportImport 
+            settings={settings} 
+            onSettingsImport={handleSettingsImport}
+            currentUser="admin"
           />
             );
             
@@ -825,88 +348,151 @@ Date: [NOC_DATE]`,
         }
       };
       
-      return (
-    <div className="min-h-screen bg-content2">
-      {/* Header Section */}
-      <div className="bg-content1 border-b border-default-300 px-6 py-4">
-        <div className="flex items-center justify-between">
-            <div>
-            <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
-            <p className="text-default-600 mt-1">Manage your application settings and preferences</p>
-            </div>
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="bordered"
-              startContent={<Icon icon="lucide:download" />}
-              className="border-divider"
-            >
-              Export Settings
-            </Button>
-            <Button 
-              color="primary" 
-              onPress={handleSaveSettings}
-              isLoading={isLoading}
-              startContent={<Icon icon="lucide:save" />}
-              className="shadow-lg"
-            >
-              Save Settings
-            </Button>
-          </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center">
+          <Spinner size="lg" color="primary" />
+          <p className="text-default-500 dark:text-default-400 mt-4 text-sm sm:text-base">Loading settings...</p>
         </div>
-          </div>
+      </div>
+    );
+  }
+      
+      return (
+    <div className="min-h-screen bg-background">
+        <DynamicPageTitle pageName="Settings" />
+        {/* Hero Section */}
+        <HeroSection
+          title="System Settings"
+          subtitle="Configuration & Preferences"
+          description="Configure your HRMS system preferences, integrations, and customize the platform to meet your organization's needs."
+          icon="lucide:settings"
+          illustration="settings"
+          actions={[
+            {
+              label: "Export Settings",
+              icon: "lucide:download",
+              onPress: () => console.log("Export settings"),
+              variant: "bordered"
+            },
+            {
+              label: "Reset to Defaults",
+              icon: "lucide:refresh-cw",
+              onPress: () => console.log("Reset settings"),
+              variant: "flat"
+            }
+          ]}
+        />
           
-      <div className="p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Settings Navigation */}
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <h3 className="text-lg font-semibold">Settings Categories</h3>
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 p-4 sm:p-6">
+        {/* Floating Sidebar Navigation */}
+        <div className="w-full lg:w-80 flex-shrink-0">
+          <Card className="border-0 shadow-lg rounded-2xl h-fit lg:sticky lg:top-6">
+            <CardHeader className="pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+                  <Icon icon="lucide:list" className="text-primary-600 dark:text-primary-400 text-xl" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-semibold text-foreground">Settings Categories</h3>
+                  <p className="text-default-500 text-xs sm:text-sm">Choose a category to configure</p>
+                </div>
+              </div>
             </CardHeader>
-              <CardBody className="p-0">
-              <div className="space-y-1">
-                  {settingsTabs.map((tab) => (
-                  <button
+            <CardBody className="px-4 sm:px-6 pb-4 sm:pb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2 sm:gap-3">
+                {filteredSettingsTabs.map((tab) => (
+                  <Button
                       key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`w-full text-left p-4 hover:bg-content1 transition-colors ${
-                      activeTab === tab.key ? 'bg-primary-50 border-r-2 border-primary-500' : ''
+                    variant={activeTab === tab.key ? "flat" : "light"}
+                    color={activeTab === tab.key ? "primary" : "default"}
+                    className={`w-full justify-start h-auto p-3 sm:p-4 rounded-xl transition-all duration-200 ${
+                      activeTab === tab.key 
+                        ? "bg-primary-50 dark:bg-primary-900/20 border border-primary-200 dark:border-primary-700 shadow-sm" 
+                        : "hover:bg-default-100 dark:hover:bg-default-50 hover:shadow-sm"
                     }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2 rounded-lg ${
-                        activeTab === tab.key ? 'bg-primary-100' : 'bg-content2'
+                    onPress={() => setActiveTab(tab.key)}
+                    startContent={
+                      <div className={`p-1.5 sm:p-2 rounded-lg ${
+                        activeTab === tab.key ? "bg-primary-100 dark:bg-primary-800" : "bg-default-100 dark:bg-default-200"
                       }`}>
                         <Icon 
                           icon={tab.icon} 
-                          className={`text-lg ${
-                            activeTab === tab.key ? 'text-primary-600' : 'text-default-600'
+                          className={`text-base sm:text-lg ${
+                            activeTab === tab.key ? "text-primary-600 dark:text-primary-400" : "text-default-500 dark:text-default-400"
                           }`} 
                         />
-                      </div>
-                      <div>
-                        <p className={`font-medium ${
-                          activeTab === tab.key ? 'text-primary-600' : 'text-foreground'
-                        }`}>
-                          {tab.title}
-                        </p>
-                        <p className="text-xs text-default-500">{tab.description}</p>
-                      </div>
                         </div>
-                  </button>
-                  ))}
+                      }
+                  >
+                    <div className="text-left ml-1 sm:ml-2 min-w-0 flex-1">
+                      <div className={`font-medium text-sm sm:text-base truncate ${
+                        activeTab === tab.key ? "text-primary-600 dark:text-primary-400" : "text-foreground"
+                      }`}>
+                        {tab.title}
+                      </div>
+                      <div className="text-xs text-default-500 dark:text-default-400 mt-1 line-clamp-2">
+                        {tab.description}
+                      </div>
+                    </div>
+                  </Button>
+                ))}
               </div>
               </CardBody>
             </Card>
-            
-            {/* Settings Content */}
-          <div className="lg:col-span-3">
-            <Card>
-              <CardBody className="p-6">
-                {renderSettingsForm()}
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 min-w-0">
+          <Card className="border-0 shadow-lg rounded-2xl">
+            <CardHeader className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 border-b border-divider">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-4">
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-foreground truncate">
+                    {filteredSettingsTabs.find(tab => tab.key === activeTab)?.title}
+                  </h2>
+                  <p className="text-default-500 text-sm mt-1 sm:mt-2">
+                    {filteredSettingsTabs.find(tab => tab.key === activeTab)?.description}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  {saving && (
+                    <div className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
+                      <Spinner size="sm" color="primary" />
+                      <span className="text-xs sm:text-sm font-medium text-primary-600 dark:text-primary-400">Saving...</span>
+                    </div>
+                  )}
+                  <Button
+                    color="primary"
+                    variant="solid"
+                    size="sm"
+                    onPress={saveAllSettings}
+                    isLoading={saving}
+                    isDisabled={saving}
+                    startContent={!saving ? <Icon icon="lucide:save" className="w-4 h-4" /> : null}
+                    className="flex"
+                  >
+                    <span className="hidden sm:inline">{saving ? 'Saving...' : 'Save Changes'}</span>
+                    <span className="sm:hidden">{saving ? 'Saving...' : 'Save'}</span>
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardBody className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+              {loading ? (
+                <div className="flex items-center justify-center py-12 sm:py-16">
+                  <div className="text-center">
+                    <Spinner size="lg" color="primary" />
+                    <p className="text-default-500 dark:text-default-400 mt-4">Loading settings...</p>
+                  </div>
+                </div>
+              ) : (
+                renderSettingsForm()
+              )}
               </CardBody>
             </Card>
           </div>
-        </div>
       </div>
 
       {/* Modals */}
@@ -920,5 +506,5 @@ Date: [NOC_DATE]`,
         onDescriptionChange={(value) => setNewApiKey(prev => ({ ...prev, description: value }))}
       />
     </div>
-  );
-}
+      );
+    }

@@ -28,6 +28,7 @@ import {
 import { useAuth } from '../contexts/auth-context';
 import { apiRequest } from '../services/api-service';
 import { addToast } from '@heroui/react';
+import HeroSection from '../components/common/HeroSection';
 import { Icon } from '@iconify/react';
 
 interface Permission {
@@ -203,35 +204,35 @@ const RolesPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-content2 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-xl">
-              <Icon icon="lucide:shield-check" className="text-foreground text-2xl" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Roles & Permissions</h1>
-              <p className="text-default-600">Manage user roles and their access permissions</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <div className="text-2xl font-bold text-foreground">{roles.length}</div>
-              <div className="text-sm text-default-500">Total Roles</div>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-primary-600">{permissions.length}</div>
-              <div className="text-sm text-default-500">Permissions</div>
-            </div>
-          </div>
-        </div>
+        {/* Hero Section */}
+        <HeroSection
+          title="Roles & Permissions"
+          subtitle="Access Control & Security"
+          description="Manage user roles and their access permissions. Define granular access controls to ensure proper security and data protection across your HRMS platform."
+          icon="lucide:shield-check"
+          illustration="roles"
+          actions={[
+            {
+              label: "Edit Permissions",
+              icon: "lucide:settings",
+              onPress: () => openEditModal(roles[0]?.name || ''),
+              variant: "flat" as const
+            },
+            {
+              label: "Refresh",
+              icon: "lucide:refresh-cw",
+              onPress: loadData,
+              color: "primary" as const
+            }
+          ]}
+        />
 
         {/* Search and Filters */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div className="flex-1 max-w-md">
             <Input
               placeholder="Search roles..."
-              value={searchQuery}
+              
               onChange={(e) => setSearchQuery(e.target.value)}
               startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
               variant="bordered"

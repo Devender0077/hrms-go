@@ -32,7 +32,7 @@ export default function ReportFilters({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Input
             placeholder="Search..."
-            value={searchQuery}
+            
             onChange={(e) => onSearchChange(e.target.value)}
             startContent={<Icon icon="lucide:search" className="text-default-400" />}
           />

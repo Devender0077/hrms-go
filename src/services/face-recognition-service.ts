@@ -157,7 +157,11 @@ const FaceRecognitionService = {
           loadFromUri: () => Promise.resolve(),
         },
       },
-      TinyFaceDetectorOptions: () => ({}),
+      TinyFaceDetectorOptions: class TinyFaceDetectorOptions {
+        constructor() {
+          return {};
+        }
+      },
     };
   },
 
@@ -170,7 +174,21 @@ const FaceRecognitionService = {
   async detectFace(imageElement) {
     try {
       const api = this.getFaceApi();
-      // Detect face with landmarks and descriptors
+      
+      // For mock implementation, simulate successful face detection
+      if (mockFaceApi && api === mockFaceApi) {
+        console.log("Using mock face detection - simulating successful detection");
+        // Simulate a delay for realistic behavior
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Return mock detection
+        return {
+          descriptor: new Float32Array(128).fill(0.5),
+          detection: { box: { x: 100, y: 100, width: 200, height: 200 } }
+        };
+      }
+      
+      // Real face-api.js implementation
       const detections = await api
         .detectSingleFace(imageElement, new api.TinyFaceDetectorOptions())
         .withFaceLandmarks()
@@ -187,7 +205,36 @@ const FaceRecognitionService = {
   async captureFace(videoElement) {
     try {
       const api = this.getFaceApi();
-      // Detect face with landmarks and descriptors
+      
+      // For mock implementation, be more lenient with video ready state
+      if (mockFaceApi && api === mockFaceApi) {
+        console.log("Using mock face capture - simulating successful detection");
+        
+        // For mock implementation, just check if video element exists
+        if (!videoElement) {
+          throw new Error("Video element not available.");
+        }
+        
+        // Simulate a delay for realistic behavior
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Return mock descriptor
+        const mockDescriptor = new Float32Array(128).fill(0.5);
+        return {
+          descriptor: Array.from(mockDescriptor),
+          detection: {
+            descriptor: mockDescriptor,
+            detection: { box: { x: 100, y: 100, width: 200, height: 200 } }
+          },
+        };
+      }
+      
+      // For real implementation, check if video element is ready
+      if (!videoElement || videoElement.readyState < 2) {
+        throw new Error("Video element not ready. Please ensure camera is active.");
+      }
+      
+      // Real face-api.js implementation
       const detections = await api
         .detectSingleFace(videoElement, new api.TinyFaceDetectorOptions())
         .withFaceLandmarks()
