@@ -1,71 +1,15 @@
 /**
- * Migration script for HR Setup tables
- * Adds missing fields to existing tables and creates new HR setup tables
+ * Migration: 006_create_hr_setup_tables
+ * Creates all HR setup configuration tables
  */
 
-const mysql = require('mysql2/promise');
+async function up(connection) {
+  console.log('📝 Creating HR setup tables...');
 
-const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'hrmgo_hero',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-};
-
-async function runMigration() {
-  let connection;
-  
-  try {
-    connection = await mysql.createConnection(dbConfig);
-    console.log('🔄 Starting HR Setup migration...\n');
-
-    // Add missing fields to existing tables
-    console.log('📝 Adding missing fields to existing tables...');
-    
-    const alterTableQueries = [
-      // Branches
-      "ALTER TABLE branches ADD COLUMN IF NOT EXISTS code VARCHAR(50) AFTER name",
-      "ALTER TABLE branches ADD COLUMN IF NOT EXISTS phone VARCHAR(20) AFTER address",
-      "ALTER TABLE branches ADD COLUMN IF NOT EXISTS email VARCHAR(255) AFTER phone",
-      "ALTER TABLE branches ADD COLUMN IF NOT EXISTS status ENUM('active', 'inactive') DEFAULT 'active' AFTER zip_code",
-      
-      // Departments
-      "ALTER TABLE departments ADD COLUMN IF NOT EXISTS code VARCHAR(50) AFTER name",
-      "ALTER TABLE departments ADD COLUMN IF NOT EXISTS manager_id INT AFTER description",
-      "ALTER TABLE departments ADD COLUMN IF NOT EXISTS status ENUM('active', 'inactive') DEFAULT 'active' AFTER description",
-      
-      // Designations
-      "ALTER TABLE designations ADD COLUMN IF NOT EXISTS code VARCHAR(50) AFTER name",
-      "ALTER TABLE designations ADD COLUMN IF NOT EXISTS status ENUM('active', 'inactive') DEFAULT 'active' AFTER description",
-      
-      // Leave Types
-      "ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS code VARCHAR(50) AFTER name",
-      "ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS description TEXT AFTER code",
-      "ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS days_per_year INT AFTER description",
-      "ALTER TABLE leave_types ADD COLUMN IF NOT EXISTS status ENUM('active', 'inactive') DEFAULT 'active' AFTER is_paid"
-    ];
-
-    for (const query of alterTableQueries) {
-      try {
-        await connection.query(query);
-        console.log(`✅ ${query.split('ADD COLUMN')[1]?.split('AFTER')[0]?.trim() || 'Field'} added`);
-      } catch (error) {
-        if (error.code === 'ER_DUP_FIELDNAME') {
-          console.log(`ℹ️  Field already exists: ${query.split('ADD COLUMN')[1]?.split('AFTER')[0]?.trim()}`);
-        } else {
-          console.error(`❌ Error: ${error.message}`);
-        }
-      }
-    }
-
-    // Create new HR setup tables
-    console.log('\n📝 Creating new HR setup tables...');
-    
-    const createTableQueries = {
-      document_types: `
+  const hrSetupTables = [
+    {
+      name: 'document_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS document_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -77,9 +21,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      payslip_types: `
+        )`
+    },
+    {
+      name: 'payslip_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS payslip_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -90,9 +36,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      allowance_options: `
+        )`
+    },
+    {
+      name: 'allowance_options',
+      sql: `
         CREATE TABLE IF NOT EXISTS allowance_options (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -104,9 +52,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      loan_options: `
+        )`
+    },
+    {
+      name: 'loan_options',
+      sql: `
         CREATE TABLE IF NOT EXISTS loan_options (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -120,9 +70,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      deduction_options: `
+        )`
+    },
+    {
+      name: 'deduction_options',
+      sql: `
         CREATE TABLE IF NOT EXISTS deduction_options (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -134,9 +86,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      goal_types: `
+        )`
+    },
+    {
+      name: 'goal_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS goal_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -147,9 +101,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      competencies: `
+        )`
+    },
+    {
+      name: 'competencies',
+      sql: `
         CREATE TABLE IF NOT EXISTS competencies (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -161,9 +117,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      performance_types: `
+        )`
+    },
+    {
+      name: 'performance_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS performance_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -174,9 +132,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      training_types: `
+        )`
+    },
+    {
+      name: 'training_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS training_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -187,9 +147,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      job_categories: `
+        )`
+    },
+    {
+      name: 'job_categories',
+      sql: `
         CREATE TABLE IF NOT EXISTS job_categories (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -200,9 +162,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      job_stages: `
+        )`
+    },
+    {
+      name: 'job_stages',
+      sql: `
         CREATE TABLE IF NOT EXISTS job_stages (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -214,9 +178,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      award_types: `
+        )`
+    },
+    {
+      name: 'award_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS award_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -227,9 +193,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      termination_types: `
+        )`
+    },
+    {
+      name: 'termination_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS termination_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -241,9 +209,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      expense_types: `
+        )`
+    },
+    {
+      name: 'expense_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS expense_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -255,9 +225,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      income_types: `
+        )`
+    },
+    {
+      name: 'income_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS income_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -269,9 +241,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      payment_types: `
+        )`
+    },
+    {
+      name: 'payment_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS payment_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -282,9 +256,11 @@ async function runMigration() {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
-        )`,
-      
-      contract_types: `
+        )`
+    },
+    {
+      name: 'contract_types',
+      sql: `
         CREATE TABLE IF NOT EXISTS contract_types (
           id INT AUTO_INCREMENT PRIMARY KEY,
           company_id INT NOT NULL DEFAULT 1,
@@ -297,37 +273,33 @@ async function runMigration() {
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
         )`
-    };
-
-    for (const [tableName, query] of Object.entries(createTableQueries)) {
-      try {
-        await connection.query(query);
-        console.log(`✅ Created/verified ${tableName} table`);
-      } catch (error) {
-        console.error(`❌ Error creating ${tableName}:`, error.message);
-      }
     }
+  ];
 
-    console.log('\n🎉 HR Setup migration completed successfully!\n');
-    
-    // Show summary
-    console.log('📊 Summary:');
-    console.log('  ✅ Updated 4 existing tables (branches, departments, designations, leave_types)');
-    console.log('  ✅ Created 16 new HR setup tables');
-    console.log('  ✅ All tables have company_id, status, and timestamps');
-    console.log('\n💡 Next steps:');
-    console.log('  1. Restart backend server');
-    console.log('  2. Visit http://localhost:5176/dashboard/hr-system-setup');
-    console.log('  3. Test all HR setup modules\n');
-    
-  } catch (error) {
-    console.error('❌ Migration failed:', error);
-    process.exit(1);
-  } finally {
-    if (connection) await connection.end();
+  for (const table of hrSetupTables) {
+    await connection.query(table.sql);
+    console.log(`✅ ${table.name} table created`);
   }
+
+  console.log('✅ All HR setup tables created');
 }
 
-// Run migration
-runMigration();
+async function down(connection) {
+  console.log('🔄 Dropping HR setup tables...');
+  
+  const hrSetupTables = [
+    'contract_types', 'payment_types', 'income_types', 'expense_types',
+    'termination_types', 'award_types', 'job_stages', 'job_categories',
+    'training_types', 'performance_types', 'competencies', 'goal_types',
+    'deduction_options', 'loan_options', 'allowance_options', 'payslip_types',
+    'document_types'
+  ];
 
+  for (const tableName of hrSetupTables) {
+    await connection.query(`DROP TABLE IF EXISTS ${tableName}`);
+  }
+  
+  console.log('✅ HR setup tables dropped');
+}
+
+module.exports = { up, down };

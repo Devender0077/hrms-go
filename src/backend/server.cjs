@@ -1,4 +1,4 @@
-// Express server for HRM API
+// Express server for HRM API - Clean Modular Version
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -140,17 +140,21 @@ const authorize = (roles = []) => {
 };
 
 // =====================================================
-// AUTO-MIGRATION FUNCTION
+// MIGRATION FUNCTION
 // =====================================================
-const runAutoMigration = require('./migrations/auto-migration');
-const runHRSetupMigration = require('./migrations/add-hr-setup-tables');
-const runNewModulesMigration = require('./migrations/add-new-modules-tables');
-
 async function runAllMigrations() {
   try {
-    await runAutoMigration(pool);
-    await runHRSetupMigration(pool);
-    await runNewModulesMigration(pool);
+    console.log('🔄 Running migrations using migration manager...');
+    
+    // Import and run the migration manager
+    const { exec } = require('child_process');
+    const { promisify } = require('util');
+    const execAsync = promisify(exec);
+    
+    // Run migrations
+    await execAsync('node migration-manager.js up', { cwd: './migrations' });
+    
+    console.log('✅ All migrations completed successfully!');
   } catch (error) {
     console.error('❌ Migration error:', error.message);
   }
@@ -176,6 +180,18 @@ const reviewsRoutes = require('./routes/reviews.routes')(pool, authenticateToken
 const assetsRoutes = require('./routes/assets.routes')(pool, authenticateToken);
 const expensesRoutes = require('./routes/expenses.routes')(pool, authenticateToken, upload);
 const documentsRoutes = require('./routes/documents.routes')(pool, authenticateToken, upload);
+const tripsRoutes = require('./routes/trips.routes')(pool, authenticateToken);
+const announcementsRoutes = require('./routes/announcements.routes')(pool, authenticateToken);
+const meetingsRoutes = require('./routes/meetings.routes')(pool, authenticateToken);
+const meetingTypesRoutes = require('./routes/meeting-types.routes')(pool, authenticateToken);
+const meetingRoomsRoutes = require('./routes/meeting-rooms.routes')(pool, authenticateToken);
+const trainingRoutes = require('./routes/training.routes')(pool, authenticateToken);
+
+// Extended routes
+const { router: auditLogsRoutes } = require('./routes/audit-logs.routes')(pool, authenticateToken);
+const performanceRoutes = require('./routes/performance.routes')(pool, authenticateToken);
+const payrollExtendedRoutes = require('./routes/payroll-extended.routes')(pool, authenticateToken);
+const timekeepingExtendedRoutes = require('./routes/timekeeping-extended.routes')(pool, authenticateToken);
 
 // =====================================================
 // MOUNT MODULAR ROUTES
@@ -197,6 +213,18 @@ app.use('/api/v1/reviews', reviewsRoutes);
 app.use('/api/v1/assets', assetsRoutes);
 app.use('/api/v1/expenses', expensesRoutes);
 app.use('/api/v1/documents', documentsRoutes);
+app.use('/api/v1/trips', tripsRoutes);
+app.use('/api/v1/announcements', announcementsRoutes);
+app.use('/api/v1/meetings', meetingsRoutes);
+app.use('/api/v1/meeting-types', meetingTypesRoutes);
+app.use('/api/v1/meeting-rooms', meetingRoomsRoutes);
+app.use('/api/v1/training', trainingRoutes);
+
+// Extended routes
+app.use('/api/v1/audit-logs', auditLogsRoutes);
+app.use('/api/v1/performance', performanceRoutes);
+app.use('/api/v1/payroll', payrollExtendedRoutes);
+app.use('/api/v1/timekeeping', timekeepingExtendedRoutes);
 
 // =====================================================
 // HEALTH CHECK & API INFO
@@ -206,7 +234,7 @@ app.get('/api/v1/health', (req, res) => {
     status: 'OK', 
     message: 'HRMS API is running',
     version: '1.0.0',
-    modules: 17,
+    modules: 20,
     timestamp: new Date().toISOString()
   });
 });
@@ -218,11 +246,22 @@ app.get('/api/v1', (req, res) => {
       'auth', 'organization', 'hr-setup', 'employees', 'leave',
       'tasks', 'settings', 'users', 'timekeeping', 'payroll',
       'recruitment', 'calendar', 'goals', 'reviews', 'assets',
-      'expenses', 'documents'
+      'expenses', 'documents', 'trips', 'announcements', 'meetings', 'training'
     ],
     documentation: '/api/v1/docs',
     health: '/api/v1/health'
   });
+});
+
+// Global permissions endpoint (used by multiple modules)
+app.get('/api/v1/permissions', authenticateToken, async (req, res) => {
+  try {
+    const [permissions] = await pool.query('SELECT * FROM permissions ORDER BY module, permission_name');
+    res.json({ success: true, data: permissions });
+  } catch (error) {
+    console.error('Error fetching permissions:', error);
+    res.status(500).json({ success: false, message: 'Error fetching permissions' });
+  }
 });
 
 // =====================================================
@@ -234,6 +273,22 @@ app.use((err, req, res, next) => {
     success: false,
     message: err.message || 'Internal server error',
     ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  });
+});
+
+// Test IP endpoint
+app.get('/api/v1/test-ip', (req, res) => {
+  const clientIP = req.ip || req.connection.remoteAddress || req.socket.remoteAddress || 
+                   (req.connection.socket ? req.connection.socket.remoteAddress : null) ||
+                   req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'Unknown';
+  
+  res.json({
+    success: true,
+    data: {
+      ip: clientIP,
+      timestamp: new Date().toISOString(),
+      userAgent: req.headers['user-agent']
+    }
   });
 });
 
@@ -254,7 +309,7 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 API Version: v1`);
-  console.log(`📁 Modular Routes: 17 modules loaded`);
+  console.log(`📁 Modular Routes: 23 modules loaded`);
   console.log(`🔗 Health Check: http://localhost:${PORT}/api/v1/health`);
   
   // Run auto-migration on startup

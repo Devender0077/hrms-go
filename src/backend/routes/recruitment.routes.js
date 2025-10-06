@@ -1,284 +1,267 @@
-/**
- * Recruitment Routes
- * Job postings, candidates, interviews, offers
- */
-
 const express = require('express');
 const router = express.Router();
 
-module.exports = (pool, authenticateToken, upload) => {
-  
-  // =====================================================
-  // JOB POSTINGS
-  // =====================================================
-  
-  router.get('/jobs', authenticateToken, async (req, res) => {
-    try {
-      const { status, category } = req.query;
-      let query = 'SELECT * FROM job_postings WHERE 1=1';
-      let params = [];
-      
-      if (status) {
-        query += ' AND status = ?';
-        params.push(status);
-      }
-      
-      if (category) {
-        query += ' AND category = ?';
-        params.push(category);
-      }
-      
-      query += ' ORDER BY created_at DESC';
-      
-      const [jobs] = await pool.query(query, params);
-      res.json({ success: true, data: jobs });
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-      res.status(500).json({ success: false, message: 'Error fetching job postings' });
-    }
-  });
+module.exports = (pool, authenticateToken) => {
 
-  router.post('/jobs', authenticateToken, async (req, res) => {
-    try {
-      const { 
-        title, description, department_id, location, employment_type, 
-        experience_required, salary_range, skills, qualifications, status 
-      } = req.body;
-      
-      const [result] = await pool.query(
-        `INSERT INTO job_postings (title, description, department_id, location, employment_type, 
-         experience_required, salary_range, skills, qualifications, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [title, description, department_id, location, employment_type, 
-         experience_required, salary_range, skills, qualifications, status || 'active']
-      );
-      
-      res.status(201).json({ success: true, message: 'Job posting created successfully', data: { id: result.insertId } });
-    } catch (error) {
-      console.error('Error creating job posting:', error);
-      res.status(500).json({ success: false, message: 'Error creating job posting' });
-    }
-  });
+// JOBS ROUTES
 
-  router.put('/jobs/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { 
-        title, description, department_id, location, employment_type, 
-        experience_required, salary_range, skills, qualifications, status 
-      } = req.body;
-      
-      await pool.query(
-        `UPDATE job_postings SET title = ?, description = ?, department_id = ?, location = ?, 
-         employment_type = ?, experience_required = ?, salary_range = ?, skills = ?, qualifications = ?, status = ?
-         WHERE id = ?`,
-        [title, description, department_id, location, employment_type, 
-         experience_required, salary_range, skills, qualifications, status, id]
-      );
-      
-      res.json({ success: true, message: 'Job posting updated successfully' });
-    } catch (error) {
-      console.error('Error updating job posting:', error);
-      res.status(500).json({ success: false, message: 'Error updating job posting' });
-    }
-  });
+// Get all jobs
+router.get('/', authenticateToken, async (req, res) => {
+  try {
+    const [jobs] = await pool.query(`
+      SELECT j.*, d.name as department_name, u.first_name, u.last_name
+      FROM jobs j
+      LEFT JOIN departments d ON j.department_id = d.id
+      LEFT JOIN users u ON j.created_by = u.id
+      ORDER BY j.posted_date DESC
+    `);
+    
+    res.json({ success: true, data: jobs });
+  } catch (error) {
+    console.error('Error fetching jobs:', error);
+    res.status(500).json({ success: false, message: 'Error fetching jobs' });
+  }
+});
 
-  router.delete('/jobs/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      await pool.query('DELETE FROM job_postings WHERE id = ?', [id]);
-      res.json({ success: true, message: 'Job posting deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting job posting:', error);
-      res.status(500).json({ success: false, message: 'Error deleting job posting' });
+// Get job by ID
+router.get('/jobs/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [jobs] = await pool.query(`
+      SELECT j.*, d.name as department_name, u.first_name, u.last_name
+      FROM jobs j
+      LEFT JOIN departments d ON j.department_id = d.id
+      LEFT JOIN users u ON j.created_by = u.id
+      WHERE j.id = ?
+    `, [id]);
+    
+    if (jobs.length === 0) {
+      return res.status(404).json({ success: false, message: 'Job not found' });
     }
-  });
-  
-  // =====================================================
-  // CANDIDATES
-  // =====================================================
-  
-  router.get('/candidates', authenticateToken, async (req, res) => {
-    try {
-      const { job_id, status, stage } = req.query;
-      let query = `
-        SELECT c.*, j.title as job_title
-        FROM candidates c
-        LEFT JOIN job_postings j ON c.job_id = j.id
-        WHERE 1=1
-      `;
-      let params = [];
-      
-      if (job_id) {
-        query += ' AND c.job_id = ?';
-        params.push(job_id);
-      }
-      
-      if (status) {
-        query += ' AND c.status = ?';
-        params.push(status);
-      }
-      
-      if (stage) {
-        query += ' AND c.stage = ?';
-        params.push(stage);
-      }
-      
-      query += ' ORDER BY c.created_at DESC';
-      
-      const [candidates] = await pool.query(query, params);
-      res.json({ success: true, data: candidates });
-    } catch (error) {
-      console.error('Error fetching candidates:', error);
-      res.status(500).json({ success: false, message: 'Error fetching candidates' });
-    }
-  });
+    
+    res.json({ success: true, data: jobs[0] });
+  } catch (error) {
+    console.error('Error fetching job:', error);
+    res.status(500).json({ success: false, message: 'Error fetching job' });
+  }
+});
 
-  router.post('/candidates', authenticateToken, async (req, res) => {
-    try {
-      const { 
-        job_id, first_name, last_name, email, phone, resume_path, 
-        cover_letter, experience, skills, status, stage 
-      } = req.body;
-      
-      const [result] = await pool.query(
-        `INSERT INTO candidates (job_id, first_name, last_name, email, phone, resume_path, 
-         cover_letter, experience, skills, status, stage)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [job_id, first_name, last_name, email, phone, resume_path, 
-         cover_letter, experience, skills, status || 'new', stage || 'applied']
-      );
-      
-      res.status(201).json({ success: true, message: 'Candidate created successfully', data: { id: result.insertId } });
-    } catch (error) {
-      console.error('Error creating candidate:', error);
-      res.status(500).json({ success: false, message: 'Error creating candidate' });
-    }
-  });
+// Create new job
+router.post('/jobs', authenticateToken, async (req, res) => {
+  try {
+    const {
+      title, description, department_id, location, employment_type,
+      experience_level, salary_min, salary_max, requirements, benefits,
+      closing_date
+    } = req.body;
+    
+    const userId = req.user.id;
+    
+    const [result] = await pool.query(`
+      INSERT INTO jobs (title, description, department_id, location, employment_type,
+                       experience_level, salary_min, salary_max, requirements, benefits,
+                       closing_date, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [title, description, department_id, location, employment_type,
+        experience_level, salary_min, salary_max, requirements, benefits,
+        closing_date, userId]);
+    
+    res.json({ success: true, data: { id: result.insertId } });
+  } catch (error) {
+    console.error('Error creating job:', error);
+    res.status(500).json({ success: false, message: 'Error creating job' });
+  }
+});
 
-  router.put('/candidates/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { status, stage, notes } = req.body;
-      
-      await pool.query(
-        `UPDATE candidates SET status = ?, stage = ?, notes = ?
-         WHERE id = ?`,
-        [status, stage, notes, id]
-      );
-      
-      res.json({ success: true, message: 'Candidate updated successfully' });
-    } catch (error) {
-      console.error('Error updating candidate:', error);
-      res.status(500).json({ success: false, message: 'Error updating candidate' });
-    }
-  });
+// Update job
+router.put('/jobs/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    const setClause = Object.keys(updateData).map(key => `${key} = ?`).join(', ');
+    const values = Object.values(updateData);
+    values.push(id);
+    
+    await pool.query(`UPDATE jobs SET ${setClause} WHERE id = ?`, values);
+    
+    res.json({ success: true, message: 'Job updated successfully' });
+  } catch (error) {
+    console.error('Error updating job:', error);
+    res.status(500).json({ success: false, message: 'Error updating job' });
+  }
+});
 
-  router.delete('/candidates/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      await pool.query('DELETE FROM candidates WHERE id = ?', [id]);
-      res.json({ success: true, message: 'Candidate deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting candidate:', error);
-      res.status(500).json({ success: false, message: 'Error deleting candidate' });
-    }
-  });
+// Delete job
+router.delete('/jobs/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM jobs WHERE id = ?', [id]);
+    res.json({ success: true, message: 'Job deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting job:', error);
+    res.status(500).json({ success: false, message: 'Error deleting job' });
+  }
+});
 
-  // Upload resume
-  router.post('/candidates/:id/resume', authenticateToken, upload.single('resume'), async (req, res) => {
-    try {
-      const { id } = req.params;
-      
-      if (!req.file) {
-        return res.status(400).json({ success: false, message: 'No file uploaded' });
-      }
-      
-      const resumePath = `/uploads/resumes/${req.file.filename}`;
-      
-      await pool.query('UPDATE candidates SET resume_path = ? WHERE id = ?', [resumePath, id]);
-      
-      res.json({ success: true, message: 'Resume uploaded successfully', data: { resume_path: resumePath } });
-    } catch (error) {
-      console.error('Error uploading resume:', error);
-      res.status(500).json({ success: false, message: 'Error uploading resume' });
-    }
-  });
-  
-  // =====================================================
-  // INTERVIEWS
-  // =====================================================
-  
-  router.get('/interviews', authenticateToken, async (req, res) => {
-    try {
-      const { candidate_id, status } = req.query;
-      let query = `
-        SELECT i.*, CONCAT(c.first_name, ' ', c.last_name) as candidate_name, 
-               j.title as job_title, CONCAT(u.name) as interviewer_name
-        FROM interviews i
-        LEFT JOIN candidates c ON i.candidate_id = c.id
-        LEFT JOIN job_postings j ON c.job_id = j.id
-        LEFT JOIN users u ON i.interviewer_id = u.id
-        WHERE 1=1
-      `;
-      let params = [];
-      
-      if (candidate_id) {
-        query += ' AND i.candidate_id = ?';
-        params.push(candidate_id);
-      }
-      
-      if (status) {
-        query += ' AND i.status = ?';
-        params.push(status);
-      }
-      
-      query += ' ORDER BY i.interview_date DESC, i.start_time DESC';
-      
-      const [interviews] = await pool.query(query, params);
-      res.json({ success: true, data: interviews });
-    } catch (error) {
-      console.error('Error fetching interviews:', error);
-      res.status(500).json({ success: false, message: 'Error fetching interviews' });
-    }
-  });
+// CANDIDATES ROUTES
 
-  router.post('/interviews', authenticateToken, async (req, res) => {
-    try {
-      const { candidate_id, interviewer_id, interview_date, start_time, end_time, location, notes, status } = req.body;
-      
-      const [result] = await pool.query(
-        `INSERT INTO interviews (candidate_id, interviewer_id, interview_date, start_time, end_time, location, notes, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [candidate_id, interviewer_id, interview_date, start_time, end_time, location, notes, status || 'scheduled']
-      );
-      
-      res.status(201).json({ success: true, message: 'Interview scheduled successfully', data: { id: result.insertId } });
-    } catch (error) {
-      console.error('Error scheduling interview:', error);
-      res.status(500).json({ success: false, message: 'Error scheduling interview' });
-    }
-  });
+// Get all candidates
+router.get('/candidates', authenticateToken, async (req, res) => {
+  try {
+    const [candidates] = await pool.query(`
+      SELECT c.*, j.title as job_title
+      FROM candidates c
+      LEFT JOIN jobs j ON c.job_id = j.id
+      ORDER BY c.created_at DESC
+    `);
+    
+    res.json({ success: true, data: candidates });
+  } catch (error) {
+    console.error('Error fetching candidates:', error);
+    res.status(500).json({ success: false, message: 'Error fetching candidates' });
+  }
+});
 
-  router.put('/interviews/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { interview_date, start_time, end_time, location, notes, status, feedback } = req.body;
-      
-      await pool.query(
-        `UPDATE interviews SET interview_date = ?, start_time = ?, end_time = ?, location = ?, 
-         notes = ?, status = ?, feedback = ?
-         WHERE id = ?`,
-        [interview_date, start_time, end_time, location, notes, status, feedback, id]
-      );
-      
-      res.json({ success: true, message: 'Interview updated successfully' });
-    } catch (error) {
-      console.error('Error updating interview:', error);
-      res.status(500).json({ success: false, message: 'Error updating interview' });
+// Get candidate by ID
+router.get('/candidates/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [candidates] = await pool.query(`
+      SELECT c.*, j.title as job_title
+      FROM candidates c
+      LEFT JOIN jobs j ON c.job_id = j.id
+      WHERE c.id = ?
+    `, [id]);
+    
+    if (candidates.length === 0) {
+      return res.status(404).json({ success: false, message: 'Candidate not found' });
     }
-  });
-  
+    
+    res.json({ success: true, data: candidates[0] });
+  } catch (error) {
+    console.error('Error fetching candidate:', error);
+    res.status(500).json({ success: false, message: 'Error fetching candidate' });
+  }
+});
+
+// Create new candidate
+router.post('/candidates', authenticateToken, async (req, res) => {
+  try {
+    const {
+      job_id, first_name, last_name, email, phone, resume_url,
+      cover_letter, experience_years, current_salary, expected_salary,
+      availability_date, notes
+    } = req.body;
+    
+    const [result] = await pool.query(`
+      INSERT INTO candidates (job_id, first_name, last_name, email, phone, resume_url,
+                             cover_letter, experience_years, current_salary, expected_salary,
+                             availability_date, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [job_id, first_name, last_name, email, phone, resume_url,
+        cover_letter, experience_years, current_salary, expected_salary,
+        availability_date, notes]);
+    
+    res.json({ success: true, data: { id: result.insertId } });
+  } catch (error) {
+    console.error('Error creating candidate:', error);
+    res.status(500).json({ success: false, message: 'Error creating candidate' });
+  }
+});
+
+// Update candidate
+router.put('/candidates/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    const setClause = Object.keys(updateData).map(key => `${key} = ?`).join(', ');
+    const values = Object.values(updateData);
+    values.push(id);
+    
+    await pool.query(`UPDATE candidates SET ${setClause} WHERE id = ?`, values);
+    
+    res.json({ success: true, message: 'Candidate updated successfully' });
+  } catch (error) {
+    console.error('Error updating candidate:', error);
+    res.status(500).json({ success: false, message: 'Error updating candidate' });
+  }
+});
+
+// Delete candidate
+router.delete('/candidates/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await pool.query('DELETE FROM candidates WHERE id = ?', [id]);
+    res.json({ success: true, message: 'Candidate deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting candidate:', error);
+    res.status(500).json({ success: false, message: 'Error deleting candidate' });
+  }
+});
+
+// INTERVIEWS ROUTES
+
+// Get interviews for a candidate
+router.get('/candidates/:id/interviews', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [interviews] = await pool.query(`
+      SELECT i.*, u.first_name, u.last_name
+      FROM interviews i
+      LEFT JOIN users u ON i.interviewer_id = u.id
+      WHERE i.candidate_id = ?
+      ORDER BY i.scheduled_date DESC
+    `, [id]);
+    
+    res.json({ success: true, data: interviews });
+  } catch (error) {
+    console.error('Error fetching interviews:', error);
+    res.status(500).json({ success: false, message: 'Error fetching interviews' });
+  }
+});
+
+// Create interview
+router.post('/interviews', authenticateToken, async (req, res) => {
+  try {
+    const {
+      candidate_id, interviewer_id, interview_type, scheduled_date,
+      duration_minutes, location, notes
+    } = req.body;
+    
+    const [result] = await pool.query(`
+      INSERT INTO interviews (candidate_id, interviewer_id, interview_type, scheduled_date,
+                             duration_minutes, location, notes)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `, [candidate_id, interviewer_id, interview_type, scheduled_date,
+        duration_minutes, location, notes]);
+    
+    res.json({ success: true, data: { id: result.insertId } });
+  } catch (error) {
+    console.error('Error creating interview:', error);
+    res.status(500).json({ success: false, message: 'Error creating interview' });
+  }
+});
+
+// Update interview
+router.put('/interviews/:id', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    const setClause = Object.keys(updateData).map(key => `${key} = ?`).join(', ');
+    const values = Object.values(updateData);
+    values.push(id);
+    
+    await pool.query(`UPDATE interviews SET ${setClause} WHERE id = ?`, values);
+    
+    res.json({ success: true, message: 'Interview updated successfully' });
+  } catch (error) {
+    console.error('Error updating interview:', error);
+    res.status(500).json({ success: false, message: 'Error updating interview' });
+  }
+});
+
   return router;
 };
-

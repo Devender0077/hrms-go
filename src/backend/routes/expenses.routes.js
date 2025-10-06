@@ -10,13 +10,12 @@ module.exports = (pool, authenticateToken, upload) => {
   
   router.get('/', authenticateToken, async (req, res) => {
     try {
-      const { employee_id, status, expense_type_id, from_date, to_date } = req.query;
+      const { employee_id, status, category, from_date, to_date } = req.query;
       let query = `
         SELECT ex.*, CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.employee_id as emp_id,
-               et.name as expense_type_name, u.name as approved_by_name
+               u.name as approved_by_name
         FROM expenses ex
         LEFT JOIN employees e ON ex.employee_id = e.id
-        LEFT JOIN expense_types et ON ex.expense_type_id = et.id
         LEFT JOIN users u ON ex.approved_by = u.id
         WHERE 1=1
       `;
@@ -32,9 +31,9 @@ module.exports = (pool, authenticateToken, upload) => {
         params.push(status);
       }
       
-      if (expense_type_id) {
-        query += ' AND ex.expense_type_id = ?';
-        params.push(expense_type_id);
+      if (category) {
+        query += ' AND ex.category = ?';
+        params.push(category);
       }
       
       if (from_date) {
@@ -59,13 +58,13 @@ module.exports = (pool, authenticateToken, upload) => {
 
   router.post('/', authenticateToken, upload.single('receipt'), async (req, res) => {
     try {
-      const { employee_id, expense_type_id, amount, expense_date, description, status } = req.body;
+      const { employee_id, category, amount, expense_date, description, status, project, vendor, payment_method } = req.body;
       const receipt_path = req.file ? `/uploads/receipts/${req.file.filename}` : null;
       
       const [result] = await pool.query(
-        `INSERT INTO expenses (employee_id, expense_type_id, amount, expense_date, description, receipt_path, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [employee_id, expense_type_id, amount, expense_date, description, receipt_path, status || 'pending']
+        `INSERT INTO expenses (employee_id, category, amount, expense_date, description, receipt_path, status, project, vendor, payment_method)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [employee_id, category, amount, expense_date, description, receipt_path, status || 'pending', project, vendor, payment_method || 'card']
       );
       
       res.status(201).json({ success: true, message: 'Expense created successfully', data: { id: result.insertId } });
@@ -78,10 +77,10 @@ module.exports = (pool, authenticateToken, upload) => {
   router.put('/:id', authenticateToken, upload.single('receipt'), async (req, res) => {
     try {
       const { id } = req.params;
-      const { expense_type_id, amount, expense_date, description, status } = req.body;
+      const { category, amount, expense_date, description, status, project, vendor, payment_method } = req.body;
       
-      let updateFields = 'expense_type_id = ?, amount = ?, expense_date = ?, description = ?, status = ?';
-      let params = [expense_type_id, amount, expense_date, description, status];
+      let updateFields = 'category = ?, amount = ?, expense_date = ?, description = ?, status = ?, project = ?, vendor = ?, payment_method = ?';
+      let params = [category, amount, expense_date, description, status, project, vendor, payment_method];
       
       if (req.file) {
         updateFields += ', receipt_path = ?';

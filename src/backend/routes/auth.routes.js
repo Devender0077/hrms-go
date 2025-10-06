@@ -9,7 +9,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 module.exports = (pool) => {
-  const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+  const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
   // Login
   router.post('/login', async (req, res) => {
@@ -29,6 +29,16 @@ module.exports = (pool) => {
       
       if (user.status !== 'active') {
         return res.status(401).json({ success: false, message: 'Account is inactive' });
+      }
+      
+      // Validate password and hash before comparison
+      if (!password || !user.password) {
+        console.error('Login error: Missing password or hash', { 
+          hasPassword: !!password, 
+          hasUserPassword: !!user.password,
+          userId: user.id 
+        });
+        return res.status(401).json({ success: false, message: 'Invalid credentials' });
       }
       
       const isValidPassword = await bcrypt.compare(password, user.password);
@@ -178,6 +188,102 @@ module.exports = (pool) => {
     } catch (error) {
       console.error('Logout error:', error);
       res.status(500).json({ success: false, message: 'Logout failed' });
+    }
+  });
+
+  // Face login endpoint
+  router.post('/face-login', async (req, res) => {
+    try {
+      const { face_descriptor } = req.body;
+
+      if (!face_descriptor || !Array.isArray(face_descriptor)) {
+        return res.status(400).json({
+          success: false,
+          message: 'Face descriptor is required'
+        });
+      }
+
+      // Find employees with face data
+      const [employees] = await pool.query(
+        'SELECT e.*, u.email, u.role FROM employees e JOIN users u ON e.user_id = u.id WHERE e.face_descriptor IS NOT NULL'
+      );
+
+      if (employees.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'No users with face recognition data found. Please register first or use password login.'
+        });
+      }
+
+      // For demo purposes, we'll use a simple comparison
+      // In a real implementation, you would use proper face recognition algorithms
+      let bestMatch = null;
+      let bestScore = 0;
+      const threshold = 0.8; // Similarity threshold
+
+      for (const employee of employees) {
+        try {
+          const storedDescriptor = JSON.parse(employee.face_descriptor);
+          
+          // Simple similarity calculation (Euclidean distance)
+          if (storedDescriptor.length === face_descriptor.length) {
+            let sum = 0;
+            for (let i = 0; i < storedDescriptor.length; i++) {
+              const diff = storedDescriptor[i] - face_descriptor[i];
+              sum += diff * diff;
+            }
+            const distance = Math.sqrt(sum);
+            const similarity = 1 / (1 + distance); // Convert distance to similarity
+            
+            if (similarity > bestScore && similarity > threshold) {
+              bestScore = similarity;
+              bestMatch = employee;
+            }
+          }
+        } catch (parseError) {
+          console.error('Error parsing face descriptor for employee', employee.id, parseError);
+        }
+      }
+
+      if (bestMatch) {
+        // Generate JWT token
+        const token = jwt.sign(
+          {
+            id: bestMatch.user_id,
+            email: bestMatch.email,
+            role: bestMatch.role,
+            company_id: bestMatch.company_id
+          },
+          process.env.JWT_SECRET || 'your-secret-key',
+          { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+        );
+
+        res.json({
+          success: true,
+          message: 'Face recognition successful',
+          user: {
+            id: bestMatch.user_id,
+            name: `${bestMatch.first_name} ${bestMatch.last_name}`,
+            email: bestMatch.email,
+            role: bestMatch.role,
+            company_id: bestMatch.company_id
+          },
+          token,
+          similarity: bestScore
+        });
+      } else {
+        res.status(401).json({
+          success: false,
+          message: 'Face not recognized. Please register first or use password login.'
+        });
+      }
+
+    } catch (error) {
+      console.error('Face login error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Face login failed. Please try again or use password login.'
+      });
     }
   });
 

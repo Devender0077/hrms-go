@@ -316,6 +316,87 @@ module.exports = (pool, authenticateToken) => {
     }
   });
 
+  // =====================================================
+  // EMPLOYEE SALARIES
+  // =====================================================
+  
+  router.get('/employee-salaries', authenticateToken, async (req, res) => {
+    try {
+      const { employee_id, status } = req.query;
+      let query = `
+        SELECT es.*, CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.employee_id as emp_id
+        FROM employee_salaries es
+        LEFT JOIN employees e ON es.employee_id = e.id
+        WHERE 1=1
+      `;
+      let params = [];
+      
+      if (employee_id) {
+        query += ' AND es.employee_id = ?';
+        params.push(employee_id);
+      }
+      
+      if (status) {
+        query += ' AND es.status = ?';
+        params.push(status);
+      }
+      
+      query += ' ORDER BY es.created_at DESC';
+      
+      const [salaries] = await pool.query(query, params);
+      res.json({ success: true, data: salaries });
+    } catch (error) {
+      console.error('Error fetching employee salaries:', error);
+      res.status(500).json({ success: false, message: 'Error fetching employee salaries' });
+    }
+  });
+
+  router.post('/employee-salaries', authenticateToken, async (req, res) => {
+    try {
+      const { employee_id, basic_salary, allowances, deductions, net_salary, effective_date, status } = req.body;
+      
+      const [result] = await pool.query(
+        `INSERT INTO employee_salaries (employee_id, basic_salary, allowances, deductions, net_salary, effective_date, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [employee_id, basic_salary, allowances, deductions, net_salary, effective_date, status || 'active']
+      );
+      
+      res.status(201).json({ success: true, message: 'Employee salary created successfully', data: { id: result.insertId } });
+    } catch (error) {
+      console.error('Error creating employee salary:', error);
+      res.status(500).json({ success: false, message: 'Error creating employee salary' });
+    }
+  });
+
+  router.put('/employee-salaries/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { basic_salary, allowances, deductions, net_salary, effective_date, status } = req.body;
+      
+      await pool.query(
+        `UPDATE employee_salaries SET basic_salary = ?, allowances = ?, deductions = ?, 
+         net_salary = ?, effective_date = ?, status = ? WHERE id = ?`,
+        [basic_salary, allowances, deductions, net_salary, effective_date, status, id]
+      );
+      
+      res.json({ success: true, message: 'Employee salary updated successfully' });
+    } catch (error) {
+      console.error('Error updating employee salary:', error);
+      res.status(500).json({ success: false, message: 'Error updating employee salary' });
+    }
+  });
+
+  router.delete('/employee-salaries/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await pool.query('DELETE FROM employee_salaries WHERE id = ?', [id]);
+      res.json({ success: true, message: 'Employee salary deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting employee salary:', error);
+      res.status(500).json({ success: false, message: 'Error deleting employee salary' });
+    }
+  });
+
   return router;
 };
 

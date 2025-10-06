@@ -285,6 +285,23 @@ module.exports = (pool, authenticateToken, upload, profileUpload) => {
       const { id } = req.params;
       const employeeData = req.body;
       
+      // Check if this is just a face_data update
+      if (Object.keys(employeeData).length === 1 && employeeData.face_data !== undefined) {
+        // Only update face_data
+        const [result] = await pool.query(
+          'UPDATE employees SET face_data = ? WHERE id = ?',
+          [employeeData.face_data, id]
+        );
+        
+        if (result.affectedRows === 0) {
+          return res.status(404).json({ success: false, message: 'Employee not found' });
+        }
+        
+        res.json({ success: true, message: 'Face data updated successfully' });
+        return;
+      }
+      
+      // Full employee update for other cases
       const [result] = await pool.query(
         `UPDATE employees SET
           user_id = ?, company_id = ?, branch_id = ?, department_id = ?, designation_id = ?,
@@ -293,7 +310,7 @@ module.exports = (pool, authenticateToken, upload, profileUpload) => {
           state = ?, country = ?, zip_code = ?, joining_date = ?, exit_date = ?,
           employment_type = ?, attendance_policy_id = ?, bank_name = ?,
           bank_account_number = ?, bank_routing_number = ?, bank_swift_code = ?,
-          bank_address = ?, role = ?, reports_to = ?, status = ?
+          bank_address = ?, role = ?, reports_to = ?, status = ?, face_data = ?
          WHERE id = ?`,
         [
           employeeData.user_id, employeeData.company_id, employeeData.branch_id,
@@ -306,7 +323,7 @@ module.exports = (pool, authenticateToken, upload, profileUpload) => {
           employeeData.attendance_policy_id, employeeData.bank_name,
           employeeData.bank_account_number, employeeData.bank_routing_number,
           employeeData.bank_swift_code, employeeData.bank_address, employeeData.role,
-          employeeData.reports_to, employeeData.status, id
+          employeeData.reports_to, employeeData.status, employeeData.face_data, id
         ]
       );
       
@@ -336,6 +353,62 @@ module.exports = (pool, authenticateToken, upload, profileUpload) => {
     } catch (error) {
       console.error('Delete employee error:', error);
       res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+  });
+
+  // Update employee face recognition data
+  router.post('/update-face', authenticateToken, async (req, res) => {
+    try {
+      const { employee_id, face_descriptor } = req.body;
+      
+      if (!employee_id || !face_descriptor) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Employee ID and face descriptor are required' 
+        });
+      }
+
+      // Check if employee exists
+      const [employee] = await pool.query('SELECT id FROM employees WHERE id = ?', [employee_id]);
+      if (employee.length === 0) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Employee not found' 
+        });
+      }
+
+      // Store face descriptor (in a real implementation, this would be encrypted)
+      // For now, we'll store it as JSON in a face_descriptor column
+      // First, let's check if the column exists, if not, we'll add it
+      try {
+        await pool.query(`
+          ALTER TABLE employees 
+          ADD COLUMN face_descriptor JSON NULL
+        `);
+      } catch (error) {
+        // Column might already exist, ignore the error
+        if (!error.message.includes('Duplicate column name')) {
+          throw error;
+        }
+      }
+
+      // Update the face descriptor
+      await pool.query(
+        'UPDATE employees SET face_descriptor = ? WHERE id = ?',
+        [JSON.stringify(face_descriptor), employee_id]
+      );
+
+      res.json({ 
+        success: true, 
+        message: 'Face recognition data updated successfully' 
+      });
+    } catch (error) {
+      console.error('Update face error:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Server error', 
+        error: error.message 
+      });
     }
   });
   

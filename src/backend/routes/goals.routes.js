@@ -10,13 +10,11 @@ module.exports = (pool, authenticateToken) => {
   
   router.get('/', authenticateToken, async (req, res) => {
     try {
-      const { employee_id, status, goal_type_id } = req.query;
+      const { employee_id, status, category } = req.query;
       let query = `
-        SELECT g.*, CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.employee_id as emp_id,
-               gt.name as goal_type_name
+        SELECT g.*, CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.employee_id as emp_id
         FROM goals g
         LEFT JOIN employees e ON g.employee_id = e.id
-        LEFT JOIN goal_types gt ON g.goal_type_id = gt.id
         WHERE 1=1
       `;
       let params = [];
@@ -31,9 +29,9 @@ module.exports = (pool, authenticateToken) => {
         params.push(status);
       }
       
-      if (goal_type_id) {
-        query += ' AND g.goal_type_id = ?';
-        params.push(goal_type_id);
+      if (category) {
+        query += ' AND g.category = ?';
+        params.push(category);
       }
       
       query += ' ORDER BY g.created_at DESC';
@@ -48,12 +46,12 @@ module.exports = (pool, authenticateToken) => {
 
   router.post('/', authenticateToken, async (req, res) => {
     try {
-      const { employee_id, title, description, goal_type_id, target_value, start_date, end_date, status } = req.body;
+      const { employee_id, title, description, category, target_value, start_date, end_date, status, priority, created_by } = req.body;
       
       const [result] = await pool.query(
-        `INSERT INTO goals (employee_id, title, description, goal_type_id, target_value, start_date, end_date, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [employee_id, title, description, goal_type_id, target_value, start_date, end_date, status || 'not_started']
+        `INSERT INTO goals (employee_id, title, description, category, target_value, start_date, end_date, status, priority, created_by)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [employee_id, title, description, category, target_value, start_date, end_date, status || 'not_started', priority || 'medium', created_by || req.user.id]
       );
       
       res.status(201).json({ success: true, message: 'Goal created successfully', data: { id: result.insertId } });
@@ -66,13 +64,13 @@ module.exports = (pool, authenticateToken) => {
   router.put('/:id', authenticateToken, async (req, res) => {
     try {
       const { id } = req.params;
-      const { title, description, goal_type_id, target_value, start_date, end_date, status } = req.body;
+      const { title, description, category, target_value, start_date, end_date, status, priority } = req.body;
       
       await pool.query(
-        `UPDATE goals SET title = ?, description = ?, goal_type_id = ?, target_value = ?, 
-         start_date = ?, end_date = ?, status = ?
+        `UPDATE goals SET title = ?, description = ?, category = ?, target_value = ?, 
+         start_date = ?, end_date = ?, status = ?, priority = ?
          WHERE id = ?`,
-        [title, description, goal_type_id, target_value, start_date, end_date, status, id]
+        [title, description, category, target_value, start_date, end_date, status, priority, id]
       );
       
       res.json({ success: true, message: 'Goal updated successfully' });
