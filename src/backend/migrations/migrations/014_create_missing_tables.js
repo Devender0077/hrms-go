@@ -144,6 +144,25 @@ async function up(connection) {
     `);
     console.log('✅ Asset categories table created');
 
+    // Create meetings table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS meetings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        meeting_date DATETIME NOT NULL,
+        duration INT DEFAULT 60,
+        location VARCHAR(255),
+        meeting_type_id INT,
+        organizer_id INT NOT NULL,
+        status ENUM('scheduled', 'in_progress', 'completed', 'cancelled') DEFAULT 'scheduled',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (organizer_id) REFERENCES employees(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('✅ Meetings table created');
+
     // Create meeting_attendees table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS meeting_attendees (
@@ -176,6 +195,30 @@ async function up(connection) {
       )
     `);
     console.log('✅ Document categories table created');
+
+    // Create documents table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS documents (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        document_type_id INT,
+        category_id INT,
+        file_path VARCHAR(500) NOT NULL,
+        file_size INT DEFAULT NULL,
+        mime_type VARCHAR(100) DEFAULT NULL,
+        uploaded_by INT NOT NULL,
+        is_public BOOLEAN DEFAULT FALSE,
+        access_level ENUM('public', 'private', 'restricted') DEFAULT 'private',
+        expiry_date DATE NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (document_type_id) REFERENCES document_types(id) ON DELETE SET NULL,
+        FOREIGN KEY (category_id) REFERENCES document_categories(id) ON DELETE SET NULL
+      )
+    `);
+    console.log('✅ Documents table created');
 
     // Create document_versions table
     await connection.execute(`
