@@ -111,6 +111,8 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleInputChange = (value: string) => {
     setQuery(value);
+    // Reset selected index when typing
+    setSelectedIndex(0);
   };
 
   const handleInputFocus = () => {
@@ -123,14 +125,25 @@ const SearchBar: React.FC<SearchBarProps> = ({
     // Delay closing to allow for clicks on dropdown items
     setTimeout(() => {
       setIsOpen(false);
-    }, 150);
+    }, 200);
   };
 
   const handleResultClick = (result: SearchResult) => {
-    navigate(result.url);
+    // Close dropdown immediately
     setIsOpen(false);
     setQuery('');
     inputRef.current?.blur();
+    
+    // Navigate after a small delay to ensure dropdown closes
+    setTimeout(() => {
+      // For settings pages, we navigate to the main settings page
+      // The user can then use the sub-navigation within settings
+      if (result.type === 'setting') {
+        navigate('/dashboard/settings');
+      } else {
+        navigate(result.url);
+      }
+    }, 100);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -164,8 +177,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
             // A result is selected (adjusted for the "Search for..." option)
             handleResultClick(results[selectedIndex - 1]);
           }
+        } else if (query.trim().length > 0) {
+          // If no dropdown open but there's a query, perform general search
+          e.preventDefault();
+          console.log(`General search for: ${query}`);
+          setIsOpen(false);
+          setQuery('');
+          inputRef.current?.blur();
         }
-        // If no dropdown open, allow normal Enter behavior
         break;
       case 'Escape':
         e.preventDefault();

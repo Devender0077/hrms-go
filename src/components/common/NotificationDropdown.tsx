@@ -94,6 +94,7 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
             type: 'info',
             timestamp: new Date(now - 4 * 60 * 60 * 1000), // 4 hours ago
             isRead: true,
+            actionUrl: '/dashboard/settings',
             icon: 'lucide:settings'
           },
           {
@@ -105,6 +106,26 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
             isRead: false,
             actionUrl: '/dashboard/audit-logs',
             icon: 'lucide:shield-alert'
+          },
+          {
+            id: '7',
+            title: 'Leave Request',
+            message: 'New leave request from Sarah Johnson needs approval',
+            type: 'info',
+            timestamp: new Date(now - 8 * 60 * 60 * 1000), // 8 hours ago
+            isRead: false,
+            actionUrl: '/dashboard/leave/applications',
+            icon: 'lucide:calendar-minus'
+          },
+          {
+            id: '8',
+            title: 'Payroll Reminder',
+            message: 'Monthly payroll processing is due tomorrow',
+            type: 'warning',
+            timestamp: new Date(now - 12 * 60 * 60 * 1000), // 12 hours ago
+            isRead: true,
+            actionUrl: '/dashboard/payroll',
+            icon: 'lucide:dollar-sign'
           }
         ];
         
@@ -160,6 +181,9 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
   };
 
   const handleNotificationClick = (notification: Notification) => {
+    // Close dropdown immediately
+    setIsOpen(false);
+    
     // Mark as read
     setNotifications(prev => 
       prev.map(n => 
@@ -169,10 +193,11 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
 
     // Navigate if action URL exists
     if (notification.actionUrl) {
-      navigate(notification.actionUrl);
+      // Small delay to ensure dropdown closes before navigation
+      setTimeout(() => {
+        navigate(notification.actionUrl);
+      }, 100);
     }
-
-    setIsOpen(false);
   };
 
   const markAllAsRead = () => {
