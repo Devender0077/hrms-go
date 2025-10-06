@@ -25,12 +25,12 @@ router.get('/attendance-records', authenticateToken, async (req, res) => {
     }
     
     if (start_date) {
-      query += ' AND ar.record_date >= ?';
+      query += ' AND ar.date >= ?';
       params.push(start_date);
     }
     
     if (end_date) {
-      query += ' AND ar.record_date <= ?';
+      query += ' AND ar.date <= ?';
       params.push(end_date);
     }
     

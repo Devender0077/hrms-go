@@ -1,73 +1,186 @@
 /**
- * Migration: 010_fix_users_table.js
- * Fix users table schema to include department_id and designation_id
+ * Migration: 013_ensure_all_tables
+ * Ensure all required tables exist with correct structure
  */
 
 async function up(connection) {
-  console.log('🔄 Running migration: Fix users table schema...');
+  console.log('🔄 Running migration: Ensure all required tables exist...');
   
   try {
-    // Add missing columns to users table
+    // Create companies table if not exists
     await connection.execute(`
-      ALTER TABLE users 
-      ADD COLUMN IF NOT EXISTS department_id INT DEFAULT NULL,
-      ADD COLUMN IF NOT EXISTS designation_id INT DEFAULT NULL,
-      ADD COLUMN IF NOT EXISTS branch_id INT DEFAULT NULL,
-      ADD COLUMN IF NOT EXISTS manager_id INT DEFAULT NULL,
-      ADD COLUMN IF NOT EXISTS hire_date DATE DEFAULT NULL,
-      ADD COLUMN IF NOT EXISTS salary DECIMAL(10,2) DEFAULT NULL,
-      ADD COLUMN IF NOT EXISTS status ENUM('active', 'inactive', 'terminated') DEFAULT 'active'
+      CREATE TABLE IF NOT EXISTS companies (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        legal_name VARCHAR(255),
+        tax_id VARCHAR(50),
+        registration_number VARCHAR(50),
+        logo VARCHAR(255),
+        email VARCHAR(255),
+        phone VARCHAR(20),
+        website VARCHAR(255),
+        address TEXT,
+        city VARCHAR(100),
+        state VARCHAR(100),
+        country VARCHAR(100),
+        zip_code VARCHAR(20),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
     `);
-    
-    // Add foreign key constraints
-    try {
-      await connection.execute(`
-        ALTER TABLE users 
-        ADD CONSTRAINT fk_users_department 
-        FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL
-      `);
-    } catch (error) {
-      if (!error.message.includes('Duplicate key name')) {
-        console.warn('Warning: Could not add department foreign key:', error.message);
-      }
-    }
-    
-    try {
-      await connection.execute(`
-        ALTER TABLE users 
-        ADD CONSTRAINT fk_users_designation 
-        FOREIGN KEY (designation_id) REFERENCES designations(id) ON DELETE SET NULL
-      `);
-    } catch (error) {
-      if (!error.message.includes('Duplicate key name')) {
-        console.warn('Warning: Could not add designation foreign key:', error.message);
-      }
-    }
-    
-    try {
-      await connection.execute(`
-        ALTER TABLE users 
-        ADD CONSTRAINT fk_users_branch 
-        FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL
-      `);
-    } catch (error) {
-      if (!error.message.includes('Duplicate key name')) {
-        console.warn('Warning: Could not add branch foreign key:', error.message);
-      }
-    }
-    
-    try {
-      await connection.execute(`
-        ALTER TABLE users 
-        ADD CONSTRAINT fk_users_manager 
+    console.log('✅ Companies table ensured');
+
+    // Create users table with all required columns
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL UNIQUE,
+        password VARCHAR(255) NOT NULL,
+        remember_token VARCHAR(100),
+        email_verified_at TIMESTAMP NULL,
+        role ENUM('super_admin', 'company_admin', 'employee') NOT NULL,
+        status ENUM('active', 'inactive') DEFAULT 'active',
+        profile_photo VARCHAR(255),
+        username VARCHAR(100) UNIQUE,
+        first_name VARCHAR(100),
+        last_name VARCHAR(100),
+        phone VARCHAR(20),
+        department VARCHAR(100),
+        position VARCHAR(100),
+        department_id INT DEFAULT NULL,
+        designation_id INT DEFAULT NULL,
+        branch_id INT DEFAULT NULL,
+        manager_id INT DEFAULT NULL,
+        hire_date DATE DEFAULT NULL,
+        salary DECIMAL(10,2) DEFAULT NULL,
+        is_email_verified BOOLEAN DEFAULT FALSE,
+        is_phone_verified BOOLEAN DEFAULT FALSE,
+        two_factor_enabled BOOLEAN DEFAULT FALSE,
+        login_attempts INT DEFAULT 0,
+        locked_until DATETIME NULL,
+        last_login DATETIME NULL,
+        permissions JSON,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✅ Users table ensured');
+
+    // Create branches table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS branches (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        company_id INT NOT NULL DEFAULT 1,
+        name VARCHAR(255) NOT NULL,
+        address TEXT,
+        phone VARCHAR(20),
+        email VARCHAR(255),
+        manager_id INT DEFAULT NULL,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('✅ Branches table ensured');
+
+    // Create departments table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS departments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        company_id INT NOT NULL DEFAULT 1,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        manager_id INT DEFAULT NULL,
+        budget DECIMAL(15,2) DEFAULT NULL,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('✅ Departments table ensured');
+
+    // Create designations table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS designations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        company_id INT NOT NULL DEFAULT 1,
+        name VARCHAR(255) NOT NULL,
+        description TEXT,
+        level INT DEFAULT 1,
+        is_active BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('✅ Designations table ensured');
+
+    // Create employees table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS employees (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        employee_id VARCHAR(50) UNIQUE,
+        company_id INT NOT NULL DEFAULT 1,
+        department_id INT DEFAULT NULL,
+        designation_id INT DEFAULT NULL,
+        branch_id INT DEFAULT NULL,
+        manager_id INT DEFAULT NULL,
+        hire_date DATE NOT NULL,
+        salary DECIMAL(10,2) DEFAULT NULL,
+        status ENUM('active', 'inactive', 'terminated') DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE,
+        FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE SET NULL,
+        FOREIGN KEY (designation_id) REFERENCES designations(id) ON DELETE SET NULL,
+        FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE SET NULL,
         FOREIGN KEY (manager_id) REFERENCES users(id) ON DELETE SET NULL
-      `);
-    } catch (error) {
-      if (!error.message.includes('Duplicate key name')) {
-        console.warn('Warning: Could not add manager foreign key:', error.message);
-      }
-    }
-    
+      )
+    `);
+    console.log('✅ Employees table ensured');
+
+    // Create system_settings table
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS system_settings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        company_id INT NOT NULL DEFAULT 1,
+        setting_key VARCHAR(255) NOT NULL,
+        setting_value TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_company_setting (company_id, setting_key),
+        FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
+      )
+    `);
+    console.log('✅ System settings table ensured');
+
+    // Create attendance_records table with correct structure
+    await connection.execute(`
+      CREATE TABLE IF NOT EXISTS attendance_records (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        employee_id INT NOT NULL,
+        date DATE NOT NULL,
+        check_in_time TIMESTAMP NULL DEFAULT NULL,
+        check_out_time TIMESTAMP NULL DEFAULT NULL,
+        total_hours DECIMAL(4,2) DEFAULT 0,
+        overtime_hours DECIMAL(4,2) DEFAULT 0,
+        status ENUM('present', 'absent', 'late', 'half-day', 'leave') DEFAULT 'absent',
+        notes TEXT DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_employee_id (employee_id),
+        INDEX idx_date (date),
+        INDEX idx_status (status),
+        UNIQUE KEY unique_employee_date (employee_id, date)
+      )
+    `);
+    console.log('✅ Attendance records table ensured');
+
     // Create audit_logs table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS audit_logs (
@@ -87,8 +200,9 @@ async function up(connection) {
         INDEX idx_created_at (created_at)
       )
     `);
-    
-    // Create jobs table for recruitment
+    console.log('✅ Audit logs table ensured');
+
+    // Create jobs table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS jobs (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -113,7 +227,8 @@ async function up(connection) {
         INDEX idx_created_by (created_by)
       )
     `);
-    
+    console.log('✅ Jobs table ensured');
+
     // Create candidates table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS candidates (
@@ -138,7 +253,8 @@ async function up(connection) {
         INDEX idx_email (email)
       )
     `);
-    
+    console.log('✅ Candidates table ensured');
+
     // Create interviews table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS interviews (
@@ -160,7 +276,8 @@ async function up(connection) {
         INDEX idx_scheduled_date (scheduled_date)
       )
     `);
-    
+    console.log('✅ Interviews table ensured');
+
     // Create performance_reviews table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS performance_reviews (
@@ -186,7 +303,8 @@ async function up(connection) {
         INDEX idx_status (status)
       )
     `);
-    
+    console.log('✅ Performance reviews table ensured');
+
     // Create training_programs table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS training_programs (
@@ -202,7 +320,8 @@ async function up(connection) {
         INDEX idx_status (status)
       )
     `);
-    
+    console.log('✅ Training programs table ensured');
+
     // Create training_enrollments table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS training_enrollments (
@@ -222,7 +341,8 @@ async function up(connection) {
         INDEX idx_status (status)
       )
     `);
-    
+    console.log('✅ Training enrollments table ensured');
+
     // Create payroll_salaries table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS payroll_salaries (
@@ -241,7 +361,8 @@ async function up(connection) {
         INDEX idx_status (status)
       )
     `);
-    
+    console.log('✅ Payroll salaries table ensured');
+
     // Create payroll_payslips table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS payroll_payslips (
@@ -266,28 +387,8 @@ async function up(connection) {
         INDEX idx_status (status)
       )
     `);
-    
-    // Create attendance_records table
-    await connection.execute(`
-      CREATE TABLE IF NOT EXISTS attendance_records (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        employee_id INT NOT NULL,
-        date DATE NOT NULL,
-        check_in_time TIMESTAMP NULL DEFAULT NULL,
-        check_out_time TIMESTAMP NULL DEFAULT NULL,
-        total_hours DECIMAL(4,2) DEFAULT 0,
-        overtime_hours DECIMAL(4,2) DEFAULT 0,
-        status ENUM('present', 'absent', 'late', 'half-day', 'leave') DEFAULT 'absent',
-        notes TEXT DEFAULT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_employee_id (employee_id),
-        INDEX idx_date (date),
-        INDEX idx_status (status),
-        UNIQUE KEY unique_employee_date (employee_id, date)
-      )
-    `);
-    
+    console.log('✅ Payroll payslips table ensured');
+
     // Create leave_applications table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS leave_applications (
@@ -311,8 +412,9 @@ async function up(connection) {
         INDEX idx_dates (start_date, end_date)
       )
     `);
-    
-    console.log('✅ Migration completed: Users table schema fixed and new tables created');
+    console.log('✅ Leave applications table ensured');
+
+    console.log('🎉 Migration completed: All required tables ensured');
     
   } catch (error) {
     console.error('❌ Migration failed:', error.message);
@@ -321,41 +423,12 @@ async function up(connection) {
 }
 
 async function down(connection) {
-  console.log('🔄 Rolling back migration: Fix users table schema...');
+  console.log('🔄 Rolling back migration: Ensure all required tables exist...');
   
   try {
-    // Drop foreign key constraints first
-    await connection.execute('ALTER TABLE users DROP FOREIGN KEY IF EXISTS fk_users_department');
-    await connection.execute('ALTER TABLE users DROP FOREIGN KEY IF EXISTS fk_users_designation');
-    await connection.execute('ALTER TABLE users DROP FOREIGN KEY IF EXISTS fk_users_branch');
-    await connection.execute('ALTER TABLE users DROP FOREIGN KEY IF EXISTS fk_users_manager');
-    
-    // Drop columns
-    await connection.execute(`
-      ALTER TABLE users 
-      DROP COLUMN IF EXISTS department_id,
-      DROP COLUMN IF EXISTS designation_id,
-      DROP COLUMN IF EXISTS branch_id,
-      DROP COLUMN IF EXISTS manager_id,
-      DROP COLUMN IF EXISTS hire_date,
-      DROP COLUMN IF EXISTS salary,
-      DROP COLUMN IF EXISTS status
-    `);
-    
-    // Drop tables
-    await connection.execute('DROP TABLE IF EXISTS leave_applications');
-    await connection.execute('DROP TABLE IF EXISTS attendance_records');
-    await connection.execute('DROP TABLE IF EXISTS payroll_payslips');
-    await connection.execute('DROP TABLE IF EXISTS payroll_salaries');
-    await connection.execute('DROP TABLE IF EXISTS training_enrollments');
-    await connection.execute('DROP TABLE IF EXISTS training_programs');
-    await connection.execute('DROP TABLE IF EXISTS performance_reviews');
-    await connection.execute('DROP TABLE IF EXISTS interviews');
-    await connection.execute('DROP TABLE IF EXISTS candidates');
-    await connection.execute('DROP TABLE IF EXISTS jobs');
-    await connection.execute('DROP TABLE IF EXISTS audit_logs');
-    
-    console.log('✅ Rollback completed: Users table schema reverted');
+    // Note: This rollback doesn't drop tables as they might contain data
+    // Individual table rollbacks should be handled by specific migrations
+    console.log('✅ Rollback completed: Tables preserved (no data loss)');
     
   } catch (error) {
     console.error('❌ Rollback failed:', error.message);

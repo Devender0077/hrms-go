@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Badge, Avatar } from '@heroui/react';
 import { Icon } from '@iconify/react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 
 interface Notification {
@@ -26,84 +25,139 @@ interface NotificationDropdownProps {
 export default function NotificationDropdown({ className = '' }: NotificationDropdownProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Mock notifications - in a real app, this would come from an API
+  // Load notifications - in a real app, this would come from an API
   useEffect(() => {
-    const mockNotifications: Notification[] = [
-      {
-        id: '1',
-        title: 'New Employee Joined',
-        message: 'John Smith has been added to the Engineering department',
-        type: 'success',
-        timestamp: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
-        isRead: false,
-        actionUrl: '/dashboard/employees',
-        icon: 'lucide:user-plus',
-        user: {
-          name: 'John Smith',
-          avatar: '/avatars/male_avatar.svg'
-        }
-      },
-      {
-        id: '2',
-        title: 'Meeting Reminder',
-        message: 'Team standup meeting starts in 15 minutes',
-        type: 'info',
-        timestamp: new Date(Date.now() - 30 * 60 * 1000), // 30 minutes ago
-        isRead: false,
-        actionUrl: '/dashboard/calendar',
-        icon: 'lucide:calendar'
-      },
-      {
-        id: '3',
-        title: 'Leave Request',
-        message: 'Sarah Johnson has requested 3 days of vacation leave',
-        type: 'warning',
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-        isRead: true,
-        actionUrl: '/dashboard/leave/applications',
-        icon: 'lucide:calendar-days',
-        user: {
-          name: 'Sarah Johnson',
-          avatar: '/avatars/female_avatar.svg'
-        }
-      },
-      {
-        id: '4',
-        title: 'System Maintenance',
-        message: 'Scheduled maintenance will begin at 2:00 AM tomorrow',
-        type: 'info',
-        timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-        isRead: true,
-        icon: 'lucide:settings'
-      },
-      {
-        id: '5',
-        title: 'Payroll Processed',
-        message: 'Monthly payroll has been processed successfully for all employees',
-        type: 'success',
-        timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-        isRead: true,
-        actionUrl: '/dashboard/payroll',
-        icon: 'lucide:check-circle'
-      },
-      {
-        id: '6',
-        title: 'Security Alert',
-        message: 'Multiple failed login attempts detected from unknown IP',
-        type: 'error',
-        timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
-        isRead: false,
-        actionUrl: '/dashboard/audit-logs',
-        icon: 'lucide:shield-alert'
+    const loadNotifications = async () => {
+      setIsLoading(true);
+      try {
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Generate dynamic notifications with current timestamps
+        const now = Date.now();
+        const mockNotifications: Notification[] = [
+          {
+            id: '1',
+            title: 'New Employee Joined',
+            message: 'John Smith has been added to the Engineering department',
+            type: 'success',
+            timestamp: new Date(now - 2 * 60 * 1000), // 2 minutes ago
+            isRead: false,
+            actionUrl: '/dashboard/employees',
+            icon: 'lucide:user-plus',
+            user: {
+              name: 'John Smith',
+              avatar: 'https://i.pravatar.cc/150?img=1'
+            }
+          },
+          {
+            id: '2',
+            title: 'Meeting Reminder',
+            message: 'Team standup meeting starts in 15 minutes',
+            type: 'info',
+            timestamp: new Date(now - 15 * 60 * 1000), // 15 minutes ago
+            isRead: false,
+            actionUrl: '/dashboard/calendar',
+            icon: 'lucide:calendar'
+          },
+          {
+            id: '3',
+            title: 'Leave Request',
+            message: 'Sarah Johnson has requested 3 days of vacation leave',
+            type: 'warning',
+            timestamp: new Date(now - 45 * 60 * 1000), // 45 minutes ago
+            isRead: false,
+            actionUrl: '/dashboard/leave/applications',
+            icon: 'lucide:calendar-days',
+            user: {
+              name: 'Sarah Johnson',
+              avatar: 'https://i.pravatar.cc/150?img=2'
+            }
+          },
+          {
+            id: '4',
+            title: 'Task Completed',
+            message: 'Project milestone has been completed successfully',
+            type: 'success',
+            timestamp: new Date(now - 2 * 60 * 60 * 1000), // 2 hours ago
+            isRead: true,
+            actionUrl: '/dashboard/tasks',
+            icon: 'lucide:check-circle'
+          },
+          {
+            id: '5',
+            title: 'System Update',
+            message: 'HRMS system has been updated to version 2.1.0',
+            type: 'info',
+            timestamp: new Date(now - 4 * 60 * 60 * 1000), // 4 hours ago
+            isRead: true,
+            icon: 'lucide:settings'
+          },
+          {
+            id: '6',
+            title: 'Security Alert',
+            message: 'Unusual login activity detected from new location',
+            type: 'error',
+            timestamp: new Date(now - 6 * 60 * 60 * 1000), // 6 hours ago
+            isRead: false,
+            actionUrl: '/dashboard/audit-logs',
+            icon: 'lucide:shield-alert'
+          }
+        ];
+        
+        setNotifications(mockNotifications);
+      } catch (error) {
+        console.error('Failed to load notifications:', error);
+        setNotifications([]);
+      } finally {
+        setIsLoading(false);
       }
-    ];
+    };
+
+    loadNotifications();
     
-    setNotifications(mockNotifications);
+    // Auto-refresh notifications every 30 seconds
+    const interval = setInterval(() => {
+      refreshNotifications();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  // Function to refresh notifications
+  const refreshNotifications = async () => {
+    setIsLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Add a new notification occasionally
+      const shouldAddNew = Math.random() > 0.7;
+      if (shouldAddNew) {
+        const newNotification: Notification = {
+          id: `new-${Date.now()}`,
+          title: 'New System Alert',
+          message: 'A new system alert has been generated',
+          type: 'info',
+          timestamp: new Date(),
+          isRead: false,
+          actionUrl: '/dashboard/alerts',
+          icon: 'lucide:alert-circle'
+        };
+        
+        setNotifications(prev => [newNotification, ...prev]);
+      }
+    } catch (error) {
+      console.error('Failed to refresh notifications:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleNotificationClick = (notification: Notification) => {
     // Mark as read
@@ -131,16 +185,6 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
     setNotifications([]);
   };
 
-  const getTypeColor = (type: Notification['type']) => {
-    switch (type) {
-      case 'success': return 'success';
-      case 'warning': return 'warning';
-      case 'error': return 'danger';
-      case 'info': 
-      default: return 'primary';
-    }
-  };
-
   const formatTimestamp = (timestamp: Date) => {
     const now = new Date();
     const diff = now.getTime() - timestamp.getTime();
@@ -153,6 +197,170 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
     if (hours < 24) return `${hours}h ago`;
     if (days < 7) return `${days}d ago`;
     return timestamp.toLocaleDateString();
+  };
+
+  const getTypeColor = (type: Notification['type']) => {
+    switch (type) {
+      case 'success': return 'success';
+      case 'warning': return 'warning';
+      case 'error': return 'danger';
+      case 'info': 
+      default: return 'primary';
+    }
+  };
+
+  // Create dropdown items array
+  const getDropdownItems = () => {
+    const items = [];
+
+    // Header
+    items.push(
+      <DropdownItem key="header" className="h-auto p-0" textValue="header">
+        <div className="flex items-center justify-between p-3 border-b border-divider">
+          <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="light"
+              onPress={refreshNotifications}
+              className="min-w-0 p-1"
+            >
+              <Icon icon="lucide:refresh-cw" className="text-sm" />
+            </Button>
+            <Button
+              size="sm"
+              variant="light"
+              onPress={markAllAsRead}
+              className="min-w-0 p-1"
+            >
+              Mark all as read
+            </Button>
+          </div>
+        </div>
+      </DropdownItem>
+    );
+
+    // Content based on state
+    if (isLoading) {
+      items.push(
+        <DropdownItem key="loading" textValue="loading">
+          <div className="flex items-center justify-center p-4">
+            <Icon icon="lucide:loader-2" className="animate-spin text-xl text-default-400 mr-2" />
+            <span className="text-sm text-default-500">Loading notifications...</span>
+          </div>
+        </DropdownItem>
+      );
+    } else if (notifications.length === 0) {
+      items.push(
+        <DropdownItem key="empty" textValue="empty">
+          <div className="flex flex-col items-center justify-center p-8 text-center">
+            <Icon icon="lucide:bell-off" className="text-4xl text-default-300 mb-2" />
+            <p className="text-sm text-default-500">No notifications</p>
+          </div>
+        </DropdownItem>
+      );
+    } else {
+      notifications.forEach((notification) => {
+        items.push(
+          <DropdownItem
+            key={notification.id}
+            textValue={notification.title}
+            onPress={() => handleNotificationClick(notification)}
+            className="p-0"
+          >
+            <div className={`flex items-start gap-3 p-3 hover:bg-default-50 cursor-pointer transition-colors ${
+              !notification.isRead ? 'bg-primary-50/30 border-l-2 border-primary-500' : ''
+            }`}>
+              <div className={`p-2 rounded-lg ${
+                notification.type === 'success' ? 'bg-success-100 text-success-600' :
+                notification.type === 'warning' ? 'bg-warning-100 text-warning-600' :
+                notification.type === 'error' ? 'bg-danger-100 text-danger-600' :
+                'bg-primary-100 text-primary-600'
+              }`}>
+                <Icon 
+                  icon={notification.icon} 
+                  className="text-lg"
+                />
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2 mb-1">
+                  <h4 className={`text-sm ${!notification.isRead ? 'font-semibold' : 'font-medium'}`}>
+                    {notification.title}
+                  </h4>
+                  {!notification.isRead && (
+                    <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1" />
+                  )}
+                </div>
+                
+                <p className="text-xs text-default-600 mb-2 line-clamp-2">
+                  {notification.message}
+                </p>
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-default-400">
+                    {formatTimestamp(notification.timestamp)}
+                  </span>
+                  
+                  {notification.user && (
+                    <div className="flex items-center gap-1">
+                      <Avatar
+                        size="sm"
+                        src={notification.user.avatar}
+                        name={notification.user.name}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-xs text-default-500">
+                        {notification.user.name}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              {notification.actionUrl && (
+                <Icon 
+                  icon="lucide:chevron-right" 
+                  className="text-default-400 flex-shrink-0 mt-1" 
+                />
+              )}
+            </div>
+          </DropdownItem>
+        );
+      });
+    }
+
+    // Footer
+    if (notifications.length > 0) {
+      items.push(
+        <DropdownItem key="footer" className="h-auto p-0" textValue="footer">
+          <div className="flex items-center justify-between p-3 border-t border-divider bg-default-50">
+            <Button
+              size="sm"
+              variant="light"
+              onPress={() => {
+                // Navigate to notifications page
+                console.log('Navigate to all notifications');
+              }}
+              className="text-xs"
+            >
+              View All
+            </Button>
+            <Button
+              size="sm"
+              variant="light"
+              color="danger"
+              onPress={clearAllNotifications}
+              className="text-xs"
+            >
+              Clear All
+            </Button>
+          </div>
+        </DropdownItem>
+      );
+    }
+
+    return items;
   };
 
   return (
@@ -176,8 +384,7 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
                 content={unreadCount > 99 ? '99+' : unreadCount} 
                 color="danger"
                 size="sm"
-                className="absolute -top-0.5 -right-0.5 min-w-4 h-4 text-xs font-medium"
-                style={{ fontSize: '10px', lineHeight: '1' }}
+                className="absolute -top-1 -right-1 min-w-5 h-5 text-xs"
               >
                 <span></span>
               </Badge>
@@ -190,133 +397,7 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
           className="w-80 max-h-96 overflow-y-auto"
           closeOnSelect={false}
         >
-          {/* Header */}
-          <DropdownItem key="header" className="h-auto p-0" textValue="header">
-            <div className="flex items-center justify-between p-4 border-b border-divider">
-              <div>
-                <h3 className="font-semibold text-lg">Notifications</h3>
-                <p className="text-sm text-default-500">
-                  {unreadCount > 0 ? `${unreadCount} unread` : 'All caught up!'}
-                </p>
-              </div>
-              {unreadCount > 0 && (
-                <Button
-                  size="sm"
-                  variant="light"
-                  onPress={markAllAsRead}
-                  className="text-xs"
-                >
-                  Mark all read
-                </Button>
-              )}
-            </div>
-          </DropdownItem>
-
-          {/* Notifications */}
-          <AnimatePresence>
-            {notifications.length === 0 ? (
-              <DropdownItem key="empty" textValue="empty">
-                <div className="flex flex-col items-center justify-center p-8 text-center">
-                  <Icon icon="lucide:bell-off" className="text-4xl text-default-300 mb-2" />
-                  <p className="text-sm text-default-500">No notifications</p>
-                </div>
-              </DropdownItem>
-            ) : (
-              notifications.map((notification) => (
-                <DropdownItem
-                  key={notification.id}
-                  textValue={notification.title}
-                  onPress={() => handleNotificationClick(notification)}
-                  className="p-0"
-                >
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className={`flex items-start gap-3 p-4 hover:bg-default-50 cursor-pointer border-l-2 ${
-                      notification.isRead 
-                        ? 'border-transparent bg-transparent' 
-                        : 'border-primary-500 bg-primary-50/50'
-                    }`}
-                  >
-                    <div className={`p-2 rounded-lg bg-${getTypeColor(notification.type)}-100`}>
-                      <Icon 
-                        icon={notification.icon} 
-                        className={`text-${getTypeColor(notification.type)} text-lg`}
-                      />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <h4 className={`font-medium text-sm ${!notification.isRead ? 'font-semibold' : ''}`}>
-                          {notification.title}
-                        </h4>
-                        {!notification.isRead && (
-                          <div className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1" />
-                        )}
-                      </div>
-                      
-                      <p className="text-xs text-default-600 mb-2 line-clamp-2">
-                        {notification.message}
-                      </p>
-                      
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-default-400">
-                          {formatTimestamp(notification.timestamp)}
-                        </span>
-                        
-                        {notification.user && (
-                          <div className="flex items-center gap-1">
-                            <Avatar
-                              size="sm"
-                              src={notification.user.avatar}
-                              name={notification.user.name}
-                              className="w-4 h-4"
-                            />
-                            <span className="text-xs text-default-500">
-                              {notification.user.name}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {notification.actionUrl && (
-                      <Icon 
-                        icon="lucide:chevron-right" 
-                        className="text-default-400 flex-shrink-0 mt-1" 
-                      />
-                    )}
-                  </motion.div>
-                </DropdownItem>
-              ))
-            )}
-          </AnimatePresence>
-
-          {/* Footer */}
-          {notifications.length > 0 && (
-            <DropdownItem key="footer" className="h-auto p-0" textValue="footer">
-              <div className="flex items-center justify-between p-3 border-t border-divider bg-default-50">
-                <Button
-                  size="sm"
-                  variant="light"
-                  onPress={() => navigate('/dashboard/notifications')}
-                  startContent={<Icon icon="lucide:eye" />}
-                >
-                  View All
-                </Button>
-                <Button
-                  size="sm"
-                  variant="light"
-                  color="danger"
-                  onPress={clearAllNotifications}
-                  startContent={<Icon icon="lucide:trash-2" />}
-                >
-                  Clear All
-                </Button>
-              </div>
-            </DropdownItem>
-          )}
+          {getDropdownItems()}
         </DropdownMenu>
       </Dropdown>
     </div>

@@ -26,10 +26,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
             </div>
             <Switch
               isSelected={settings.googleCalendar?.enabled === true || settings.googleCalendar?.enabled === 'true'}
-              onValueChange={(value) => onSettingsChange('googleCalendar', {
-                ...settings.googleCalendar,
-                enabled: value
-              })}
+              onValueChange={(value) => onSettingsChange('googleCalendar', 'enabled', value)}
             />
           </div>
 
@@ -76,10 +73,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.googleCalendar?.syncLeaveRequests === true || settings.googleCalendar?.syncLeaveRequests === 'true'}
-                  onValueChange={(value) => onSettingsChange('googleCalendar', {
-                    ...settings.googleCalendar,
-                    syncLeaveRequests: value
-                  })}
+                  onValueChange={(value) => onSettingsChange('googleCalendar', 'syncLeaveRequests', value)}
                 />
               </div>
 
@@ -90,10 +84,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.googleCalendar?.syncMeetings === true || settings.googleCalendar?.syncMeetings === 'true'}
-                  onValueChange={(value) => onSettingsChange('googleCalendar', {
-                    ...settings.googleCalendar,
-                    syncMeetings: value
-                  })}
+                  onValueChange={(value) => onSettingsChange('googleCalendar', 'syncMeetings', value)}
                 />
               </div>
 
@@ -122,10 +113,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
             </div>
             <Switch
               isSelected={settings.slack?.enabled === true || settings.slack?.enabled === 'true'}
-              onValueChange={(value) => onSettingsChange('slack', {
-                ...settings.slack,
-                enabled: value
-              })}
+              onValueChange={(value) => onSettingsChange('slack', 'enabled', value)}
             />
           </div>
 
@@ -160,10 +148,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.slack?.leaveNotifications === true || settings.slack?.leaveNotifications === 'true'}
-                  onValueChange={(value) => onSettingsChange('slack', {
-                    ...settings.slack,
-                    leaveNotifications: value
-                  })}
+                  onValueChange={(value) => onSettingsChange('slack', 'leaveNotifications', value)}
                 />
               </div>
 
@@ -174,10 +159,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.slack?.birthdayNotifications === true || settings.slack?.birthdayNotifications === 'true'}
-                  onValueChange={(value) => onSettingsChange('slack', {
-                    ...settings.slack,
-                    birthdayNotifications: value
-                  })}
+                  onValueChange={(value) => onSettingsChange('slack', 'birthdayNotifications', value)}
                 />
               </div>
 
@@ -206,10 +188,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
             </div>
             <Switch
               isSelected={settings.zoom?.enabled === true || settings.zoom?.enabled === 'true'}
-              onValueChange={(value) => onSettingsChange('zoom', {
-                ...settings.zoom,
-                enabled: value
-              })}
+              onValueChange={(value) => onSettingsChange('zoom', 'enabled', value)}
             />
           </div>
 
@@ -256,10 +235,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.zoom?.autoCreateMeetings === true || settings.zoom?.autoCreateMeetings === 'true'}
-                  onValueChange={(value) => onSettingsChange('zoom', {
-                    ...settings.zoom,
-                    autoCreateMeetings: value
-                  })}
+                  onValueChange={(value) => onSettingsChange('zoom', 'autoCreateMeetings', value)}
                 />
               </div>
 
@@ -290,10 +266,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
               </div>
               <Switch
                 isSelected={settings.paypal?.enabled === true || settings.paypal?.enabled === 'true'}
-                onValueChange={(value) => onSettingsChange('paypal', {
-                  ...settings.paypal,
-                  enabled: value
-                })}
+                onValueChange={(value) => onSettingsChange('paypal', 'enabled', value)}
               />
             </div>
 
@@ -331,10 +304,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
               </div>
               <Switch
                 isSelected={settings.stripe?.enabled === true || settings.stripe?.enabled === 'true'}
-                onValueChange={(value) => onSettingsChange('stripe', {
-                  ...settings.stripe,
-                  enabled: value
-                })}
+                onValueChange={(value) => onSettingsChange('stripe', 'enabled', value)}
               />
             </div>
 
@@ -381,10 +351,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
             </div>
             <Switch
               isSelected={settings.quickbooks?.enabled === true || settings.quickbooks?.enabled === 'true'}
-              onValueChange={(value) => onSettingsChange('quickbooks', {
-                ...settings.quickbooks,
-                enabled: value
-              })}
+              onValueChange={(value) => onSettingsChange('quickbooks', 'enabled', value)}
             />
           </div>
 
@@ -431,10 +398,7 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.quickbooks?.syncPayroll === true || settings.quickbooks?.syncPayroll === 'true'}
-                  onValueChange={(value) => onSettingsChange('quickbooks', {
-                    ...settings.quickbooks,
-                    syncPayroll: value
-                  })}
+                  onValueChange={(value) => onSettingsChange('quickbooks', 'syncPayroll', value)}
                 />
               </div>
 
