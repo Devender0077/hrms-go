@@ -25,7 +25,7 @@ interface NotificationDropdownProps {
 export default function NotificationDropdown({ className = '' }: NotificationDropdownProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   // Load notifications - in a real app, this would come from an API
@@ -33,6 +33,24 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
     const loadNotifications = async () => {
       setIsLoading(true);
       try {
+        // Check if we have saved notifications in localStorage
+        const savedNotifications = localStorage.getItem('hrms-notifications');
+        if (savedNotifications) {
+          try {
+            const parsed = JSON.parse(savedNotifications);
+            // Convert timestamp strings back to Date objects
+            const notificationsWithDates = parsed.map((n: any) => ({
+              ...n,
+              timestamp: new Date(n.timestamp)
+            }));
+            setNotifications(notificationsWithDates);
+            setIsLoading(false);
+            return; // Don't load mock data if we have saved notifications
+          } catch (error) {
+            console.error('Failed to parse saved notifications:', error);
+          }
+        }
+
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 500));
         
@@ -130,6 +148,8 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
         ];
         
         setNotifications(mockNotifications);
+        // Save to localStorage
+        localStorage.setItem('hrms-notifications', JSON.stringify(mockNotifications));
       } catch (error) {
         console.error('Failed to load notifications:', error);
         setNotifications([]);
@@ -147,6 +167,13 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
     
     return () => clearInterval(interval);
   }, []);
+
+  // Save notifications to localStorage whenever they change
+  useEffect(() => {
+    if (notifications.length > 0) {
+      localStorage.setItem('hrms-notifications', JSON.stringify(notifications));
+    }
+  }, [notifications]);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -171,7 +198,12 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
           icon: 'lucide:alert-circle'
         };
         
-        setNotifications(prev => [newNotification, ...prev]);
+        setNotifications(prev => {
+          const updated = [newNotification, ...prev];
+          // Save to localStorage
+          localStorage.setItem('hrms-notifications', JSON.stringify(updated));
+          return updated;
+        });
       }
     } catch (error) {
       console.error('Failed to refresh notifications:', error);
@@ -201,13 +233,18 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => 
-      prev.map(n => ({ ...n, isRead: true }))
-    );
+    setNotifications(prev => {
+      const updated = prev.map(n => ({ ...n, isRead: true }));
+      // Save to localStorage
+      localStorage.setItem('hrms-notifications', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const clearAllNotifications = () => {
     setNotifications([]);
+    // Clear from localStorage
+    localStorage.removeItem('hrms-notifications');
   };
 
   const formatTimestamp = (timestamp: Date) => {

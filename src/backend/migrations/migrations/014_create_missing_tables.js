@@ -11,7 +11,7 @@ async function up(connection) {
     console.log('📝 Fixing attendance_records table structure...');
     await connection.execute(`
       ALTER TABLE attendance_records 
-      CHANGE COLUMN work_hours total_hours DECIMAL(4,2) DEFAULT 0,
+      ADD COLUMN IF NOT EXISTS total_hours DECIMAL(4,2) DEFAULT 0,
       ADD COLUMN IF NOT EXISTS notes TEXT DEFAULT NULL
     `);
     console.log('✅ Attendance records table structure fixed');

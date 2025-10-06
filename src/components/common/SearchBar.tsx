@@ -113,6 +113,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
     setQuery(value);
     // Reset selected index when typing
     setSelectedIndex(0);
+    // Show dropdown when there's input
+    if (value.trim().length > 0) {
+      setIsOpen(true);
+    }
   };
 
   const handleInputFocus = () => {
@@ -211,8 +215,15 @@ const SearchBar: React.FC<SearchBarProps> = ({
   return (
     <div className={`relative ${className}`}>
       <Dropdown 
-        isOpen={isOpen && (query.trim().length > 0 || isLoading)} 
-        onOpenChange={setIsOpen}
+        isOpen={isOpen} 
+        onOpenChange={(open) => {
+          // Only allow closing if there's no query or user explicitly closes
+          if (!open && query.trim().length === 0) {
+            setIsOpen(false);
+          } else if (open) {
+            setIsOpen(true);
+          }
+        }}
         placement="bottom-start"
         className="w-full max-w-md"
       >
