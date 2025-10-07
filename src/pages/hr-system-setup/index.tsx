@@ -27,6 +27,7 @@ import ExpenseTypeSettings from "../../components/hr-setup/ExpenseTypeSettings";
 import IncomeTypeSettings from "../../components/hr-setup/IncomeTypeSettings";
 import PaymentTypeSettings from "../../components/hr-setup/PaymentTypeSettings";
 import ContractTypeSettings from "../../components/hr-setup/ContractTypeSettings";
+import AttendanceCalculationSettings from "../../components/hr-setup/AttendanceCalculationSettings";
 
 // HR System Setup configuration
 const hrSetupCategories = [
@@ -154,6 +155,15 @@ const hrSetupCategories = [
     items: [
       { key: "contract-type", title: "Contract Type", icon: "lucide:file-signature", description: "Define contract types" }
     ]
+  },
+  {
+    key: "attendance",
+    title: "Attendance",
+    icon: "lucide:clock",
+    description: "Configure attendance calculation rules",
+    items: [
+      { key: "attendance-calculation", title: "Attendance Calculation", icon: "lucide:calculator", description: "Configure attendance calculation rules" }
+    ]
   }
 ];
 
@@ -214,6 +224,9 @@ export default function HRSystemSetup() {
       
       // Contract
       case "contract-type": return <ContractTypeSettings />;
+      
+      // Attendance
+      case "attendance-calculation": return <AttendanceCalculationSettings />;
       
       default:
         return (

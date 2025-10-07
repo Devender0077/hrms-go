@@ -1,6 +1,6 @@
 /**
- * Attendance & Timekeeping Routes
- * Shifts, policies, attendance records, regularization
+ * Attendance Management Routes
+ * Attendance muster, calculation rules, and tracking
  */
 
 const express = require('express');
@@ -8,208 +8,93 @@ const router = express.Router();
 
 module.exports = (pool, authenticateToken) => {
   
-  // =====================================================
-  // SHIFTS
-  // =====================================================
-  
-  router.get('/shifts', authenticateToken, async (req, res) => {
+  // Get attendance muster for a specific date
+  router.get('/muster', authenticateToken, async (req, res) => {
     try {
-      const [shifts] = await pool.query(
-        'SELECT * FROM shifts WHERE is_active = 1 ORDER BY created_at DESC'
-      );
-      res.json({ success: true, data: shifts });
-    } catch (error) {
-      console.error('Error fetching shifts:', error);
-      res.status(500).json({ success: false, message: 'Error fetching shifts' });
-    }
-  });
-
-  router.post('/shifts', authenticateToken, async (req, res) => {
-    try {
-      const companyId = req.user?.company_id || 1;
-      const { name, start_time, end_time, break_duration, grace_period, status } = req.body;
+      const { date } = req.query;
       
-      const [result] = await pool.query(
-        `INSERT INTO shifts (company_id, name, start_time, end_time, break_duration, grace_period, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [companyId, name, start_time, end_time, break_duration, grace_period, status || 'active']
-      );
-      
-      res.status(201).json({ success: true, message: 'Shift created successfully', data: { id: result.insertId } });
-    } catch (error) {
-      console.error('Error creating shift:', error);
-      res.status(500).json({ success: false, message: 'Error creating shift' });
-    }
-  });
-
-  router.put('/shifts/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { name, start_time, end_time, break_duration, grace_period, status } = req.body;
-      
-      await pool.query(
-        `UPDATE shifts SET name = ?, start_time = ?, end_time = ?, break_duration = ?, grace_period = ?, status = ?
-         WHERE id = ?`,
-        [name, start_time, end_time, break_duration, grace_period, status, id]
-      );
-      
-      res.json({ success: true, message: 'Shift updated successfully' });
-    } catch (error) {
-      console.error('Error updating shift:', error);
-      res.status(500).json({ success: false, message: 'Error updating shift' });
-    }
-  });
-
-  router.delete('/shifts/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      await pool.query('DELETE FROM shifts WHERE id = ?', [id]);
-      res.json({ success: true, message: 'Shift deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting shift:', error);
-      res.status(500).json({ success: false, message: 'Error deleting shift' });
-    }
-  });
-  
-  // =====================================================
-  // ATTENDANCE POLICIES
-  // =====================================================
-  
-  router.get('/policies', authenticateToken, async (req, res) => {
-    try {
-      const companyId = req.user?.company_id || 1;
-      const [policies] = await pool.query(
-        'SELECT * FROM attendance_policies WHERE company_id = ? ORDER BY created_at DESC',
-        [companyId]
-      );
-      res.json({ success: true, data: policies });
-    } catch (error) {
-      console.error('Error fetching policies:', error);
-      res.status(500).json({ success: false, message: 'Error fetching policies' });
-    }
-  });
-
-  router.post('/policies', authenticateToken, async (req, res) => {
-    try {
-      const companyId = req.user?.company_id || 1;
-      const { name, description, late_arrival_grace, early_departure_grace, half_day_hours, full_day_hours, status } = req.body;
-      
-      const [result] = await pool.query(
-        `INSERT INTO attendance_policies (company_id, name, description, late_arrival_grace, early_departure_grace, half_day_hours, full_day_hours, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [companyId, name, description, late_arrival_grace, early_departure_grace, half_day_hours, full_day_hours, status || 'active']
-      );
-      
-      res.status(201).json({ success: true, message: 'Policy created successfully', data: { id: result.insertId } });
-    } catch (error) {
-      console.error('Error creating policy:', error);
-      res.status(500).json({ success: false, message: 'Error creating policy' });
-    }
-  });
-
-  router.put('/policies/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { name, description, late_arrival_grace, early_departure_grace, half_day_hours, full_day_hours, status } = req.body;
-      
-      await pool.query(
-        `UPDATE attendance_policies SET name = ?, description = ?, late_arrival_grace = ?, early_departure_grace = ?, 
-         half_day_hours = ?, full_day_hours = ?, status = ?
-         WHERE id = ?`,
-        [name, description, late_arrival_grace, early_departure_grace, half_day_hours, full_day_hours, status, id]
-      );
-      
-      res.json({ success: true, message: 'Policy updated successfully' });
-    } catch (error) {
-      console.error('Error updating policy:', error);
-      res.status(500).json({ success: false, message: 'Error updating policy' });
-    }
-  });
-
-  router.delete('/policies/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      await pool.query('DELETE FROM attendance_policies WHERE id = ?', [id]);
-      res.json({ success: true, message: 'Policy deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting policy:', error);
-      res.status(500).json({ success: false, message: 'Error deleting policy' });
-    }
-  });
-  
-  // =====================================================
-  // ATTENDANCE RECORDS
-  // =====================================================
-  
-  router.get('/records', authenticateToken, async (req, res) => {
-    try {
-      const { employee_id, date_from, date_to, status } = req.query;
-      let query = `
-        SELECT ar.*, CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.employee_id
-        FROM attendance_records ar
-        LEFT JOIN employees e ON ar.employee_id = e.id
-        WHERE 1=1
-      `;
-      let params = [];
-      
-      if (employee_id) {
-        query += ' AND ar.employee_id = ?';
-        params.push(employee_id);
+      if (!date) {
+        return res.status(400).json({ success: false, message: 'Date is required' });
       }
-      
-      if (date_from) {
-        query += ' AND ar.date >= ?';
-        params.push(date_from);
-      }
-      
-      if (date_to) {
-        query += ' AND ar.date <= ?';
-        params.push(date_to);
-      }
-      
-      if (status) {
-        query += ' AND ar.status = ?';
-        params.push(status);
-      }
-      
-      query += ' ORDER BY ar.date DESC, ar.check_in DESC';
-      
-      const [records] = await pool.query(query, params);
-      res.json({ success: true, data: records });
-    } catch (error) {
-      console.error('Error fetching attendance records:', error);
-      res.status(500).json({ success: false, message: 'Error fetching attendance records' });
-    }
-  });
 
-  router.post('/records', authenticateToken, async (req, res) => {
-    try {
-      const { employee_id, date, check_in, check_out, status, remarks } = req.body;
-      
-      const [result] = await pool.query(
-        `INSERT INTO attendance_records (employee_id, date, check_in, check_out, status, remarks)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [employee_id, date, check_in, check_out, status || 'present', remarks]
+      // Get all employees and their attendance for the date
+      const [attendanceRecords] = await pool.query(
+        `SELECT 
+          a.id,
+          a.employee_id,
+          CONCAT(u.first_name, ' ', u.last_name) as employee_name,
+          a.date,
+          a.check_in,
+          a.check_out,
+          a.total_hours,
+          a.status,
+          a.overtime_hours,
+          a.remarks
+        FROM attendance a
+        RIGHT JOIN users u ON a.employee_id = u.id
+        WHERE a.date = ? OR a.date IS NULL
+        ORDER BY u.first_name, u.last_name`,
+        [date]
       );
-      
-      res.status(201).json({ success: true, message: 'Attendance record created successfully', data: { id: result.insertId } });
+
+      // Calculate statistics
+      const stats = {
+        total_employees: attendanceRecords.length,
+        present_count: attendanceRecords.filter(r => r.status === 'present').length,
+        absent_count: attendanceRecords.filter(r => r.status === 'absent' || r.status === null).length,
+        half_day_count: attendanceRecords.filter(r => r.status === 'half_day').length,
+        late_count: attendanceRecords.filter(r => r.status === 'late').length,
+        early_leave_count: attendanceRecords.filter(r => r.status === 'early_leave').length,
+        total_overtime: attendanceRecords.reduce((sum, r) => sum + (r.overtime_hours || 0), 0)
+      };
+
+      res.json({ 
+        success: true, 
+        data: { 
+          records: attendanceRecords,
+          stats 
+        } 
+      });
     } catch (error) {
-      console.error('Error creating attendance record:', error);
-      res.status(500).json({ success: false, message: 'Error creating attendance record' });
+      console.error('Error fetching attendance muster:', error);
+      res.status(500).json({ success: false, message: 'Error fetching attendance muster' });
     }
   });
 
-  router.put('/records/:id', authenticateToken, async (req, res) => {
+  // Update attendance record
+  router.put('/:id', authenticateToken, async (req, res) => {
     try {
       const { id } = req.params;
       const { check_in, check_out, status, remarks } = req.body;
+
+      // Calculate total hours if both check_in and check_out are provided
+      let total_hours = 0;
+      let overtime_hours = 0;
       
+      if (check_in && check_out) {
+        const checkInTime = new Date(`2000-01-01T${check_in}`);
+        const checkOutTime = new Date(`2000-01-01T${check_out}`);
+        total_hours = (checkOutTime - checkInTime) / (1000 * 60 * 60);
+        
+        // Calculate overtime (assuming 8 hours is standard)
+        if (total_hours > 8) {
+          overtime_hours = total_hours - 8;
+        }
+      }
+
       await pool.query(
-        `UPDATE attendance_records SET check_in = ?, check_out = ?, status = ?, remarks = ?
-         WHERE id = ?`,
-        [check_in, check_out, status, remarks, id]
+        `UPDATE attendance SET 
+          check_in = ?, 
+          check_out = ?, 
+          total_hours = ?, 
+          status = ?, 
+          overtime_hours = ?, 
+          remarks = ?,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?`,
+        [check_in, check_out, total_hours, status, overtime_hours, remarks, id]
       );
-      
+
       res.json({ success: true, message: 'Attendance record updated successfully' });
     } catch (error) {
       console.error('Error updating attendance record:', error);
@@ -217,126 +102,114 @@ module.exports = (pool, authenticateToken) => {
     }
   });
 
-  router.delete('/records/:id', authenticateToken, async (req, res) => {
+  // Create attendance record
+  router.post('/', authenticateToken, async (req, res) => {
     try {
-      const { id } = req.params;
-      await pool.query('DELETE FROM attendance_records WHERE id = ?', [id]);
-      res.json({ success: true, message: 'Attendance record deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting attendance record:', error);
-      res.status(500).json({ success: false, message: 'Error deleting attendance record' });
-    }
-  });
-  
-  // =====================================================
-  // ATTENDANCE REGULATIONS
-  // =====================================================
-  
-  router.get('/regulations', authenticateToken, async (req, res) => {
-    try {
-      const companyId = req.user?.company_id || 1;
-      const [regulations] = await pool.query(
-        'SELECT * FROM attendance_regulations WHERE company_id = ? ORDER BY created_at DESC',
-        [companyId]
-      );
-      res.json({ success: true, data: regulations });
-    } catch (error) {
-      console.error('Error fetching regulations:', error);
-      res.status(500).json({ success: false, message: 'Error fetching regulations' });
-    }
-  });
+      const { employee_id, date, check_in, check_out, status, remarks } = req.body;
 
-  router.post('/regulations', authenticateToken, async (req, res) => {
-    try {
-      const companyId = req.user?.company_id || 1;
-      const { name, description, rule_type, penalty_type, penalty_value, status } = req.body;
+      // Calculate total hours if both check_in and check_out are provided
+      let total_hours = 0;
+      let overtime_hours = 0;
       
+      if (check_in && check_out) {
+        const checkInTime = new Date(`2000-01-01T${check_in}`);
+        const checkOutTime = new Date(`2000-01-01T${check_out}`);
+        total_hours = (checkOutTime - checkInTime) / (1000 * 60 * 60);
+        
+        // Calculate overtime (assuming 8 hours is standard)
+        if (total_hours > 8) {
+          overtime_hours = total_hours - 8;
+        }
+      }
+
       const [result] = await pool.query(
-        `INSERT INTO attendance_regulations (company_id, name, description, rule_type, penalty_type, penalty_value, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [companyId, name, description, rule_type, penalty_type, penalty_value, status || 'active']
+        `INSERT INTO attendance (employee_id, date, check_in, check_out, total_hours, status, overtime_hours, remarks, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+        [employee_id, date, check_in, check_out, total_hours, status, overtime_hours, remarks]
       );
-      
-      res.status(201).json({ success: true, message: 'Regulation created successfully', data: { id: result.insertId } });
+
+      res.status(201).json({ 
+        success: true, 
+        message: 'Attendance record created successfully',
+        data: { id: result.insertId }
+      });
     } catch (error) {
-      console.error('Error creating regulation:', error);
-      res.status(500).json({ success: false, message: 'Error creating regulation' });
-    }
-  });
-  
-  // =====================================================
-  // REGULARIZATION REQUESTS
-  // =====================================================
-  
-  router.get('/regularization', authenticateToken, async (req, res) => {
-    try {
-      const [requests] = await pool.query(
-        `SELECT rr.*, CONCAT(e.first_name, ' ', e.last_name) as employee_name, e.employee_id,
-                CONCAT(a.first_name, ' ', a.last_name) as approver_name
-         FROM attendance_regularization rr
-         LEFT JOIN employees e ON rr.employee_id = e.id
-         LEFT JOIN users a ON rr.approved_by = a.id
-         ORDER BY rr.created_at DESC`
-      );
-      res.json({ success: true, data: requests });
-    } catch (error) {
-      console.error('Error fetching regularization requests:', error);
-      res.status(500).json({ success: false, message: 'Error fetching regularization requests' });
+      console.error('Error creating attendance record:', error);
+      res.status(500).json({ success: false, message: 'Error creating attendance record' });
     }
   });
 
-  router.post('/regularization', authenticateToken, async (req, res) => {
+  // Get attendance calculation rules
+  router.get('/rules', authenticateToken, async (req, res) => {
     try {
-      const { employee_id, date, requested_check_in, requested_check_out, reason, status } = req.body;
+      const [rules] = await pool.query(
+        'SELECT * FROM attendance_calculation_rules WHERE is_active = true ORDER BY created_at DESC'
+      );
       
+      res.json({ success: true, data: rules });
+    } catch (error) {
+      console.error('Error fetching attendance rules:', error);
+      res.status(500).json({ success: false, message: 'Error fetching attendance rules' });
+    }
+  });
+
+  // Create attendance calculation rule
+  router.post('/rules', authenticateToken, async (req, res) => {
+    try {
+      const { name, type, min_hours, max_hours, grace_period_minutes, overtime_threshold_hours, description, is_active } = req.body;
+
       const [result] = await pool.query(
-        `INSERT INTO attendance_regularization (employee_id, date, requested_check_in, requested_check_out, reason, status)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [employee_id, date, requested_check_in, requested_check_out, reason, status || 'pending']
+        `INSERT INTO attendance_calculation_rules 
+         (name, type, min_hours, max_hours, grace_period_minutes, overtime_threshold_hours, description, is_active, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+        [name, type, min_hours, max_hours, grace_period_minutes, overtime_threshold_hours, description, is_active]
       );
-      
-      res.status(201).json({ success: true, message: 'Regularization request created successfully', data: { id: result.insertId } });
+
+      res.status(201).json({ 
+        success: true, 
+        message: 'Attendance rule created successfully',
+        data: { id: result.insertId }
+      });
     } catch (error) {
-      console.error('Error creating regularization request:', error);
-      res.status(500).json({ success: false, message: 'Error creating regularization request' });
+      console.error('Error creating attendance rule:', error);
+      res.status(500).json({ success: false, message: 'Error creating attendance rule' });
     }
   });
 
-  router.put('/regularization/:id/approve', authenticateToken, async (req, res) => {
+  // Update attendance calculation rule
+  router.put('/rules/:id', authenticateToken, async (req, res) => {
     try {
       const { id } = req.params;
-      
+      const { name, type, min_hours, max_hours, grace_period_minutes, overtime_threshold_hours, description, is_active } = req.body;
+
       await pool.query(
-        `UPDATE attendance_regularization SET status = 'approved', approved_by = ?, approved_at = NOW()
-         WHERE id = ?`,
-        [req.user.id, id]
+        `UPDATE attendance_calculation_rules SET 
+          name = ?, type = ?, min_hours = ?, max_hours = ?, grace_period_minutes = ?, 
+          overtime_threshold_hours = ?, description = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?`,
+        [name, type, min_hours, max_hours, grace_period_minutes, overtime_threshold_hours, description, is_active, id]
       );
-      
-      res.json({ success: true, message: 'Regularization request approved successfully' });
+
+      res.json({ success: true, message: 'Attendance rule updated successfully' });
     } catch (error) {
-      console.error('Error approving regularization:', error);
-      res.status(500).json({ success: false, message: 'Error approving regularization request' });
+      console.error('Error updating attendance rule:', error);
+      res.status(500).json({ success: false, message: 'Error updating attendance rule' });
     }
   });
 
-  router.put('/regularization/:id/reject', authenticateToken, async (req, res) => {
+  // Delete attendance calculation rule
+  router.delete('/rules/:id', authenticateToken, async (req, res) => {
     try {
       const { id } = req.params;
-      const { rejection_reason } = req.body;
-      
-      await pool.query(
-        `UPDATE attendance_regularization SET status = 'rejected', approved_by = ?, approved_at = NOW(), rejection_reason = ?
-         WHERE id = ?`,
-        [req.user.id, rejection_reason, id]
-      );
-      
-      res.json({ success: true, message: 'Regularization request rejected successfully' });
+
+      await pool.query('DELETE FROM attendance_calculation_rules WHERE id = ?', [id]);
+
+      res.json({ success: true, message: 'Attendance rule deleted successfully' });
     } catch (error) {
-      console.error('Error rejecting regularization:', error);
-      res.status(500).json({ success: false, message: 'Error rejecting regularization request' });
+      console.error('Error deleting attendance rule:', error);
+      res.status(500).json({ success: false, message: 'Error deleting attendance rule' });
     }
   });
-  
+
   return router;
 };
-

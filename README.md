@@ -2,342 +2,397 @@
 
 A modern Human Resource Management System (HRMS) combining a Vite + React TypeScript frontend with a Node.js (Express) backend and MySQL. This repository contains the frontend HUI (v2) and a modular backend under `src/backend` with migrations and demo data.
 
-Current status (2025-10-07)
+## 🚀 Quick Setup (Recommended)
 
-- Frontend: feature-rich and mostly complete — responsive UI, role-based navigation, dynamic theming, advanced search, notifications, and most HR pages implemented.
-- Backend: working REST APIs for core modules (authentication, employees, leaves, attendance, payroll, recruitment, tasks, assets, reports). Migrations and demo data are available. Some backend endpoints and tests are still in active development.
-- Demo data & migrations: included; multiple migrations (80+) and schema loaders are present to bootstrap a development DB.
+Use our automated setup script for consistent installation across different environments:
 
-Highlights & Key Features
+```bash
+# Make the setup script executable
+chmod +x setup-project.sh
 
-- Core HR modules: Employees, Leave, Attendance, Payroll, Recruitment, Tasks, Performance Reviews, Assets, Expenses, Documents, Calendar/Meetings, Reports.
-- Role-based access control with a detailed permission model (Super Admin, Company Admin, HR Manager, Manager, Employee).
-- Modern frontend: React 18 + TypeScript, Vite, TailwindCSS, HeroUI components, Framer Motion animations.
-- Backend: Node.js + Express, MySQL, JWT auth, modular route organization, migration scripts, file uploads.
-- Demo data system: sample employees, departments, attendance, payroll, job postings, candidates, tasks, and more — useful for development and QA.
+# Run the complete setup
+./setup-project.sh
 
-Quick start (development)
+# Start the backend server
+./setup-project.sh start-backend
+```
 
-Prerequisites
+## 📋 Prerequisites
 
-- Node.js 18+ (or compatible)
-- MySQL 8+
-- npm (or yarn)
+- **Node.js 18+** - [Download here](https://nodejs.org/)
+- **MySQL 8.0+** - [Download here](https://dev.mysql.com/downloads/)
+- **Git** - [Download here](https://git-scm.com/)
 
-1. Clone
+## 🛠️ Manual Installation
 
+### 1. Clone and Setup
 ```bash
 git clone <repository-url>
 cd hrms_hui_v2
 ```
 
-2. Install frontend dependencies
-
+### 2. Install Dependencies
 ```bash
+# Frontend dependencies
 npm install
-```
 
-3. Install backend dependencies
-
-```bash
+# Backend dependencies
 cd src/backend
 npm install
+cd ../..
 ```
 
-4. Database setup
-
-Create a development database (adjust user/host as needed):
-
+### 3. Database Setup
 ```bash
+# Create database
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS hrmgo_hero;"
-```
 
-Run migrations / load demo data (from `src/backend`):
-
-```bash
-# from repo root
+# Run migrations (automated)
 cd src/backend
-node migrations/migration-manager.js up
+node -e "
+const mysql = require('mysql2/promise');
+const fs = require('fs');
+
+async function runMigrations() {
+  const pool = mysql.createPool({
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: '', // Update with your MySQL password
+    database: 'hrmgo_hero'
+  });
+  
+  try {
+    const migrationFiles = fs.readdirSync('./migrations').filter(file => file.endsWith('.js'));
+    console.log('Running', migrationFiles.length, 'migrations...');
+    
+    for (const file of migrationFiles) {
+      console.log('Running:', file);
+      const migration = require('./migrations/' + file);
+      await migration.up(pool);
+    }
+    
+    console.log('✅ All migrations completed successfully');
+  } catch (error) {
+    console.error('❌ Migration error:', error.message);
+  } finally {
+    await pool.end();
+  }
+}
+
+runMigrations();
+"
+cd ../..
 ```
 
-Alternative: if you prefer schema loader (from repo root):
-
+### 4. Environment Configuration
 ```bash
-node ../../src/database/load-schemas.js load all
+# Create backend environment file
+cat > src/backend/.env << EOF
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=hrmgo_hero
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+
+# Server Configuration
+PORT=8000
+NODE_ENV=development
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,http://localhost:5177,http://localhost:3000
+EOF
 ```
 
-5. Environment
-
-Copy example env and edit values in `src/backend`:
-
+### 5. Start the Application
 ```bash
+# Terminal 1: Start backend server
 cd src/backend
-cp .env.example .env
-# edit .env and set DB credentials, JWT_SECRET, PORT, etc.
-```
+node server.js
 
-6. Start servers
-
-Frontend (project root):
-
-```bash
+# Terminal 2: Start frontend development server
 npm run dev
 ```
 
-Backend (new terminal, from `src/backend`):
+### 6. Access the Application
+- **Frontend**: http://localhost:5173
+- **Backend API**: http://localhost:8000/api/v1/health
+- **API Documentation**: http://localhost:8000/api/v1
 
-```bash
-npm run dev   # or `npm start` for production start
-```
+## 🔐 Default Login Credentials
 
-Default local URLs
+| Role | Email | Password | Permissions |
+|------|-------|----------|-------------|
+| **Super Admin** | admin@example.com | admin123 | Full system access |
+| **Company Admin** | company@example.com | company123 | Company-wide management |
+| **HR Manager** | hr@example.com | hr123 | HR operations |
+| **Manager** | manager@example.com | manager123 | Team management |
+| **Employee** | employee@example.com | employee123 | Basic employee access |
 
-- Frontend: http://localhost:5174 (Vite) — port may vary based on your machine
-- Backend API: http://localhost:8000 (configurable via `.env`)
-
-Project structure (top-level)
+## 🏗️ Project Structure
 
 ```
 hrms_hui_v2/
 ├── src/
-│   ├── backend/            # Express backend, routes, migrations, server
-│   ├── components/         # React UI components
-│   ├── contexts/           # React contexts (auth, settings, theme)
-│   ├── hooks/              # Custom hooks
-│   ├── pages/              # App pages (employees, payroll, reports, ...)
-│   ├── services/           # API clients and helpers
-+│   ├── utils/              # Utility functions
-│   └── assets/             # Static assets (images, lottie, icons)
-├── public/                 # Public assets
-├── plugins/                # Custom Vite/Babel plugins used by the frontend
-├── package.json            # Frontend scripts & dependencies (root)
-└── README.md               # This file
+│   ├── components/          # React components
+│   │   ├── auth/           # Authentication components
+│   │   ├── common/         # Shared components
+│   │   ├── dashboard/      # Dashboard components
+│   │   ├── employees/      # Employee management
+│   │   ├── hr-setup/       # HR system setup
+│   │   └── ui/             # UI components
+│   ├── pages/              # Page components
+│   │   ├── auth/           # Authentication pages
+│   │   ├── dashboard/      # Dashboard pages
+│   │   ├── employees/      # Employee pages
+│   │   ├── timekeeping/    # Timekeeping pages
+│   │   └── training/       # Training pages
+│   ├── hooks/              # Custom React hooks
+│   ├── services/           # API services
+│   ├── contexts/           # React contexts
+│   ├── utils/              # Utility functions
+│   └── backend/            # Node.js backend
+│       ├── routes/         # API routes
+│       ├── migrations/     # Database migrations
+│       ├── models/         # Database models
+│       └── server.js       # Main server file
+├── public/                 # Static assets
+├── setup-project.sh       # Automated setup script
+└── package.json           # Frontend dependencies
 ```
 
-Environment variables (backend `src/backend/.env`)
+## 🔧 Key Features
 
-```env
-# Database
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=hrmgo_hero
+### 📊 **Dashboard & Analytics**
+- Real-time dashboard with key metrics
+- Role-based dashboard views
+- Interactive charts and statistics
 
-# JWT
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=24h
+### 👥 **Employee Management**
+- Complete employee lifecycle management
+- Employee documents and contracts
+- Salary management and history
+- Performance tracking
 
-# Server
-PORT=8000
-NODE_ENV=development
-```
+### 🕒 **Timekeeping & Attendance**
+- **Attendance Muster**: Daily attendance tracking with status codes (P, A, L, H, R, O, D, ?)
+- **Attendance Calculation Rules**: Configurable rules for half-day, full-day, present, absent, etc.
+- Shift management and policies
+- Time tracking and regularization
 
-Default credentials (development/demo)
+### 🏖️ **Leave Management**
+- Leave applications and approvals
+- Leave balances and policies
+- Holiday management
+- Leave reports and analytics
 
-- Super Admin: `admin@example.com` / `admin123` (full access)
-- Company Admin: `company@example.com` / `company123`
-- HR Manager: `hr@example.com` / `hr123`
-- Manager: `manager@example.com` / `manager123`
-- Employee: `employee@example.com` / `employee123`
+### 💰 **Payroll System**
+- Salary components management
+- Payslip generation
+- Payroll reports
+- Expense management
 
-Testing & Scripts
+### 🎯 **Performance Management**
+- Goal setting and tracking
+- Performance reviews
+- Competency management
+- 360-degree feedback
 
-- Frontend: `npm run dev`, `npm run build`, `npm run preview`
-- Backend (in `src/backend`): `npm run dev` (nodemon), `npm start`
-- Migration helpers: `node migrations/migration-manager.js up|down|status`
+### 🎓 **Training & Development**
+- Training programs and sessions
+- Employee training tracking
+- Skill development plans
+- Training reports
 
-What's implemented (short)
+### 📈 **Recruitment**
+- Job postings and management
+- Candidate tracking
+- Interview scheduling
+- Recruitment analytics
 
-- Employee lifecycle: profiles, documents, transfers, warnings, terminations
-- Attendance & timekeeping: check-in/out, shifts, regularizations
-- Leave management: applications, approvals, balances
-- Payroll: components, salary records, payslip generation
-- Recruitment: jobs, candidates, interviews
-- Tasks & performance: tasks, goals, reviews
-- Assets & inventory: asset assignment and tracking
-- Documents: versioned document storage and types
-- Calendar & meetings: event scheduling and rooms
-- Reports & audit logs: activity tracking and report templates
+### 🏢 **Organization Management**
+- Department and designation setup
+- Branch management
+- Organization chart
+- Role and permission management
 
-Known status & next steps
+### 📊 **Reports & Analytics**
+- Comprehensive reporting system
+- Custom report generation
+- Data export capabilities
+- Real-time analytics
 
-- Stable dev build for frontend; backend largely functional but still being hardened.
-- Remaining/ongoing work:
-  - Add/expand automated tests (unit, integration, E2E)
-  - Harden error handling and edge-case coverage on some backend endpoints
-  - Add Docker Compose for easy local orchestration
-  - CI pipeline (GitHub Actions) for lint/test/build on PRs
+## 🔌 API Endpoints
 
-Contributing
+### Authentication
+- `POST /api/v1/auth/login` - User login
+- `POST /api/v1/auth/register` - User registration
+- `POST /api/v1/auth/logout` - User logout
 
-- Fork, create a feature branch, add tests, follow existing TypeScript + ESLint + Prettier rules, and open a PR.
+### Employees
+- `GET /api/v1/employees` - Get all employees
+- `POST /api/v1/employees` - Create employee
+- `PUT /api/v1/employees/:id` - Update employee
+- `DELETE /api/v1/employees/:id` - Delete employee
 
-License
+### Timekeeping
+- `GET /api/v1/timekeeping/muster` - Get attendance muster
+- `PUT /api/v1/timekeeping/:id` - Update attendance record
+- `POST /api/v1/timekeeping` - Create attendance record
 
-- MIT — see `LICENSE`.
+### Leave Management
+- `GET /api/v1/leave/applications` - Get leave applications
+- `POST /api/v1/leave/applications` - Create leave application
+- `PUT /api/v1/leave/applications/:id` - Update leave application
 
-Support & Contacts
+### Payroll
+- `GET /api/v1/payroll/salaries` - Get salary information
+- `POST /api/v1/payroll/salaries` - Create salary record
+- `GET /api/v1/payroll/payslips` - Get payslips
 
-- For issues and feature requests, use GitHub Issues on the repository.
-- Documentation lives under `Documentation/` and several guide files in the repo.
+### HR Setup
+- `GET /api/v1/hr-setup/attendance-rules` - Get attendance calculation rules
+- `POST /api/v1/hr-setup/attendance-rules` - Create attendance rule
+- `PUT /api/v1/hr-setup/attendance-rules/:id` - Update attendance rule
 
-Thanks for using and contributing to HRMS HUI v2 — a modern, modular HR platform. If you'd like, I can also:
+## 🛠️ Development
 
-- Add a short developer checklist (ports, env vars, common troubleshooting)
-- Create a Docker Compose file to run MySQL + backend + frontend locally
-- Generate a concise architecture diagram or onboarding guide
-
----
-
-_Generated/updated: 2025-10-07_
-
-- **Modular Schema** - 8 domain-specific files
-- **Migration System** - Version-controlled changes
-- **Foreign Keys** - Data integrity
-- **Indexes** - Performance optimization
-- **Audit Logging** - Change tracking
-
-## 🔧 Configuration
-
-### Environment Variables
-
-```env
-# Database
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=hrmgo_hero
-
-# JWT
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=24h
-
-# Server
-PORT=8000
-NODE_ENV=development
-```
-
-### Customization
-
-- **Themes**: Modify `src/contexts/theme-context.tsx`
-- **API Endpoints**: Update `src/config/api-config.ts`
-- **Routes**: Modify `src/config/routes.ts`
-- **Permissions**: Update database permissions table
-
-## 📈 Performance
-
-### Optimizations
-
-- **Code Splitting** - Lazy loading of components
-- **Image Optimization** - WebP format with fallbacks
-- **Caching** - API response caching
-- **Database Indexing** - Optimized queries
-- **Bundle Analysis** - Regular bundle size monitoring
-
-### Monitoring
-
-- **Error Tracking** - Comprehensive error logging
-- **Performance Metrics** - Response time monitoring
-- **Database Monitoring** - Query performance tracking
-- **User Analytics** - Usage pattern analysis
-
-## 🧪 Testing
-
-### Test Coverage
-
-- **Unit Tests** - Component and utility testing
-- **Integration Tests** - API endpoint testing
-- **E2E Tests** - Full user journey testing
-- **Performance Tests** - Load and stress testing
-
-### Running Tests
-
+### Frontend Development
 ```bash
-# Frontend tests
-npm test
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+```
 
-# Backend tests
+### Backend Development
+```bash
 cd src/backend
-npm test
-
-# E2E tests
-npm run test:e2e
+node server.js       # Start development server
+npm test            # Run tests (if available)
 ```
 
-## 🚀 Deployment
-
-### Production Build
-
+### Database Management
 ```bash
-# Build frontend
-npm run build
+# Run migrations
+./setup-project.sh migrate
 
-# Start production server
-cd src/backend
-npm start
+# Check database connection
+./setup-project.sh check
 ```
 
-### Docker Deployment
+## 🐛 Troubleshooting
 
-```bash
-# Build and run with Docker
-docker-compose up -d
-```
+### Common Issues
 
-### Environment Setup
+1. **Database Connection Error**
+   ```bash
+   # Check MySQL is running
+   mysql -u root -e "SELECT 1;"
+   
+   # Update database credentials in src/backend/.env
+   ```
 
-- **Production Database** - Configure production MySQL
-- **Environment Variables** - Set production values
-- **SSL Certificate** - Configure HTTPS
-- **Domain Configuration** - Set up domain and DNS
+2. **Port Already in Use**
+   ```bash
+   # Kill existing processes
+   pkill -f "node server.js"
+   
+   # Or change port in src/backend/.env
+   PORT=8001
+   ```
 
-## 📚 Documentation
+3. **Permission Errors**
+   ```bash
+   # Fix file permissions
+   chmod +x setup-project.sh
+   chmod -R 755 src/
+   ```
 
-### Available Guides
+4. **Missing Dependencies**
+   ```bash
+   # Reinstall dependencies
+   rm -rf node_modules package-lock.json
+   npm install
+   
+   cd src/backend
+   rm -rf node_modules package-lock.json
+   npm install
+   ```
 
-- **[Implementation Plan](IMPLEMENTATION_PLAN.md)** - Development roadmap
-- **[Server Refactoring Guide](SERVER_REFACTORING_GUIDE.md)** - Backend architecture
-- **[Modular Routes Complete](MODULAR_ROUTES_COMPLETE.md)** - API documentation
-- **[HR Setup Guide](HR_SETUP_COMPLETION_GUIDE.md)** - HR configuration
-- **[Migration Checklist](MIGRATION_CHECKLIST.md)** - Database migration guide
-- **[Database Setup](DATABASE_SETUP.md)** - Database configuration
-- **[Modular Database System](MODULAR_DATABASE_SYSTEM.md)** - Database architecture
-- **[Accessibility Guide](ACCESSIBILITY.md)** - Accessibility compliance
+5. **Role Permission Update Errors**
+   ```bash
+   # Check backend server is running
+   curl http://localhost:8000/api/v1/health
+   
+   # Restart backend server
+   cd src/backend
+   node server.js
+   ```
+
+6. **Attendance Muster Not Loading**
+   ```bash
+   # Verify attendance tables exist
+   mysql -u root -p hrmgo_hero -e "SHOW TABLES LIKE 'attendance%';"
+   
+   # Run attendance migration
+   cd src/backend
+   node migrations/20241201_create_attendance_tables.js
+   ```
 
 ## 🤝 Contributing
 
-### Development Workflow
-
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests
-5. Submit a pull request
-
-### Code Standards
-
-- **TypeScript** - Strict type checking
-- **ESLint** - Code linting
-- **Prettier** - Code formatting
-- **Conventional Commits** - Commit message format
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Proprietary License - see the [LICENSE](LICENSE) file for details.
 
 ## 🆘 Support
 
-### Getting Help
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the troubleshooting section above
 
-- **Documentation** - Check the guides in the Documentation folder
-- **Issues** - Report bugs and request features
-- **Discussions** - Ask questions and share ideas
+## 📝 Changelog
 
-### Contact
+### Version 2.4.4
+- ✅ **Fixed SQL errors** in role permissions update
+- ✅ **Added Attendance Muster** with daily tracking and status codes
+- ✅ **Implemented Attendance Calculation Rules** for configurable attendance logic
+- ✅ **Enhanced sidebar navigation** with proper permission filtering
+- ✅ **Created automated setup script** for consistent environment setup
+- ✅ **Fixed API endpoint routing** for attendance and timekeeping
+- ✅ **Improved error handling** and user feedback
+- ✅ **Added comprehensive documentation** and troubleshooting guide
 
-- **Email**: support@hrms.com
-- **Documentation**: [Project Documentation](Documentation/)
-- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
+### Version 2.4.0
+- Added comprehensive permission system (224 permissions)
+- Implemented role-based access control
+- Enhanced user management with detailed permissions
+- Fixed form population issues across HR setup modules
+- Improved database schema with proper relationships
+- Added dynamic version management
+- Enhanced UI consistency across all modules
+
+## 🎯 Roadmap
+
+- [ ] Mobile app development
+- [ ] Advanced reporting dashboard
+- [ ] Integration with external HR systems
+- [ ] Multi-language support
+- [ ] Advanced workflow automation
+- [ ] Real-time notifications
+- [ ] Advanced analytics and AI insights
 
 ---
 

@@ -173,7 +173,13 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           icon: "lucide:edit-3", 
           path: "/dashboard/timekeeping/regularization",
           permissions: ["regularization.view"]
-            },
+        },
+        { 
+          title: "Attendance Muster", 
+          icon: "lucide:users", 
+          path: "/dashboard/timekeeping/attendance-muster",
+          permissions: ["attendance.view"]
+        },
           ]
         },
         {

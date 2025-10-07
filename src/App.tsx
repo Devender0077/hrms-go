@@ -93,6 +93,7 @@ import Awards from "./pages/employee-lifecycle/awards";
 import Promotions from "./pages/employee-lifecycle/promotions";
 import TimeEntries from "./pages/time-tracking/entries";
 import ProjectTimeTracking from "./pages/time-tracking/projects";
+import AttendanceMuster from "./pages/timekeeping/attendance-muster";
 import MediaLibrary from "./pages/media-library";
 
 // Layout Components
@@ -380,6 +381,18 @@ export default function App() {
             >
               <DashboardLayout>
                 <Regularization />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/timekeeping/attendance-muster"
+          element={
+            <ProtectedRoute
+              requiredPermissions={["super_admin", "company_admin", "hr_manager"]}
+            >
+              <DashboardLayout>
+                <AttendanceMuster />
               </DashboardLayout>
             </ProtectedRoute>
           }
