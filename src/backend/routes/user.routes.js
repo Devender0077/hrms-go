@@ -56,10 +56,10 @@ module.exports = (pool, authenticateToken) => {
 
       const [permissions] = await pool.query(
         `SELECT DISTINCT p.*, 
-                CASE WHEN rp.permission_id IS NOT NULL THEN 1 ELSE 0 END as role_has_permission
+                CASE WHEN rp.permission_id IS NOT NULL AND rp.is_active = 1 AND r.name = ? THEN 1 ELSE 0 END as role_has_permission
          FROM permissions p
          LEFT JOIN role_permissions rp ON p.id = rp.permission_id 
-         LEFT JOIN roles r ON rp.role_id = r.id AND r.name = ?
+         LEFT JOIN roles r ON rp.role_id = r.id
          WHERE p.is_active = true
          ORDER BY p.module, p.name`,
         [role]

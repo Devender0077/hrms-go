@@ -172,16 +172,26 @@ The following default users are created automatically when you run the migration
 - **Database Role**: super_admin (mapped to admin in frontend)
 
 ### Company Admin
-- **Email**: company@hrms.com
+- **Email**: company@example.com
 - **Password**: company123
-- **Role**: Company Administrator with company-level access
+- **Role**: Company Administrator with company-level access (76 permissions)
+
+### HR Manager
+- **Email**: hr@example.com
+- **Password**: hr123
+- **Role**: HR Manager with HR-specific access (48 permissions)
+
+### Manager
+- **Email**: manager@example.com
+- **Password**: manager123
+- **Role**: Team Manager with management access (27 permissions)
 
 ### Employee
-- **Email**: employee@hrms.com
+- **Email**: employee@example.com
 - **Password**: employee123
-- **Role**: Standard employee with basic access
+- **Role**: Standard employee with basic access (9 permissions)
 
-> **Note**: The primary login for testing is `admin@example.com` with password `admin123`. This user has complete super admin access with all 224 permissions assigned. Additional test users may exist in the database for development purposes.
+> **Note**: The primary login for testing is `admin@example.com` with password `admin123`. This user has complete super admin access with all 224 permissions assigned. All roles have been properly configured with appropriate permission levels.
 
 ## 📊 Demo Data
 
@@ -268,10 +278,10 @@ The HRMS includes a comprehensive permission system with 224 detailed permission
 
 ### Role Hierarchy
 1. **Super Admin** (`admin@example.com`): Full access to all 224 permissions
-2. **Company Admin**: Company-level permissions
-3. **HR Manager**: HR-specific permissions
-4. **Manager**: Team management permissions
-5. **Employee**: Basic access permissions
+2. **Company Admin** (`company@example.com`): 76 permissions for company-level management
+3. **HR Manager** (`hr@example.com`): 48 permissions for HR-specific functions
+4. **Manager** (`manager@example.com`): 27 permissions for team management
+5. **Employee** (`employee@example.com`): 9 permissions for basic access
 
 ### Permission Management
 - **Roles Page**: Manage permissions for each role
@@ -279,9 +289,16 @@ The HRMS includes a comprehensive permission system with 224 detailed permission
 - **Module-based**: Permissions organized by functional modules
 - **Real-time Updates**: Permission changes take effect immediately
 
-## 📝 Recent Updates (v2.3.0)
+## 📝 Recent Updates (v2.4.0)
 
-### ✨ New Features
+### ✨ New Features (v2.4.0)
+- **Fixed Permission Counts**: Roles page now displays accurate permission counts for each role
+- **Optimized SQL Queries**: Improved permission API performance with proper JOIN conditions
+- **Complete Role Setup**: All user roles properly configured with appropriate permissions
+- **Enhanced Permission Management**: Fixed permission modal loading and selection
+- **Improved User Experience**: Resolved all permission-related display issues
+
+### ✨ Previous Features (v2.3.0)
 - **Comprehensive Permission System**: 224 detailed permissions covering all CRUD operations
 - **Role-Based Access Control**: Complete permission management with role assignment
 - **Enhanced Authentication**: Fixed login system with proper role mapping
@@ -299,13 +316,16 @@ The HRMS includes a comprehensive permission system with 224 detailed permission
 - **Authentication System**: Fixed login issues and role mapping problems
 - **Permission Checking**: Resolved "Access Denied" errors for super admin users
 - **Roles Page**: Fixed "No Permissions Found" error in permission management
+- **Permission Counts**: Fixed roles page showing incorrect permission counts (224 for all roles)
 - **API Endpoints**: Corrected permission API endpoints and data structure
 - **Frontend Permission Logic**: Fixed usePermissions hook to properly handle admin role
 - **Database Permissions**: Assigned all 224 permissions to super admin role
+- **SQL Query Optimization**: Fixed LEFT JOIN query to properly filter role permissions
 - **Modal Functionality**: Fixed permission modal loading and selection
 - **API Connection**: Resolved ERR_CONNECTION_REFUSED errors
 - **Settings Context**: Fixed undefined settings errors
 - **Auth Service**: Corrected permission fetching and token handling
+- **Role Permission Assignment**: Properly assigned permissions to all roles (company_admin: 76, hr_manager: 48, manager: 27, employee: 9)
 - Fixed API errors across all pages
 - Resolved employee data fetching issues (404 errors)
 - Fixed settings persistence problems
@@ -327,6 +347,9 @@ The HRMS includes a comprehensive permission system with 224 detailed permission
 - **API Performance**: Optimized permission loading and caching
 - **Error Handling**: Better error messages and user feedback
 - **Debug Logging**: Added comprehensive logging for troubleshooting
+- **Permission Display**: Fixed roles page to show accurate permission counts for each role
+- **SQL Query Performance**: Optimized permission queries with proper JOIN conditions
+- **Role Hierarchy**: Implemented proper permission distribution across all user roles
 - Better error handling and user feedback
 - Improved database structure and migrations (83+ migrations)
 - Enhanced security with proper authentication

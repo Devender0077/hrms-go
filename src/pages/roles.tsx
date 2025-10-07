@@ -119,9 +119,9 @@ const RolesPage: React.FC = () => {
           const roleResponse = await apiRequest(`/users/roles/${role.name}/permissions`);
           const rolePermissions = roleResponse.data || [];
           
-          // Filter valid permissions for this role
+          // Filter permissions that this role actually has
           const validRolePermissions = rolePermissions.filter(permission => 
-            permission && permission.id
+            permission && permission.id && permission.role_has_permission === 1
           );
           
           rolesData.push({
