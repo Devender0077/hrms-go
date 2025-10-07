@@ -70,6 +70,7 @@ import OrganizationChart from "./pages/organization/org-chart";
 import Settings from "./pages/settings";
 import Profile from "./pages/profile";
 import Roles from "./pages/roles";
+import VersionHistory from "./pages/version-history";
 import Calendar from "./pages/calendar";
 import Tasks from "./pages/tasks";
 import Recruitment from "./pages/recruitment";
@@ -684,6 +685,18 @@ export default function App() {
             <ProtectedRoute requiredPermissions={["super_admin", "company_admin"]}>
               <DashboardLayout>
               <Settings />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Version History Route */}
+        <Route
+          path="/dashboard/version-history"
+          element={
+            <ProtectedRoute requiredPermissions={["settings.view"]}>
+              <DashboardLayout>
+                <VersionHistory />
               </DashboardLayout>
             </ProtectedRoute>
           }

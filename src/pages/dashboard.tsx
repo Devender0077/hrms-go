@@ -9,7 +9,7 @@ import EmployeeDashboard from "../components/dashboard/EmployeeDashboard";
   const { user } = useAuth();
 
   // Render role-based dashboard
-  if (user?.role === 'super_admin') {
+  if (user?.role === 'admin' || user?.role === 'super_admin') {
     return (
       <>
         <DynamicPageTitle pageName="Super Admin Dashboard" />

@@ -619,7 +619,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                 {settingsLoading ? 'Loading...' : 'System Online'}
               </p>
               <p className="text-xs text-default-500 truncate">
-                {settingsLoading ? '...' : 'v2.1.0'}
+                {settingsLoading ? '...' : 'v2.4.2'}
               </p>
             </div>
           )}
