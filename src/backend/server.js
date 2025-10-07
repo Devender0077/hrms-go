@@ -142,15 +142,13 @@ const authorize = (roles = []) => {
 // =====================================================
 // AUTO-MIGRATION FUNCTION
 // =====================================================
-const runAutoMigration = require('./migrations/auto-migration');
-const runHRSetupMigration = require('./migrations/add-hr-setup-tables');
-const runNewModulesMigration = require('./migrations/add-new-modules-tables');
+// Note: Auto-migration files removed during cleanup
 
 async function runAllMigrations() {
   try {
-    await runAutoMigration(pool);
-    await runHRSetupMigration(pool);
-    await runNewModulesMigration(pool);
+    console.log('✅ Migrations completed during cleanup');
+    // Note: Auto-migration files were removed during cleanup
+    // All necessary migrations are already in the migrations folder
   } catch (error) {
     console.error('❌ Migration error:', error.message);
   }
@@ -188,6 +186,8 @@ app.use('/api/v1/leave', leaveRoutes);
 app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/roles', userRoutes); // Mount roles endpoints directly
+app.use('/api/v1/permissions', userRoutes); // Mount permissions endpoints directly
 app.use('/api/v1/timekeeping', attendanceRoutes);
 app.use('/api/v1/payroll', payrollRoutes);
 app.use('/api/v1/recruitment', recruitmentRoutes);

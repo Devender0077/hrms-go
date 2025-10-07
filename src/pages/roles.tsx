@@ -33,8 +33,8 @@ import { Icon } from '@iconify/react';
 
 interface Permission {
   id: number;
-  permission_key: string;
   permission_name: string;
+  name: string;
   module: string;
   description: string;
   is_active: boolean;
@@ -86,18 +86,48 @@ const RolesPage: React.FC = () => {
       setLoading(true);
       
       // Load permissions
-      const permissionsResponse = await apiRequest('/permissions');
-      setPermissions(permissionsResponse.data || []);
+      console.log('🔄 Loading permissions...');
+      const permissionsResponse = await apiRequest('/users/permissions');
+      console.log('📡 Permissions API response:', permissionsResponse);
+      
+      const permissionsData = permissionsResponse.data || [];
+      console.log(`📊 Raw permissions data length: ${permissionsData.length}`);
+      
+      // Validate permissions data structure
+      const validPermissions = permissionsData.filter(permission => 
+        permission && 
+        permission.id && 
+        permission.permission_name && 
+        permission.module
+      );
+      
+      setPermissions(validPermissions);
+      console.log(`✅ Loaded ${validPermissions.length} valid permissions`);
+      
+      // Debug: Show sample permission structure
+      if (validPermissions.length > 0) {
+        console.log('📋 Sample permission structure:', validPermissions[0]);
+      } else {
+        console.warn('⚠️ No valid permissions found in response');
+        console.log('🔍 Full response:', permissionsResponse);
+      }
 
       // Load roles with their permissions
       const rolesData: Role[] = [];
       for (const role of availableRoles) {
         try {
-          const roleResponse = await apiRequest(`/roles/${role.name}/permissions`);
+          const roleResponse = await apiRequest(`/users/roles/${role.name}/permissions`);
+          const rolePermissions = roleResponse.data || [];
+          
+          // Filter valid permissions for this role
+          const validRolePermissions = rolePermissions.filter(permission => 
+            permission && permission.id
+          );
+          
           rolesData.push({
             name: role.name,
-            permissions: roleResponse.data || [],
-            permission_count: roleResponse.data?.length || 0
+            permissions: validRolePermissions,
+            permission_count: validRolePermissions.length
           });
         } catch (error) {
           console.error(`Error loading permissions for ${role.name}:`, error);
@@ -111,22 +141,49 @@ const RolesPage: React.FC = () => {
       
       setRoles(rolesData);
     } catch (error) {
-      console.error('Error loading roles data:', error);
-      addToast({
-        title: 'Error',
-        description: 'Failed to load roles and permissions data',
-        color: 'danger'
-      });
+      console.error('❌ Error loading roles data:', error);
+      
+      // Check if it's an authentication error
+      if (error.message && error.message.includes('Authentication required')) {
+        addToast({
+          title: 'Authentication Required',
+          description: 'Please log in to access roles and permissions',
+          color: 'warning'
+        });
+      } else {
+        addToast({
+          title: 'Error',
+          description: 'Failed to load roles and permissions data',
+          color: 'danger'
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const openEditModal = (roleName: string) => {
-    const role = roles.find(r => r.name === roleName);
-    setSelectedRole(roleName);
-    setSelectedPermissions(role?.permissions.map(p => p.id) || []);
-    onEditOpen();
+  const openEditModal = async (roleName: string) => {
+    try {
+      setSelectedRole(roleName);
+      
+      // Fetch role permissions dynamically
+      console.log(`🔄 Loading permissions for role: ${roleName}`);
+      const roleResponse = await apiRequest(`/users/roles/${roleName}/permissions`);
+      const rolePermissions = roleResponse.data || [];
+      
+      // Get permissions that this role has
+      const grantedPermissions = rolePermissions
+        .filter(p => p.role_has_permission === 1)
+        .map(p => p.id);
+      
+      console.log(`📊 Role ${roleName} has ${grantedPermissions.length} permissions`);
+      setSelectedPermissions(grantedPermissions);
+      onEditOpen();
+    } catch (error) {
+      console.error(`Error loading permissions for ${roleName}:`, error);
+      setSelectedPermissions([]);
+      onEditOpen();
+    }
   };
 
   const handlePermissionToggle = (permissionId: number) => {
@@ -137,11 +194,33 @@ const RolesPage: React.FC = () => {
     );
   };
 
+  const handleSelectAllPermissions = () => {
+    const allPermissionIds = permissions.map(p => p.id);
+    setSelectedPermissions(allPermissionIds);
+  };
+
+  const handleDeselectAllPermissions = () => {
+    setSelectedPermissions([]);
+  };
+
+  const handleSelectAllInModule = (modulePermissions: Permission[]) => {
+    const modulePermissionIds = modulePermissions.map(p => p.id);
+    setSelectedPermissions(prev => {
+      const otherPermissions = prev.filter(id => !modulePermissionIds.includes(id));
+      return [...otherPermissions, ...modulePermissionIds];
+    });
+  };
+
+  const handleDeselectAllInModule = (modulePermissions: Permission[]) => {
+    const modulePermissionIds = modulePermissions.map(p => p.id);
+    setSelectedPermissions(prev => prev.filter(id => !modulePermissionIds.includes(id)));
+  };
+
   const handleSavePermissions = async () => {
     try {
       setSaving(true);
       
-      await apiRequest(`/roles/${selectedRole}/permissions`, {
+      await apiRequest(`/users/roles/${selectedRole}/permissions`, {
         method: 'PUT',
         body: {
           permission_ids: selectedPermissions
@@ -190,6 +269,11 @@ const RolesPage: React.FC = () => {
     acc[permission.module].push(permission);
     return acc;
   }, {} as Record<string, Permission[]>);
+
+  // Debug logging
+  console.log('🔍 Debug - Permissions count:', permissions.length);
+  console.log('🔍 Debug - Grouped permissions keys:', Object.keys(groupedPermissions));
+  console.log('🔍 Debug - Sample permission:', permissions[0]);
 
   if (loading) {
     return (
@@ -351,34 +435,130 @@ const RolesPage: React.FC = () => {
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
-            <div className="flex items-center gap-3">
-              <div className={`w-3 h-3 rounded-full ${
-                getRoleColor(selectedRole) === 'danger' ? 'bg-danger' : 
-                getRoleColor(selectedRole) === 'warning' ? 'bg-warning' : 
-                getRoleColor(selectedRole) === 'success' ? 'bg-success' : 'bg-primary'
-              }`}></div>
-              <div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  Manage Permissions - {getRoleDisplayName(selectedRole)}
-                </h3>
-                <p className="text-sm text-default-600 mt-1">
-                  Select the permissions to grant to this role.
-                </p>
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <div className={`w-3 h-3 rounded-full ${
+                  getRoleColor(selectedRole) === 'danger' ? 'bg-danger' : 
+                  getRoleColor(selectedRole) === 'warning' ? 'bg-warning' : 
+                  getRoleColor(selectedRole) === 'success' ? 'bg-success' : 'bg-primary'
+                }`}></div>
+                <div>
+                  <h3 className="text-xl font-semibold text-foreground">
+                    Manage Permissions - {getRoleDisplayName(selectedRole)}
+                  </h3>
+                  <p className="text-sm text-default-600 mt-1">
+                    Select the permissions to grant to this role.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color="success"
+                  onPress={handleSelectAllPermissions}
+                  startContent={<Icon icon="lucide:check-square" className="w-4 h-4" />}
+                >
+                  Select All
+                </Button>
+                <Button
+                  size="sm"
+                  variant="flat"
+                  color="danger"
+                  onPress={handleDeselectAllPermissions}
+                  startContent={<Icon icon="lucide:square" className="w-4 h-4" />}
+                >
+                  Deselect All
+                </Button>
               </div>
             </div>
           </ModalHeader>
           <ModalBody>
+            <div className="mb-4 p-3 bg-content1 rounded-lg border border-default-200">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Icon icon="lucide:info" className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-foreground">
+                    Selected Permissions
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Chip 
+                    size="sm" 
+                    color="primary" 
+                    variant="flat"
+                  >
+                    {selectedPermissions.length} of {permissions.length}
+                  </Chip>
+                  <span className="text-xs text-default-500">
+                    ({permissions.length > 0 ? Math.round((selectedPermissions.length / permissions.length) * 100) : 0}%)
+                  </span>
+                </div>
+              </div>
+            </div>
             <div className="space-y-6">
-              {Object.entries(groupedPermissions).map(([module, modulePermissions]) => (
+              {Object.keys(groupedPermissions).length === 0 ? (
+                <div className="text-center py-8">
+                  <Icon icon="lucide:shield-off" className="w-12 h-12 text-default-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-foreground mb-2">No Permissions Found</h3>
+                  <p className="text-default-500 mb-4">
+                    {permissions.length === 0 
+                      ? "No permissions are available. This might be due to authentication issues or empty permissions table."
+                      : "Permissions are loaded but not properly grouped. Please check the console for errors."
+                    }
+                  </p>
+                  <div className="flex gap-2 justify-center">
+                    <Button
+                      color="primary"
+                      variant="flat"
+                      onPress={loadData}
+                      startContent={<Icon icon="lucide:refresh-cw" className="w-4 h-4" />}
+                    >
+                      Refresh Permissions
+                    </Button>
+                    <Button
+                      color="secondary"
+                      variant="flat"
+                      onPress={() => window.location.href = '/login'}
+                      startContent={<Icon icon="lucide:log-in" className="w-4 h-4" />}
+                    >
+                      Go to Login
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                Object.entries(groupedPermissions).map(([module, modulePermissions]) => (
                 <div key={module} className="border border-default-300 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Icon icon="lucide:folder" className="w-4 h-4 text-default-500" />
-                    <h4 className="text-base font-semibold text-foreground capitalize">
-                      {module.replace('_', ' ')} Module
-                    </h4>
-                    <Chip size="sm" variant="flat" color="default">
-                      {modulePermissions.length}
-                    </Chip>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <Icon icon="lucide:folder" className="w-4 h-4 text-default-500" />
+                      <h4 className="text-base font-semibold text-foreground capitalize">
+                        {module ? module.replace('_', ' ') : 'Unknown'} Module
+                      </h4>
+                      <Chip size="sm" variant="flat" color="default">
+                        {modulePermissions.length}
+                      </Chip>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="light"
+                        color="success"
+                        onPress={() => handleSelectAllInModule(modulePermissions)}
+                        startContent={<Icon icon="lucide:check" className="w-3 h-3" />}
+                      >
+                        All
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="light"
+                        color="danger"
+                        onPress={() => handleDeselectAllInModule(modulePermissions)}
+                        startContent={<Icon icon="lucide:x" className="w-3 h-3" />}
+                      >
+                        None
+                      </Button>
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     {modulePermissions.map((permission) => (
@@ -402,14 +582,15 @@ const RolesPage: React.FC = () => {
                             {permission.permission_name}
                           </div>
                           <div className="text-xs text-default-500">
-                            {permission.description || 'No description'}
+                            {permission.description && permission.description.trim() ? permission.description : 'No description available'}
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              ))}
+                ))
+              )}
             </div>
           </ModalBody>
           <ModalFooter>

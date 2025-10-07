@@ -384,7 +384,7 @@ export default function EmployeeDashboard() {
                           <span>{task.progress}%</span>
                         </div>
                         <Progress 
-                           
+                          value={task.progress}
                           color={task.progress === 100 ? "success" : task.progress > 50 ? "primary" : "warning"}
                           className="h-2"
                         />

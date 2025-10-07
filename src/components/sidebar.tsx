@@ -448,9 +448,15 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           icon: "lucide:settings-2", 
           path: "/dashboard/hr-system-setup",
           permissions: ["settings.view"]
-            },
-          ]
         },
+        { 
+          title: "Version History", 
+          icon: "lucide:git-branch", 
+          path: "/dashboard/version-history",
+          permissions: ["settings.view"]
+        },
+      ]
+    },
         {
           title: "Administration",
           items: [
@@ -610,10 +616,10 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           {isOpen && (
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">
-                System Online
+                {settingsLoading ? 'Loading...' : 'System Online'}
               </p>
               <p className="text-xs text-default-500 truncate">
-                v1.0.0
+                {settingsLoading ? '...' : 'v2.1.0'}
               </p>
             </div>
           )}

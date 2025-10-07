@@ -1,22 +1,27 @@
+#!/usr/bin/env node
+
 /**
  * Clear Authentication Data Script
- * Run this script in your browser console to clear all authentication data
+ * This script clears all authentication data from localStorage and sessionStorage
+ * Use this when you're experiencing authentication issues
  */
 
 console.log('🧹 Clearing authentication data...');
 
 // Clear localStorage
-localStorage.removeItem('authToken');
-localStorage.removeItem('user');
-localStorage.removeItem('rememberMe');
+if (typeof localStorage !== 'undefined') {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('user');
+  localStorage.removeItem('rememberMe');
+  console.log('✅ Cleared localStorage');
+}
 
 // Clear sessionStorage
-sessionStorage.removeItem('authToken');
-sessionStorage.removeItem('user');
-sessionStorage.removeItem('rememberMe');
+if (typeof sessionStorage !== 'undefined') {
+  sessionStorage.removeItem('authToken');
+  sessionStorage.removeItem('user');
+  console.log('✅ Cleared sessionStorage');
+}
 
-console.log('✅ Authentication data cleared successfully!');
-console.log('🔄 Please refresh the page and log in again.');
-
-// Optional: Auto refresh
-// window.location.reload();
+console.log('🎉 Authentication data cleared successfully!');
+console.log('📝 Please refresh your browser and log in again.');

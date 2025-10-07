@@ -7,7 +7,7 @@ export interface SettingsData {
 }
 
 // Create a settings service that uses the authenticated API hook
-export const createSettingsAPI = () => {
+export const useSettingsAPI = () => {
   const { apiRequest } = useAuthenticatedAPI();
 
   return {

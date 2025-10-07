@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { createSettingsAPI, SettingsData } from '../services/settings-service';
+import { useSettingsAPI, SettingsData } from '../services/settings-service';
 import { useAuth } from './auth-context';
 import { dynamicTheme, ThemeColors } from '../utils/dynamic-theme';
 import { applySettingsFeature, applyAllSettingsFeatures } from '../utils/settings-features';
@@ -48,7 +48,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const settingsAPI = createSettingsAPI();
+  const settingsAPI = useSettingsAPI();
 
   const loadSettings = async () => {
     // Only load settings if user is authenticated
@@ -185,7 +185,10 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
   };
 
   const getSetting = (category: string, key: string, defaultValue: any = null) => {
-    return settings[category]?.[key] ?? defaultValue;
+    if (!settings || !settings[category]) {
+      return defaultValue;
+    }
+    return settings[category][key] ?? defaultValue;
   };
 
   // Convenience methods for commonly used settings

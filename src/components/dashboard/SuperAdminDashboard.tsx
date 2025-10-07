@@ -428,7 +428,7 @@ export default function SuperAdminDashboard() {
                         <span className="text-sm font-semibold text-foreground">{item.value}%</span>
                       </div>
                       <Progress 
-                         
+                        value={item.value}
                         color={item.value > 80 ? "danger" : item.value > 60 ? "warning" : "success"}
                         className="h-2"
                       />

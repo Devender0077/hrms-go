@@ -229,10 +229,10 @@ export const useTasks = () => {
 
   // Load tasks when authentication state changes
   useEffect(() => {
-    if (!authLoading) {
+    if (!authLoading && isAuthenticated) {
       loadTasks();
     }
-  }, [authLoading, loadTasks]);
+  }, [authLoading, isAuthenticated]);
 
   return {
     tasks,

@@ -38,13 +38,13 @@ export function usePermissions(): UserPermissions {
         setError(null);
 
         // Super admin bypasses all permission checks
-        if (user.role === 'super_admin') {
+        if (user.role === 'super_admin' || user.role === 'admin') {
           // Fetch all permissions for super admin
-          const response = await apiRequest('/permissions');
+          const response = await apiRequest('/users/permissions');
           setPermissions(response.data || []);
         } else {
           // Fetch user's role permissions
-          const response = await apiRequest(`/roles/${user.role}/permissions`);
+          const response = await apiRequest(`/users/roles/${user.role}/permissions`);
           setPermissions(response.data || []);
         }
       } catch (err) {
@@ -63,10 +63,10 @@ export function usePermissions(): UserPermissions {
     if (!user || !permissionKey || !permissions || !Array.isArray(permissions)) return false;
     
     // Super admin has all permissions
-    if (user.role === 'super_admin') return true;
+    if (user.role === 'super_admin' || user.role === 'admin') return true;
     
     return permissions.some(permission => 
-      permission.permission_key === permissionKey && permission.is_active
+      permission.permission_name === permissionKey && permission.is_active
     );
   };
 
@@ -74,7 +74,7 @@ export function usePermissions(): UserPermissions {
     if (!user || !permissionKeys || !Array.isArray(permissionKeys)) return false;
     
     // Super admin has all permissions
-    if (user.role === 'super_admin') return true;
+    if (user.role === 'super_admin' || user.role === 'admin') return true;
     
     return permissionKeys.some(key => hasPermission(key));
   };
@@ -83,7 +83,7 @@ export function usePermissions(): UserPermissions {
     if (!user || !permissionKeys || !Array.isArray(permissionKeys)) return false;
     
     // Super admin has all permissions
-    if (user.role === 'super_admin') return true;
+    if (user.role === 'super_admin' || user.role === 'admin') return true;
     
     return permissionKeys.every(key => hasPermission(key));
   };

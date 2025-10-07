@@ -1,6 +1,6 @@
 // Create a new authentication service
 import { jwtDecode } from "jwt-decode";
-import api from "./api-service";
+import api, { apiRequest } from "./api-service";
 
 // JWT token interface
 interface JwtToken {
@@ -48,16 +48,34 @@ const AuthService = {
     try {
       // Always use real API login
       const response = await api.auth.login(credentials);
-      const { token, user } = response;
+      
+      // Handle the response structure - backend returns {success, token, user} directly
+      if (response.success && (response as any).token && (response as any).user) {
+        const { token, user } = response as any;
 
-      // Store token in localStorage or sessionStorage based on rememberMe
-      if (credentials.rememberMe) {
-        localStorage.setItem("authToken", token);
+        // Store token in localStorage or sessionStorage based on rememberMe
+        if (credentials.rememberMe) {
+          localStorage.setItem("authToken", token);
+        } else {
+          sessionStorage.setItem("authToken", token);
+        }
+
+        // Fetch user permissions after successful login
+        try {
+          const permissionsResponse = await apiRequest('/users/roles/' + user.role + '/permissions');
+          user.permissions = permissionsResponse.data
+            .filter((p: any) => p.role_has_permission === 1)
+            .map((p: any) => p.permission_name); // Use permission_name for the key
+        } catch (permError) {
+          console.warn('Failed to fetch permissions:', permError);
+          user.permissions = [];
+        }
+
+        return user;
       } else {
-        sessionStorage.setItem("authToken", token);
+        // Handle login failure
+        throw new Error(response.message || 'Login failed');
       }
-
-      return user;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -79,12 +97,18 @@ const AuthService = {
       
       // Real API call for production
       const response = await api.auth.loginWithFace(faceData);
-      const { token, user } = response;
+      
+      // Handle the response structure - backend returns {success, token, user} directly
+      if (response.success && (response as any).token && (response as any).user) {
+        const { token, user } = response as any;
 
-      // Store token in localStorage (face login implies remember me)
-      localStorage.setItem("authToken", token);
+        // Store token in localStorage (face login implies remember me)
+        localStorage.setItem("authToken", token);
 
-      return user;
+        return user;
+      } else {
+        throw new Error(response.message || 'Face login failed');
+      }
     } catch (error) {
       console.error("Face login error:", error);
       throw error;
@@ -163,13 +187,18 @@ const AuthService = {
           return null;
         }
 
-        return {
+        const user = {
           id: decoded.id.toString(),
           email: decoded.email,
           role: decoded.role,
           permissions: decoded.permissions || [],
           name: decoded.name,
         };
+
+        // Note: If permissions are not in token, they will be empty
+        // Permissions should be fetched separately when needed
+
+        return user;
       } catch (decodeError) {
         console.error("JWT decode error:", decodeError);
         AuthService.logout();

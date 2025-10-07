@@ -339,7 +339,7 @@ export default function CompanyAdminDashboard() {
                         <span className="text-sm font-semibold text-foreground">{dept.utilization}%</span>
                       </div>
                       <Progress 
-                         
+                        value={dept.utilization}
                         color={dept.utilization > 90 ? "success" : dept.utilization > 80 ? "warning" : "danger"}
                         className="h-2"
                       />

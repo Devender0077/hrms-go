@@ -31,6 +31,101 @@ module.exports = (pool, authenticateToken) => {
     }
   });
 
+  // =====================================================
+  // ROLES & PERMISSIONS (must be before /:id route)
+  // =====================================================
+  
+  router.get('/roles', authenticateToken, async (req, res) => {
+    try {
+      const [roles] = await pool.query('SELECT * FROM roles ORDER BY created_at DESC');
+      res.json({ success: true, data: roles });
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+      res.status(500).json({ success: false, message: 'Error fetching roles' });
+    }
+  });
+
+  // Get permissions for a specific role
+  router.get('/roles/:role/permissions', authenticateToken, async (req, res) => {
+    try {
+      const { role } = req.params;
+      
+      if (!role) {
+        return res.status(400).json({ success: false, message: 'Role is required' });
+      }
+
+      const [permissions] = await pool.query(
+        `SELECT DISTINCT p.*, 
+                CASE WHEN rp.permission_id IS NOT NULL THEN 1 ELSE 0 END as role_has_permission
+         FROM permissions p
+         LEFT JOIN role_permissions rp ON p.id = rp.permission_id 
+         LEFT JOIN roles r ON rp.role_id = r.id AND r.name = ?
+         WHERE p.is_active = true
+         ORDER BY p.module, p.name`,
+        [role]
+      );
+      
+      res.json({ success: true, data: permissions });
+    } catch (error) {
+      console.error('Error fetching role permissions:', error);
+      res.status(500).json({ success: false, message: 'Error fetching role permissions' });
+    }
+  });
+
+  // Update permissions for a role
+  router.put('/roles/:role/permissions', authenticateToken, async (req, res) => {
+    try {
+      const { role } = req.params;
+      const { permissions } = req.body;
+      
+      if (!role) {
+        return res.status(400).json({ success: false, message: 'Role is required' });
+      }
+
+      // Get role ID
+      const [roles] = await pool.query('SELECT id FROM roles WHERE name = ?', [role]);
+      if (roles.length === 0) {
+        return res.status(404).json({ success: false, message: 'Role not found' });
+      }
+      
+      const roleId = roles[0].id;
+
+      // Clear existing permissions for this role
+      await pool.query('DELETE FROM role_permissions WHERE role_id = ?', [roleId]);
+
+      // Add new permissions
+      if (permissions && permissions.length > 0) {
+        const values = permissions.map(permissionId => [roleId, permissionId]);
+        const placeholders = values.map(() => '(?, ?)').join(', ');
+        const flatValues = values.flat();
+        
+        await pool.query(
+          `INSERT INTO role_permissions (role_id, permission_id, is_active, created_at, updated_at) 
+           VALUES ${placeholders}`,
+          [...flatValues, ...Array(permissions.length).fill(true), ...Array(permissions.length).fill(new Date()), ...Array(permissions.length).fill(new Date())]
+        );
+      }
+
+      res.json({ success: true, message: 'Role permissions updated successfully' });
+    } catch (error) {
+      console.error('Error updating role permissions:', error);
+      res.status(500).json({ success: false, message: 'Error updating role permissions' });
+    }
+  });
+
+  // Get all permissions
+  router.get('/permissions', authenticateToken, async (req, res) => {
+    try {
+      const [permissions] = await pool.query(
+        'SELECT * FROM permissions WHERE is_active = true ORDER BY module, name'
+      );
+      res.json({ success: true, data: permissions });
+    } catch (error) {
+      console.error('Error fetching permissions:', error);
+      res.status(500).json({ success: false, message: 'Error fetching permissions' });
+    }
+  });
+
   router.get('/:id', authenticateToken, async (req, res) => {
     try {
       const { id } = req.params;
@@ -126,20 +221,6 @@ module.exports = (pool, authenticateToken) => {
     } catch (error) {
       console.error('Error resetting password:', error);
       res.status(500).json({ success: false, message: 'Error resetting password' });
-    }
-  });
-
-  // =====================================================
-  // ROLES & PERMISSIONS
-  // =====================================================
-  
-  router.get('/roles', authenticateToken, async (req, res) => {
-    try {
-      const [roles] = await pool.query('SELECT * FROM roles ORDER BY created_at DESC');
-      res.json({ success: true, data: roles });
-    } catch (error) {
-      console.error('Error fetching roles:', error);
-      res.status(500).json({ success: false, message: 'Error fetching roles' });
     }
   });
   

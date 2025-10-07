@@ -40,8 +40,12 @@ module.exports = (pool, authenticateToken, upload, profileUpload) => {
       const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
       
       const [employees] = await pool.query(
-        `SELECT e.*, d.name as department_name, ds.name as designation_name, b.name as branch_name,
-                ap.name as attendance_policy_name, s.name as shift_name
+        `SELECT e.*, 
+                COALESCE(d.name, 'N/A') as department_name, 
+                COALESCE(ds.name, 'N/A') as designation_name, 
+                COALESCE(b.name, 'N/A') as branch_name,
+                COALESCE(ap.name, 'N/A') as attendance_policy_name, 
+                COALESCE(s.name, 'N/A') as shift_name
          FROM employees e
          LEFT JOIN departments d ON e.department_id = d.id
          LEFT JOIN designations ds ON e.designation_id = ds.id

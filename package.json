@@ -13,6 +13,7 @@
     "start": "concurrently \"npm run server\" \"npm run dev\""
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@heroui/react": "^2.8.4",
     "@heroui/theme": "^2.4.22",
     "@iconify/react": "^4.1.1",

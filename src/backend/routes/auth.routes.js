@@ -15,6 +15,7 @@ module.exports = (pool) => {
   router.post('/login', async (req, res) => {
     try {
       const { email, password } = req.body;
+      console.log('🔐 Login attempt for:', email, 'Password length:', password?.length);
       
       const [users] = await pool.query(
         'SELECT * FROM users WHERE email = ?',
@@ -22,12 +23,15 @@ module.exports = (pool) => {
       );
       
       if (users.length === 0) {
+        console.log('❌ User not found for email:', email);
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
       }
       
       const user = users[0];
+      console.log('👤 User found:', user.email, 'Status:', user.status, 'Role:', user.role);
       
       if (user.status !== 'active') {
+        console.log('❌ Account is inactive');
         return res.status(401).json({ success: false, message: 'Account is inactive' });
       }
       
@@ -42,13 +46,18 @@ module.exports = (pool) => {
       }
       
       const isValidPassword = await bcrypt.compare(password, user.password);
+      console.log('🔐 Password validation result:', isValidPassword);
       
       if (!isValidPassword) {
+        console.log('❌ Invalid password for user:', user.email);
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
       }
       
+      // Map super_admin to admin for frontend compatibility
+      const frontendRole = user.role === 'super_admin' ? 'admin' : user.role;
+      
       const token = jwt.sign(
-        { id: user.id, email: user.email, role: user.role, company_id: user.company_id || 1 },
+        { id: user.id, email: user.email, role: frontendRole, company_id: 1 },
         JWT_SECRET,
         { expiresIn: '24h' }
       );
@@ -61,11 +70,11 @@ module.exports = (pool) => {
         token,
         user: {
           id: user.id,
-          name: user.name,
+          name: `${user.first_name} ${user.last_name}`,
           email: user.email,
-          role: user.role,
-          profile_photo: user.profile_photo,
-          company_id: user.company_id
+          role: frontendRole, // Use mapped role for frontend
+          profile_photo: user.avatar,
+          company_id: 1 // Default company ID
         }
       });
     } catch (error) {

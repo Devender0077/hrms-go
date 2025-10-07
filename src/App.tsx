@@ -32,7 +32,6 @@ import Branches from "./pages/organization/branches";
 import Leave from "./pages/leave";
 
 // User Management Pages
-import RolesPage from "./pages/users/roles";
 
 // Employee Management Pages
 import EmployeeDocumentsPage from "./pages/employees/documents";
@@ -317,7 +316,7 @@ export default function App() {
               requiredPermissions={["super_admin", "company_admin"]}
             >
               <DashboardLayout>
-                <RolesPage />
+                <Roles />
               </DashboardLayout>
             </ProtectedRoute>
           }
