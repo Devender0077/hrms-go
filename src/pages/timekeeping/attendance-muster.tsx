@@ -179,27 +179,6 @@ const AttendanceMuster: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'present': return 'success';
-      case 'absent': return 'danger';
-      case 'half_day': return 'warning';
-      case 'late': return 'warning';
-      case 'early_leave': return 'warning';
-      default: return 'default';
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'present': return 'lucide:check-circle';
-      case 'absent': return 'lucide:x-circle';
-      case 'half_day': return 'lucide:clock';
-      case 'late': return 'lucide:clock-4';
-      case 'early_leave': return 'lucide:clock-12';
-      default: return 'lucide:help-circle';
-    }
-  };
 
   return (
     <div className="p-6 space-y-6">

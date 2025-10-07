@@ -233,5 +233,165 @@ module.exports = (pool, authenticateToken) => {
     }
   });
 
+  // Get attendance records for a user
+  router.get('/attendance-records', authenticateToken, async (req, res) => {
+    try {
+      const { employee_id, start_date, end_date } = req.query;
+      const userId = req.user.id;
+
+      let query = `
+        SELECT a.*, u.first_name, u.last_name, u.employee_id as employee_code
+        FROM attendance a
+        JOIN users u ON a.employee_id = u.id
+        WHERE 1=1
+      `;
+      const params = [];
+
+      // If employee_id is provided, filter by it, otherwise use current user
+      if (employee_id) {
+        query += ' AND a.employee_id = ?';
+        params.push(employee_id);
+      } else {
+        query += ' AND a.employee_id = ?';
+        params.push(userId);
+      }
+
+      if (start_date) {
+        query += ' AND a.date >= ?';
+        params.push(start_date);
+      }
+
+      if (end_date) {
+        query += ' AND a.date <= ?';
+        params.push(end_date);
+      }
+
+      query += ' ORDER BY a.date DESC LIMIT 100';
+
+      const [records] = await pool.query(query, params);
+
+      res.json({ success: true, data: records });
+    } catch (error) {
+      console.error('Error fetching attendance records:', error);
+      res.status(500).json({ success: false, message: 'Error fetching attendance records' });
+    }
+  });
+
+  // Check-in endpoint
+  router.post('/check-in', authenticateToken, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { location, device_info } = req.body;
+      const today = new Date().toISOString().split('T')[0];
+      const currentTime = new Date().toTimeString().split(' ')[0];
+
+      // Check if user already checked in today
+      const [existing] = await pool.query(
+        'SELECT id FROM attendance WHERE employee_id = ? AND date = ?',
+        [userId, today]
+      );
+
+      if (existing.length > 0) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'You have already checked in today' 
+        });
+      }
+
+      // Create attendance record
+      const [result] = await pool.query(
+        `INSERT INTO attendance (employee_id, date, check_in_time, status, remarks, created_at, updated_at)
+         VALUES (?, ?, ?, 'Present', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+        [userId, today, currentTime, `Check-in at ${location || 'Office'} - ${device_info || 'Unknown device'}`]
+      );
+
+      res.status(201).json({ 
+        success: true, 
+        message: 'Check-in successful',
+        data: { 
+          id: result.insertId, 
+          check_in_time: currentTime,
+          date: today
+        }
+      });
+    } catch (error) {
+      console.error('Error during check-in:', error);
+      res.status(500).json({ success: false, message: 'Error during check-in' });
+    }
+  });
+
+  // Check-out endpoint
+  router.post('/check-out', authenticateToken, async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { location, device_info } = req.body;
+      const today = new Date().toISOString().split('T')[0];
+      const currentTime = new Date().toTimeString().split(' ')[0];
+
+      // Find today's attendance record
+      const [records] = await pool.query(
+        'SELECT id, check_in_time FROM attendance WHERE employee_id = ? AND date = ?',
+        [userId, today]
+      );
+
+      if (records.length === 0) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'No check-in found for today' 
+        });
+      }
+
+      const record = records[0];
+
+      if (!record.check_in_time) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Check-in time not found' 
+        });
+      }
+
+      // Calculate total hours
+      const checkInTime = new Date(`2000-01-01T${record.check_in_time}`);
+      const checkOutTime = new Date(`2000-01-01T${currentTime}`);
+      const totalHours = (checkOutTime - checkInTime) / (1000 * 60 * 60);
+      const overtimeHours = totalHours > 8 ? totalHours - 8 : 0;
+
+      // Determine status based on hours
+      let status = 'Present';
+      if (totalHours < 4) {
+        status = 'Half Day';
+      } else if (totalHours < 8) {
+        status = 'Early Leave';
+      }
+
+      // Update attendance record
+      await pool.query(
+        `UPDATE attendance SET 
+          check_out_time = ?, 
+          total_hours = ?, 
+          overtime_hours = ?,
+          status = ?,
+          remarks = CONCAT(IFNULL(remarks, ''), ' | Check-out at ${location || 'Office'} - ${device_info || 'Unknown device'}'),
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?`,
+        [currentTime, totalHours, overtimeHours, status, record.id]
+      );
+
+      res.json({ 
+        success: true, 
+        message: 'Check-out successful',
+        data: { 
+          check_out_time: currentTime,
+          total_hours: totalHours,
+          overtime_hours: overtimeHours,
+          status: status
+        }
+      });
+    } catch (error) {
+      console.error('Error during check-out:', error);
+      res.status(500).json({ success: false, message: 'Error during check-out' });
+    }
+  });
+
   return router;
 };

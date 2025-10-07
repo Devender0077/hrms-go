@@ -86,7 +86,7 @@ export const useAttendance = () => {
         }
       };
 
-      await apiRequest('/attendance/check-in', {
+      await apiRequest('/timekeeping/check-in', {
         method: 'POST',
         body: checkInData
       });
@@ -134,7 +134,7 @@ export const useAttendance = () => {
         }
       };
 
-      await apiRequest('/attendance/check-out', {
+      await apiRequest('/timekeeping/check-out', {
         method: 'POST',
         body: checkOutData
       });
