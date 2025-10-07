@@ -45,6 +45,106 @@ module.exports = (pool, authenticateToken) => {
     }
   });
 
+  // Create a new role
+  router.post('/roles', authenticateToken, async (req, res) => {
+    try {
+      const { name, description, permissions } = req.body;
+      
+      if (!name) {
+        return res.status(400).json({ success: false, message: 'Role name is required' });
+      }
+
+      // Check if role already exists
+      const [existingRoles] = await pool.query('SELECT id FROM roles WHERE name = ?', [name]);
+      if (existingRoles.length > 0) {
+        return res.status(400).json({ success: false, message: 'Role already exists' });
+      }
+
+      // Create the role
+      const [result] = await pool.query(
+        'INSERT INTO roles (name, description, company_id) VALUES (?, ?, ?)',
+        [name, description || '', 1]
+      );
+
+      const roleId = result.insertId;
+
+      // Assign permissions if provided
+      if (permissions && permissions.length > 0) {
+        const permissionValues = permissions.map(permissionId => [roleId, permissionId]);
+        await pool.query(
+          'INSERT INTO role_permissions (role_id, permission_id) VALUES ?',
+          [permissionValues]
+        );
+      }
+
+      res.json({ success: true, message: 'Role created successfully', data: { id: roleId, name } });
+    } catch (error) {
+      console.error('Error creating role:', error);
+      res.status(500).json({ success: false, message: 'Error creating role' });
+    }
+  });
+
+  // Update a role
+  router.put('/roles/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, description } = req.body;
+      
+      if (!name) {
+        return res.status(400).json({ success: false, message: 'Role name is required' });
+      }
+
+      // Check if role exists
+      const [existingRoles] = await pool.query('SELECT id FROM roles WHERE id = ?', [id]);
+      if (existingRoles.length === 0) {
+        return res.status(404).json({ success: false, message: 'Role not found' });
+      }
+
+      // Update the role
+      await pool.query(
+        'UPDATE roles SET name = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+        [name, description || '', id]
+      );
+
+      res.json({ success: true, message: 'Role updated successfully' });
+    } catch (error) {
+      console.error('Error updating role:', error);
+      res.status(500).json({ success: false, message: 'Error updating role' });
+    }
+  });
+
+  // Delete a role
+  router.delete('/roles/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // Check if role exists
+      const [existingRoles] = await pool.query('SELECT id, name FROM roles WHERE id = ?', [id]);
+      if (existingRoles.length === 0) {
+        return res.status(404).json({ success: false, message: 'Role not found' });
+      }
+
+      const roleName = existingRoles[0].name;
+
+      // Check if role is being used by any users
+      const [users] = await pool.query('SELECT COUNT(*) as count FROM users WHERE role = ?', [roleName]);
+      if (users[0].count > 0) {
+        return res.status(400).json({ success: false, message: 'Cannot delete role that is assigned to users' });
+      }
+
+      // Delete role permissions first
+      await pool.query('DELETE FROM role_permissions WHERE role_id = ?', [id]);
+      
+      // Delete the role
+      await pool.query('DELETE FROM roles WHERE id = ?', [id]);
+
+      res.json({ success: true, message: 'Role deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting role:', error);
+      res.status(500).json({ success: false, message: 'Error deleting role' });
+    }
+  });
+
   // Get permissions for a specific role
   router.get('/roles/:role/permissions', authenticateToken, async (req, res) => {
     try {
