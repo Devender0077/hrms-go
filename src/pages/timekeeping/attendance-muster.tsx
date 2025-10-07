@@ -4,38 +4,43 @@ import { Icon } from '@iconify/react';
 import { useAuthenticatedAPI } from '../../hooks/useAuthenticatedAPI';
 
 interface AttendanceRecord {
-  id: number;
+  id: number | null;
   employee_id: number;
   employee_name: string;
+  employee_code: string;
+  designation_name: string | null;
+  department_name: string | null;
   date: string;
-  check_in: string;
-  check_out: string;
+  check_in_time: string | null;
+  check_out_time: string | null;
   total_hours: number;
-  status: 'present' | 'absent' | 'half_day' | 'late' | 'early_leave';
+  status: 'Present' | 'Absent' | 'Half Day' | 'Late' | 'Early Leave' | 'On Leave' | 'Holiday';
   overtime_hours: number;
-  remarks: string;
+  remarks: string | null;
 }
 
 interface AttendanceStats {
-  total_employees: number;
-  present_count: number;
-  absent_count: number;
-  half_day_count: number;
-  late_count: number;
-  early_leave_count: number;
-  total_overtime: number;
+  totalEmployees: number;
+  present: number;
+  absent: number;
+  halfDay: number;
+  late: number;
+  earlyLeave: number;
+  onLeave: number;
+  holiday: number;
 }
 
 const AttendanceMuster: React.FC = () => {
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [stats, setStats] = useState<AttendanceStats>({
-    total_employees: 0,
-    present_count: 0,
-    absent_count: 0,
-    half_day_count: 0,
-    late_count: 0,
-    early_leave_count: 0,
-    total_overtime: 0
+    totalEmployees: 0,
+    present: 0,
+    absent: 0,
+    halfDay: 0,
+    late: 0,
+    earlyLeave: 0,
+    onLeave: 0,
+    holiday: 0
   });
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -44,13 +49,63 @@ const AttendanceMuster: React.FC = () => {
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<AttendanceRecord | null>(null);
   const [formData, setFormData] = useState({
-    check_in: '',
-    check_out: '',
-    status: 'present',
+    check_in_time: '',
+    check_out_time: '',
+    status: 'Present',
     remarks: ''
   });
 
+  const statusOptions = [
+    { value: 'Present', label: 'Present (P)', color: 'success' },
+    { value: 'Absent', label: 'Absent (A)', color: 'danger' },
+    { value: 'Half Day', label: 'Half Day (HD)', color: 'warning' },
+    { value: 'Late', label: 'Late (L)', color: 'warning' },
+    { value: 'Early Leave', label: 'Early Leave (EL)', color: 'warning' },
+    { value: 'On Leave', label: 'On Leave (OL)', color: 'primary' },
+    { value: 'Holiday', label: 'Holiday (H)', color: 'secondary' }
+  ];
+
   const { apiRequest } = useAuthenticatedAPI();
+
+  // Helper functions for status display
+  const getStatusCode = (status: string) => {
+    const statusMap: { [key: string]: string } = {
+      'Present': 'P',
+      'Absent': 'A',
+      'Half Day': 'HD',
+      'Late': 'L',
+      'Early Leave': 'EL',
+      'On Leave': 'OL',
+      'Holiday': 'H'
+    };
+    return statusMap[status] || status;
+  };
+
+  const getStatusColor = (status: string) => {
+    const colorMap: { [key: string]: string } = {
+      'Present': 'success',
+      'Absent': 'danger',
+      'Half Day': 'warning',
+      'Late': 'warning',
+      'Early Leave': 'warning',
+      'On Leave': 'primary',
+      'Holiday': 'secondary'
+    };
+    return colorMap[status] || 'default';
+  };
+
+  const getStatusIcon = (status: string) => {
+    const iconMap: { [key: string]: string } = {
+      'Present': 'lucide:check-circle',
+      'Absent': 'lucide:x-circle',
+      'Half Day': 'lucide:clock',
+      'Late': 'lucide:clock',
+      'Early Leave': 'lucide:clock',
+      'On Leave': 'lucide:calendar',
+      'Holiday': 'lucide:calendar'
+    };
+    return iconMap[status] || 'lucide:help-circle';
+  };
 
   const fetchAttendanceMuster = async () => {
     try {
@@ -82,9 +137,9 @@ const AttendanceMuster: React.FC = () => {
   const handleEditRecord = (record: AttendanceRecord) => {
     setEditingRecord(record);
     setFormData({
-      check_in: record.check_in || '',
-      check_out: record.check_out || '',
-      status: record.status,
+      check_in_time: record.check_in_time || '',
+      check_out_time: record.check_out_time || '',
+      status: record.status || 'Present',
       remarks: record.remarks || ''
     });
     setIsEditOpen(true);
@@ -168,7 +223,7 @@ const AttendanceMuster: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Present</p>
-              <p className="text-2xl font-bold text-green-600">{stats.present_count}</p>
+              <p className="text-2xl font-bold text-green-600">{stats.present}</p>
             </div>
           </CardBody>
         </Card>
@@ -180,7 +235,7 @@ const AttendanceMuster: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Absent</p>
-              <p className="text-2xl font-bold text-red-600">{stats.absent_count}</p>
+              <p className="text-2xl font-bold text-red-600">{stats.absent}</p>
             </div>
           </CardBody>
         </Card>
@@ -192,7 +247,7 @@ const AttendanceMuster: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Half Day</p>
-              <p className="text-2xl font-bold text-yellow-600">{stats.half_day_count}</p>
+              <p className="text-2xl font-bold text-yellow-600">{stats.halfDay}</p>
             </div>
           </CardBody>
         </Card>
@@ -204,11 +259,35 @@ const AttendanceMuster: React.FC = () => {
             </div>
             <div>
               <p className="text-sm text-gray-600">Late</p>
-              <p className="text-2xl font-bold text-blue-600">{stats.late_count}</p>
+              <p className="text-2xl font-bold text-blue-600">{stats.late}</p>
             </div>
           </CardBody>
         </Card>
       </div>
+
+      {/* Status Ledger */}
+      <Card className="shadow-sm">
+        <CardHeader>
+          <h3 className="text-lg font-semibold">Status Legend</h3>
+        </CardHeader>
+        <CardBody>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {statusOptions.map((option) => (
+              <div key={option.value} className="flex items-center space-x-2">
+                <Chip
+                  color={option.color as any}
+                  variant="flat"
+                  size="sm"
+                  startContent={<Icon icon={getStatusIcon(option.value)} className="w-3 h-3" />}
+                >
+                  {getStatusCode(option.value)}
+                </Chip>
+                <span className="text-sm text-gray-600">{option.value}</span>
+              </div>
+            ))}
+          </div>
+        </CardBody>
+      </Card>
 
       {/* Filters */}
       <Card>
@@ -281,19 +360,22 @@ const AttendanceMuster: React.FC = () => {
                     <TableCell>
                       <div>
                         <p className="font-medium">{record.employee_name}</p>
-                        <p className="text-sm text-gray-500">ID: {record.employee_id}</p>
+                        <p className="text-sm text-gray-500">ID: {record.employee_code}</p>
+                        {record.department_name && (
+                          <p className="text-xs text-gray-400">{record.department_name}</p>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell>
-                      {record.check_in ? (
-                        <span className="text-green-600">{record.check_in}</span>
+                      {record.check_in_time ? (
+                        <span className="text-green-600">{record.check_in_time}</span>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      {record.check_out ? (
-                        <span className="text-red-600">{record.check_out}</span>
+                      {record.check_out_time ? (
+                        <span className="text-red-600">{record.check_out_time}</span>
                       ) : (
                         <span className="text-gray-400">-</span>
                       )}
@@ -307,7 +389,7 @@ const AttendanceMuster: React.FC = () => {
                         variant="flat"
                         startContent={<Icon icon={getStatusIcon(record.status)} className="w-3 h-3" />}
                       >
-                        {record.status.replace('_', ' ').toUpperCase()}
+                        {getStatusCode(record.status)}
                       </Chip>
                     </TableCell>
                     <TableCell>
@@ -345,14 +427,14 @@ const AttendanceMuster: React.FC = () => {
                 <Input
                   label="Check In Time"
                   type="time"
-                  value={formData.check_in}
-                  onChange={(e) => setFormData({ ...formData, check_in: e.target.value })}
+                  value={formData.check_in_time}
+                  onChange={(e) => setFormData({ ...formData, check_in_time: e.target.value })}
                 />
                 <Input
                   label="Check Out Time"
                   type="time"
-                  value={formData.check_out}
-                  onChange={(e) => setFormData({ ...formData, check_out: e.target.value })}
+                  value={formData.check_out_time}
+                  onChange={(e) => setFormData({ ...formData, check_out_time: e.target.value })}
                 />
               </div>
               <Select
@@ -360,11 +442,11 @@ const AttendanceMuster: React.FC = () => {
                 selectedKeys={[formData.status]}
                 onSelectionChange={(keys) => setFormData({ ...formData, status: Array.from(keys)[0] as string })}
               >
-                <SelectItem key="present">Present</SelectItem>
-                <SelectItem key="absent">Absent</SelectItem>
-                <SelectItem key="half_day">Half Day</SelectItem>
-                <SelectItem key="late">Late</SelectItem>
-                <SelectItem key="early_leave">Early Leave</SelectItem>
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </Select>
               <Textarea
                 label="Remarks"
