@@ -50,8 +50,6 @@ import SalaryComponentsPage from "./pages/payroll/salary-components";
 import EmployeeSalariesPage from "./pages/payroll/employee-salaries";
 import EmployeeSalaryManagementPage from "./pages/employees/salaries";
 import PayslipsPage from "./pages/payroll/payslips";
-import ColorTest from "./pages/color-test";
-import ThemeTest from "./pages/theme-test";
 // Individual Report Pages
 import IncomeExpenseReport from "./pages/reports/income-expense";
 import MonthlyAttendanceReport from "./pages/reports/monthly-attendance";
@@ -91,8 +89,6 @@ import Awards from "./pages/employee-lifecycle/awards";
 import Promotions from "./pages/employee-lifecycle/promotions";
 import TimeEntries from "./pages/time-tracking/entries";
 import MediaLibrary from "./pages/media-library";
-import SettingsTest from "./pages/settings-test";
-import SettingsComprehensiveTest from "./pages/settings-comprehensive-test";
 
 // Layout Components
 import DashboardLayout from "./layouts/dashboard-layout";
@@ -160,27 +156,6 @@ export default function App() {
           }
         />
 
-        {/* Color Test Route */}
-        <Route
-          path="/dashboard/color-test"
-          element={
-            <ProtectedRoute requiredPermissions={["dashboard.view"]}>
-              <DashboardLayout>
-                <ColorTest />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dashboard/theme-test"
-          element={
-            <ProtectedRoute requiredPermissions={["dashboard.view"]}>
-              <DashboardLayout>
-                <ThemeTest />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
 
         {/* Calendar Route */}
         <Route
@@ -918,28 +893,6 @@ export default function App() {
           }
         />
 
-        {/* Settings Test Routes */}
-        <Route
-          path="/dashboard/settings-test"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <SettingsTest />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/dashboard/settings-comprehensive-test"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout>
-                <SettingsComprehensiveTest />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
 
         {/* Default Route */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
