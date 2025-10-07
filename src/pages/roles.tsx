@@ -312,116 +312,204 @@ const RolesPage: React.FC = () => {
         />
 
         {/* Search and Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="flex-1 max-w-md">
-            <Input
-              placeholder="Search roles..."
-              
-              onChange={(e) => setSearchQuery(e.target.value)}
-              startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
-              variant="bordered"
-              size="md"
-            />
-          </div>
-          <div className="flex gap-2">
-            <Chip color="success" variant="flat" size="sm">
-              {roles.filter(r => r.permission_count > 0).length} Active
-            </Chip>
-            <Chip color="warning" variant="flat" size="sm">
-              {roles.filter(r => r.permission_count === 0).length} Inactive
-            </Chip>
-          </div>
-        </div>
+        <Card className="shadow-sm border border-default-200">
+          <CardBody className="p-4">
+            <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+              <div className="flex-1 max-w-md">
+                <Input
+                  placeholder="Search roles by name or permissions..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  startContent={<Icon icon="lucide:search" className="w-4 h-4 text-default-400" />}
+                  endContent={
+                    searchQuery && (
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        onPress={() => setSearchQuery('')}
+                      >
+                        <Icon icon="lucide:x" className="w-4 h-4" />
+                      </Button>
+                    )
+                  }
+                  variant="bordered"
+                  size="md"
+                  className="w-full"
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Chip 
+                  color="success" 
+                  variant="flat" 
+                  size="sm"
+                  startContent={<Icon icon="lucide:check-circle" className="w-3 h-3" />}
+                >
+                  {roles.filter(r => r.permission_count > 0).length} Active
+                </Chip>
+                <Chip 
+                  color="warning" 
+                  variant="flat" 
+                  size="sm"
+                  startContent={<Icon icon="lucide:alert-circle" className="w-3 h-3" />}
+                >
+                  {roles.filter(r => r.permission_count === 0).length} Inactive
+                </Chip>
+                <Chip 
+                  color="primary" 
+                  variant="flat" 
+                  size="sm"
+                  startContent={<Icon icon="lucide:users" className="w-3 h-3" />}
+                >
+                  {roles.length} Total
+                </Chip>
+              </div>
+            </div>
+          </CardBody>
+        </Card>
 
         {/* Roles Table */}
-        <Card className="shadow-sm">
-          <CardHeader className="pb-3">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-foreground">Role Management</h3>
-              <div className="text-sm text-default-500">
-                {filteredRoles.length} of {roles.length} roles
+        <Card className="shadow-sm border border-default-200">
+          <CardHeader className="pb-3 bg-gradient-to-r from-primary-50 to-secondary-50 dark:from-primary-900/20 dark:to-secondary-900/20">
+            <div className="flex justify-between items-center w-full">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary-100 dark:bg-primary-900/30">
+                  <Icon icon="lucide:shield-check" className="w-5 h-5 text-primary-600 dark:text-primary-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">Role Management</h3>
+                  <p className="text-sm text-default-500">Manage user roles and their permissions</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Chip color="primary" variant="flat" size="sm">
+                  {filteredRoles.length} of {roles.length} roles
+                </Chip>
               </div>
             </div>
           </CardHeader>
           <CardBody className="p-0">
-            <Table aria-label="Roles and permissions table" removeWrapper>
-              <TableHeader>
-                <TableColumn>ROLE</TableColumn>
-                <TableColumn>PERMISSIONS</TableColumn>
-                <TableColumn>STATUS</TableColumn>
-                <TableColumn>ACTIONS</TableColumn>
-              </TableHeader>
-              <TableBody>
-                {filteredRoles.map((role) => (
-                  <TableRow key={role.name}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className={`w-3 h-3 rounded-full ${
-                          getRoleColor(role.name) === 'danger' ? 'bg-danger' : 
-                          getRoleColor(role.name) === 'warning' ? 'bg-warning' : 
-                          getRoleColor(role.name) === 'success' ? 'bg-success' : 'bg-primary'
-                        }`}></div>
-                        <div>
-                          <div className="font-semibold text-foreground">
-                            {getRoleDisplayName(role.name)}
-                          </div>
-                          <div className="text-sm text-default-500 capitalize">
-                            {role.name.replace('_', ' ')}
+            <div className="overflow-x-auto">
+              <Table 
+                aria-label="Roles and permissions table" 
+                removeWrapper
+                classNames={{
+                  wrapper: "min-h-[400px]",
+                  th: "bg-default-100 dark:bg-default-800 text-default-700 dark:text-default-300 font-semibold",
+                  td: "py-4",
+                  tbody: "divide-y divide-default-200 dark:divide-default-700"
+                }}
+              >
+                <TableHeader>
+                  <TableColumn className="w-[25%]">ROLE</TableColumn>
+                  <TableColumn className="w-[35%]">PERMISSIONS</TableColumn>
+                  <TableColumn className="w-[15%]">STATUS</TableColumn>
+                  <TableColumn className="w-[25%]">ACTIONS</TableColumn>
+                </TableHeader>
+                <TableBody emptyContent="No roles found">
+                  {filteredRoles.map((role) => (
+                    <TableRow key={role.name} className="hover:bg-default-50 dark:hover:bg-default-800/50 transition-colors">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <div className={`w-4 h-4 rounded-full shadow-sm ${
+                            getRoleColor(role.name) === 'danger' ? 'bg-danger-500' : 
+                            getRoleColor(role.name) === 'warning' ? 'bg-warning-500' : 
+                            getRoleColor(role.name) === 'success' ? 'bg-success-500' : 'bg-primary-500'
+                          }`}></div>
+                          <div className="flex-1">
+                            <div className="font-semibold text-foreground text-base">
+                              {getRoleDisplayName(role.name)}
+                            </div>
+                            <div className="text-sm text-default-500 capitalize flex items-center gap-1 mt-1">
+                              <Icon icon="lucide:user" className="w-3 h-3" />
+                              {role.name.replace('_', ' ')}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Icon icon="lucide:key" className="w-4 h-4 text-default-400" />
-                        <span className="font-medium">{role.permission_count}</span>
-                        <span className="text-sm text-default-500">permissions</span>
-                      </div>
-                      {role.permissions.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1">
-                          {role.permissions.slice(0, 3).map((permission) => (
-                            <Chip
-                              key={permission.id}
-                              size="sm"
-                              variant="flat"
-                              color="default"
-                              className="text-xs"
-                            >
-                              {permission.permission_name}
-                            </Chip>
-                          ))}
-                          {role.permissions.length > 3 && (
-                            <Chip size="sm" variant="flat" color="default" className="text-xs">
-                              +{role.permissions.length - 3} more
-                            </Chip>
+                      </TableCell>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Icon icon="lucide:key" className="w-4 h-4 text-primary-500" />
+                            <span className="font-semibold text-foreground">{role.permission_count}</span>
+                            <span className="text-sm text-default-500">permissions</span>
+                            <div className="ml-2 w-16 bg-default-200 dark:bg-default-700 rounded-full h-2">
+                              <div 
+                                className="bg-primary-500 h-2 rounded-full transition-all duration-300" 
+                                style={{ width: `${Math.min((role.permission_count / 224) * 100, 100)}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                          {role.permissions.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              {role.permissions.slice(0, 2).map((permission) => (
+                                <Chip
+                                  key={permission.id}
+                                  size="sm"
+                                  variant="flat"
+                                  color="default"
+                                  className="text-xs font-medium"
+                                >
+                                  {permission.permission_name.split('.')[0]}
+                                </Chip>
+                              ))}
+                              {role.permissions.length > 2 && (
+                                <Chip size="sm" variant="flat" color="primary" className="text-xs font-medium">
+                                  +{role.permissions.length - 2} more
+                                </Chip>
+                              )}
+                            </div>
                           )}
                         </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        color={role.permission_count > 0 ? "success" : "warning"}
-                        variant="flat"
-                        size="sm"
-                      >
-                        {role.permission_count > 0 ? "Active" : "Inactive"}
-                      </Chip>
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        color="primary"
-                        variant="flat"
-                        size="sm"
-                        onPress={() => openEditModal(role.name)}
-                        startContent={<Icon icon="lucide:settings" className="w-4 h-4" />}
-                      >
-                        Manage
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Chip
+                            color={role.permission_count > 0 ? "success" : "warning"}
+                            variant="flat"
+                            size="sm"
+                            startContent={
+                              <Icon 
+                                icon={role.permission_count > 0 ? "lucide:check-circle" : "lucide:alert-circle"} 
+                                className="w-3 h-3" 
+                              />
+                            }
+                          >
+                            {role.permission_count > 0 ? "Active" : "Inactive"}
+                          </Chip>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            color="primary"
+                            variant="flat"
+                            size="sm"
+                            onPress={() => openEditModal(role.name)}
+                            startContent={<Icon icon="lucide:settings" className="w-4 h-4" />}
+                            className="font-medium"
+                          >
+                            Manage
+                          </Button>
+                          <Button
+                            color="default"
+                            variant="light"
+                            size="sm"
+                            isIconOnly
+                            onPress={() => {
+                              // Add view details functionality
+                              console.log('View role details:', role.name);
+                            }}
+                          >
+                            <Icon icon="lucide:eye" className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </CardBody>
         </Card>
       </div>
