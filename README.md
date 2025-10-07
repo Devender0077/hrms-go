@@ -1,403 +1,196 @@
-# 🏢 HRMS HUI v2 - Enterprise HR Management System
+# 🏢 HRMS HUI v2 (hrms-go)
 
-A comprehensive, modern Human Resource Management System built with React, TypeScript, Node.js, and MySQL. Features a modular architecture, role-based access control, and a beautiful responsive UI with advanced search functionality and dynamic theming.
+A modern Human Resource Management System (HRMS) combining a Vite + React TypeScript frontend with a Node.js (Express) backend and MySQL. This repository contains the frontend HUI (v2) and a modular backend under `src/backend` with migrations and demo data.
 
-## ✨ Features
+Current status (2025-10-07)
 
-### 🎯 Core HR Modules
-- **Employee Management** - Complete employee lifecycle management
-- **User Management** - Role-based access control with permissions
-- **Organization Chart** - Interactive hierarchical organization view
-- **Leave Management** - Comprehensive leave tracking and approval workflows
-- **Attendance & Timekeeping** - Time tracking with shift management
-- **Payroll Processing** - Salary management and payslip generation
-- **Recruitment** - Job postings, candidate management, and interviews
-- **Task Management** - Project and task assignment system
-- **Performance Reviews** - Goal setting and performance evaluation
-- **Asset Management** - Company asset tracking and assignments
-- **Expense Management** - Employee expense tracking and approval
-- **Document Management** - Centralized document storage and management
-- **Calendar & Events** - Company calendar with event management
-- **Reports & Analytics** - Comprehensive reporting dashboard
-- **Version History** - Complete release notes and version tracking
+- Frontend: feature-rich and mostly complete — responsive UI, role-based navigation, dynamic theming, advanced search, notifications, and most HR pages implemented.
+- Backend: working REST APIs for core modules (authentication, employees, leaves, attendance, payroll, recruitment, tasks, assets, reports). Migrations and demo data are available. Some backend endpoints and tests are still in active development.
+- Demo data & migrations: included; multiple migrations (80+) and schema loaders are present to bootstrap a development DB.
 
-### 🎨 Modern UI/UX
-- **Responsive Design** - Works perfectly on desktop, tablet, and mobile
-- **Dark/Light Mode** - Beautiful theme switching with system preference detection
-- **Modern Components** - Built with HeroUI and TailwindCSS
-- **Animations** - Smooth transitions and micro-interactions
-- **Accessibility** - WCAG compliant with keyboard navigation support
-- **Advanced Search** - Real-time search with keyboard shortcuts (Ctrl/Cmd + K)
-- **Smart Notifications** - Interactive notification system with unread counts
-- **Dynamic Theming** - Color customization that applies across the entire application
+Highlights & Key Features
 
-### 🏗️ Technical Architecture
-- **Modular Backend** - 23 focused route modules with clean separation
-- **Modular Database** - Schema split into domain-specific files with migration system
-- **Migration System** - Comprehensive database migration management with 83+ migrations
-- **API-First Design** - RESTful APIs with proper error handling
-- **Type Safety** - Full TypeScript implementation
-- **Security** - JWT authentication, role-based permissions, audit logging
-- **Global Settings** - Dynamic theming, maintenance mode, debug mode
-- **Advanced Search** - Real-time search with keyboard shortcuts and smart suggestions
-- **Demo Data System** - Comprehensive sample data for testing and development
+- Core HR modules: Employees, Leave, Attendance, Payroll, Recruitment, Tasks, Performance Reviews, Assets, Expenses, Documents, Calendar/Meetings, Reports.
+- Role-based access control with a detailed permission model (Super Admin, Company Admin, HR Manager, Manager, Employee).
+- Modern frontend: React 18 + TypeScript, Vite, TailwindCSS, HeroUI components, Framer Motion animations.
+- Backend: Node.js + Express, MySQL, JWT auth, modular route organization, migration scripts, file uploads.
+- Demo data system: sample employees, departments, attendance, payroll, job postings, candidates, tasks, and more — useful for development and QA.
 
-## 🚀 Quick Start
+Quick start (development)
 
-### Prerequisites
-- Node.js 18+ 
-- MySQL 8.0+
-- npm or yarn
+Prerequisites
 
-### Installation
+- Node.js 18+ (or compatible)
+- MySQL 8+
+- npm (or yarn)
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd hrms_hui_v2
-   ```
+1. Clone
 
-2. **Install dependencies**
-   ```bash
-   # Frontend dependencies
-   npm install
-   
-   # Backend dependencies
-   cd src/backend
-   npm install
-   cd ../..
-   ```
+```bash
+git clone <repository-url>
+cd hrms_hui_v2
+```
 
-3. **Database Setup**
-   ```bash
-   # Create database
-   mysql -u root -p -e "CREATE DATABASE hrmgo_hero;"
-   
-   # Run migrations (recommended)
-   cd src/backend/migrations
-   node migration-manager.js up
-   
-   # OR load all schemas
-   cd src/database
-   node load-schemas.js load all
-   ```
+2. Install frontend dependencies
 
-4. **Environment Configuration**
-   ```bash
-   # Backend environment
-   cd src/backend
-   cp .env.example .env
-   # Edit .env with your database credentials
-   ```
+```bash
+npm install
+```
 
-5. **Start the application**
-   ```bash
-   # Start backend server
-   cd src/backend
-   npm start
-   
-   # Start frontend (in new terminal)
-   npm run dev
-   ```
+3. Install backend dependencies
 
-6. **Access the application**
-   - Frontend: http://localhost:5174
-   - Backend API: http://localhost:8000
+```bash
+cd src/backend
+npm install
+```
 
-## 📁 Project Structure
+4. Database setup
+
+Create a development database (adjust user/host as needed):
+
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS hrmgo_hero;"
+```
+
+Run migrations / load demo data (from `src/backend`):
+
+```bash
+# from repo root
+cd src/backend
+node migrations/migration-manager.js up
+```
+
+Alternative: if you prefer schema loader (from repo root):
+
+```bash
+node ../../src/database/load-schemas.js load all
+```
+
+5. Environment
+
+Copy example env and edit values in `src/backend`:
+
+```bash
+cd src/backend
+cp .env.example .env
+# edit .env and set DB credentials, JWT_SECRET, PORT, etc.
+```
+
+6. Start servers
+
+Frontend (project root):
+
+```bash
+npm run dev
+```
+
+Backend (new terminal, from `src/backend`):
+
+```bash
+npm run dev   # or `npm start` for production start
+```
+
+Default local URLs
+
+- Frontend: http://localhost:5174 (Vite) — port may vary based on your machine
+- Backend API: http://localhost:8000 (configurable via `.env`)
+
+Project structure (top-level)
 
 ```
 hrms_hui_v2/
 ├── src/
-│   ├── backend/                 # Node.js backend
-│   │   ├── routes/             # 23 modular route files
-│   │   ├── migrations/         # Database migration system
-│   │   │   ├── migrations/     # Sequential migration files
-│   │   │   └── migration-manager.js
-│   │   └── server.cjs          # Main server
-│   ├── components/             # React components
-│   │   ├── common/             # Shared components (SearchBar, NotificationDropdown)
-│   │   ├── settings/           # Settings-specific components
-│   │   └── layouts/            # Layout components
-│   ├── contexts/               # React contexts (Settings, Auth, Theme)
-│   ├── pages/                  # Application pages
-│   ├── hooks/                  # Custom React hooks
-│   ├── services/               # API services
-│   ├── utils/                  # Utility functions
-│   └── assets/                 # Static assets (images, lottie animations)
-├── Documentation/              # Comprehensive guides
-└── README.md                   # This file
+│   ├── backend/            # Express backend, routes, migrations, server
+│   ├── components/         # React UI components
+│   ├── contexts/           # React contexts (auth, settings, theme)
+│   ├── hooks/              # Custom hooks
+│   ├── pages/              # App pages (employees, payroll, reports, ...)
+│   ├── services/           # API clients and helpers
++│   ├── utils/              # Utility functions
+│   └── assets/             # Static assets (images, lottie, icons)
+├── public/                 # Public assets
+├── plugins/                # Custom Vite/Babel plugins used by the frontend
+├── package.json            # Frontend scripts & dependencies (root)
+└── README.md               # This file
 ```
 
-## 🛠️ Development Tools
+Environment variables (backend `src/backend/.env`)
 
-### Database Management
-```bash
-# Check migration status
-node migration-manager.js status
+```env
+# Database
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=hrmgo_hero
 
-# Run pending migrations
-node migration-manager.js up
+# JWT
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=24h
 
-# Rollback migration
-node migration-manager.js down <migration-name>
-
-# Load specific schema
-node load-schemas.js load 01_core_tables
-
-# Load all schemas
-node load-schemas.js load all
+# Server
+PORT=8000
+NODE_ENV=development
 ```
 
-### Available Scripts
-```bash
-# Frontend
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
+Default credentials (development/demo)
 
-# Backend
-npm start            # Start production server
-npm run dev          # Start with nodemon
-```
+- Super Admin: `admin@example.com` / `admin123` (full access)
+- Company Admin: `company@example.com` / `company123`
+- HR Manager: `hr@example.com` / `hr123`
+- Manager: `manager@example.com` / `manager123`
+- Employee: `employee@example.com` / `employee123`
 
-## 🔐 Default Credentials
+Testing & Scripts
 
-The following default users are created automatically when you run the migrations:
+- Frontend: `npm run dev`, `npm run build`, `npm run preview`
+- Backend (in `src/backend`): `npm run dev` (nodemon), `npm start`
+- Migration helpers: `node migrations/migration-manager.js up|down|status`
 
-### Super Admin (Primary Login)
-- **Email**: admin@example.com
-- **Password**: admin123
-- **Role**: Super Administrator with full system access (224 permissions)
-- **Database Role**: super_admin (mapped to admin in frontend)
+What's implemented (short)
 
-### Company Admin
-- **Email**: company@example.com
-- **Password**: company123
-- **Role**: Company Administrator with company-level access (76 permissions)
+- Employee lifecycle: profiles, documents, transfers, warnings, terminations
+- Attendance & timekeeping: check-in/out, shifts, regularizations
+- Leave management: applications, approvals, balances
+- Payroll: components, salary records, payslip generation
+- Recruitment: jobs, candidates, interviews
+- Tasks & performance: tasks, goals, reviews
+- Assets & inventory: asset assignment and tracking
+- Documents: versioned document storage and types
+- Calendar & meetings: event scheduling and rooms
+- Reports & audit logs: activity tracking and report templates
 
-### HR Manager
-- **Email**: hr@example.com
-- **Password**: hr123
-- **Role**: HR Manager with HR-specific access (48 permissions)
+Known status & next steps
 
-### Manager
-- **Email**: manager@example.com
-- **Password**: manager123
-- **Role**: Team Manager with management access (27 permissions)
+- Stable dev build for frontend; backend largely functional but still being hardened.
+- Remaining/ongoing work:
+  - Add/expand automated tests (unit, integration, E2E)
+  - Harden error handling and edge-case coverage on some backend endpoints
+  - Add Docker Compose for easy local orchestration
+  - CI pipeline (GitHub Actions) for lint/test/build on PRs
 
-### Employee
-- **Email**: employee@example.com
-- **Password**: employee123
-- **Role**: Standard employee with basic access (9 permissions)
+Contributing
 
-> **Note**: The primary login for testing is `admin@example.com` with password `admin123`. This user has complete super admin access with all 224 permissions assigned. All roles have been properly configured with appropriate permission levels.
+- Fork, create a feature branch, add tests, follow existing TypeScript + ESLint + Prettier rules, and open a PR.
 
-## 📊 Demo Data
+License
 
-The system includes comprehensive demo data for testing and development:
+- MIT — see `LICENSE`.
 
-### Core HR Data
-- **Sample Employees**: 10+ employees with complete profiles and face recognition data
-- **Departments & Designations**: Pre-configured organizational structure
-- **Attendance Records**: Sample attendance data with check-in/check-out times
-- **Tasks & Calendar Events**: Sample tasks, projects, and calendar events
-- **System Settings**: Pre-configured application settings with dynamic theming
+Support & Contacts
 
-### Leave & Payroll
-- **Leave Applications**: Sample leave requests, approvals, and balances
-- **Leave Types & Policies**: Complete leave management setup
-- **Payroll Components**: Salary structures, deductions, and payslips
-- **Payroll Records**: Sample payroll data with calculations
+- For issues and feature requests, use GitHub Issues on the repository.
+- Documentation lives under `Documentation/` and several guide files in the repo.
 
-### Recruitment & Performance
-- **Job Postings**: Sample job openings and descriptions
-- **Candidates**: Complete candidate profiles and applications
-- **Interviews**: Interview schedules and feedback
-- **Performance Reviews**: Goal setting and performance evaluations
-- **Performance Ratings**: Detailed performance assessments
+Thanks for using and contributing to HRMS HUI v2 — a modern, modular HR platform. If you'd like, I can also:
 
-### Training & Development
-- **Training Programs**: Comprehensive training courses and materials
-- **Training Sessions**: Scheduled training events and enrollments
-- **Training Enrollments**: Employee training participation records
+- Add a short developer checklist (ports, env vars, common troubleshooting)
+- Create a Docker Compose file to run MySQL + backend + frontend locally
+- Generate a concise architecture diagram or onboarding guide
 
-### Asset & Document Management
-- **Assets**: Company equipment and asset assignments
-- **Asset Categories**: Organized asset classification system
-- **Documents**: Sample company documents and policies
-- **Document Types**: Categorized document management
-- **Employee Documents**: Individual employee document records
+---
 
-### Employee Lifecycle
-- **Warnings**: Disciplinary actions and warnings
-- **Resignations**: Employee resignation records
-- **Terminations**: Termination documentation and procedures
-- **Transfers**: Employee transfer requests and approvals
-- **Complaints**: Workplace complaint management
+_Generated/updated: 2025-10-07_
 
-### Meetings & Communications
-- **Meeting Types**: Various meeting categories and templates
-- **Meeting Rooms**: Conference rooms and facilities
-- **Meetings**: Scheduled meetings with attendees
-- **Messages**: Internal communication system
-- **Notifications**: System notifications and alerts
-
-### Audit & Reports
-- **Audit Logs**: Complete system activity tracking
-- **Reports**: Pre-configured report templates
-- **Webhooks**: Integration endpoints and event logs
-- **System Logs**: Comprehensive system monitoring
-
-All demo data is automatically loaded when running migrations and provides a complete testing environment.
-
-## 🔐 Permission System
-
-The HRMS includes a comprehensive permission system with 224 detailed permissions across 19 modules:
-
-### Permission Modules
-- **Dashboard** (2 permissions): View Dashboard, Export Dashboard
-- **Admin** (12 permissions): Backup, Database, Security, Logs, Audit, Settings, etc.
-- **Employees** (12 permissions): View, Create, Edit, Delete, Manage, Reports, etc.
-- **Attendance** (12 permissions): View, Create, Edit, Delete, Regularization, Reports, etc.
-- **Leave** (12 permissions): View, Create, Edit, Delete, Approve, Reports, etc.
-- **Payroll** (12 permissions): View, Create, Edit, Delete, Process, Reports, etc.
-- **Recruitment** (12 permissions): View, Create, Edit, Delete, Manage, Reports, etc.
-- **Tasks** (12 permissions): View, Create, Edit, Delete, Assign, Reports, etc.
-- **Performance** (12 permissions): View, Create, Edit, Delete, Review, Reports, etc.
-- **Assets** (12 permissions): View, Create, Edit, Delete, Assign, Reports, etc.
-- **Expenses** (12 permissions): View, Create, Edit, Delete, Approve, Reports, etc.
-- **Documents** (12 permissions): View, Create, Edit, Delete, Manage, Reports, etc.
-- **Calendar** (12 permissions): View, Create, Edit, Delete, Manage, Reports, etc.
-- **Meetings** (12 permissions): View, Create, Edit, Delete, Schedule, Reports, etc.
-- **Training** (12 permissions): View, Create, Edit, Delete, Enroll, Reports, etc.
-- **Reports** (12 permissions): View, Create, Edit, Delete, Export, Analytics, etc.
-- **Settings** (12 permissions): View, Create, Edit, Delete, Manage, Configure, etc.
-- **Organization** (12 permissions): View, Create, Edit, Delete, Manage, Reports, etc.
-- **Timekeeping** (12 permissions): View, Create, Edit, Delete, Manage, Reports, etc.
-
-### Role Hierarchy
-1. **Super Admin** (`admin@example.com`): Full access to all 224 permissions
-2. **Company Admin** (`company@example.com`): 76 permissions for company-level management
-3. **HR Manager** (`hr@example.com`): 48 permissions for HR-specific functions
-4. **Manager** (`manager@example.com`): 27 permissions for team management
-5. **Employee** (`employee@example.com`): 9 permissions for basic access
-
-### Permission Management
-- **Roles Page**: Manage permissions for each role
-- **Select All**: Bulk permission assignment
-- **Module-based**: Permissions organized by functional modules
-- **Real-time Updates**: Permission changes take effect immediately
-
-## 📝 Recent Updates (v2.4.0)
-
-### ✨ New Features (v2.4.0)
-- **Fixed Permission Counts**: Roles page now displays accurate permission counts for each role
-- **Optimized SQL Queries**: Improved permission API performance with proper JOIN conditions
-- **Complete Role Setup**: All user roles properly configured with appropriate permissions
-- **Enhanced Permission Management**: Fixed permission modal loading and selection
-- **Improved User Experience**: Resolved all permission-related display issues
-
-### ✨ Previous Features (v2.3.0)
-- **Comprehensive Permission System**: 224 detailed permissions covering all CRUD operations
-- **Role-Based Access Control**: Complete permission management with role assignment
-- **Enhanced Authentication**: Fixed login system with proper role mapping
-- **Permission Management UI**: Interactive roles page with permission assignment
-- **Select All Functionality**: Bulk permission selection for efficient management
-- **Version History Page**: Complete release notes and version tracking system
-- **Enhanced Search**: Advanced search with keyboard shortcuts (Ctrl/Cmd + K)
-- **Smart Notifications**: Interactive notification system with unread counts
-- **Dynamic System Status**: Real-time system status and version display in sidebar
-- **Comprehensive Demo Data**: Complete sample data across all HR modules
-- **Advanced Audit System**: Comprehensive audit logging and reporting
-- **Webhook Integration**: Event-driven webhook system for external integrations
-
-### 🐛 Bug Fixes
-- **Authentication System**: Fixed login issues and role mapping problems
-- **Permission Checking**: Resolved "Access Denied" errors for super admin users
-- **Roles Page**: Fixed "No Permissions Found" error in permission management
-- **Permission Counts**: Fixed roles page showing incorrect permission counts (224 for all roles)
-- **API Endpoints**: Corrected permission API endpoints and data structure
-- **Frontend Permission Logic**: Fixed usePermissions hook to properly handle admin role
-- **Database Permissions**: Assigned all 224 permissions to super admin role
-- **SQL Query Optimization**: Fixed LEFT JOIN query to properly filter role permissions
-- **Modal Functionality**: Fixed permission modal loading and selection
-- **API Connection**: Resolved ERR_CONNECTION_REFUSED errors
-- **Settings Context**: Fixed undefined settings errors
-- **Auth Service**: Corrected permission fetching and token handling
-- **Role Permission Assignment**: Properly assigned permissions to all roles (company_admin: 76, hr_manager: 48, manager: 27, employee: 9)
-- Fixed API errors across all pages
-- Resolved employee data fetching issues (404 errors)
-- Fixed settings persistence problems
-- Corrected database migration issues
-- Fixed search bar input blocking
-- Resolved notification dropdown errors
-- Fixed system settings table creation
-- Fixed all console errors and warnings
-- Resolved database foreign key constraint issues
-- Fixed webhook log foreign key errors
-
-### 🔧 Improvements
-- **Permission Architecture**: Complete permission system with 19 modules and 224 permissions
-- **Role Management**: Enhanced role-based access control with proper permission assignment
-- **Authentication Flow**: Improved login process with proper role mapping
-- **Database Structure**: Enhanced permissions and role_permissions tables
-- **Frontend Security**: Better permission checking and access control
-- **User Experience**: Fixed all access denied issues for super admin users
-- **API Performance**: Optimized permission loading and caching
-- **Error Handling**: Better error messages and user feedback
-- **Debug Logging**: Added comprehensive logging for troubleshooting
-- **Permission Display**: Fixed roles page to show accurate permission counts for each role
-- **SQL Query Performance**: Optimized permission queries with proper JOIN conditions
-- **Role Hierarchy**: Implemented proper permission distribution across all user roles
-- Better error handling and user feedback
-- Improved database structure and migrations (83+ migrations)
-- Enhanced security with proper authentication
-- Optimized API performance
-- Better mobile user experience
-- Comprehensive demo data system across all modules
-- Complete employee lifecycle management
-- Advanced asset management system
-- Meeting and calendar management
-- Document management with version control
-- Notification templates and messaging system
-- Audit logs and system reports
-- Webhook management and logging
-
-## 📊 System Requirements
-
-### Minimum Requirements
-- **RAM**: 4GB
-- **Storage**: 2GB free space
-- **CPU**: 2 cores
-- **Browser**: Chrome 90+, Firefox 88+, Safari 14+
-
-### Recommended Requirements
-- **RAM**: 8GB+
-- **Storage**: 5GB+ free space
-- **CPU**: 4+ cores
-- **Browser**: Latest version
-
-## 🏗️ Architecture
-
-### Backend Architecture
-- **Express.js** - Web framework
-- **MySQL** - Primary database
-- **JWT** - Authentication
-- **bcrypt** - Password hashing
-- **Multer** - File uploads
-- **CORS** - Cross-origin requests
-
-### Frontend Architecture
-- **React 18** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **HeroUI** - Component library
-- **TailwindCSS** - Styling
-- **Framer Motion** - Animations
-- **React Router** - Navigation
-
-### Database Architecture
 - **Modular Schema** - 8 domain-specific files
 - **Migration System** - Version-controlled changes
 - **Foreign Keys** - Data integrity
@@ -407,6 +200,7 @@ The HRMS includes a comprehensive permission system with 224 detailed permission
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```env
 # Database
 DB_HOST=localhost
@@ -424,6 +218,7 @@ NODE_ENV=development
 ```
 
 ### Customization
+
 - **Themes**: Modify `src/contexts/theme-context.tsx`
 - **API Endpoints**: Update `src/config/api-config.ts`
 - **Routes**: Modify `src/config/routes.ts`
@@ -432,6 +227,7 @@ NODE_ENV=development
 ## 📈 Performance
 
 ### Optimizations
+
 - **Code Splitting** - Lazy loading of components
 - **Image Optimization** - WebP format with fallbacks
 - **Caching** - API response caching
@@ -439,6 +235,7 @@ NODE_ENV=development
 - **Bundle Analysis** - Regular bundle size monitoring
 
 ### Monitoring
+
 - **Error Tracking** - Comprehensive error logging
 - **Performance Metrics** - Response time monitoring
 - **Database Monitoring** - Query performance tracking
@@ -447,12 +244,14 @@ NODE_ENV=development
 ## 🧪 Testing
 
 ### Test Coverage
+
 - **Unit Tests** - Component and utility testing
 - **Integration Tests** - API endpoint testing
 - **E2E Tests** - Full user journey testing
 - **Performance Tests** - Load and stress testing
 
 ### Running Tests
+
 ```bash
 # Frontend tests
 npm test
@@ -468,6 +267,7 @@ npm run test:e2e
 ## 🚀 Deployment
 
 ### Production Build
+
 ```bash
 # Build frontend
 npm run build
@@ -478,12 +278,14 @@ npm start
 ```
 
 ### Docker Deployment
+
 ```bash
 # Build and run with Docker
 docker-compose up -d
 ```
 
 ### Environment Setup
+
 - **Production Database** - Configure production MySQL
 - **Environment Variables** - Set production values
 - **SSL Certificate** - Configure HTTPS
@@ -492,6 +294,7 @@ docker-compose up -d
 ## 📚 Documentation
 
 ### Available Guides
+
 - **[Implementation Plan](IMPLEMENTATION_PLAN.md)** - Development roadmap
 - **[Server Refactoring Guide](SERVER_REFACTORING_GUIDE.md)** - Backend architecture
 - **[Modular Routes Complete](MODULAR_ROUTES_COMPLETE.md)** - API documentation
@@ -504,6 +307,7 @@ docker-compose up -d
 ## 🤝 Contributing
 
 ### Development Workflow
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
@@ -511,6 +315,7 @@ docker-compose up -d
 5. Submit a pull request
 
 ### Code Standards
+
 - **TypeScript** - Strict type checking
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
@@ -523,11 +328,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🆘 Support
 
 ### Getting Help
+
 - **Documentation** - Check the guides in the Documentation folder
 - **Issues** - Report bugs and request features
 - **Discussions** - Ask questions and share ideas
 
 ### Contact
+
 - **Email**: support@hrms.com
 - **Documentation**: [Project Documentation](Documentation/)
 - **Issues**: [GitHub Issues](https://github.com/your-repo/issues)

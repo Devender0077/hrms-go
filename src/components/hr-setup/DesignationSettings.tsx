@@ -282,14 +282,14 @@ export default function DesignationSettings() {
                     <Input
                       label="Designation Name"
                       placeholder="Enter designation name"
-                      
+                      value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       isRequired
                     />
                     <Input
                       label="Designation Code"
                       placeholder="Enter designation code"
-                      
+                      value={formData.code}
                       onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                     />
                   </div>
@@ -311,7 +311,7 @@ export default function DesignationSettings() {
                   <Textarea
                     label="Description"
                     placeholder="Enter designation description"
-                    
+                    value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                 </div>

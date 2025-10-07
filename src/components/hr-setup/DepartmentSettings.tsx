@@ -284,14 +284,14 @@ export default function DepartmentSettings() {
                     <Input
                       label="Department Name"
                       placeholder="Enter department name"
-                      
+                      value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       isRequired
                     />
                     <Input
                       label="Department Code"
                       placeholder="Enter department code"
-                      
+                      value={formData.code}
                       onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                     />
                   </div>
@@ -313,7 +313,7 @@ export default function DepartmentSettings() {
                   <Textarea
                     label="Description"
                     placeholder="Enter department description"
-                    
+                    value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                 </div>

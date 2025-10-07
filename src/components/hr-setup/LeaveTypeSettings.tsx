@@ -285,28 +285,28 @@ export default function LeaveTypeSettings() {
                     <Input
                       label="Leave Type Name"
                       placeholder="Enter leave type name"
-                      
+                      value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       isRequired
                     />
                     <Input
                       label="Code"
                       placeholder="Enter code"
-                      
+                      value={formData.code}
                       onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                     />
                   </div>
                   <Textarea
                     label="Description"
                     placeholder="Enter leave type description"
-                    
+                    value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                   <Input
                     type="number"
                     label="Days Per Year"
                     placeholder="Enter maximum days per year"
-                    
+                    value={formData.days_per_year}
                     onChange={(e) => setFormData({ ...formData, days_per_year: e.target.value })}
                   />
                   <div className="flex gap-6">

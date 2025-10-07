@@ -9,6 +9,7 @@ import { Spinner } from "@heroui/react";
 import { motion } from "framer-motion";
 import { useAuth } from "./contexts/auth-context";
 import { useSettings } from "./contexts/settings-context";
+import { VersionProvider } from "./contexts/version-context";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DynamicPageTitle from "./components/common/DynamicPageTitle";
 import MaintenanceMode from "./components/common/MaintenanceMode";
@@ -86,9 +87,12 @@ import Trips from "./pages/trips";
 import Announcements from "./pages/announcements";
 import Meetings from "./pages/meetings";
 import TrainingPrograms from "./pages/training/programs";
+import TrainingSessions from "./pages/training/sessions";
+import EmployeeTraining from "./pages/training/employee-training";
 import Awards from "./pages/employee-lifecycle/awards";
 import Promotions from "./pages/employee-lifecycle/promotions";
 import TimeEntries from "./pages/time-tracking/entries";
+import ProjectTimeTracking from "./pages/time-tracking/projects";
 import MediaLibrary from "./pages/media-library";
 
 // Layout Components
@@ -134,8 +138,9 @@ export default function App() {
 
   return (
     <Router>
-      <MaintenanceMode>
-        <DebugMode>
+      <VersionProvider>
+        <MaintenanceMode>
+          <DebugMode>
           <Routes>
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
@@ -859,6 +864,26 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/training/sessions"
+          element={
+            <ProtectedRoute requiredPermissions={["training.view"]}>
+              <DashboardLayout>
+                <TrainingSessions />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/training/employee-training"
+          element={
+            <ProtectedRoute requiredPermissions={["training.view"]}>
+              <DashboardLayout>
+                <EmployeeTraining />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
         
         {/* Employee Lifecycle Routes */}
         <Route
@@ -893,6 +918,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/time-tracking/projects"
+          element={
+            <ProtectedRoute requiredPermissions={["time_tracking.view"]}>
+              <DashboardLayout>
+                <ProjectTimeTracking />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
         
         {/* Media & Content Routes */}
         <Route
@@ -912,7 +947,8 @@ export default function App() {
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </DebugMode>
-      </MaintenanceMode>
+        </MaintenanceMode>
+      </VersionProvider>
     </Router>
   );
 }

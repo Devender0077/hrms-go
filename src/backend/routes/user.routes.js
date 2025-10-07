@@ -14,13 +14,14 @@ module.exports = (pool, authenticateToken) => {
     try {
       const [users] = await pool.query(
         `SELECT u.id, u.name, u.email, u.role, u.status, u.profile_photo, u.phone, u.department_id, u.designation_id,
-                u.created_at, u.last_login,
+                u.created_at, u.last_login, u.first_name, u.last_name, u.is_email_verified, u.is_phone_verified, u.two_factor_enabled,
                 d.name as department_name, des.name as designation_name,
-                COUNT(DISTINCT up.permission_id) as permission_count
+                COUNT(DISTINCT rp.permission_id) as permission_count
          FROM users u
          LEFT JOIN departments d ON u.department_id = d.id
          LEFT JOIN designations des ON u.designation_id = des.id
-         LEFT JOIN user_permissions up ON u.id = up.user_id AND up.is_active = true
+         LEFT JOIN roles r ON u.role = r.name
+         LEFT JOIN role_permissions rp ON r.id = rp.role_id
          GROUP BY u.id
          ORDER BY u.created_at DESC`
       );
@@ -230,11 +231,15 @@ module.exports = (pool, authenticateToken) => {
     try {
       const { id } = req.params;
       const [users] = await pool.query(
-        `SELECT u.*, d.name as department_name, des.name as designation_name
+        `SELECT u.*, d.name as department_name, des.name as designation_name,
+                COUNT(DISTINCT rp.permission_id) as permission_count
          FROM users u
          LEFT JOIN departments d ON u.department_id = d.id
          LEFT JOIN designations des ON u.designation_id = des.id
-         WHERE u.id = ?`,
+         LEFT JOIN roles r ON u.role = r.name
+         LEFT JOIN role_permissions rp ON r.id = rp.role_id
+         WHERE u.id = ?
+         GROUP BY u.id`,
         [id]
       );
       
@@ -251,7 +256,7 @@ module.exports = (pool, authenticateToken) => {
 
   router.post('/', authenticateToken, async (req, res) => {
     try {
-      const { name, email, password, role, phone, department_id, designation_id, status } = req.body;
+      const { name, email, password, role, phone, department_id, designation_id, status, first_name, last_name } = req.body;
       
       // Check if email exists
       const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
@@ -262,9 +267,9 @@ module.exports = (pool, authenticateToken) => {
       const hashedPassword = await bcrypt.hash(password, 10);
       
       const [result] = await pool.query(
-        `INSERT INTO users (name, email, password, role, phone, department_id, designation_id, status, company_id)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [name, email, hashedPassword, role, phone, department_id, designation_id, status || 'active', req.user?.company_id || 1]
+        `INSERT INTO users (name, email, password, role, phone, department_id, designation_id, status, company_id, first_name, last_name)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [name, email, hashedPassword, role, phone, department_id, designation_id, status || 'active', req.user?.company_id || 1, first_name, last_name]
       );
       
       res.status(201).json({ success: true, message: 'User created successfully', data: { id: result.insertId } });
@@ -277,12 +282,12 @@ module.exports = (pool, authenticateToken) => {
   router.put('/:id', authenticateToken, async (req, res) => {
     try {
       const { id } = req.params;
-      const { name, email, role, phone, department_id, designation_id, status } = req.body;
+      const { name, email, role, phone, department_id, designation_id, status, first_name, last_name } = req.body;
       
       await pool.query(
-        `UPDATE users SET name = ?, email = ?, role = ?, phone = ?, department_id = ?, designation_id = ?, status = ?
+        `UPDATE users SET name = ?, email = ?, role = ?, phone = ?, department_id = ?, designation_id = ?, status = ?, first_name = ?, last_name = ?
          WHERE id = ?`,
-        [name, email, role, phone, department_id, designation_id, status, id]
+        [name, email, role, phone, department_id, designation_id, status, first_name, last_name, id]
       );
       
       res.json({ success: true, message: 'User updated successfully' });

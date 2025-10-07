@@ -273,14 +273,14 @@ export default function BranchSettings() {
                     <Input
                       label="Branch Name"
                       placeholder="Enter branch name"
-                      
+                      value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       isRequired
                     />
                     <Input
                       label="Branch Code"
                       placeholder="Enter branch code"
-                      
+                      value={formData.code}
                       onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                       isRequired
                     />
@@ -288,21 +288,21 @@ export default function BranchSettings() {
                   <Textarea
                     label="Address"
                     placeholder="Enter branch address"
-                    
+                    value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   />
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       label="Phone"
                       placeholder="Enter phone number"
-                      
+                      value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     />
                     <Input
                       label="Email"
                       type="email"
                       placeholder="Enter email address"
-                      
+                      value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     />
                   </div>

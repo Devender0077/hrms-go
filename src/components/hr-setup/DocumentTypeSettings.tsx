@@ -273,21 +273,21 @@ export default function DocumentTypeSettings() {
                     <Input
                       label="Document Type Name"
                       placeholder="Enter document type name"
-                      
+                      value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       isRequired
                     />
                     <Input
                       label="Code"
                       placeholder="Enter code"
-                      
+                      value={formData.code}
                       onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                     />
                   </div>
                   <Textarea
                     label="Description"
                     placeholder="Enter document type description"
-                    
+                    value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   />
                   <Switch

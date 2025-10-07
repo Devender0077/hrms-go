@@ -142,8 +142,8 @@ const UsersPage: React.FC = () => {
   const fetchDepartmentsAndDesignations = async () => {
     try {
       const [deptResponse, desigResponse] = await Promise.all([
-        apiRequest('/departments', { method: 'GET' }),
-        apiRequest('/designations', { method: 'GET' })
+        apiRequest('/organization/departments', { method: 'GET' }),
+        apiRequest('/organization/designations', { method: 'GET' })
       ]);
       
       if (deptResponse.success) setDepartments(deptResponse.data);
@@ -845,7 +845,7 @@ const UsersPage: React.FC = () => {
                   <Input
                     label="Full Name"
                     placeholder="Enter full name"
-                    
+                    value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     isRequired
                   />
@@ -853,7 +853,7 @@ const UsersPage: React.FC = () => {
                     label="Email"
                     type="email"
                     placeholder="Enter email"
-                    
+                    value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     isRequired
                   />
@@ -861,15 +861,15 @@ const UsersPage: React.FC = () => {
                     label="Password"
                     type="password"
                     placeholder="Enter password"
-                    
+                    value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     isRequired
                   />
                   <Select
                     label="Role"
                     placeholder="Select role"
-                    
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    selectedKeys={formData.role ? [formData.role] : []}
+                    onSelectionChange={(keys) => setFormData({ ...formData, role: Array.from(keys)[0] as string })}
                     isRequired
                   >
                     <SelectItem key="super_admin">Super Admin</SelectItem>
@@ -881,8 +881,8 @@ const UsersPage: React.FC = () => {
                   <Select
                     label="Status"
                     placeholder="Select status"
-                    
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    selectedKeys={formData.status ? [formData.status] : []}
+                    onSelectionChange={(keys) => setFormData({ ...formData, status: Array.from(keys)[0] as string })}
                   >
                     <SelectItem key="active">Active</SelectItem>
                     <SelectItem key="inactive">Inactive</SelectItem>
@@ -892,26 +892,26 @@ const UsersPage: React.FC = () => {
                   <Input
                     label="Phone"
                     placeholder="Enter phone number"
-                    
+                    value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />
                   <Input
                     label="First Name"
                     placeholder="Enter first name"
-                    
+                    value={formData.first_name}
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                   />
                   <Input
                     label="Last Name"
                     placeholder="Enter last name"
-                    
+                    value={formData.last_name}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                   />
                   <Select
                     label="Department"
                     placeholder="Select department"
-                    
-                    onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
+                    selectedKeys={formData.department_id ? [formData.department_id] : []}
+                    onSelectionChange={(keys) => setFormData({ ...formData, department_id: Array.from(keys)[0] as string })}
                   >
                     {departments.map((dept) => (
                       <SelectItem key={dept.id} >
@@ -922,8 +922,8 @@ const UsersPage: React.FC = () => {
                   <Select
                     label="Designation"
                     placeholder="Select designation"
-                    
-                    onChange={(e) => setFormData({ ...formData, designation_id: e.target.value })}
+                    selectedKeys={formData.designation_id ? [formData.designation_id] : []}
+                    onSelectionChange={(keys) => setFormData({ ...formData, designation_id: Array.from(keys)[0] as string })}
                   >
                     {designations.map((desig) => (
                       <SelectItem key={desig.id} >
@@ -957,7 +957,7 @@ const UsersPage: React.FC = () => {
                   <Input
                     label="Full Name"
                     placeholder="Enter full name"
-                    
+                    value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     isRequired
                   />
@@ -965,7 +965,7 @@ const UsersPage: React.FC = () => {
                     label="Email"
                     type="email"
                     placeholder="Enter email"
-                    
+                    value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     isRequired
                   />
@@ -973,14 +973,14 @@ const UsersPage: React.FC = () => {
                     label="Password"
                     type="password"
                     placeholder="Leave blank to keep current"
-                    
+                    value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   />
                   <Select
                     label="Role"
                     placeholder="Select role"
-                    
-                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    selectedKeys={formData.role ? [formData.role] : []}
+                    onSelectionChange={(keys) => setFormData({ ...formData, role: Array.from(keys)[0] as string })}
                     isRequired
                   >
                     <SelectItem key="super_admin">Super Admin</SelectItem>
@@ -992,8 +992,8 @@ const UsersPage: React.FC = () => {
                   <Select
                     label="Status"
                     placeholder="Select status"
-                    
-                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    selectedKeys={formData.status ? [formData.status] : []}
+                    onSelectionChange={(keys) => setFormData({ ...formData, status: Array.from(keys)[0] as string })}
                   >
                     <SelectItem key="active">Active</SelectItem>
                     <SelectItem key="inactive">Inactive</SelectItem>
@@ -1003,26 +1003,26 @@ const UsersPage: React.FC = () => {
                   <Input
                     label="Phone"
                     placeholder="Enter phone number"
-                    
+                    value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />
                   <Input
                     label="First Name"
                     placeholder="Enter first name"
-                    
+                    value={formData.first_name}
                     onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                   />
                   <Input
                     label="Last Name"
                     placeholder="Enter last name"
-                    
+                    value={formData.last_name}
                     onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
                   />
                   <Select
                     label="Department"
                     placeholder="Select department"
-                    
-                    onChange={(e) => setFormData({ ...formData, department_id: e.target.value })}
+                    selectedKeys={formData.department_id ? [formData.department_id] : []}
+                    onSelectionChange={(keys) => setFormData({ ...formData, department_id: Array.from(keys)[0] as string })}
                   >
                     {departments.map((dept) => (
                       <SelectItem key={dept.id} >
@@ -1033,8 +1033,8 @@ const UsersPage: React.FC = () => {
                   <Select
                     label="Designation"
                     placeholder="Select designation"
-                    
-                    onChange={(e) => setFormData({ ...formData, designation_id: e.target.value })}
+                    selectedKeys={formData.designation_id ? [formData.designation_id] : []}
+                    onSelectionChange={(keys) => setFormData({ ...formData, designation_id: Array.from(keys)[0] as string })}
                   >
                     {designations.map((desig) => (
                       <SelectItem key={desig.id} >

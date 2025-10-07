@@ -133,10 +133,10 @@ export default function AllowanceOptionSettings() {
               <ModalBody>
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Input label="Name" placeholder="Enter name"  onChange={(e) => setFormData({ ...formData, name: e.target.value })} isRequired />
-                    <Input label="Code" placeholder="Enter code"  onChange={(e) => setFormData({ ...formData, code: e.target.value })} />
+                    <Input label="Name" placeholder="Enter name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} isRequired />
+                    <Input label="Code" placeholder="Enter code" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} />
                   </div>
-                  <Textarea label="Description" placeholder="Enter description"  onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
+                  <Textarea label="Description" placeholder="Enter description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} />
                   <Switch isSelected={formData.is_taxable} onValueChange={(value) => setFormData({ ...formData, is_taxable: value })}>
                     <div>
                       <p className="font-medium">Taxable Allowance</p>

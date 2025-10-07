@@ -7,6 +7,7 @@ import { useAuth } from "../contexts/auth-context";
 import { useTaskContext } from "../contexts/task-context";
 import { usePermissions } from "../hooks/usePermissions";
 import { useSettings } from "../contexts/settings-context";
+import { useVersion } from "../contexts/version-context";
     
     interface SidebarProps {
       isOpen: boolean;
@@ -31,6 +32,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
   const { taskCounts } = useTaskContext();
   const { hasAnyPermission, loading: permissionsLoading } = usePermissions();
   const { getSiteName, getCompanyName, loading: settingsLoading } = useSettings();
+  const { currentVersion } = useVersion();
       
       const navSections: NavSection[] = [
         {
@@ -227,19 +229,19 @@ export default function Sidebar({ isOpen }: SidebarProps) {
               title: "Training Programs", 
               icon: "lucide:graduation-cap", 
               path: "/dashboard/training/programs",
-          permissions: ["training.view"]
+              permissions: ["training.view"]
             },
             { 
               title: "Training Sessions", 
               icon: "lucide:book-open", 
               path: "/dashboard/training/sessions",
-          permissions: ["training.view"]
+              permissions: ["training.view"]
             },
             { 
               title: "Employee Training", 
-              icon: "lucide:user-graduate", 
+              icon: "lucide:user-check", 
               path: "/dashboard/training/employee-training",
-          permissions: ["training.view"]
+              permissions: ["training.view"]
             },
           ]
         },
@@ -619,7 +621,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                 {settingsLoading ? 'Loading...' : 'System Online'}
               </p>
               <p className="text-xs text-default-500 truncate">
-                {settingsLoading ? '...' : 'v2.4.2'}
+                {settingsLoading ? '...' : `v${currentVersion}`}
               </p>
             </div>
           )}
