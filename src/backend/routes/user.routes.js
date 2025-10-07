@@ -196,14 +196,14 @@ module.exports = (pool, authenticateToken) => {
 
       // Add new permissions
       if (permissions && permissions.length > 0) {
-        const values = permissions.map(permissionId => [roleId, permissionId]);
-        const placeholders = values.map(() => '(?, ?)').join(', ');
+        const values = permissions.map(permissionId => [roleId, permissionId, true, new Date(), new Date()]);
+        const placeholders = values.map(() => '(?, ?, ?, ?, ?)').join(', ');
         const flatValues = values.flat();
         
         await pool.query(
           `INSERT INTO role_permissions (role_id, permission_id, is_active, created_at, updated_at) 
            VALUES ${placeholders}`,
-          [...flatValues, ...Array(permissions.length).fill(true), ...Array(permissions.length).fill(new Date()), ...Array(permissions.length).fill(new Date())]
+          flatValues
         );
       }
 

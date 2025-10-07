@@ -56,8 +56,26 @@ module.exports = (pool) => {
       // Map super_admin to admin for frontend compatibility
       const frontendRole = user.role === 'super_admin' ? 'admin' : user.role;
       
+      // Fetch user permissions
+      const [permissions] = await pool.query(
+        `SELECT p.permission_name 
+         FROM permissions p
+         JOIN role_permissions rp ON p.id = rp.permission_id
+         JOIN roles r ON rp.role_id = r.id
+         WHERE r.name = ? AND rp.is_active = 1`,
+        [user.role]
+      );
+      
+      const userPermissions = permissions.map(p => p.permission_name);
+      
       const token = jwt.sign(
-        { id: user.id, email: user.email, role: frontendRole, company_id: 1 },
+        { 
+          id: user.id, 
+          email: user.email, 
+          role: frontendRole, 
+          company_id: 1,
+          permissions: userPermissions
+        },
         JWT_SECRET,
         { expiresIn: '24h' }
       );
@@ -74,7 +92,8 @@ module.exports = (pool) => {
           email: user.email,
           role: frontendRole, // Use mapped role for frontend
           profile_photo: user.avatar,
-          company_id: 1 // Default company ID
+          company_id: 1, // Default company ID
+          permissions: userPermissions
         }
       });
     } catch (error) {
