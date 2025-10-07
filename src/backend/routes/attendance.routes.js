@@ -19,17 +19,20 @@ module.exports = (pool, authenticateToken) => {
 
       // Get all active employees
       const [employees] = await pool.query(
-        `SELECT id, first_name, last_name, employee_id, designation_id, department_id
-         FROM users WHERE status = 'active' AND role != 'super_admin'`
+        `SELECT u.id, u.first_name, u.last_name, e.employee_id, u.designation_id, u.department_id
+         FROM users u
+         LEFT JOIN employees e ON u.id = e.user_id
+         WHERE u.status = 'active' AND u.role != 'super_admin'`
       );
 
       // Fetch attendance records for the given date
       const [attendanceRecords] = await pool.query(
         `SELECT a.id, a.employee_id, a.date, a.check_in_time, a.check_out_time, a.status, a.total_hours, a.overtime_hours, a.remarks,
-                u.first_name, u.last_name, u.employee_id as employee_code,
+                u.first_name, u.last_name, e.employee_id as employee_code,
                 d.name as designation_name, dep.name as department_name
          FROM attendance a
          JOIN users u ON a.employee_id = u.id
+         LEFT JOIN employees e ON u.id = e.user_id
          LEFT JOIN designations d ON u.designation_id = d.id
          LEFT JOIN departments dep ON u.department_id = dep.id
          WHERE a.date = ?`,
@@ -240,9 +243,10 @@ module.exports = (pool, authenticateToken) => {
       const userId = req.user.id;
 
       let query = `
-        SELECT a.*, u.first_name, u.last_name, u.employee_id as employee_code
+        SELECT a.*, u.first_name, u.last_name, e.employee_id as employee_code
         FROM attendance a
         JOIN users u ON a.employee_id = u.id
+        LEFT JOIN employees e ON u.id = e.user_id
         WHERE 1=1
       `;
       const params = [];
