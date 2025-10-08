@@ -22,13 +22,18 @@ export function PusherProvider({ children }: { children: ReactNode }) {
     // Check if Pusher is enabled and configured
     const pusherSettings = settings?.integration?.pusher;
     
+    // Silently skip if not enabled
     if (!pusherSettings || !pusherSettings.enabled) {
-      console.log('Pusher is not enabled');
+      if (pusher) {
+        pusher.disconnect();
+        setPusher(null);
+        setIsConnected(false);
+      }
       return;
     }
 
+    // Silently skip if configuration is incomplete
     if (!pusherSettings.appKey || !pusherSettings.cluster) {
-      console.log('Pusher configuration incomplete');
       return;
     }
 
@@ -42,30 +47,25 @@ export function PusherProvider({ children }: { children: ReactNode }) {
       });
 
       pusherInstance.connection.bind('connected', () => {
-        console.log('✅ Pusher connected successfully');
+        console.log('✅ Pusher connected');
         setIsConnected(true);
       });
 
       pusherInstance.connection.bind('disconnected', () => {
-        console.log('⚠️  Pusher disconnected');
         setIsConnected(false);
       });
 
       pusherInstance.connection.bind('unavailable', () => {
-        console.warn('⚠️  Pusher connection unavailable - check your credentials');
         setIsConnected(false);
       });
 
       pusherInstance.connection.bind('failed', () => {
-        console.error('❌ Pusher connection failed - invalid credentials or network issue');
         setIsConnected(false);
       });
 
       pusherInstance.connection.bind('error', (err: any) => {
-        console.error('❌ Pusher error:', err);
-        if (err.error && err.error.data) {
-          console.error('Error details:', err.error.data);
-        }
+        // Silently handle errors - don't spam console
+        setIsConnected(false);
       });
 
       setPusher(pusherInstance);

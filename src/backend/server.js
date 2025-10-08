@@ -210,6 +210,10 @@ app.use('/api/v1/pusher', pusherModule.router);
 const integrationsModule = require('./routes/integrations.routes')(pool, authenticateToken);
 app.use('/api/v1/integrations', integrationsModule.router);
 
+// Messenger routes
+const messengerModule = require('./routes/messenger.routes')(pool, authenticateToken);
+app.use('/api/v1/messenger', messengerModule.router);
+
 // =====================================================
 // HEALTH CHECK & API INFO
 // =====================================================
@@ -277,7 +281,7 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 API Version: v1`);
-  console.log(`📁 Modular Routes: 19 modules loaded`);
+  console.log(`📁 Modular Routes: 20 modules loaded`);
   console.log(`🔗 Health Check: http://localhost:${PORT}/api/v1/health`);
   
   // Run auto-migration on startup

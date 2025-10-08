@@ -84,9 +84,9 @@ export default function LeaveReports() {
     try {
       setLoading(true);
       const [reportsResponse, summaryResponse, departmentResponse] = await Promise.all([
-        apiRequest(`GET`, `/leave/reports?year=${yearFilter}&month=${monthFilter}&department=${departmentFilter}`),
-        apiRequest(`GET`, `/leave/reports/summary?year=${yearFilter}&month=${monthFilter}`),
-        apiRequest(`GET`, `/leave/reports/departments?year=${yearFilter}&month=${monthFilter}`)
+        apiRequest(`/leave/reports?year=${yearFilter}&month=${monthFilter}&department=${departmentFilter}`),
+        apiRequest(`/leave/reports/summary?year=${yearFilter}&month=${monthFilter}`),
+        apiRequest(`/leave/reports/departments?year=${yearFilter}&month=${monthFilter}`)
       ]);
 
       if (reportsResponse.success) {

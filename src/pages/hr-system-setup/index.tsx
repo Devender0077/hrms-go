@@ -29,6 +29,7 @@ import PaymentTypeSettings from "../../components/hr-setup/PaymentTypeSettings";
 import ContractTypeSettings from "../../components/hr-setup/ContractTypeSettings";
 import AttendanceCalculationSettings from "../../components/hr-setup/AttendanceCalculationSettings";
 import WeekendSettings from "../../components/hr-setup/WeekendSettings";
+import MessengerSettings from "../../components/hr-setup/MessengerSettings";
 
 // HR System Setup configuration
 const hrSetupCategories = [
@@ -166,6 +167,15 @@ const hrSetupCategories = [
       { key: "attendance-calculation", title: "Attendance Calculation", icon: "lucide:calculator", description: "Configure attendance calculation rules" },
       { key: "weekend-config", title: "Weekend Configuration", icon: "lucide:calendar", description: "Configure weekend days" }
     ]
+  },
+  {
+    key: "messenger",
+    title: "Messenger",
+    icon: "lucide:message-circle",
+    description: "Configure messenger and group settings",
+    items: [
+      { key: "messenger-settings", title: "Messenger Settings", icon: "lucide:settings", description: "Enable/disable messenger and manage groups" }
+    ]
   }
 ];
 
@@ -230,6 +240,9 @@ export default function HRSystemSetup() {
       // Attendance
       case "attendance-calculation": return <AttendanceCalculationSettings />;
       case "weekend-config": return <WeekendSettings />;
+      
+      // Messenger
+      case "messenger-settings": return <MessengerSettings />;
       
       default:
         return (

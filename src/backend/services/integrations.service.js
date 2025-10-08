@@ -10,7 +10,7 @@ const AWS = require('aws-sdk');
 async function getIntegrationSettings(pool, integrationName) {
   try {
     const [settings] = await pool.query(
-      `SELECT setting_value FROM system_settings 
+      `SELECT setting_value FROM settings 
        WHERE category = 'integration' AND setting_key = ? 
        LIMIT 1`,
       [integrationName]

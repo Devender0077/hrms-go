@@ -10,8 +10,8 @@ module.exports = (pool, authenticateToken) => {
   
   router.get('/', authenticateToken, async (req, res) => {
     try {
-      // Get settings from system_settings table
-      const [rows] = await pool.query('SELECT * FROM system_settings WHERE category IS NOT NULL ORDER BY category, setting_key');
+      // Get settings from settings table (has category column)
+      const [rows] = await pool.query('SELECT * FROM settings ORDER BY category, setting_key');
       const settings = {
         general: {},
         company: {},
@@ -27,7 +27,7 @@ module.exports = (pool, authenticateToken) => {
       };
       
       rows.forEach(row => {
-        // Use the category column directly
+        // Use category directly from database
         const category = row.category || 'general';
         const key = row.setting_key;
         
@@ -118,12 +118,11 @@ module.exports = (pool, authenticateToken) => {
       // Ensure value is properly serialized
       const serializedValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
       
-      // Save with category to ensure proper loading
+      // Save to settings table with category column
       await pool.query(
-        `INSERT INTO system_settings (company_id, category, setting_key, setting_value) 
+        `INSERT INTO settings (company_id, category, setting_key, setting_value) 
          VALUES (?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE 
-           category = VALUES(category),
            setting_value = VALUES(setting_value), 
            updated_at = CURRENT_TIMESTAMP`,
         [companyId, category, key, serializedValue]

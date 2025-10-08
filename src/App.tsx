@@ -25,6 +25,7 @@ import Unauthorized from "./pages/auth/unauthorized";
 
 // Dashboard Pages
 import Dashboard from "./pages/dashboard";
+import Messenger from "./pages/messenger";
 import Employees from "./pages/employees";
 // import EmployeeDetails from "./pages/employees/employee-details";
 import Departments from "./pages/organization/departments";
@@ -163,6 +164,17 @@ export default function App() {
           }
         />
 
+        {/* Messenger Route */}
+        <Route
+          path="/dashboard/messenger"
+          element={
+            <ProtectedRoute requiredPermissions={["messenger.view"]}>
+              <DashboardLayout>
+                <Messenger />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Calendar Route */}
         <Route

@@ -9,7 +9,7 @@ async function initializePusher(pool) {
   try {
     // Get Pusher settings from database
     const [settings] = await pool.query(
-      `SELECT setting_value FROM system_settings 
+      `SELECT setting_value FROM settings 
        WHERE category = 'integration' AND setting_key = 'pusher' 
        LIMIT 1`
     );

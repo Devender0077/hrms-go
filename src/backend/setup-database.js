@@ -329,13 +329,18 @@ async function seedPermissions(connection) {
     // Time Tracking
     { name: 'time_tracking.view', description: 'View time tracking', category: 'time_tracking' },
     { name: 'time_tracking.manage', description: 'Manage time tracking', category: 'time_tracking' },
+    
+    // Messenger
+    { name: 'messenger.view', description: 'Access and use messenger', category: 'messenger' },
+    { name: 'messenger.groups.create', description: 'Create message groups', category: 'messenger' },
+    { name: 'messenger.groups.manage', description: 'Manage message groups', category: 'messenger' },
   ];
   
   for (const permission of permissions) {
     await connection.query(
-      `INSERT IGNORE INTO permissions (name, description, category, created_at, updated_at)
-       VALUES (?, ?, ?, NOW(), NOW())`,
-      [permission.name, permission.description, permission.category]
+      `INSERT IGNORE INTO permissions (permission_name, name, description, module, is_active, created_at, updated_at)
+       VALUES (?, ?, ?, ?, 1, NOW(), NOW())`,
+      [permission.name, permission.description.replace('View ', '').replace('Manage ', ''), permission.description, permission.category]
     );
   }
   
@@ -360,6 +365,7 @@ async function seedSettings(connection) {
     { category: 'general', setting_key: 'siteName', setting_value: 'HRMS Platform', type: 'string' },
     { category: 'general', setting_key: 'companyName', setting_value: 'Your Company', type: 'string' },
     { category: 'general', setting_key: 'primaryColor', setting_value: '#3b82f6', type: 'string' },
+    { category: 'general', setting_key: 'messengerEnabled', setting_value: 'true', type: 'boolean' },
     { category: 'localization', setting_key: 'language', setting_value: 'en', type: 'string' },
     { category: 'localization', setting_key: 'timezone', setting_value: 'UTC', type: 'string' },
     { category: 'localization', setting_key: 'currency', setting_value: 'USD', type: 'string' },
@@ -367,11 +373,13 @@ async function seedSettings(connection) {
     { category: 'features', setting_key: 'enableFaceRecognition', setting_value: 'false', type: 'boolean' },
   ];
   
+  // Insert into settings table (the active table with category column)
   for (const setting of defaultSettings) {
     await connection.query(
-      `INSERT IGNORE INTO system_settings (category, setting_key, setting_value, type, created_at, updated_at)
-       VALUES (?, ?, ?, ?, NOW(), NOW())`,
-      [setting.category, setting.setting_key, setting.setting_value, setting.type]
+      `INSERT INTO settings (company_id, category, setting_key, setting_value, created_at, updated_at)
+       VALUES (1, ?, ?, ?, NOW(), NOW())
+       ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)`,
+      [setting.category, setting.setting_key, setting.setting_value]
     );
   }
 }
