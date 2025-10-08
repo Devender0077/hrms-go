@@ -1,8 +1,23 @@
-# 🏢 HRMS HUI v2.5.1 (hrms-go)
+# 🏢 HRMS HUI v2.5.2 (hrms-go)
 
 A modern Human Resource Management System (HRMS) combining a Vite + React TypeScript frontend with a Node.js (Express) backend and MySQL. This repository contains the frontend HUI (v2) and a modular backend under `src/backend` with migrations and demo data.
 
-## ✨ Latest Updates (v2.5.1)
+## ✨ Latest Updates (v2.5.2)
+
+### **🎨 UI/UX Improvements**
+- **Cleaner Design**: Removed drop shadows and borders from sidebar and navbar for a modern, flat design
+- **Better Visual Hierarchy**: Improved focus on content with less visual noise
+- **Consistent Styling**: Unified design language across all components
+
+### **🐛 Critical Bug Fixes**
+- **Fixed Attendance Records API**: Resolved 500 error when loading attendance records
+  - Added role-based filtering (admins see all, employees see only their own)
+  - Fixed employee record lookup for users without employee records
+  - Returns empty array instead of error for users without records
+- **Fixed Audit Logs API**: Registered audit-logs routes in server.js (was causing 404 errors)
+- **Improved Error Handling**: Better error messages and graceful fallbacks
+
+### **Previous Updates (v2.5.1)**
 
 ### **🚀 Universal Deployment System**
 - **Automated Database Setup**: Comprehensive `setup-database.js` script that runs all migrations and seeds data

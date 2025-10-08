@@ -278,6 +278,7 @@ module.exports = (pool, authenticateToken) => {
             try {
               const { employee_id, start_date, end_date } = req.query;
               const userId = req.user.id;
+              const userRole = req.user.role;
 
               let query = `
                 SELECT a.*, e.first_name, e.last_name, e.employee_id as employee_code,
@@ -290,22 +291,25 @@ module.exports = (pool, authenticateToken) => {
               `;
               const params = [];
 
-              // If employee_id is provided, filter by it, otherwise use current user's employee ID
+              // If employee_id is provided, filter by it
               if (employee_id) {
                 query += ' AND a.employee_id = ?';
                 params.push(employee_id);
-              } else {
+              } else if (userRole !== 'super_admin' && userRole !== 'company_admin' && userRole !== 'hr') {
+                // For regular employees, show only their own records
                 // Get the employee ID for the current user
                 const [userEmployee] = await pool.query(
                   'SELECT id FROM employees WHERE user_id = ?',
                   [userId]
                 );
                 if (userEmployee.length === 0) {
-                  return res.status(404).json({ success: false, message: 'Employee record not found for user' });
+                  // If no employee record, return empty array instead of error
+                  return res.json({ success: true, data: [] });
                 }
                 query += ' AND a.employee_id = ?';
                 params.push(userEmployee[0].id);
               }
+              // For admin roles, show all records (no filter)
 
               if (start_date) {
                 query += ' AND a.date >= ?';

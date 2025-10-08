@@ -198,6 +198,10 @@ app.use('/api/v1/assets', assetsRoutes);
 app.use('/api/v1/expenses', expensesRoutes);
 app.use('/api/v1/documents', documentsRoutes);
 
+// Audit logs routes
+const auditLogsModule = require('./routes/audit-logs.routes')(pool, authenticateToken);
+app.use('/api/v1/audit-logs', auditLogsModule.router);
+
 // =====================================================
 // HEALTH CHECK & API INFO
 // =====================================================

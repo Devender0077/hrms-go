@@ -88,7 +88,7 @@ import React, { useState, useEffect } from "react";
           {/* Main Content */}
           <div className="flex flex-col flex-1 overflow-hidden">
             {/* Enhanced Top Navbar */}
-            <Navbar maxWidth="full" className="bg-content1/80 backdrop-blur-xl shadow-lg border-b border-default-200/50 px-4 lg:px-6">
+            <Navbar maxWidth="full" className="bg-content1/80 backdrop-blur-xl px-4 lg:px-6">
               <NavbarContent className="gap-4" justify="start">
                 {/* Sidebar Toggle */}
                 <Button 

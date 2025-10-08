@@ -543,7 +543,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       
       return (
         <aside 
-      className={`bg-content1/95 backdrop-blur-xl shadow-2xl border-r border-default-200/50 transition-all duration-300 flex flex-col h-full ${
+      className={`bg-content1/95 backdrop-blur-xl transition-all duration-300 flex flex-col h-full ${
             isOpen ? "w-64" : "w-20"
       }`}
         >
