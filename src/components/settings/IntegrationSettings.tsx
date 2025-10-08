@@ -1,6 +1,7 @@
-import React from 'react';
-import { Card, CardBody, CardHeader, Switch, Input, Button } from '@heroui/react';
+import React, { useState } from 'react';
+import { Card, CardBody, CardHeader, Switch, Input, Button, Spinner } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { apiRequest } from '../../services/api-service';
 
 interface IntegrationSettingsProps {
   settings: Record<string, any>;
@@ -8,6 +9,215 @@ interface IntegrationSettingsProps {
 }
 
 export default function IntegrationSettings({ settings, onSettingsChange }: IntegrationSettingsProps) {
+  const [testingPusher, setTestingPusher] = useState(false);
+  const [pusherTestResult, setPusherTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  
+  const [testingSlack, setTestingSlack] = useState(false);
+  const [slackTestResult, setSlackTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  
+  const [testingTeams, setTestingTeams] = useState(false);
+  const [teamsTestResult, setTeamsTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  
+  const [testingZoom, setTestingZoom] = useState(false);
+  const [zoomTestResult, setZoomTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  
+  const [testingGoogleCalendar, setTestingGoogleCalendar] = useState(false);
+  const [googleCalendarTestResult, setGoogleCalendarTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  
+  const [testingGoogleDrive, setTestingGoogleDrive] = useState(false);
+  const [googleDriveTestResult, setGoogleDriveTestResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  const handleTestPusher = async () => {
+    if (!settings.pusher?.appId || !settings.pusher?.appKey || !settings.pusher?.appSecret || !settings.pusher?.cluster) {
+      setPusherTestResult({
+        success: false,
+        message: 'Please fill in all Pusher credentials first'
+      });
+      return;
+    }
+
+    setTestingPusher(true);
+    setPusherTestResult(null);
+
+    try {
+      const response = await apiRequest<{ success: boolean; message: string }>('/pusher/test', {
+        method: 'POST',
+        body: JSON.stringify({
+          appId: settings.pusher.appId,
+          appKey: settings.pusher.appKey,
+          appSecret: settings.pusher.appSecret,
+          cluster: settings.pusher.cluster
+        })
+      });
+
+      setPusherTestResult(response);
+    } catch (error: any) {
+      setPusherTestResult({
+        success: false,
+        message: error.message || 'Connection test failed'
+      });
+    } finally {
+      setTestingPusher(false);
+    }
+  };
+
+  const handleTestSlack = async () => {
+    if (!settings.slack?.webhookUrl) {
+      setSlackTestResult({
+        success: false,
+        message: 'Please enter Webhook URL first'
+      });
+      return;
+    }
+
+    setTestingSlack(true);
+    setSlackTestResult(null);
+
+    try {
+      const response = await apiRequest<{ success: boolean; message: string }>('/integrations/slack/test', {
+        method: 'POST',
+        body: JSON.stringify({
+          webhookUrl: settings.slack.webhookUrl
+        })
+      });
+
+      setSlackTestResult(response);
+    } catch (error: any) {
+      setSlackTestResult({
+        success: false,
+        message: error.message || 'Connection test failed'
+      });
+    } finally {
+      setTestingSlack(false);
+    }
+  };
+
+  const handleTestTeams = async () => {
+    if (!settings.microsoftTeams?.webhookUrl) {
+      setTeamsTestResult({
+        success: false,
+        message: 'Please enter Webhook URL first'
+      });
+      return;
+    }
+
+    setTestingTeams(true);
+    setTeamsTestResult(null);
+
+    try {
+      const response = await apiRequest<{ success: boolean; message: string }>('/integrations/teams/test', {
+        method: 'POST',
+        body: JSON.stringify({
+          webhookUrl: settings.microsoftTeams.webhookUrl
+        })
+      });
+
+      setTeamsTestResult(response);
+    } catch (error: any) {
+      setTeamsTestResult({
+        success: false,
+        message: error.message || 'Connection test failed'
+      });
+    } finally {
+      setTestingTeams(false);
+    }
+  };
+
+  const handleTestZoom = async () => {
+    if (!settings.zoom?.apiKey || !settings.zoom?.apiSecret) {
+      setZoomTestResult({
+        success: false,
+        message: 'Please enter API Key and Secret first'
+      });
+      return;
+    }
+
+    setTestingZoom(true);
+    setZoomTestResult(null);
+
+    try {
+      const response = await apiRequest<{ success: boolean; message: string }>('/integrations/zoom/test', {
+        method: 'POST',
+        body: JSON.stringify({
+          apiKey: settings.zoom.apiKey,
+          apiSecret: settings.zoom.apiSecret
+        })
+      });
+
+      setZoomTestResult(response);
+    } catch (error: any) {
+      setZoomTestResult({
+        success: false,
+        message: error.message || 'Connection test failed'
+      });
+    } finally {
+      setTestingZoom(false);
+    }
+  };
+
+  const handleTestGoogleCalendar = async () => {
+    if (!settings.googleCalendar?.clientId || !settings.googleCalendar?.clientSecret) {
+      setGoogleCalendarTestResult({
+        success: false,
+        message: 'Please enter Client ID and Secret first'
+      });
+      return;
+    }
+
+    setTestingGoogleCalendar(true);
+    setGoogleCalendarTestResult(null);
+
+    try {
+      const response = await apiRequest<{ success: boolean; message: string }>('/integrations/google-calendar/test', {
+        method: 'POST',
+        body: JSON.stringify({
+          clientId: settings.googleCalendar.clientId,
+          clientSecret: settings.googleCalendar.clientSecret
+        })
+      });
+
+      setGoogleCalendarTestResult(response);
+    } catch (error: any) {
+      setGoogleCalendarTestResult({
+        success: false,
+        message: error.message || 'Connection test failed'
+      });
+    } finally {
+      setTestingGoogleCalendar(false);
+    }
+  };
+
+  const handleTestGoogleDrive = async () => {
+    if (!settings.googleDrive?.clientId || !settings.googleDrive?.clientSecret) {
+      setGoogleDriveTestResult({
+        success: false,
+        message: 'Please enter Client ID and Secret first'
+      });
+      return;
+    }
+
+    setTestingGoogleDrive(true);
+    setGoogleDriveTestResult(null);
+
+    try {
+      const response = await apiRequest<{ success: boolean; message: string }>('/integrations/google-drive/test', {
+        method: 'POST',
+        body: JSON.stringify({
+          clientId: settings.googleDrive.clientId,
+          clientSecret: settings.googleDrive.clientSecret
+        })
+      });
+
+      setGoogleDriveTestResult(response);
+    } catch (error: any) {
+      setGoogleDriveTestResult({
+        success: false,
+        message: error.message || 'Connection test failed'
+      });
+    } finally {
+      setTestingGoogleDrive(false);
+    }
+  };
   return (
     <div className="space-y-6">
       {/* Google Calendar Integration */}
@@ -97,10 +307,39 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 />
               </div>
 
-              <Button color="primary" variant="flat" className="w-full">
-                <Icon icon="lucide:link" className="text-lg" />
-                Connect Google Calendar
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  color="primary" 
+                  variant="flat" 
+                  className="w-full"
+                  onPress={handleTestGoogleCalendar}
+                  isLoading={testingGoogleCalendar}
+                >
+                  {testingGoogleCalendar ? (
+                    <>
+                      <Spinner size="sm" color="white" />
+                      Testing Connection...
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="lucide:link" className="text-lg" />
+                      Test Google Calendar Connection
+                    </>
+                  )}
+                </Button>
+
+                {googleCalendarTestResult && (
+                  <div className={`p-3 rounded-lg ${googleCalendarTestResult.success ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700'}`}>
+                    <div className="flex items-center gap-2">
+                      <Icon 
+                        icon={googleCalendarTestResult.success ? 'lucide:check-circle' : 'lucide:x-circle'} 
+                        className="text-lg" 
+                      />
+                      <span className="text-sm font-medium">{googleCalendarTestResult.message}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </CardBody>
@@ -181,10 +420,39 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 />
               </div>
 
-              <Button color="primary" variant="flat" className="w-full">
-                <Icon icon="lucide:message-square" className="text-lg" />
-                Test Slack Connection
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  color="primary" 
+                  variant="flat" 
+                  className="w-full"
+                  onPress={handleTestSlack}
+                  isLoading={testingSlack}
+                >
+                  {testingSlack ? (
+                    <>
+                      <Spinner size="sm" color="white" />
+                      Testing Connection...
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="lucide:message-square" className="text-lg" />
+                      Test Slack Connection
+                    </>
+                  )}
+                </Button>
+
+                {slackTestResult && (
+                  <div className={`p-3 rounded-lg ${slackTestResult.success ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700'}`}>
+                    <div className="flex items-center gap-2">
+                      <Icon 
+                        icon={slackTestResult.success ? 'lucide:check-circle' : 'lucide:x-circle'} 
+                        className="text-lg" 
+                      />
+                      <span className="text-sm font-medium">{slackTestResult.message}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </CardBody>
@@ -263,10 +531,39 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 />
               </div>
 
-              <Button color="primary" variant="flat" className="w-full">
-                <Icon icon="lucide:video" className="text-lg" />
-                Test Zoom Connection
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  color="primary" 
+                  variant="flat" 
+                  className="w-full"
+                  onPress={handleTestZoom}
+                  isLoading={testingZoom}
+                >
+                  {testingZoom ? (
+                    <>
+                      <Spinner size="sm" color="white" />
+                      Testing Connection...
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="lucide:video" className="text-lg" />
+                      Test Zoom Connection
+                    </>
+                  )}
+                </Button>
+
+                {zoomTestResult && (
+                  <div className={`p-3 rounded-lg ${zoomTestResult.success ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700'}`}>
+                    <div className="flex items-center gap-2">
+                      <Icon 
+                        icon={zoomTestResult.success ? 'lucide:check-circle' : 'lucide:x-circle'} 
+                        className="text-lg" 
+                      />
+                      <span className="text-sm font-medium">{zoomTestResult.message}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </CardBody>
@@ -447,85 +744,6 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
         </CardBody>
       </Card>
 
-      {/* Pusher Integration */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <Icon icon="lucide:radio" className="text-primary-500 text-xl" />
-            <h3 className="text-lg font-semibold text-foreground">Pusher (Real-time Notifications)</h3>
-          </div>
-        </CardHeader>
-        <CardBody className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-foreground">Enable Pusher</p>
-              <p className="text-xs text-default-500">Real-time notifications and updates</p>
-            </div>
-            <Switch
-              isSelected={settings.pusher?.enabled === true || settings.pusher?.enabled === 'true'}
-              onValueChange={(value) => onSettingsChange('pusher', {
-                ...settings.pusher,
-                enabled: value
-              })}
-            />
-          </div>
-
-          {settings.pusher?.enabled && (
-            <div className="space-y-4">
-              <Input
-                label="App ID"
-                value={settings.pusher?.appId || ''}
-                onChange={(e) => onSettingsChange('pusher', {
-                  ...settings.pusher,
-                  appId: e.target.value
-                })}
-                placeholder="Enter Pusher App ID"
-                startContent={<Icon icon="lucide:hash" className="text-default-400" />}
-              />
-
-              <Input
-                label="App Key"
-                value={settings.pusher?.appKey || ''}
-                onChange={(e) => onSettingsChange('pusher', {
-                  ...settings.pusher,
-                  appKey: e.target.value
-                })}
-                placeholder="Enter Pusher App Key"
-                startContent={<Icon icon="lucide:key" className="text-default-400" />}
-              />
-
-              <Input
-                label="App Secret"
-                type="password"
-                value={settings.pusher?.appSecret || ''}
-                onChange={(e) => onSettingsChange('pusher', {
-                  ...settings.pusher,
-                  appSecret: e.target.value
-                })}
-                placeholder="Enter Pusher App Secret"
-                startContent={<Icon icon="lucide:lock" className="text-default-400" />}
-              />
-
-              <Input
-                label="Cluster"
-                value={settings.pusher?.cluster || 'us2'}
-                onChange={(e) => onSettingsChange('pusher', {
-                  ...settings.pusher,
-                  cluster: e.target.value
-                })}
-                placeholder="e.g., us2, eu, ap1"
-                startContent={<Icon icon="lucide:globe" className="text-default-400" />}
-              />
-
-              <Button color="primary" variant="flat" className="w-full">
-                <Icon icon="lucide:radio" className="text-lg" />
-                Test Pusher Connection
-              </Button>
-            </div>
-          )}
-        </CardBody>
-      </Card>
-
       {/* Microsoft Teams Integration */}
       <Card>
         <CardHeader>
@@ -624,10 +842,39 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 />
               </div>
 
-              <Button color="primary" variant="flat" className="w-full">
-                <Icon icon="lucide:message-square" className="text-lg" />
-                Test Teams Connection
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  color="primary" 
+                  variant="flat" 
+                  className="w-full"
+                  onPress={handleTestTeams}
+                  isLoading={testingTeams}
+                >
+                  {testingTeams ? (
+                    <>
+                      <Spinner size="sm" color="white" />
+                      Testing Connection...
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="lucide:message-square" className="text-lg" />
+                      Test Teams Connection
+                    </>
+                  )}
+                </Button>
+
+                {teamsTestResult && (
+                  <div className={`p-3 rounded-lg ${teamsTestResult.success ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700'}`}>
+                    <div className="flex items-center gap-2">
+                      <Icon 
+                        icon={teamsTestResult.success ? 'lucide:check-circle' : 'lucide:x-circle'} 
+                        className="text-lg" 
+                      />
+                      <span className="text-sm font-medium">{teamsTestResult.message}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </CardBody>
@@ -839,14 +1086,247 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 startContent={<Icon icon="lucide:folder" className="text-default-400" />}
               />
 
+              <div className="space-y-2">
+                <Button 
+                  color="primary" 
+                  variant="flat" 
+                  className="w-full"
+                  onPress={handleTestGoogleDrive}
+                  isLoading={testingGoogleDrive}
+                >
+                  {testingGoogleDrive ? (
+                    <>
+                      <Spinner size="sm" color="white" />
+                      Testing Connection...
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="lucide:hard-drive" className="text-lg" />
+                      Test Google Drive Connection
+                    </>
+                  )}
+                </Button>
+
+                {googleDriveTestResult && (
+                  <div className={`p-3 rounded-lg ${googleDriveTestResult.success ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700'}`}>
+                    <div className="flex items-center gap-2">
+                      <Icon 
+                        icon={googleDriveTestResult.success ? 'lucide:check-circle' : 'lucide:x-circle'} 
+                        className="text-lg" 
+                      />
+                      <span className="text-sm font-medium">{googleDriveTestResult.message}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* Pusher Integration */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:radio" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Pusher (Real-time Notifications)</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Pusher</p>
+              <p className="text-xs text-default-500">Real-time notifications and updates</p>
+            </div>
+            <Switch
+              isSelected={settings.pusher?.enabled === true || settings.pusher?.enabled === 'true'}
+              onValueChange={(value) => {
+                console.log('Pusher toggle:', value);
+                onSettingsChange('pusher', {
+                  ...settings.pusher,
+                  enabled: value
+                });
+              }}
+            />
+          </div>
+
+          {settings.pusher?.enabled && (
+            <div className="space-y-4">
+              <Input
+                label="App ID"
+                value={settings.pusher?.appId || ''}
+                onChange={(e) => {
+                  console.log('Pusher appId:', e.target.value);
+                  onSettingsChange('pusher', {
+                    ...settings.pusher,
+                    appId: e.target.value
+                  });
+                }}
+                placeholder="Enter Pusher App ID"
+                startContent={<Icon icon="lucide:hash" className="text-default-400" />}
+              />
+
+              <Input
+                label="App Key"
+                value={settings.pusher?.appKey || ''}
+                onChange={(e) => {
+                  console.log('Pusher appKey:', e.target.value);
+                  onSettingsChange('pusher', {
+                    ...settings.pusher,
+                    appKey: e.target.value
+                  });
+                }}
+                placeholder="Enter Pusher App Key"
+                startContent={<Icon icon="lucide:key" className="text-default-400" />}
+              />
+
+              <Input
+                label="App Secret"
+                type="password"
+                value={settings.pusher?.appSecret || ''}
+                onChange={(e) => {
+                  console.log('Pusher appSecret:', e.target.value);
+                  onSettingsChange('pusher', {
+                    ...settings.pusher,
+                    appSecret: e.target.value
+                  });
+                }}
+                placeholder="Enter Pusher App Secret"
+                startContent={<Icon icon="lucide:lock" className="text-default-400" />}
+              />
+
+              <Input
+                label="Cluster"
+                value={settings.pusher?.cluster || ''}
+                onChange={(e) => {
+                  console.log('Pusher cluster:', e.target.value);
+                  onSettingsChange('pusher', {
+                    ...settings.pusher,
+                    cluster: e.target.value
+                  });
+                }}
+                placeholder="e.g., ap2, us2, eu"
+                startContent={<Icon icon="lucide:globe" className="text-default-400" />}
+              />
+
+              <div className="space-y-2">
+                <Button 
+                  color="primary" 
+                  variant="flat" 
+                  className="w-full"
+                  onPress={handleTestPusher}
+                  isLoading={testingPusher}
+                >
+                  {testingPusher ? (
+                    <>
+                      <Spinner size="sm" color="white" />
+                      Testing Connection...
+                    </>
+                  ) : (
+                    <>
+                      <Icon icon="lucide:zap" className="text-lg" />
+                      Test Pusher Connection
+                    </>
+                  )}
+                </Button>
+
+                {pusherTestResult && (
+                  <div className={`p-3 rounded-lg ${pusherTestResult.success ? 'bg-success-50 text-success-700' : 'bg-danger-50 text-danger-700'}`}>
+                    <div className="flex items-center gap-2">
+                      <Icon 
+                        icon={pusherTestResult.success ? 'lucide:check-circle' : 'lucide:x-circle'} 
+                        className="text-lg" 
+                      />
+                      <span className="text-sm font-medium">{pusherTestResult.message}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* QuickBooks Integration */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:book-open" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">QuickBooks</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable QuickBooks</p>
+              <p className="text-xs text-default-500">Sync payroll and financial data</p>
+            </div>
+            <Switch
+              isSelected={settings.quickbooks?.enabled === true || settings.quickbooks?.enabled === 'true'}
+              onValueChange={(value) => {
+                console.log('QuickBooks toggle:', value);
+                onSettingsChange('quickbooks', {
+                  ...settings.quickbooks,
+                  enabled: value
+                });
+              }}
+            />
+          </div>
+
+          {settings.quickbooks?.enabled && (
+            <div className="space-y-4">
+              <Input
+                label="Client ID"
+                value={settings.quickbooks?.clientId || ''}
+                onChange={(e) => {
+                  console.log('QuickBooks clientId:', e.target.value);
+                  onSettingsChange('quickbooks', {
+                    ...settings.quickbooks,
+                    clientId: e.target.value
+                  });
+                }}
+                placeholder="Enter QuickBooks Client ID"
+                startContent={<Icon icon="lucide:key" className="text-default-400" />}
+              />
+
+              <Input
+                label="Client Secret"
+                type="password"
+                value={settings.quickbooks?.clientSecret || ''}
+                onChange={(e) => {
+                  console.log('QuickBooks clientSecret:', e.target.value);
+                  onSettingsChange('quickbooks', {
+                    ...settings.quickbooks,
+                    clientSecret: e.target.value
+                  });
+                }}
+                placeholder="Enter Client Secret"
+                startContent={<Icon icon="lucide:lock" className="text-default-400" />}
+              />
+
+              <Input
+                label="Company ID"
+                value={settings.quickbooks?.companyId || ''}
+                onChange={(e) => {
+                  console.log('QuickBooks companyId:', e.target.value);
+                  onSettingsChange('quickbooks', {
+                    ...settings.quickbooks,
+                    companyId: e.target.value
+                  });
+                }}
+                placeholder="Enter QuickBooks Company ID"
+                startContent={<Icon icon="lucide:building" className="text-default-400" />}
+              />
+
               <Button color="primary" variant="flat" className="w-full">
-                <Icon icon="lucide:hard-drive" className="text-lg" />
-                Connect Google Drive
+                <Icon icon="lucide:link" className="text-lg" />
+                Connect QuickBooks
               </Button>
             </div>
           )}
         </CardBody>
       </Card>
+
     </div>
   );
 }

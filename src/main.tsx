@@ -6,6 +6,7 @@ import { TaskProvider } from "./contexts/task-context";
 import { ThemeProvider } from "./contexts/theme-context";
 import { SettingsProvider } from "./contexts/settings-context";
 import { TranslationProvider } from "./contexts/translation-context";
+import { PusherProvider } from "./contexts/pusher-context";
 import App from './App.tsx'
 import './index.css'
     
@@ -16,10 +17,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <TranslationProvider>
           <AuthProvider>
             <SettingsProvider>
-              <TaskProvider>
-                <ToastProvider />
-                <App />
-              </TaskProvider>
+              <PusherProvider>
+                <TaskProvider>
+                  <ToastProvider />
+                  <App />
+                </TaskProvider>
+              </PusherProvider>
             </SettingsProvider>
           </AuthProvider>
         </TranslationProvider>

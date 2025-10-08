@@ -202,6 +202,14 @@ app.use('/api/v1/documents', documentsRoutes);
 const auditLogsModule = require('./routes/audit-logs.routes')(pool, authenticateToken);
 app.use('/api/v1/audit-logs', auditLogsModule.router);
 
+// Pusher routes
+const pusherModule = require('./routes/pusher.routes')(pool, authenticateToken);
+app.use('/api/v1/pusher', pusherModule.router);
+
+// Integrations routes (Slack, Teams, Twilio, SendGrid, S3, Zoom, etc.)
+const integrationsModule = require('./routes/integrations.routes')(pool, authenticateToken);
+app.use('/api/v1/integrations', integrationsModule.router);
+
 // =====================================================
 // HEALTH CHECK & API INFO
 // =====================================================
@@ -269,13 +277,18 @@ const PORT = process.env.PORT || 8000;
 app.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📊 API Version: v1`);
-  console.log(`📁 Modular Routes: 17 modules loaded`);
+  console.log(`📁 Modular Routes: 19 modules loaded`);
   console.log(`🔗 Health Check: http://localhost:${PORT}/api/v1/health`);
   
   // Run auto-migration on startup
   await runAllMigrations();
   
+  // Initialize Pusher
+  const { initializePusher } = require('./services/pusher.service');
+  await initializePusher(pool);
+  
   console.log(`✅ Server ready and accepting connections`);
+  console.log(`📡 Integrations: Slack, Teams, Twilio, SendGrid, S3, Zoom`);
 });
 
 module.exports = app;

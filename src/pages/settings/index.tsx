@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
       CardBody, 
       CardHeader,
       Button,
-  Spinner
+  Spinner,
+  addToast
     } from "@heroui/react";
     import { Icon } from "@iconify/react";
     import { motion } from "framer-motion";
@@ -110,8 +111,20 @@ import SettingsExportImport from "../../components/settings/SettingsExportImport
     // Save immediately to backend
     try {
       await updateSetting(category, key, value, type);
+      addToast({
+        title: 'Settings Saved',
+        description: `${category}.${key} has been updated successfully`,
+        type: 'success',
+        duration: 3000
+      });
     } catch (error) {
       console.error('Error saving setting:', error);
+      addToast({
+        title: 'Save Failed',
+        description: 'Failed to save setting. Please try again.',
+        type: 'error',
+        duration: 5000
+      });
     }
   };
 

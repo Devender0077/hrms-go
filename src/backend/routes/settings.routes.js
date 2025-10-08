@@ -11,10 +11,11 @@ module.exports = (pool, authenticateToken) => {
   router.get('/', authenticateToken, async (req, res) => {
     try {
       // Get settings from system_settings table
-      const [rows] = await pool.query('SELECT * FROM system_settings ORDER BY setting_key');
+      const [rows] = await pool.query('SELECT * FROM system_settings WHERE category IS NOT NULL ORDER BY category, setting_key');
       const settings = {
         general: {},
         company: {},
+        localization: {},
         email: {},
         notification: {},
         security: {},
@@ -26,29 +27,33 @@ module.exports = (pool, authenticateToken) => {
       };
       
       rows.forEach(row => {
-        // Map setting_key to appropriate category
-        let category = 'general';
-        if (row.setting_key.includes('company_')) category = 'company';
-        else if (row.setting_key.includes('email_')) category = 'email';
-        else if (row.setting_key.includes('notification_')) category = 'notification';
-        else if (row.setting_key.includes('security_')) category = 'security';
-        else if (row.setting_key.includes('integration_')) category = 'integration';
-        else if (row.setting_key.includes('backup_')) category = 'backup';
-        else if (row.setting_key.includes('workflow_')) category = 'workflow';
-        else if (row.setting_key.includes('reports_')) category = 'reports';
-        else if (row.setting_key.includes('api_')) category = 'api';
+        // Use the category column directly
+        const category = row.category || 'general';
+        const key = row.setting_key;
         
-        // Parse the value based on its type
+        // Parse the value based on its type or try to parse JSON
         let parsedValue = row.setting_value;
-        if (row.setting_value === 'true') {
-          parsedValue = true;
-        } else if (row.setting_value === 'false') {
-          parsedValue = false;
-        } else if (!isNaN(row.setting_value) && !isNaN(parseFloat(row.setting_value))) {
-          parsedValue = parseFloat(row.setting_value);
+        
+        // Try to parse JSON first (for objects like pusher config)
+        try {
+          parsedValue = JSON.parse(row.setting_value);
+        } catch (e) {
+          // Not JSON, check for boolean/number
+          if (row.setting_value === 'true') {
+            parsedValue = true;
+          } else if (row.setting_value === 'false') {
+            parsedValue = false;
+          } else if (!isNaN(row.setting_value) && row.setting_value !== '' && !isNaN(parseFloat(row.setting_value))) {
+            parsedValue = parseFloat(row.setting_value);
+          }
         }
         
-        settings[category][row.setting_key] = parsedValue;
+        // Initialize category if it doesn't exist
+        if (!settings[category]) {
+          settings[category] = {};
+        }
+        
+        settings[category][key] = parsedValue;
       });
       
       res.json({ success: true, data: settings });
@@ -113,10 +118,15 @@ module.exports = (pool, authenticateToken) => {
       // Ensure value is properly serialized
       const serializedValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
       
+      // Save with category to ensure proper loading
       await pool.query(
-        `INSERT INTO system_settings (company_id, setting_key, setting_value) VALUES (?, ?, ?)
-         ON DUPLICATE KEY UPDATE setting_value = ?, updated_at = CURRENT_TIMESTAMP`,
-        [companyId, key, serializedValue, serializedValue]
+        `INSERT INTO system_settings (company_id, category, setting_key, setting_value) 
+         VALUES (?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE 
+           category = VALUES(category),
+           setting_value = VALUES(setting_value), 
+           updated_at = CURRENT_TIMESTAMP`,
+        [companyId, category, key, serializedValue]
       );
       
       res.json({ success: true, message: 'Setting updated successfully' });
