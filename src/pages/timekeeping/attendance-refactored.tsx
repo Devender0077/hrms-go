@@ -93,7 +93,9 @@ const AttendancePage: React.FC = () => {
       const recordDate = record.date.includes('T') ? record.date.split('T')[0] : record.date;
       return recordDate === today;
     });
-    return !todayRecord || !todayRecord.check_in;
+    // Check both check_in and check_in_time fields
+    const hasCheckedIn = todayRecord && (todayRecord.check_in || (todayRecord as any).check_in_time);
+    return !hasCheckedIn;
   }, [attendanceRecords]);
 
   const canCheckOut = useMemo(() => {
@@ -103,7 +105,10 @@ const AttendancePage: React.FC = () => {
       const recordDate = record.date.includes('T') ? record.date.split('T')[0] : record.date;
       return recordDate === today;
     });
-    return todayRecord && todayRecord.check_in && !todayRecord.check_out;
+    // Check both field name variations
+    const hasCheckedIn = todayRecord && (todayRecord.check_in || (todayRecord as any).check_in_time);
+    const hasCheckedOut = todayRecord && (todayRecord.check_out || (todayRecord as any).check_out_time);
+    return hasCheckedIn && !hasCheckedOut;
   }, [attendanceRecords]);
 
   // Handle check in
