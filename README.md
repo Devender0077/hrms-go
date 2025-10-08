@@ -1,8 +1,32 @@
-# 🏢 HRMS HUI v2.5.0 (hrms-go)
+# 🏢 HRMS HUI v2.5.1 (hrms-go)
 
 A modern Human Resource Management System (HRMS) combining a Vite + React TypeScript frontend with a Node.js (Express) backend and MySQL. This repository contains the frontend HUI (v2) and a modular backend under `src/backend` with migrations and demo data.
 
-## ✨ Latest Updates (v2.5.0)
+## ✨ Latest Updates (v2.5.1)
+
+### **🚀 Universal Deployment System**
+- **Automated Database Setup**: Comprehensive `setup-database.js` script that runs all migrations and seeds data
+- **One-Command Deployment**: `deploy.sh` script for VPS/Cloud deployment with zero manual configuration
+- **Docker Support**: Complete Docker and Docker Compose configuration for containerized deployment
+- **PM2 Integration**: Production-ready PM2 ecosystem configuration for process management
+- **Environment Templates**: `.env.example` files for easy configuration
+- **Migration Tracking**: Automatic migration tracking to prevent duplicate runs
+- **Universal Compatibility**: Works on Local, VPS, AWS, DigitalOcean, Linode, Google Cloud, Azure
+
+### **💾 Enhanced Database Management**
+- **Automatic Seeding**: Default users, permissions, and settings created automatically
+- **Smart Migration System**: Tracks executed migrations and skips duplicates
+- **Verification System**: Post-setup verification to ensure all tables and data exist
+- **Rollback Safety**: Safe migration system that continues even if individual migrations fail
+- **Comprehensive Permissions**: 50+ permissions seeded automatically with role assignments
+
+### **📖 Complete Documentation**
+- **DEPLOYMENT.md**: Comprehensive deployment guide for all environments
+- **Step-by-Step Instructions**: Detailed guides for Local, VPS, Cloud, and Docker deployments
+- **Troubleshooting Section**: Common issues and solutions
+- **PM2 Commands**: Complete reference for process management
+
+### **Previous Updates (v2.5.0)**
 
 ### **🌍 Internationalization & Localization**
 - **Multi-Language Support**: Full translation support for 10 languages (English, Hindi, Spanish, French, German, Chinese, Arabic, Portuguese, Russian, Japanese)
@@ -58,7 +82,7 @@ A modern Human Resource Management System (HRMS) combining a Vite + React TypeSc
 
 ## 🚀 Quick Setup (Recommended)
 
-Use our automated setup script for consistent installation across different environments:
+### Local Development
 
 ```bash
 # Make the setup script executable
@@ -73,6 +97,25 @@ chmod +x setup-project.sh
 # Stop both servers
 ./stop-servers.sh
 ```
+
+### Production Deployment (VPS/Cloud)
+
+```bash
+# One-command deployment
+chmod +x deploy.sh && ./deploy.sh
+```
+
+### Docker Deployment
+
+```bash
+# Start with Docker Compose
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+```
+
+📖 **For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)**
 
 ## 📋 Prerequisites
 

@@ -121,7 +121,27 @@ EOF
 
 # Run database migrations
 run_migrations() {
-    print_status "Running database migrations..."
+    print_status "Running comprehensive database setup..."
+    if [ -f "src/backend/setup-database.js" ]; then
+        cd src/backend
+        node setup-database.js
+        if [ $? -eq 0 ]; then
+            print_success "Database setup completed successfully"
+            cd ../..
+        else
+            print_error "Database setup failed"
+            cd ../..
+            exit 1
+        fi
+    else
+        print_error "Database setup script not found"
+        exit 1
+    fi
+}
+
+# Legacy migration function (keeping for backward compatibility)
+run_legacy_migrations() {
+    print_status "Running legacy database migrations..."
     if [ -d "src/backend/migrations" ]; then
         cd src/backend
         node -e "
