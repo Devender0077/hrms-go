@@ -433,12 +433,23 @@ async function seedRoles(connection) {
 }
 
 async function seedDepartments(connection) {
-  log.step('Seeding departments...');
-  const [existing] = await connection.query('SELECT COUNT(*) as count FROM departments');
-  if (existing[0].count > 0) {
-    log.info('Departments already exist, skipping');
-    return;
-  }
+  try {
+    log.step('Seeding departments...');
+    
+    // Check if table exists
+    const [tables] = await connection.query(
+      "SHOW TABLES LIKE 'departments'"
+    );
+    if (tables.length === 0) {
+      log.warning('departments table does not exist, skipping');
+      return;
+    }
+    
+    const [existing] = await connection.query('SELECT COUNT(*) as count FROM departments');
+    if (existing[0].count > 0) {
+      log.info('Departments already exist, skipping');
+      return;
+    }
   
   const departments = [
     { name: 'Engineering', description: 'Software Development', status: 'active' },
@@ -455,16 +466,30 @@ async function seedDepartments(connection) {
       [dept.name, dept.description, dept.status]
     );
   }
-  log.success('Departments seeded');
+    log.success('Departments seeded');
+  } catch (error) {
+    log.warning(`Could not seed departments: ${error.message}`);
+  }
 }
 
 async function seedDesignations(connection) {
-  log.step('Seeding designations...');
-  const [existing] = await connection.query('SELECT COUNT(*) as count FROM designations');
-  if (existing[0].count > 0) {
-    log.info('Designations already exist, skipping');
-    return;
-  }
+  try {
+    log.step('Seeding designations...');
+    
+    // Check if table exists
+    const [tables] = await connection.query(
+      "SHOW TABLES LIKE 'designations'"
+    );
+    if (tables.length === 0) {
+      log.warning('designations table does not exist, skipping');
+      return;
+    }
+    
+    const [existing] = await connection.query('SELECT COUNT(*) as count FROM designations');
+    if (existing[0].count > 0) {
+      log.info('Designations already exist, skipping');
+      return;
+    }
   
   const designations = [
     { name: 'Software Engineer', description: 'Software Development', status: 'active' },
@@ -482,42 +507,70 @@ async function seedDesignations(connection) {
       [desig.name, desig.description, desig.status]
     );
   }
-  log.success('Designations seeded');
+    log.success('Designations seeded');
+  } catch (error) {
+    log.warning(`Could not seed designations: ${error.message}`);
+  }
 }
 
 async function seedLeaveTypes(connection) {
-  log.step('Seeding leave types...');
-  const [existing] = await connection.query('SELECT COUNT(*) as count FROM leave_types');
-  if (existing[0].count > 0) {
-    log.info('Leave types already exist, skipping');
-    return;
-  }
-  
-  const leaveTypes = [
-    { name: 'Casual Leave', days: 12, description: 'For personal matters', status: 'active' },
-    { name: 'Sick Leave', days: 10, description: 'For medical reasons', status: 'active' },
-    { name: 'Earned Leave', days: 15, description: 'Earned annual leave', status: 'active' },
-    { name: 'Maternity Leave', days: 180, description: 'For maternity', status: 'active' },
-    { name: 'Paternity Leave', days: 15, description: 'For paternity', status: 'active' },
-  ];
-  
-  for (const leave of leaveTypes) {
-    await connection.query(
-      `INSERT INTO leave_types (name, days, description, status, company_id, created_at, updated_at)
-       VALUES (?, ?, ?, ?, 1, NOW(), NOW())`,
-      [leave.name, leave.days, leave.description, leave.status]
+  try {
+    log.step('Seeding leave types...');
+    
+    // Check if table exists
+    const [tables] = await connection.query(
+      "SHOW TABLES LIKE 'leave_types'"
     );
+    if (tables.length === 0) {
+      log.warning('leave_types table does not exist, skipping');
+      return;
+    }
+    
+    const [existing] = await connection.query('SELECT COUNT(*) as count FROM leave_types');
+    if (existing[0].count > 0) {
+      log.info('Leave types already exist, skipping');
+      return;
+    }
+    
+    const leaveTypes = [
+      { name: 'Casual Leave', total_days: 12, description: 'For personal matters', status: 'active' },
+      { name: 'Sick Leave', total_days: 10, description: 'For medical reasons', status: 'active' },
+      { name: 'Earned Leave', total_days: 15, description: 'Earned annual leave', status: 'active' },
+      { name: 'Maternity Leave', total_days: 180, description: 'For maternity', status: 'active' },
+      { name: 'Paternity Leave', total_days: 15, description: 'For paternity', status: 'active' },
+    ];
+    
+    for (const leave of leaveTypes) {
+      await connection.query(
+        `INSERT INTO leave_types (name, total_days, description, status, company_id, created_at, updated_at)
+         VALUES (?, ?, ?, ?, 1, NOW(), NOW())`,
+        [leave.name, leave.total_days, leave.description, leave.status]
+      );
+    }
+    log.success('Leave types seeded');
+  } catch (error) {
+    log.warning(`Could not seed leave types: ${error.message}`);
   }
-  log.success('Leave types seeded');
 }
 
 async function seedDocumentTypes(connection) {
-  log.step('Seeding document types...');
-  const [existing] = await connection.query('SELECT COUNT(*) as count FROM document_types');
-  if (existing[0].count > 0) {
-    log.info('Document types already exist, skipping');
-    return;
-  }
+  try {
+    log.step('Seeding document types...');
+    
+    // Check if table exists
+    const [tables] = await connection.query(
+      "SHOW TABLES LIKE 'document_types'"
+    );
+    if (tables.length === 0) {
+      log.warning('document_types table does not exist, skipping');
+      return;
+    }
+    
+    const [existing] = await connection.query('SELECT COUNT(*) as count FROM document_types');
+    if (existing[0].count > 0) {
+      log.info('Document types already exist, skipping');
+      return;
+    }
   
   const documentTypes = [
     { name: 'Aadhar Card', description: 'Government ID', is_required: 1, status: 'active' },
@@ -535,16 +588,30 @@ async function seedDocumentTypes(connection) {
       [doc.name, doc.description, doc.is_required, doc.status]
     );
   }
-  log.success('Document types seeded');
+    log.success('Document types seeded');
+  } catch (error) {
+    log.warning(`Could not seed document types: ${error.message}`);
+  }
 }
 
 async function seedWeekendConfigs(connection) {
-  log.step('Seeding weekend configurations...');
-  const [existing] = await connection.query('SELECT COUNT(*) as count FROM weekend_configs');
-  if (existing[0].count > 0) {
-    log.info('Weekend configs already exist, skipping');
-    return;
-  }
+  try {
+    log.step('Seeding weekend configurations...');
+    
+    // Check if table exists
+    const [tables] = await connection.query(
+      "SHOW TABLES LIKE 'weekend_configs'"
+    );
+    if (tables.length === 0) {
+      log.warning('weekend_configs table does not exist, skipping');
+      return;
+    }
+    
+    const [existing] = await connection.query('SELECT COUNT(*) as count FROM weekend_configs');
+    if (existing[0].count > 0) {
+      log.info('Weekend configs already exist, skipping');
+      return;
+    }
   
   const weekends = [
     { day_of_week: 0, name: 'Sunday', is_active: 1 },
@@ -558,16 +625,30 @@ async function seedWeekendConfigs(connection) {
       [weekend.day_of_week, weekend.name, weekend.is_active]
     );
   }
-  log.success('Weekend configurations seeded');
+    log.success('Weekend configurations seeded');
+  } catch (error) {
+    log.warning(`Could not seed weekend configs: ${error.message}`);
+  }
 }
 
 async function seedAttendanceRules(connection) {
-  log.step('Seeding attendance calculation rules...');
-  const [existing] = await connection.query('SELECT COUNT(*) as count FROM attendance_calculation_rules');
-  if (existing[0].count > 0) {
-    log.info('Attendance rules already exist, skipping');
-    return;
-  }
+  try {
+    log.step('Seeding attendance calculation rules...');
+    
+    // Check if table exists
+    const [tables] = await connection.query(
+      "SHOW TABLES LIKE 'attendance_calculation_rules'"
+    );
+    if (tables.length === 0) {
+      log.warning('attendance_calculation_rules table does not exist, skipping');
+      return;
+    }
+    
+    const [existing] = await connection.query('SELECT COUNT(*) as count FROM attendance_calculation_rules');
+    if (existing[0].count > 0) {
+      log.info('Attendance rules already exist, skipping');
+      return;
+    }
   
   const rules = [
     {
@@ -610,7 +691,10 @@ async function seedAttendanceRules(connection) {
       [rule.name, rule.type, rule.min_hours, rule.max_hours, rule.grace_period_minutes, rule.overtime_threshold_hours, rule.description, rule.is_active]
     );
   }
-  log.success('Attendance rules seeded');
+    log.success('Attendance rules seeded');
+  } catch (error) {
+    log.warning(`Could not seed attendance rules: ${error.message}`);
+  }
 }
 
 // Run the setup
