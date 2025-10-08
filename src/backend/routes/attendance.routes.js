@@ -641,5 +641,27 @@ module.exports = (pool, authenticateToken) => {
     }
   });
 
+  // Get shifts (for employee form)
+  router.get('/shifts', authenticateToken, async (req, res) => {
+    try {
+      // Return empty array for now - shifts can be added later
+      res.json({ success: true, data: [] });
+    } catch (error) {
+      console.error('Error fetching shifts:', error);
+      res.status(500).json({ success: false, message: 'Error fetching shifts' });
+    }
+  });
+
+  // Get attendance policies (for employee form)
+  router.get('/policies', authenticateToken, async (req, res) => {
+    try {
+      // Return empty array for now - policies can be added later
+      res.json({ success: true, data: [] });
+    } catch (error) {
+      console.error('Error fetching policies:', error);
+      res.status(500).json({ success: false, message: 'Error fetching policies' });
+    }
+  });
+
   return router;
 };
