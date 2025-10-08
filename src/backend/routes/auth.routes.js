@@ -103,33 +103,35 @@ module.exports = (pool) => {
   });
 
   // Register
-  router.post('/register', async (req, res) => {
-    try {
-      const { name, email, password, role } = req.body;
-      
-      // Check if user exists
-      const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
-      if (existing.length > 0) {
-        return res.status(400).json({ success: false, message: 'Email already registered' });
-      }
-      
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
-      const [result] = await pool.query(
-        'INSERT INTO users (name, email, password, role, company_id) VALUES (?, ?, ?, ?, ?)',
-        [name, email, hashedPassword, role || 'employee', 1]
-      );
-      
-      res.status(201).json({
-        success: true,
-        message: 'User registered successfully',
-        userId: result.insertId
-      });
-    } catch (error) {
-      console.error('Registration error:', error);
-      res.status(500).json({ success: false, message: 'Registration failed', error: error.message });
+  // Register
+router.post('/register', async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    // Check if user exists
+    const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
+    if (existing.length > 0) {
+      return res.status(400).json({ success: false, message: 'Email already registered' });
     }
-  });
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // ✅ Removed company_id (no such column in DB)
+    const [result] = await pool.query(
+      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
+      [name, email, hashedPassword, role || 'employee']
+    );
+
+    res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+      userId: result.insertId
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ success: false, message: 'Registration failed', error: error.message });
+  }
+});
 
   // Forgot Password
   router.post('/forgot-password', async (req, res) => {
@@ -317,4 +319,3 @@ module.exports = (pool) => {
 
   return router;
 };
-
