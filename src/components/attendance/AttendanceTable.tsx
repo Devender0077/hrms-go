@@ -96,23 +96,27 @@ const AttendanceTable: React.FC<AttendanceTableProps> = ({
             <TableCell>{formatDate(record.date)}</TableCell>
             <TableCell>
               <div className="text-sm">
-                <div className="font-medium">{formatTime(record.check_in)}</div>
-                {record.check_in_location && (
-                  <div className="text-xs text-default-500">📍 {record.check_in_location}</div>
+                <div className="font-medium">{formatTime(record.check_in || (record as any).check_in_time)}</div>
+                {((record as any).location_latitude || record.check_in_location) && (
+                  <div className="text-xs text-default-500">
+                    📍 {record.check_in_location || `${(record as any).location_latitude}, ${(record as any).location_longitude}`}
+                  </div>
                 )}
-                {record.check_in_ip && (
-                  <div className="text-xs text-default-500">🌐 {record.check_in_ip}</div>
+                {((record as any).ip_address || record.check_in_ip) && (
+                  <div className="text-xs text-default-500">🌐 {record.check_in_ip || (record as any).ip_address}</div>
                 )}
               </div>
             </TableCell>
             <TableCell>
               <div className="text-sm">
-                <div className="font-medium">{formatTime(record.check_out)}</div>
-                {record.check_out_location && (
-                  <div className="text-xs text-default-500">📍 {record.check_out_location}</div>
+                <div className="font-medium">{formatTime(record.check_out || (record as any).check_out_time)}</div>
+                {((record as any).location_latitude || record.check_out_location) && (
+                  <div className="text-xs text-default-500">
+                    📍 {record.check_out_location || `${(record as any).location_latitude}, ${(record as any).location_longitude}`}
+                  </div>
                 )}
-                {record.check_out_ip && (
-                  <div className="text-xs text-default-500">🌐 {record.check_out_ip}</div>
+                {((record as any).ip_address || record.check_out_ip) && (
+                  <div className="text-xs text-default-500">🌐 {record.check_out_ip || (record as any).ip_address}</div>
                 )}
               </div>
             </TableCell>

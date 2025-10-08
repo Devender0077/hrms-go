@@ -531,11 +531,22 @@ module.exports = (pool, authenticateToken) => {
         });
       }
 
-      // Create attendance record
+      // Get IP address
+      const ipAddress = req.ip || req.connection.remoteAddress || 'Unknown';
+      
+      // Create attendance record with location and IP
       const [result] = await pool.query(
-        `INSERT INTO attendance (employee_id, date, check_in_time, status, remarks, created_at, updated_at)
-         VALUES (?, ?, ?, 'Present', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-        [employeeId, today, currentTime, `Check-in at ${location || 'Office'} - ${device_info || 'Unknown device'}`]
+        `INSERT INTO attendance (employee_id, date, check_in_time, status, location_latitude, location_longitude, ip_address, remarks, created_at, updated_at)
+         VALUES (?, ?, ?, 'Present', ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+        [
+          employeeId, 
+          today, 
+          currentTime, 
+          location?.lat || null, 
+          location?.lng || null, 
+          ipAddress,
+          `Check-in via ${device_info || 'web app'}`
+        ]
       );
 
       res.status(201).json({ 
@@ -612,17 +623,23 @@ module.exports = (pool, authenticateToken) => {
         status = 'Early Leave';
       }
 
-      // Update attendance record
+      // Get IP address
+      const ipAddress = req.ip || req.connection.remoteAddress || 'Unknown';
+      
+      // Update attendance record with location and IP
       await pool.query(
         `UPDATE attendance SET 
           check_out_time = ?, 
           total_hours = ?, 
           overtime_hours = ?,
           status = ?,
-          remarks = CONCAT(IFNULL(remarks, ''), ' | Check-out at ${location || 'Office'} - ${device_info || 'Unknown device'}'),
+          location_latitude = COALESCE(location_latitude, ?),
+          location_longitude = COALESCE(location_longitude, ?),
+          ip_address = COALESCE(ip_address, ?),
+          remarks = CONCAT(IFNULL(remarks, ''), ' | Check-out via ${device_info || 'web app'}'),
           updated_at = CURRENT_TIMESTAMP
         WHERE id = ?`,
-        [currentTime, totalHours, overtimeHours, status, record.id]
+        [currentTime, totalHours, overtimeHours, status, location?.lat || null, location?.lng || null, ipAddress, record.id]
       );
 
       res.json({ 
