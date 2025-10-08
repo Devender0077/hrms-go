@@ -160,6 +160,9 @@ async function setupDatabase() {
 async function seedDefaultData(connection) {
   const bcrypt = require('bcrypt');
   
+  // Seed roles first
+  await seedRoles(connection);
+  
   // Check if users already exist
   const [existingUsers] = await connection.query('SELECT COUNT(*) as count FROM users');
   if (existingUsers[0].count > 0) {
@@ -236,6 +239,14 @@ async function seedDefaultData(connection) {
     await seedSettings(connection);
     log.success('Default settings created');
   }
+  
+  // Seed other important tables
+  await seedDepartments(connection);
+  await seedDesignations(connection);
+  await seedLeaveTypes(connection);
+  await seedDocumentTypes(connection);
+  await seedWeekendConfigs(connection);
+  await seedAttendanceRules(connection);
 }
 
 async function seedPermissions(connection) {
@@ -399,6 +410,207 @@ async function verifySetup(connection) {
     success: warnings.length === 0,
     warnings
   };
+}
+
+async function seedRoles(connection) {
+  log.step('Seeding roles...');
+  const roles = [
+    { name: 'super_admin', description: 'Super Administrator with full access', is_active: 1 },
+    { name: 'company_admin', description: 'Company Administrator', is_active: 1 },
+    { name: 'hr', description: 'HR Manager', is_active: 1 },
+    { name: 'manager', description: 'Department Manager', is_active: 1 },
+    { name: 'employee', description: 'Regular Employee', is_active: 1 },
+  ];
+  
+  for (const role of roles) {
+    await connection.query(
+      `INSERT IGNORE INTO roles (name, description, is_active, created_at, updated_at)
+       VALUES (?, ?, ?, NOW(), NOW())`,
+      [role.name, role.description, role.is_active]
+    );
+  }
+  log.success('Roles seeded');
+}
+
+async function seedDepartments(connection) {
+  log.step('Seeding departments...');
+  const [existing] = await connection.query('SELECT COUNT(*) as count FROM departments');
+  if (existing[0].count > 0) {
+    log.info('Departments already exist, skipping');
+    return;
+  }
+  
+  const departments = [
+    { name: 'Engineering', description: 'Software Development', status: 'active' },
+    { name: 'Human Resources', description: 'HR Management', status: 'active' },
+    { name: 'Sales', description: 'Sales and Marketing', status: 'active' },
+    { name: 'Finance', description: 'Finance and Accounting', status: 'active' },
+    { name: 'Operations', description: 'Operations Management', status: 'active' },
+  ];
+  
+  for (const dept of departments) {
+    await connection.query(
+      `INSERT INTO departments (name, description, status, company_id, created_at, updated_at)
+       VALUES (?, ?, ?, 1, NOW(), NOW())`,
+      [dept.name, dept.description, dept.status]
+    );
+  }
+  log.success('Departments seeded');
+}
+
+async function seedDesignations(connection) {
+  log.step('Seeding designations...');
+  const [existing] = await connection.query('SELECT COUNT(*) as count FROM designations');
+  if (existing[0].count > 0) {
+    log.info('Designations already exist, skipping');
+    return;
+  }
+  
+  const designations = [
+    { name: 'Software Engineer', description: 'Software Development', status: 'active' },
+    { name: 'Senior Software Engineer', description: 'Senior Developer', status: 'active' },
+    { name: 'HR Manager', description: 'Human Resources Manager', status: 'active' },
+    { name: 'Sales Executive', description: 'Sales Representative', status: 'active' },
+    { name: 'Accountant', description: 'Finance and Accounting', status: 'active' },
+    { name: 'Manager', description: 'Department Manager', status: 'active' },
+  ];
+  
+  for (const desig of designations) {
+    await connection.query(
+      `INSERT INTO designations (name, description, status, company_id, created_at, updated_at)
+       VALUES (?, ?, ?, 1, NOW(), NOW())`,
+      [desig.name, desig.description, desig.status]
+    );
+  }
+  log.success('Designations seeded');
+}
+
+async function seedLeaveTypes(connection) {
+  log.step('Seeding leave types...');
+  const [existing] = await connection.query('SELECT COUNT(*) as count FROM leave_types');
+  if (existing[0].count > 0) {
+    log.info('Leave types already exist, skipping');
+    return;
+  }
+  
+  const leaveTypes = [
+    { name: 'Casual Leave', days: 12, description: 'For personal matters', status: 'active' },
+    { name: 'Sick Leave', days: 10, description: 'For medical reasons', status: 'active' },
+    { name: 'Earned Leave', days: 15, description: 'Earned annual leave', status: 'active' },
+    { name: 'Maternity Leave', days: 180, description: 'For maternity', status: 'active' },
+    { name: 'Paternity Leave', days: 15, description: 'For paternity', status: 'active' },
+  ];
+  
+  for (const leave of leaveTypes) {
+    await connection.query(
+      `INSERT INTO leave_types (name, days, description, status, company_id, created_at, updated_at)
+       VALUES (?, ?, ?, ?, 1, NOW(), NOW())`,
+      [leave.name, leave.days, leave.description, leave.status]
+    );
+  }
+  log.success('Leave types seeded');
+}
+
+async function seedDocumentTypes(connection) {
+  log.step('Seeding document types...');
+  const [existing] = await connection.query('SELECT COUNT(*) as count FROM document_types');
+  if (existing[0].count > 0) {
+    log.info('Document types already exist, skipping');
+    return;
+  }
+  
+  const documentTypes = [
+    { name: 'Aadhar Card', description: 'Government ID', is_required: 1, status: 'active' },
+    { name: 'PAN Card', description: 'Tax ID', is_required: 1, status: 'active' },
+    { name: 'Passport', description: 'International ID', is_required: 0, status: 'active' },
+    { name: 'Driving License', description: 'Driving permit', is_required: 0, status: 'active' },
+    { name: 'Educational Certificate', description: 'Degree/Diploma', is_required: 1, status: 'active' },
+    { name: 'Experience Letter', description: 'Previous employment', is_required: 0, status: 'active' },
+  ];
+  
+  for (const doc of documentTypes) {
+    await connection.query(
+      `INSERT INTO document_types (name, description, is_required, status, company_id, created_at, updated_at)
+       VALUES (?, ?, ?, ?, 1, NOW(), NOW())`,
+      [doc.name, doc.description, doc.is_required, doc.status]
+    );
+  }
+  log.success('Document types seeded');
+}
+
+async function seedWeekendConfigs(connection) {
+  log.step('Seeding weekend configurations...');
+  const [existing] = await connection.query('SELECT COUNT(*) as count FROM weekend_configs');
+  if (existing[0].count > 0) {
+    log.info('Weekend configs already exist, skipping');
+    return;
+  }
+  
+  const weekends = [
+    { day_of_week: 0, name: 'Sunday', is_active: 1 },
+    { day_of_week: 6, name: 'Saturday', is_active: 1 },
+  ];
+  
+  for (const weekend of weekends) {
+    await connection.query(
+      `INSERT INTO weekend_configs (day_of_week, name, is_active, company_id, created_at, updated_at)
+       VALUES (?, ?, ?, 1, NOW(), NOW())`,
+      [weekend.day_of_week, weekend.name, weekend.is_active]
+    );
+  }
+  log.success('Weekend configurations seeded');
+}
+
+async function seedAttendanceRules(connection) {
+  log.step('Seeding attendance calculation rules...');
+  const [existing] = await connection.query('SELECT COUNT(*) as count FROM attendance_calculation_rules');
+  if (existing[0].count > 0) {
+    log.info('Attendance rules already exist, skipping');
+    return;
+  }
+  
+  const rules = [
+    {
+      name: 'Full Day',
+      type: 'full_day',
+      min_hours: 8,
+      max_hours: 10,
+      grace_period_minutes: 15,
+      overtime_threshold_hours: 8,
+      description: 'Standard full day work hours',
+      is_active: 1
+    },
+    {
+      name: 'Half Day',
+      type: 'half_day',
+      min_hours: 4,
+      max_hours: 5,
+      grace_period_minutes: 10,
+      overtime_threshold_hours: 4,
+      description: 'Half day work hours',
+      is_active: 1
+    },
+    {
+      name: 'Late Arrival',
+      type: 'late',
+      min_hours: 0,
+      max_hours: 0,
+      grace_period_minutes: 15,
+      overtime_threshold_hours: 0,
+      description: 'Late arrival beyond grace period',
+      is_active: 1
+    },
+  ];
+  
+  for (const rule of rules) {
+    await connection.query(
+      `INSERT INTO attendance_calculation_rules 
+       (name, type, min_hours, max_hours, grace_period_minutes, overtime_threshold_hours, description, is_active, company_id, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, NOW(), NOW())`,
+      [rule.name, rule.type, rule.min_hours, rule.max_hours, rule.grace_period_minutes, rule.overtime_threshold_hours, rule.description, rule.is_active]
+    );
+  }
+  log.success('Attendance rules seeded');
 }
 
 // Run the setup

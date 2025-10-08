@@ -86,7 +86,7 @@ import React, { useState, useEffect } from "react";
           <MobileSidebar isOpen={isOpen} onClose={onClose} />
           
           {/* Main Content */}
-          <div className="flex flex-col flex-1 overflow-hidden">
+          <div className="flex flex-col flex-1 overflow-y-auto">
             {/* Enhanced Top Navbar */}
             <Navbar maxWidth="full" className="bg-content1/80 backdrop-blur-xl px-4 lg:px-6">
               <NavbarContent className="gap-4" justify="start">
@@ -248,7 +248,7 @@ import React, { useState, useEffect } from "react";
             
             {/* Page Content */}
             <motion.main 
-              className="flex-1 overflow-y-auto bg-background"
+              className="flex-1 bg-background"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -257,7 +257,7 @@ import React, { useState, useEffect } from "react";
             </motion.main>
             
             {/* Footer */}
-            <footer className="bg-content1 py-4 px-6 mt-auto">
+            <footer className="bg-content1 py-4 px-6">
               <div className="flex flex-col md:flex-row justify-between items-center text-sm text-default-600">
                 <div className="flex items-center space-x-4 mb-2 md:mb-0">
                   <span>© 2024 HRMS GO. All rights reserved.</span>
