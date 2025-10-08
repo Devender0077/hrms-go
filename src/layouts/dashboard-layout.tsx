@@ -257,7 +257,7 @@ import React, { useState, useEffect } from "react";
             </motion.main>
             
             {/* Footer */}
-            <footer className="bg-content1 border-t border-divider py-4 px-6">
+            <footer className="bg-content1 py-4 px-6 mt-auto">
               <div className="flex flex-col md:flex-row justify-between items-center text-sm text-default-600">
                 <div className="flex items-center space-x-4 mb-2 md:mb-0">
                   <span>© 2024 HRMS GO. All rights reserved.</span>
