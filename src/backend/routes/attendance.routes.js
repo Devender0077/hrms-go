@@ -321,7 +321,7 @@ module.exports = (pool, authenticateToken) => {
                 params.push(end_date);
               }
 
-              query += ' ORDER BY u.first_name, u.last_name, a.date ASC';
+              query += ' ORDER BY e.first_name, e.last_name, a.date DESC';
 
               const [records] = await pool.query(query, params);
 

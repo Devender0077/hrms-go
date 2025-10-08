@@ -10,8 +10,10 @@ import EmployeeTable from "../components/employees/EmployeeTable";
 import EmployeeModals from "../components/employees/EmployeeModals";
 import ChangePasswordModal from "../components/employees/ChangePasswordModal";
 import HeroSection from "../components/common/HeroSection";
+import { useTranslation } from "../contexts/translation-context";
 
 export default function EmployeesPage() {
+  const { t } = useTranslation();
   const {
     employees,
     loading,
@@ -145,8 +147,8 @@ export default function EmployeesPage() {
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
         {/* Hero Section */}
         <HeroSection
-          title="Employee Management"
-          subtitle="Workforce Management"
+          title={t('Employees')}
+          subtitle={t('HR Management')}
           description="Manage your organization's workforce with comprehensive employee data, performance tracking, and streamlined HR processes."
           icon="lucide:users"
           illustration="employee"

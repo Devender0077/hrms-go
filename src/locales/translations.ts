@@ -51,21 +51,48 @@ export const translations = {
     'Reports': 'Reports',
     'System': 'System',
     
-    // Common
+    // Common Actions
     'Save': 'Save',
     'Cancel': 'Cancel',
     'Edit': 'Edit',
     'Delete': 'Delete',
     'Add': 'Add',
+    'Create': 'Create',
+    'Update': 'Update',
+    'View': 'View',
     'Search': 'Search',
     'Filter': 'Filter',
     'Export': 'Export',
     'Import': 'Import',
+    'Submit': 'Submit',
+    'Close': 'Close',
     'Loading': 'Loading',
     'Success': 'Success',
     'Error': 'Error',
     'Warning': 'Warning',
     'Info': 'Info',
+    
+    // Status
+    'Active': 'Active',
+    'Inactive': 'Inactive',
+    'Pending': 'Pending',
+    'Approved': 'Approved',
+    'Rejected': 'Rejected',
+    
+    // Common Labels
+    'Name': 'Name',
+    'Email': 'Email',
+    'Phone': 'Phone',
+    'Address': 'Address',
+    'Status': 'Status',
+    'Date': 'Date',
+    'Time': 'Time',
+    'Actions': 'Actions',
+    'Description': 'Description',
+    'Department': 'Department',
+    'Designation': 'Designation',
+    'Role': 'Role',
+    'Permissions': 'Permissions',
   },
   
   hi: {
@@ -115,21 +142,48 @@ export const translations = {
     'Reports': 'रिपोर्ट',
     'System': 'सिस्टम',
     
-    // Common
+    // Common Actions
     'Save': 'सहेजें',
     'Cancel': 'रद्द करें',
     'Edit': 'संपादित करें',
     'Delete': 'हटाएं',
     'Add': 'जोड़ें',
+    'Create': 'बनाएं',
+    'Update': 'अपडेट करें',
+    'View': 'देखें',
     'Search': 'खोजें',
     'Filter': 'फ़िल्टर',
     'Export': 'निर्यात',
     'Import': 'आयात',
+    'Submit': 'जमा करें',
+    'Close': 'बंद करें',
     'Loading': 'लोड हो रहा है',
     'Success': 'सफलता',
     'Error': 'त्रुटि',
     'Warning': 'चेतावनी',
     'Info': 'जानकारी',
+    
+    // Status
+    'Active': 'सक्रिय',
+    'Inactive': 'निष्क्रिय',
+    'Pending': 'लंबित',
+    'Approved': 'स्वीकृत',
+    'Rejected': 'अस्वीकृत',
+    
+    // Common Labels
+    'Name': 'नाम',
+    'Email': 'ईमेल',
+    'Phone': 'फ़ोन',
+    'Address': 'पता',
+    'Status': 'स्थिति',
+    'Date': 'तारीख',
+    'Time': 'समय',
+    'Actions': 'क्रियाएं',
+    'Description': 'विवरण',
+    'Department': 'विभाग',
+    'Designation': 'पदनाम',
+    'Role': 'भूमिका',
+    'Permissions': 'अनुमतियां',
   },
   
   es: {
@@ -179,21 +233,48 @@ export const translations = {
     'Reports': 'Informes',
     'System': 'Sistema',
     
-    // Common
+    // Common Actions
     'Save': 'Guardar',
     'Cancel': 'Cancelar',
     'Edit': 'Editar',
     'Delete': 'Eliminar',
     'Add': 'Agregar',
+    'Create': 'Crear',
+    'Update': 'Actualizar',
+    'View': 'Ver',
     'Search': 'Buscar',
     'Filter': 'Filtrar',
     'Export': 'Exportar',
     'Import': 'Importar',
+    'Submit': 'Enviar',
+    'Close': 'Cerrar',
     'Loading': 'Cargando',
     'Success': 'Éxito',
     'Error': 'Error',
     'Warning': 'Advertencia',
     'Info': 'Información',
+    
+    // Status
+    'Active': 'Activo',
+    'Inactive': 'Inactivo',
+    'Pending': 'Pendiente',
+    'Approved': 'Aprobado',
+    'Rejected': 'Rechazado',
+    
+    // Common Labels
+    'Name': 'Nombre',
+    'Email': 'Correo',
+    'Phone': 'Teléfono',
+    'Address': 'Dirección',
+    'Status': 'Estado',
+    'Date': 'Fecha',
+    'Time': 'Hora',
+    'Actions': 'Acciones',
+    'Description': 'Descripción',
+    'Department': 'Departamento',
+    'Designation': 'Designación',
+    'Role': 'Rol',
+    'Permissions': 'Permisos',
   },
   
   // Add more languages as needed (fr, de, zh, ar, pt, ru, ja)

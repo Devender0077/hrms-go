@@ -130,7 +130,11 @@ docker-compose up -d
 docker-compose logs -f
 ```
 
-📖 **For detailed deployment instructions, see [DEPLOYMENT.md](DEPLOYMENT.md)**
+📖 **Documentation:**
+- [DEPLOYMENT.md](DEPLOYMENT.md) - Complete deployment guide for all environments
+- [TRANSLATION_GUIDE.md](TRANSLATION_GUIDE.md) - How to use the translation system
+- [SEARCH_GUIDE.md](SEARCH_GUIDE.md) - Search implementation guide
+- [FIXES_SUMMARY.md](FIXES_SUMMARY.md) - All fixes and troubleshooting
 
 ## 📋 Prerequisites
 
