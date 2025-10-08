@@ -211,10 +211,19 @@ module.exports = (pool, authenticateToken) => {
   router.get('/holidays', authenticateToken, async (req, res) => {
     try {
       const companyId = req.user?.company_id || 1;
-      const [rows] = await pool.query(
-        'SELECT * FROM leave_holidays WHERE company_id = ? ORDER BY date ASC',
-        [companyId]
-      );
+      const { country } = req.query;
+      
+      let query = 'SELECT * FROM leave_holidays WHERE company_id = ?';
+      const params = [companyId];
+      
+      if (country && country !== 'All') {
+        query += ' AND country = ?';
+        params.push(country);
+      }
+      
+      query += ' ORDER BY date ASC';
+      
+      const [rows] = await pool.query(query, params);
       res.json({ success: true, data: rows });
     } catch (error) {
       console.error('Error fetching holidays:', error);
@@ -225,16 +234,45 @@ module.exports = (pool, authenticateToken) => {
   router.post('/holidays', authenticateToken, async (req, res) => {
     try {
       const companyId = req.user?.company_id || 1;
-      const { name, date, type, is_recurring, description } = req.body;
+      const { name, date, type, is_recurring, country } = req.body;
       const [result] = await pool.query(
-        `INSERT INTO leave_holidays (company_id, name, date, type, is_recurring, description)
+        `INSERT INTO leave_holidays (company_id, name, date, type, country, is_recurring)
          VALUES (?, ?, ?, ?, ?, ?)`,
-        [companyId, name, date, type, is_recurring, description]
+        [companyId, name, date, type, country || 'Global', is_recurring || 0]
       );
       res.status(201).json({ success: true, message: 'Holiday created successfully', data: { id: result.insertId } });
     } catch (error) {
       console.error('Error creating holiday:', error);
       res.status(500).json({ success: false, message: 'Error creating holiday' });
+    }
+  });
+
+  router.put('/holidays/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, date, type, is_recurring, country } = req.body;
+      
+      await pool.query(
+        `UPDATE leave_holidays SET name = ?, date = ?, type = ?, country = ?, is_recurring = ?
+         WHERE id = ? AND company_id = ?`,
+        [name, date, type, country || 'Global', is_recurring || 0, id, req.user?.company_id || 1]
+      );
+      
+      res.json({ success: true, message: 'Holiday updated successfully' });
+    } catch (error) {
+      console.error('Error updating holiday:', error);
+      res.status(500).json({ success: false, message: 'Error updating holiday' });
+    }
+  });
+
+  router.delete('/holidays/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await pool.query('DELETE FROM leave_holidays WHERE id = ? AND company_id = ?', [id, req.user?.company_id || 1]);
+      res.json({ success: true, message: 'Holiday deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting holiday:', error);
+      res.status(500).json({ success: false, message: 'Error deleting holiday' });
     }
   });
   

@@ -80,5 +80,70 @@ module.exports = (pool, authenticateToken) => {
     }
   });
 
-  return router;
-};
+          // Weekend Configuration Routes
+          router.get('/weekend-configs', authenticateToken, async (req, res) => {
+            try {
+              const [configs] = await pool.query('SELECT * FROM weekend_configs ORDER BY day_of_week');
+              res.json({ success: true, data: configs });
+            } catch (error) {
+              console.error('Error fetching weekend configs:', error);
+              res.status(500).json({ success: false, message: 'Error fetching weekend configs' });
+            }
+          });
+
+          router.post('/weekend-configs', authenticateToken, async (req, res) => {
+            try {
+              const { name, day_of_week, is_active, description } = req.body;
+
+              if (!name || day_of_week === undefined) {
+                return res.status(400).json({ success: false, message: 'Name and day_of_week are required' });
+              }
+
+              const [result] = await pool.query(
+                `INSERT INTO weekend_configs (name, day_of_week, is_active, description)
+                 VALUES (?, ?, ?, ?)`,
+                [name, day_of_week, is_active !== undefined ? is_active : true, description || '']
+              );
+
+              res.status(201).json({ success: true, message: 'Weekend config created successfully', data: { id: result.insertId } });
+            } catch (error) {
+              console.error('Error creating weekend config:', error);
+              res.status(500).json({ success: false, message: 'Error creating weekend config' });
+            }
+          });
+
+          router.put('/weekend-configs/:id', authenticateToken, async (req, res) => {
+            try {
+              const { id } = req.params;
+              const { name, day_of_week, is_active, description } = req.body;
+
+              if (!name || day_of_week === undefined) {
+                return res.status(400).json({ success: false, message: 'Name and day_of_week are required' });
+              }
+
+              await pool.query(
+                `UPDATE weekend_configs SET name = ?, day_of_week = ?, is_active = ?, description = ?, updated_at = NOW()
+                 WHERE id = ?`,
+                [name, day_of_week, is_active !== undefined ? is_active : true, description || '', id]
+              );
+
+              res.json({ success: true, message: 'Weekend config updated successfully' });
+            } catch (error) {
+              console.error('Error updating weekend config:', error);
+              res.status(500).json({ success: false, message: 'Error updating weekend config' });
+            }
+          });
+
+          router.delete('/weekend-configs/:id', authenticateToken, async (req, res) => {
+            try {
+              const { id } = req.params;
+              await pool.query('DELETE FROM weekend_configs WHERE id = ?', [id]);
+              res.json({ success: true, message: 'Weekend config deleted successfully' });
+            } catch (error) {
+              console.error('Error deleting weekend config:', error);
+              res.status(500).json({ success: false, message: 'Error deleting weekend config' });
+            }
+          });
+
+          return router;
+        };

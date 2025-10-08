@@ -1,7 +1,7 @@
 {
   "name": "hrms-hui-v2",
   "private": true,
-  "version": "2.4.4",
+  "version": "2.5.0",
   "license": "Proprietary",
   "type": "module",
   "scripts": {

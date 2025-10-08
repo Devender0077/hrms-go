@@ -26,7 +26,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
             </div>
             <Switch
               isSelected={settings.googleCalendar?.enabled === true || settings.googleCalendar?.enabled === 'true'}
-              onValueChange={(value) => onSettingsChange('googleCalendar', 'enabled', value)}
+              onValueChange={(value) => onSettingsChange('googleCalendar', {
+                ...settings.googleCalendar,
+                enabled: value
+              })}
             />
           </div>
 
@@ -73,7 +76,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.googleCalendar?.syncLeaveRequests === true || settings.googleCalendar?.syncLeaveRequests === 'true'}
-                  onValueChange={(value) => onSettingsChange('googleCalendar', 'syncLeaveRequests', value)}
+                  onValueChange={(value) => onSettingsChange('googleCalendar', {
+                    ...settings.googleCalendar,
+                    syncLeaveRequests: value
+                  })}
                 />
               </div>
 
@@ -84,7 +90,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.googleCalendar?.syncMeetings === true || settings.googleCalendar?.syncMeetings === 'true'}
-                  onValueChange={(value) => onSettingsChange('googleCalendar', 'syncMeetings', value)}
+                  onValueChange={(value) => onSettingsChange('googleCalendar', {
+                    ...settings.googleCalendar,
+                    syncMeetings: value
+                  })}
                 />
               </div>
 
@@ -113,7 +122,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
             </div>
             <Switch
               isSelected={settings.slack?.enabled === true || settings.slack?.enabled === 'true'}
-              onValueChange={(value) => onSettingsChange('slack', 'enabled', value)}
+              onValueChange={(value) => onSettingsChange('slack', {
+                ...settings.slack,
+                enabled: value
+              })}
             />
           </div>
 
@@ -148,7 +160,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.slack?.leaveNotifications === true || settings.slack?.leaveNotifications === 'true'}
-                  onValueChange={(value) => onSettingsChange('slack', 'leaveNotifications', value)}
+                  onValueChange={(value) => onSettingsChange('slack', {
+                    ...settings.slack,
+                    leaveNotifications: value
+                  })}
                 />
               </div>
 
@@ -159,7 +174,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.slack?.birthdayNotifications === true || settings.slack?.birthdayNotifications === 'true'}
-                  onValueChange={(value) => onSettingsChange('slack', 'birthdayNotifications', value)}
+                  onValueChange={(value) => onSettingsChange('slack', {
+                    ...settings.slack,
+                    birthdayNotifications: value
+                  })}
                 />
               </div>
 
@@ -188,7 +206,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
             </div>
             <Switch
               isSelected={settings.zoom?.enabled === true || settings.zoom?.enabled === 'true'}
-              onValueChange={(value) => onSettingsChange('zoom', 'enabled', value)}
+              onValueChange={(value) => onSettingsChange('zoom', {
+                ...settings.zoom,
+                enabled: value
+              })}
             />
           </div>
 
@@ -235,7 +256,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.zoom?.autoCreateMeetings === true || settings.zoom?.autoCreateMeetings === 'true'}
-                  onValueChange={(value) => onSettingsChange('zoom', 'autoCreateMeetings', value)}
+                  onValueChange={(value) => onSettingsChange('zoom', {
+                    ...settings.zoom,
+                    autoCreateMeetings: value
+                  })}
                 />
               </div>
 
@@ -266,7 +290,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
               </div>
               <Switch
                 isSelected={settings.paypal?.enabled === true || settings.paypal?.enabled === 'true'}
-                onValueChange={(value) => onSettingsChange('paypal', 'enabled', value)}
+                onValueChange={(value) => onSettingsChange('paypal', {
+                  ...settings.paypal,
+                  enabled: value
+                })}
               />
             </div>
 
@@ -304,7 +331,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
               </div>
               <Switch
                 isSelected={settings.stripe?.enabled === true || settings.stripe?.enabled === 'true'}
-                onValueChange={(value) => onSettingsChange('stripe', 'enabled', value)}
+                onValueChange={(value) => onSettingsChange('stripe', {
+                  ...settings.stripe,
+                  enabled: value
+                })}
               />
             </div>
 
@@ -351,7 +381,10 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
             </div>
             <Switch
               isSelected={settings.quickbooks?.enabled === true || settings.quickbooks?.enabled === 'true'}
-              onValueChange={(value) => onSettingsChange('quickbooks', 'enabled', value)}
+              onValueChange={(value) => onSettingsChange('quickbooks', {
+                ...settings.quickbooks,
+                enabled: value
+              })}
             />
           </div>
 
@@ -398,13 +431,417 @@ export default function IntegrationSettings({ settings, onSettingsChange }: Inte
                 </div>
                 <Switch
                   isSelected={settings.quickbooks?.syncPayroll === true || settings.quickbooks?.syncPayroll === 'true'}
-                  onValueChange={(value) => onSettingsChange('quickbooks', 'syncPayroll', value)}
+                  onValueChange={(value) => onSettingsChange('quickbooks', {
+                    ...settings.quickbooks,
+                    syncPayroll: value
+                  })}
                 />
               </div>
 
               <Button color="primary" variant="flat" className="w-full">
                 <Icon icon="lucide:calculator" className="text-lg" />
                 Connect QuickBooks
+              </Button>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* Pusher Integration */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:radio" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Pusher (Real-time Notifications)</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Pusher</p>
+              <p className="text-xs text-default-500">Real-time notifications and updates</p>
+            </div>
+            <Switch
+              isSelected={settings.pusher?.enabled === true || settings.pusher?.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('pusher', {
+                ...settings.pusher,
+                enabled: value
+              })}
+            />
+          </div>
+
+          {settings.pusher?.enabled && (
+            <div className="space-y-4">
+              <Input
+                label="App ID"
+                value={settings.pusher?.appId || ''}
+                onChange={(e) => onSettingsChange('pusher', {
+                  ...settings.pusher,
+                  appId: e.target.value
+                })}
+                placeholder="Enter Pusher App ID"
+                startContent={<Icon icon="lucide:hash" className="text-default-400" />}
+              />
+
+              <Input
+                label="App Key"
+                value={settings.pusher?.appKey || ''}
+                onChange={(e) => onSettingsChange('pusher', {
+                  ...settings.pusher,
+                  appKey: e.target.value
+                })}
+                placeholder="Enter Pusher App Key"
+                startContent={<Icon icon="lucide:key" className="text-default-400" />}
+              />
+
+              <Input
+                label="App Secret"
+                type="password"
+                value={settings.pusher?.appSecret || ''}
+                onChange={(e) => onSettingsChange('pusher', {
+                  ...settings.pusher,
+                  appSecret: e.target.value
+                })}
+                placeholder="Enter Pusher App Secret"
+                startContent={<Icon icon="lucide:lock" className="text-default-400" />}
+              />
+
+              <Input
+                label="Cluster"
+                value={settings.pusher?.cluster || 'us2'}
+                onChange={(e) => onSettingsChange('pusher', {
+                  ...settings.pusher,
+                  cluster: e.target.value
+                })}
+                placeholder="e.g., us2, eu, ap1"
+                startContent={<Icon icon="lucide:globe" className="text-default-400" />}
+              />
+
+              <Button color="primary" variant="flat" className="w-full">
+                <Icon icon="lucide:radio" className="text-lg" />
+                Test Pusher Connection
+              </Button>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* Microsoft Teams Integration */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:message-square" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Microsoft Teams</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Microsoft Teams</p>
+              <p className="text-xs text-default-500">Send notifications and updates to Teams</p>
+            </div>
+            <Switch
+              isSelected={settings.microsoftTeams?.enabled === true || settings.microsoftTeams?.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('microsoftTeams', {
+                ...settings.microsoftTeams,
+                enabled: value
+              })}
+            />
+          </div>
+
+          {settings.microsoftTeams?.enabled && (
+            <div className="space-y-4">
+              <Input
+                label="Webhook URL"
+                value={settings.microsoftTeams?.webhookUrl || ''}
+                onChange={(e) => onSettingsChange('microsoftTeams', {
+                  ...settings.microsoftTeams,
+                  webhookUrl: e.target.value
+                })}
+                placeholder="Enter Microsoft Teams Webhook URL"
+                startContent={<Icon icon="lucide:link" className="text-default-400" />}
+              />
+
+              <Input
+                label="Tenant ID"
+                value={settings.microsoftTeams?.tenantId || ''}
+                onChange={(e) => onSettingsChange('microsoftTeams', {
+                  ...settings.microsoftTeams,
+                  tenantId: e.target.value
+                })}
+                placeholder="Enter Tenant ID"
+                startContent={<Icon icon="lucide:building" className="text-default-400" />}
+              />
+
+              <Input
+                label="Client ID"
+                value={settings.microsoftTeams?.clientId || ''}
+                onChange={(e) => onSettingsChange('microsoftTeams', {
+                  ...settings.microsoftTeams,
+                  clientId: e.target.value
+                })}
+                placeholder="Enter Client ID"
+                startContent={<Icon icon="lucide:key" className="text-default-400" />}
+              />
+
+              <Input
+                label="Client Secret"
+                type="password"
+                value={settings.microsoftTeams?.clientSecret || ''}
+                onChange={(e) => onSettingsChange('microsoftTeams', {
+                  ...settings.microsoftTeams,
+                  clientSecret: e.target.value
+                })}
+                placeholder="Enter Client Secret"
+                startContent={<Icon icon="lucide:lock" className="text-default-400" />}
+              />
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Notify on Leave Requests</p>
+                  <p className="text-xs text-default-500">Send Teams notification for new leave requests</p>
+                </div>
+                <Switch
+                  isSelected={settings.microsoftTeams?.notifyLeaveRequests === true || settings.microsoftTeams?.notifyLeaveRequests === 'true'}
+                  onValueChange={(value) => onSettingsChange('microsoftTeams', {
+                    ...settings.microsoftTeams,
+                    notifyLeaveRequests: value
+                  })}
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Notify on Attendance</p>
+                  <p className="text-xs text-default-500">Send Teams notification for attendance updates</p>
+                </div>
+                <Switch
+                  isSelected={settings.microsoftTeams?.notifyAttendance === true || settings.microsoftTeams?.notifyAttendance === 'true'}
+                  onValueChange={(value) => onSettingsChange('microsoftTeams', {
+                    ...settings.microsoftTeams,
+                    notifyAttendance: value
+                  })}
+                />
+              </div>
+
+              <Button color="primary" variant="flat" className="w-full">
+                <Icon icon="lucide:message-square" className="text-lg" />
+                Test Teams Connection
+              </Button>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* Twilio Integration (SMS) */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:message-circle" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Twilio (SMS Notifications)</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Twilio</p>
+              <p className="text-xs text-default-500">Send SMS notifications to employees</p>
+            </div>
+            <Switch
+              isSelected={settings.twilio?.enabled === true || settings.twilio?.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('twilio', {
+                ...settings.twilio,
+                enabled: value
+              })}
+            />
+          </div>
+
+          {settings.twilio?.enabled && (
+            <div className="space-y-4">
+              <Input
+                label="Account SID"
+                value={settings.twilio?.accountSid || ''}
+                onChange={(e) => onSettingsChange('twilio', {
+                  ...settings.twilio,
+                  accountSid: e.target.value
+                })}
+                placeholder="Enter Twilio Account SID"
+                startContent={<Icon icon="lucide:hash" className="text-default-400" />}
+              />
+
+              <Input
+                label="Auth Token"
+                type="password"
+                value={settings.twilio?.authToken || ''}
+                onChange={(e) => onSettingsChange('twilio', {
+                  ...settings.twilio,
+                  authToken: e.target.value
+                })}
+                placeholder="Enter Twilio Auth Token"
+                startContent={<Icon icon="lucide:lock" className="text-default-400" />}
+              />
+
+              <Input
+                label="Phone Number"
+                value={settings.twilio?.phoneNumber || ''}
+                onChange={(e) => onSettingsChange('twilio', {
+                  ...settings.twilio,
+                  phoneNumber: e.target.value
+                })}
+                placeholder="+1234567890"
+                startContent={<Icon icon="lucide:phone" className="text-default-400" />}
+              />
+
+              <Button color="primary" variant="flat" className="w-full">
+                <Icon icon="lucide:message-circle" className="text-lg" />
+                Test Twilio Connection
+              </Button>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* AWS S3 Integration */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:cloud" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">AWS S3 (Cloud Storage)</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable AWS S3</p>
+              <p className="text-xs text-default-500">Store files and documents in AWS S3</p>
+            </div>
+            <Switch
+              isSelected={settings.awsS3?.enabled === true || settings.awsS3?.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('awsS3', {
+                ...settings.awsS3,
+                enabled: value
+              })}
+            />
+          </div>
+
+          {settings.awsS3?.enabled && (
+            <div className="space-y-4">
+              <Input
+                label="Access Key ID"
+                value={settings.awsS3?.accessKeyId || ''}
+                onChange={(e) => onSettingsChange('awsS3', {
+                  ...settings.awsS3,
+                  accessKeyId: e.target.value
+                })}
+                placeholder="Enter AWS Access Key ID"
+                startContent={<Icon icon="lucide:key" className="text-default-400" />}
+              />
+
+              <Input
+                label="Secret Access Key"
+                type="password"
+                value={settings.awsS3?.secretAccessKey || ''}
+                onChange={(e) => onSettingsChange('awsS3', {
+                  ...settings.awsS3,
+                  secretAccessKey: e.target.value
+                })}
+                placeholder="Enter AWS Secret Access Key"
+                startContent={<Icon icon="lucide:lock" className="text-default-400" />}
+              />
+
+              <Input
+                label="Bucket Name"
+                value={settings.awsS3?.bucketName || ''}
+                onChange={(e) => onSettingsChange('awsS3', {
+                  ...settings.awsS3,
+                  bucketName: e.target.value
+                })}
+                placeholder="your-bucket-name"
+                startContent={<Icon icon="lucide:folder" className="text-default-400" />}
+              />
+
+              <Input
+                label="Region"
+                value={settings.awsS3?.region || 'us-east-1'}
+                onChange={(e) => onSettingsChange('awsS3', {
+                  ...settings.awsS3,
+                  region: e.target.value
+                })}
+                placeholder="us-east-1"
+                startContent={<Icon icon="lucide:globe" className="text-default-400" />}
+              />
+
+              <Button color="primary" variant="flat" className="w-full">
+                <Icon icon="lucide:cloud" className="text-lg" />
+                Test S3 Connection
+              </Button>
+            </div>
+          )}
+        </CardBody>
+      </Card>
+
+      {/* Google Drive Integration */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <Icon icon="lucide:hard-drive" className="text-primary-500 text-xl" />
+            <h3 className="text-lg font-semibold text-foreground">Google Drive</h3>
+          </div>
+        </CardHeader>
+        <CardBody className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-foreground">Enable Google Drive</p>
+              <p className="text-xs text-default-500">Store documents in Google Drive</p>
+            </div>
+            <Switch
+              isSelected={settings.googleDrive?.enabled === true || settings.googleDrive?.enabled === 'true'}
+              onValueChange={(value) => onSettingsChange('googleDrive', {
+                ...settings.googleDrive,
+                enabled: value
+              })}
+            />
+          </div>
+
+          {settings.googleDrive?.enabled && (
+            <div className="space-y-4">
+              <Input
+                label="Client ID"
+                value={settings.googleDrive?.clientId || ''}
+                onChange={(e) => onSettingsChange('googleDrive', {
+                  ...settings.googleDrive,
+                  clientId: e.target.value
+                })}
+                placeholder="Enter Google Drive Client ID"
+                startContent={<Icon icon="lucide:key" className="text-default-400" />}
+              />
+
+              <Input
+                label="Client Secret"
+                type="password"
+                value={settings.googleDrive?.clientSecret || ''}
+                onChange={(e) => onSettingsChange('googleDrive', {
+                  ...settings.googleDrive,
+                  clientSecret: e.target.value
+                })}
+                placeholder="Enter Client Secret"
+                startContent={<Icon icon="lucide:lock" className="text-default-400" />}
+              />
+
+              <Input
+                label="Folder ID"
+                value={settings.googleDrive?.folderId || ''}
+                onChange={(e) => onSettingsChange('googleDrive', {
+                  ...settings.googleDrive,
+                  folderId: e.target.value
+                })}
+                placeholder="Enter Google Drive Folder ID"
+                startContent={<Icon icon="lucide:folder" className="text-default-400" />}
+              />
+
+              <Button color="primary" variant="flat" className="w-full">
+                <Icon icon="lucide:hard-drive" className="text-lg" />
+                Connect Google Drive
               </Button>
             </div>
           )}

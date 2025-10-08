@@ -33,9 +33,10 @@ interface Holiday {
   name: string;
   date: string;
   type: string;
-  description: string;
+  country: string;
+  description?: string;
   is_recurring: boolean;
-  is_active: boolean;
+  is_active?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -47,6 +48,7 @@ export default function Holidays() {
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [countryFilter, setCountryFilter] = useState("All");
   const [selectedHoliday, setSelectedHoliday] = useState<Holiday | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
   
@@ -59,19 +61,21 @@ export default function Holidays() {
     name: "",
     date: "",
     type: "national",
-    description: "",
+    country: "Global",
     is_recurring: false,
-    is_active: true,
   });
 
   useEffect(() => {
     loadHolidays();
-  }, []);
+  }, [countryFilter]);
 
   const loadHolidays = async () => {
     try {
       setLoading(true);
-      const response = await apiRequest("/leave/holidays");
+      const url = countryFilter && countryFilter !== "All" 
+        ? `/leave/holidays?country=${countryFilter}`
+        : "/leave/holidays";
+      const response = await apiRequest(url);
       if (response.success) {
         setHolidays(response.data || []);
       }
@@ -89,9 +93,8 @@ export default function Holidays() {
       name: "",
       date: "",
       type: "national",
-      description: "",
+      country: "Global",
       is_recurring: false,
-      is_active: true,
     });
     onOpen();
   };
@@ -99,13 +102,14 @@ export default function Holidays() {
   const handleEdit = (holiday: Holiday) => {
     setSelectedHoliday(holiday);
     setIsEditMode(true);
+    // Format date for HTML date input (YYYY-MM-DD)
+    const formattedDate = new Date(holiday.date).toISOString().split('T')[0];
     setFormData({
-      name: holiday.name,
-      date: holiday.date,
-      type: holiday.type,
-      description: holiday.description,
-      is_recurring: holiday.is_recurring,
-      is_active: holiday.is_active,
+      name: holiday.name || "",
+      date: formattedDate,
+      type: holiday.type || "national",
+      country: holiday.country || "Global",
+      is_recurring: holiday.is_recurring || false,
     });
     onOpen();
   };
@@ -115,7 +119,7 @@ export default function Holidays() {
       setSaving(true);
       
       const url = isEditMode 
-        ? `/api/v1/leave/holidays/${selectedHoliday?.id}`
+        ? `/leave/holidays/${selectedHoliday?.id}`
         : "/leave/holidays";
       const method = isEditMode ? "PUT" : "POST";
       
@@ -134,7 +138,7 @@ export default function Holidays() {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to delete this holiday?")) {
       try {
-        const response = await apiRequest("DELETE", `/api/v1/leave/holidays/${id}`);
+        const response = await apiRequest(`/leave/holidays/${id}`, { method: "DELETE" });
         if (response.success) {
           await loadHolidays();
         }
@@ -144,10 +148,62 @@ export default function Holidays() {
     }
   };
 
+  // Helper function to normalize holiday names for comparison
+  const normalizeHolidayName = (name: string): string => {
+    return name
+      .trim()
+      .toLowerCase()
+      .replace(/[''']/g, '') // Remove apostrophes
+      .replace(/\s+/g, ' ') // Normalize spaces
+      .replace(/\./g, '') // Remove periods
+      .replace(/\bday\b/g, '') // Remove "day" word
+      .replace(/\s+/g, ' ') // Normalize spaces again
+      .trim();
+  };
+
+  // Group holidays by normalized name and date to merge duplicates across countries
+  const groupedHolidays = holidays.reduce((acc: any[], holiday) => {
+    // Normalize date format for comparison
+    const normalizedDate = holiday.date instanceof Date 
+      ? holiday.date.toISOString().split('T')[0]
+      : holiday.date.split('T')[0];
+    
+    // Normalize name for comparison
+    const normalizedName = normalizeHolidayName(holiday.name);
+    const key = `${normalizedName}_${normalizedDate}`;
+    
+    const existing = acc.find(h => {
+      const hDate = h.date instanceof Date ? h.date.toISOString().split('T')[0] : h.date.split('T')[0];
+      const hName = normalizeHolidayName(h.name);
+      return `${hName}_${hDate}` === key;
+    });
+    
+    if (existing) {
+      // Add country to existing holiday if not already present
+      if (!existing.countries.includes(holiday.country)) {
+        existing.countries.push(holiday.country);
+      }
+      // Keep all IDs for reference
+      if (!existing.ids) {
+        existing.ids = [existing.id];
+      }
+      existing.ids.push(holiday.id);
+    } else {
+      // Create new grouped holiday
+      acc.push({
+        ...holiday,
+        date: normalizedDate,
+        countries: [holiday.country],
+        ids: [holiday.id]
+      });
+    }
+    
+    return acc;
+  }, []);
+
   // Filter holidays based on search query and type
-  const filteredHolidays = holidays.filter(holiday => {
-    const matchesSearch = holiday.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         holiday.description.toLowerCase().includes(searchQuery.toLowerCase());
+  const filteredHolidays = groupedHolidays.filter(holiday => {
+    const matchesSearch = holiday.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesType = typeFilter === "all" || holiday.type === typeFilter;
     return matchesSearch && matchesType;
   });
@@ -201,6 +257,16 @@ export default function Holidays() {
     );
   }
 
+  // Calculate statistics by country
+  const stats = {
+    total: holidays.length,
+    india: holidays.filter(h => h.country === 'India').length,
+    usa: holidays.filter(h => h.country === 'USA').length,
+    global: holidays.filter(h => h.country === 'Global').length,
+    national: holidays.filter(h => h.type === 'national').length,
+    religious: holidays.filter(h => h.type === 'religious').length,
+  };
+
   return (
     <PageLayout>
       <PageHeader
@@ -230,6 +296,17 @@ export default function Holidays() {
                 </SelectItem>
               )) as any}
             </Select>
+            <Select
+              placeholder="Filter by country"
+              selectedKeys={[countryFilter]}
+              onSelectionChange={(keys) => setCountryFilter(Array.from(keys)[0] as string)}
+              className="w-40"
+            >
+              <SelectItem key="All">All Countries</SelectItem>
+              <SelectItem key="India">🇮🇳 India</SelectItem>
+              <SelectItem key="USA">🇺🇸 USA</SelectItem>
+              <SelectItem key="Global">🌍 Global</SelectItem>
+            </Select>
             <Button
               color="primary"
               startContent={<Icon icon="lucide:plus" />}
@@ -241,6 +318,65 @@ export default function Holidays() {
         }
       />
 
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Card className="shadow-sm">
+          <CardBody className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">Total Holidays</p>
+                <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+              </div>
+              <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
+                <Icon icon="lucide:calendar" className="text-primary-600 dark:text-primary-400 text-2xl" />
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardBody className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">🇮🇳 India Holidays</p>
+                <p className="text-2xl font-bold text-foreground">{stats.india}</p>
+              </div>
+              <div className="p-3 bg-success-100 dark:bg-success-900/30 rounded-lg">
+                <Icon icon="lucide:flag" className="text-success-600 dark:text-success-400 text-2xl" />
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardBody className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">🇺🇸 USA Holidays</p>
+                <p className="text-2xl font-bold text-foreground">{stats.usa}</p>
+              </div>
+              <div className="p-3 bg-warning-100 dark:bg-warning-900/30 rounded-lg">
+                <Icon icon="lucide:flag" className="text-warning-600 dark:text-warning-400 text-2xl" />
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardBody className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-default-500">National Holidays</p>
+                <p className="text-2xl font-bold text-foreground">{stats.national}</p>
+              </div>
+              <div className="p-3 bg-secondary-100 dark:bg-secondary-900/30 rounded-lg">
+                <Icon icon="lucide:star" className="text-secondary-600 dark:text-secondary-400 text-2xl" />
+              </div>
+            </div>
+          </CardBody>
+        </Card>
+      </div>
+
       {/* Holidays Table */}
       <Card>
         <CardHeader>
@@ -251,9 +387,9 @@ export default function Holidays() {
             <TableHeader>
               <TableColumn>HOLIDAY NAME</TableColumn>
               <TableColumn>DATE</TableColumn>
+              <TableColumn>COUNTRY</TableColumn>
               <TableColumn>TYPE</TableColumn>
               <TableColumn>RECURRING</TableColumn>
-              <TableColumn>STATUS</TableColumn>
               <TableColumn>ACTIONS</TableColumn>
             </TableHeader>
             <TableBody>
@@ -262,11 +398,26 @@ export default function Holidays() {
                   <TableCell>
                     <div>
                       <p className="font-semibold text-foreground">{holiday.name}</p>
-                      <p className="text-sm text-default-500">{holiday.description}</p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <span className="font-medium">{formatDate(holiday.date)}</span>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {holiday.countries.map((country: string, idx: number) => (
+                        <Chip 
+                          key={idx}
+                          color="secondary" 
+                          variant="flat" 
+                          size="sm"
+                        >
+                          {country === 'India' ? '🇮🇳 India' : 
+                           country === 'USA' ? '🇺🇸 USA' : 
+                           '🌍 ' + country}
+                        </Chip>
+                      ))}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Chip 
@@ -284,15 +435,6 @@ export default function Holidays() {
                       size="sm"
                     >
                       {holiday.is_recurring ? "Yes" : "No"}
-                    </Chip>
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      color={getStatusColor(holiday.is_active)} 
-                      variant="flat" 
-                      size="sm"
-                    >
-                      {getStatusText(holiday.is_active)}
                     </Chip>
                   </TableCell>
                   <TableCell>
@@ -350,7 +492,7 @@ export default function Holidays() {
                   <Input
                     label="Holiday Name"
                     placeholder="Enter holiday name"
-                    
+                    value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     isRequired
                   />
@@ -358,7 +500,7 @@ export default function Holidays() {
                   <Input
                     label="Date"
                     type="date"
-                    
+                    value={formData.date}
                     onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                     isRequired
                   />
@@ -377,33 +519,26 @@ export default function Holidays() {
                     ))}
                   </Select>
                   
-                  <Textarea
-                    label="Description"
-                    placeholder="Enter holiday description"
-                    
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  />
+                  <Select
+                    label="Country"
+                    placeholder="Select country"
+                    selectedKeys={[formData.country]}
+                    onSelectionChange={(keys) => setFormData({ ...formData, country: Array.from(keys)[0] as string })}
+                    isRequired
+                  >
+                    <SelectItem key="Global">🌍 Global</SelectItem>
+                    <SelectItem key="India">🇮🇳 India</SelectItem>
+                    <SelectItem key="USA">🇺🇸 USA</SelectItem>
+                  </Select>
                   
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.is_recurring}
-                        onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
-                        className="rounded"
-                      />
-                      <label className="text-sm">Recurring Holiday</label>
-                    </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.is_active}
-                        onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                        className="rounded"
-                      />
-                      <label className="text-sm">Active</label>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_recurring}
+                      onChange={(e) => setFormData({ ...formData, is_recurring: e.target.checked })}
+                      className="rounded"
+                    />
+                    <label className="text-sm">Recurring Holiday</label>
                   </div>
                 </div>
               </ModalBody>

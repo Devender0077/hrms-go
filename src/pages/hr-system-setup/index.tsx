@@ -28,6 +28,7 @@ import IncomeTypeSettings from "../../components/hr-setup/IncomeTypeSettings";
 import PaymentTypeSettings from "../../components/hr-setup/PaymentTypeSettings";
 import ContractTypeSettings from "../../components/hr-setup/ContractTypeSettings";
 import AttendanceCalculationSettings from "../../components/hr-setup/AttendanceCalculationSettings";
+import WeekendSettings from "../../components/hr-setup/WeekendSettings";
 
 // HR System Setup configuration
 const hrSetupCategories = [
@@ -162,7 +163,8 @@ const hrSetupCategories = [
     icon: "lucide:clock",
     description: "Configure attendance calculation rules",
     items: [
-      { key: "attendance-calculation", title: "Attendance Calculation", icon: "lucide:calculator", description: "Configure attendance calculation rules" }
+      { key: "attendance-calculation", title: "Attendance Calculation", icon: "lucide:calculator", description: "Configure attendance calculation rules" },
+      { key: "weekend-config", title: "Weekend Configuration", icon: "lucide:calendar", description: "Configure weekend days" }
     ]
   }
 ];
@@ -227,6 +229,7 @@ export default function HRSystemSetup() {
       
       // Attendance
       case "attendance-calculation": return <AttendanceCalculationSettings />;
+      case "weekend-config": return <WeekendSettings />;
       
       default:
         return (

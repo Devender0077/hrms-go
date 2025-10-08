@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button, Tooltip } from "@heroui/react";
 import { motion } from "framer-motion";
@@ -26,15 +26,8 @@ import { useVersion } from "../contexts/version-context";
       items: NavItem[];
     }
     
-export default function Sidebar({ isOpen }: SidebarProps) {
-  const location = useLocation();
-  const { user } = useAuth();
-  const { taskCounts } = useTaskContext();
-  const { hasAnyPermission, loading: permissionsLoading } = usePermissions();
-  const { getSiteName, getCompanyName, loading: settingsLoading } = useSettings();
-  const { currentVersion } = useVersion();
-      
-      const navSections: NavSection[] = [
+// Static navigation sections (moved outside component for performance)
+const navSections: NavSection[] = [
         {
           title: "Main",
           items: [
@@ -54,7 +47,6 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           title: "Tasks", 
           icon: "lucide:check-circle", 
           path: "/dashboard/tasks", 
-          badge: taskCounts.pending + taskCounts.in_progress,
           permissions: ["tasks.view"]
         },
         { 
@@ -501,15 +493,38 @@ export default function Sidebar({ isOpen }: SidebarProps) {
           ]
         }
       ];
+
+export default function Sidebar({ isOpen }: SidebarProps) {
+  const location = useLocation();
+  const { user } = useAuth();
+  const { taskCounts } = useTaskContext();
+  const { hasAnyPermission, loading: permissionsLoading } = usePermissions();
+  const { getSiteName, getCompanyName, loading: settingsLoading } = useSettings();
+  const { currentVersion } = useVersion();
+
+  // Add dynamic data to navigation items
+  const navSectionsWithData = useMemo(() => {
+    return navSections.map(section => ({
+      ...section,
+      items: section.items.map(item => ({
+        ...item,
+        badge: item.title === "Tasks" ? (taskCounts.pending + taskCounts.in_progress) : item.badge
+      }))
+    }));
+  }, [taskCounts.pending, taskCounts.in_progress]);
       
-  // Filter navigation items based on permissions
-  const filteredNavSections = navSections.map(section => ({
-    ...section,
-    items: section.items.filter(item => {
-      if (permissionsLoading) return false;
-      return hasAnyPermission(item.permissions);
-    })
-  })).filter(section => section.items.length > 0);
+  // Filter navigation items based on permissions (memoized for performance)
+  const filteredNavSections = useMemo(() => {
+    // Show all items initially, then filter when permissions load
+    if (permissionsLoading) {
+      return navSectionsWithData;
+    }
+    
+    return navSectionsWithData.map(section => ({
+      ...section,
+      items: section.items.filter(item => hasAnyPermission(item.permissions))
+    })).filter(section => section.items.length > 0);
+  }, [navSectionsWithData, hasAnyPermission, permissionsLoading]);
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -528,31 +543,43 @@ export default function Sidebar({ isOpen }: SidebarProps) {
       
       return (
         <aside 
-      className={`bg-content1 shadow-md border-r border-default-300 transition-all duration-300 flex flex-col h-full ${
+      className={`bg-content1/95 backdrop-blur-xl shadow-2xl border-r border-default-200/50 transition-all duration-300 flex flex-col h-full ${
             isOpen ? "w-64" : "w-20"
       }`}
         >
-          {/* Logo */}
-      <div className="p-4 flex items-center justify-center h-16 border-b border-default-300">
+          {/* Logo Section with Gradient Background */}
+      <div className="p-4 flex items-center justify-center h-20 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 backdrop-blur-sm">
             {isOpen ? (
-          <h1 className="text-xl font-bold text-foreground truncate">
-            {settingsLoading ? 'HRMS' : (getSiteName() || 'HRMS')}
-          </h1>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">
+                {settingsLoading ? 'HR' : (getSiteName()?.substring(0, 2).toUpperCase() || 'HR')}
+              </span>
+            </div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent truncate">
+              {settingsLoading ? 'HRMS' : (getSiteName() || 'HRMS')}
+            </h1>
+          </div>
             ) : (
-          <h1 className="text-xl font-bold text-primary-600">
-            {settingsLoading ? 'HR' : (getSiteName()?.substring(0, 2).toUpperCase() || 'HR')}
-          </h1>
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-lg">
+            <span className="text-white font-bold text-lg">
+              {settingsLoading ? 'HR' : (getSiteName()?.substring(0, 2).toUpperCase() || 'HR')}
+            </span>
+          </div>
             )}
       </div>
           
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto py-4 px-2">
+          <nav className="flex-1 overflow-y-auto py-6 px-3 custom-scrollbar">
         {filteredNavSections.map((section, idx) => (
-                <div key={idx} className="mb-6">
+                <div key={idx} className="mb-8">
                   {isOpen && (
-                    <p className="px-4 text-xs font-medium text-default-500 uppercase tracking-wider mb-2">
-                      {section.title}
-                    </p>
+                    <div className="px-3 mb-3">
+                      <p className="text-xs font-semibold text-default-600 uppercase tracking-wider flex items-center gap-2">
+                        <span className="w-8 h-0.5 bg-gradient-to-r from-primary-500/50 to-transparent rounded-full"></span>
+                        {section.title}
+                      </p>
+                    </div>
                   )}
                   
                   <ul>
@@ -570,7 +597,11 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                               <Button
                           variant={isActiveItem ? "flat" : "light"}
                           color={isActiveItem ? "primary" : "default"}
-                                className="justify-start w-full mb-1 rounded-lg"
+                                className={`justify-start w-full mb-2 rounded-2xl transition-all duration-200 ${
+                                  isActiveItem 
+                                    ? 'shadow-lg shadow-primary-500/20 scale-[1.02]' 
+                                    : 'hover:shadow-md hover:scale-[1.01] hover:bg-default-100/50'
+                                }`}
                                 startContent={
                                   <div className="relative">
                                     <Icon icon={item.icon} className="text-lg" />
@@ -592,7 +623,11 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                                   isIconOnly
                             variant={isActiveItem ? "flat" : "light"}
                             color={isActiveItem ? "primary" : "default"}
-                                  className="w-full mb-1 rounded-lg"
+                                  className={`w-full mb-2 rounded-2xl transition-all duration-200 ${
+                                    isActiveItem 
+                                      ? 'shadow-lg shadow-primary-500/20 scale-[1.05]' 
+                                      : 'hover:shadow-md hover:scale-[1.02] hover:bg-default-100/50'
+                                  }`}
                                   aria-label={item.title}
                                 >
                                   <div className="relative">
@@ -615,24 +650,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
         ))}
           </nav>
 
-      {/* System Status & Version */}
-      <div className="p-4 border-t border-default-300">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
-            <Icon icon="lucide:activity" className="text-foreground text-sm" />
-          </div>
-          {isOpen && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">
-                {settingsLoading ? 'Loading...' : 'System Online'}
-              </p>
-              <p className="text-xs text-default-500 truncate">
-                {settingsLoading ? '...' : `v${currentVersion}`}
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Footer - System Status & Version removed as requested */}
         </aside>
       );
     }

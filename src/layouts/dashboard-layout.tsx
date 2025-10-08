@@ -18,6 +18,7 @@ import React, { useState, useEffect } from "react";
     import { useNavigate } from "react-router-dom";
     import { useAuth } from "../contexts/auth-context";
     import { useTheme } from "../contexts/theme-context";
+    import { useTranslation } from "../contexts/translation-context";
     import { employeeAPI } from "../services/api-service";
     import { getDefaultAvatar } from "../utils/avatarUtils";
     import Sidebar from "../components/sidebar";
@@ -36,7 +37,13 @@ import React, { useState, useEffect } from "react";
       const { isOpen, onOpen, onClose } = useDisclosure();
       const { user, logout } = useAuth();
       const { theme, toggleTheme } = useTheme();
+      const { language, setLanguage, t } = useTranslation();
       const navigate = useNavigate();
+      
+      // Debug: Log current language
+      useEffect(() => {
+        console.log('Current language:', language);
+      }, [language]);
       
       const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
@@ -81,7 +88,7 @@ import React, { useState, useEffect } from "react";
           {/* Main Content */}
           <div className="flex flex-col flex-1 overflow-hidden">
             {/* Enhanced Top Navbar */}
-            <Navbar maxWidth="full" className="shadow-sm border-b border-divider px-4 lg:px-6">
+            <Navbar maxWidth="full" className="bg-content1/80 backdrop-blur-xl shadow-lg border-b border-default-200/50 px-4 lg:px-6">
               <NavbarContent className="gap-4" justify="start">
                 {/* Sidebar Toggle */}
                 <Button 
@@ -123,6 +130,41 @@ import React, { useState, useEffect } from "react";
                   >
                     <Icon icon="lucide:search" className="text-xl" />
                   </Button>
+                </NavbarItem>
+
+                {/* Language Selector */}
+                <NavbarItem>
+                  <Dropdown>
+                    <DropdownTrigger>
+                      <Button 
+                        isIconOnly 
+                        variant="light"
+                        aria-label="Select Language"
+                        className="rounded-lg"
+                      >
+                        <Icon icon="lucide:languages" className="text-xl" />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu 
+                      aria-label="Language Selection"
+                      selectedKeys={[language]}
+                      onAction={(key) => {
+                        console.log('Language selected:', key);
+                        setLanguage(key as string);
+                      }}
+                    >
+                      <DropdownItem key="en" startContent="🇺🇸">English</DropdownItem>
+                      <DropdownItem key="hi" startContent="🇮🇳">Hindi</DropdownItem>
+                      <DropdownItem key="es" startContent="🇪🇸">Spanish</DropdownItem>
+                      <DropdownItem key="fr" startContent="🇫🇷">French</DropdownItem>
+                      <DropdownItem key="de" startContent="🇩🇪">German</DropdownItem>
+                      <DropdownItem key="zh" startContent="🇨🇳">Chinese</DropdownItem>
+                      <DropdownItem key="ar" startContent="🇸🇦">Arabic</DropdownItem>
+                      <DropdownItem key="pt" startContent="🇵🇹">Portuguese</DropdownItem>
+                      <DropdownItem key="ru" startContent="🇷🇺">Russian</DropdownItem>
+                      <DropdownItem key="ja" startContent="🇯🇵">Japanese</DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
                 </NavbarItem>
 
                 {/* Theme Toggle */}

@@ -1,6 +1,55 @@
-# 🏢 HRMS HUI v2 (hrms-go)
+# 🏢 HRMS HUI v2.5.0 (hrms-go)
 
 A modern Human Resource Management System (HRMS) combining a Vite + React TypeScript frontend with a Node.js (Express) backend and MySQL. This repository contains the frontend HUI (v2) and a modular backend under `src/backend` with migrations and demo data.
+
+## ✨ Latest Updates (v2.5.0)
+
+### **🌍 Internationalization & Localization**
+- **Multi-Language Support**: Added 10 languages (English, Hindi, Spanish, French, German, Chinese, Arabic, Portuguese, Russian, Japanese)
+- **Language Selector**: Quick language switcher in top navbar with flag icons
+- **Currency Support**: Added Indian Rupee (₹) and 9 other currencies with auto-populated symbols
+- **Timezone Support**: Added IST (India Standard Time) and 10 other timezones
+
+### **⚙️ Enhanced Settings**
+- **Logo & Favicon Upload**: Upload and preview company logo and favicon with file validation
+- **Enhanced Color Picker**: Visual color swatches with live preview for primary color selection
+- **New Integrations**: Added Pusher, Microsoft Teams, Twilio (SMS), AWS S3, and Google Drive
+- **Fixed Integration Toggles**: All enable/disable switches now work correctly
+
+### **🗓️ Advanced Holiday Management**
+- **Country-Wise Holidays**: Pre-populated with 24 government holidays (14 India + 11 USA)
+- **Smart Grouping**: Duplicate holidays across countries displayed in single row with multiple country tags
+- **Country Filtering**: Filter holidays by India, USA, or Global
+- **Statistics Dashboard**: Visual cards showing holiday counts by country and type
+- **Recurring Holidays**: Fixed display of recurring holidays in attendance muster
+
+### **📊 Attendance & Timekeeping**
+- **Fixed Date Format Issues**: Attendance records now display correctly with proper date matching
+- **Weekend Detection**: Timezone-safe weekend detection (Saturday & Sunday)
+- **Holiday Integration**: All holidays including recurring ones now display in attendance muster
+- **Duplicate Rules Cleanup**: Removed duplicate attendance calculation rules
+
+### **🔔 Notifications**
+- **Removed Mock Data**: Cleaned up dummy notifications
+- **Real-Time Ready**: System prepared for real notification events
+- **7-Day Retention**: Auto-cleanup of notifications older than 7 days
+
+### **📱 Mobile & Responsive Design**
+- **Permission-Based Mobile Navigation**: Mobile sidebar now filters pages by user permissions
+- **Shared Navigation Config**: Single source of truth for desktop and mobile navigation
+- **Touch-Optimized UI**: Large buttons, smooth animations, and mobile-friendly interactions
+- **Responsive Breakpoints**: Seamless experience across all screen sizes
+- **Dynamic Branding**: Mobile sidebar displays company logo and name from settings
+
+### **🐛 Bug Fixes**
+- Fixed integration toggle switches not saving
+- Fixed holidays API 500 errors
+- Fixed weekend display showing wrong days
+- Fixed attendance data not reflecting after updates
+- Fixed server management scripts
+- Fixed translation system initialization
+- Fixed mobile sidebar `require()` error in ES modules
+- Improved error handling across the application
 
 ## 🚀 Quick Setup (Recommended)
 
@@ -13,8 +62,11 @@ chmod +x setup-project.sh
 # Run the complete setup
 ./setup-project.sh
 
-# Start the backend server
-./setup-project.sh start-backend
+# Start both servers
+./start-servers.sh
+
+# Stop both servers
+./stop-servers.sh
 ```
 
 ## 📋 Prerequisites
@@ -226,6 +278,14 @@ hrms_hui_v2/
 - Data export capabilities
 - Real-time analytics
 
+### ⏰ **Advanced Attendance Management**
+- Monthly attendance grid view
+- Dynamic holiday integration from leave system
+- Configurable weekend settings
+- Real-time attendance status calculation
+- Attendance muster with visual indicators
+- Status legend (Present, Absent, Half Day, Late, Early Leave, On Leave, Holiday, Weekend)
+
 ## 🔌 API Endpoints
 
 ### Authentication
@@ -241,8 +301,21 @@ hrms_hui_v2/
 
 ### Timekeeping
 - `GET /api/v1/timekeeping/muster` - Get attendance muster
+- `GET /api/v1/timekeeping/monthly-muster` - Get monthly attendance data with holidays and weekends
 - `PUT /api/v1/timekeeping/:id` - Update attendance record
 - `POST /api/v1/timekeeping` - Create attendance record
+- `POST /api/v1/timekeeping/check-in` - Employee check-in
+- `POST /api/v1/timekeeping/check-out` - Employee check-out
+
+### HR System Setup
+- `GET /api/v1/hr-setup/weekend-configs` - Get weekend configurations
+- `POST /api/v1/hr-setup/weekend-configs` - Create weekend configuration
+- `PUT /api/v1/hr-setup/weekend-configs/:id` - Update weekend configuration
+- `DELETE /api/v1/hr-setup/weekend-configs/:id` - Delete weekend configuration
+- `GET /api/v1/hr-setup/attendance-rules` - Get attendance calculation rules
+- `POST /api/v1/hr-setup/attendance-rules` - Create attendance rule
+- `PUT /api/v1/hr-setup/attendance-rules/:id` - Update attendance rule
+- `DELETE /api/v1/hr-setup/attendance-rules/:id` - Delete attendance rule
 
 ### Leave Management
 - `GET /api/v1/leave/applications` - Get leave applications
@@ -384,15 +457,24 @@ For support and questions:
 - Added dynamic version management
 - Enhanced UI consistency across all modules
 
+### **🎨 UI/UX Enhancements (v2.5.0)**
+- **Modern Sidebar Design**: Gradient backgrounds, frosted glass effect, and custom scrollbar
+- **Enhanced Navigation**: Rounded buttons with glow effects and smooth animations
+- **Responsive Mobile View**: Permission-based navigation matching desktop experience
+- **Transparent Layout Option**: Toggle for transparent sidebar and navbar
+- **Color Swatches**: Visual color picker with 8 preset colors
+
 ## 🎯 Roadmap
 
-- [ ] Mobile app development
-- [ ] Advanced reporting dashboard
-- [ ] Integration with external HR systems
-- [ ] Multi-language support
+- [x] Multi-language support (10 languages)
+- [x] Mobile responsive design
+- [x] Real-time notifications framework
+- [ ] Mobile app development (iOS/Android)
+- [ ] Advanced reporting dashboard with AI insights
+- [ ] Integration with external HR systems (ADP, Workday, etc.)
 - [ ] Advanced workflow automation
-- [ ] Real-time notifications
-- [ ] Advanced analytics and AI insights
+- [ ] Biometric attendance integration
+- [ ] Advanced analytics and predictive insights
 
 ---
 

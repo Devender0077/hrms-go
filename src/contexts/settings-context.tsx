@@ -64,7 +64,7 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
       setSettings(data);
       
       // Update page title dynamically
-      const siteName = data.general?.siteName || 'HRMS Platform';
+      const siteName = data?.general?.siteName || 'HRMS Platform';
       document.title = `${siteName} - Human Resource Management System`;
       
       // Apply all settings features
@@ -73,6 +73,12 @@ export const SettingsProvider: React.FC<SettingsProviderProps> = ({ children }) 
     } catch (err) {
       console.error('Error loading settings:', err);
       setError(err instanceof Error ? err.message : 'Failed to load settings');
+      // Set default settings to prevent undefined errors
+      setSettings({
+        general: { siteName: 'HRMS Platform', companyName: 'Your Company' },
+        appearance: { theme: 'light' },
+        features: { enableNotifications: true }
+      });
     } finally {
       setLoading(false);
     }

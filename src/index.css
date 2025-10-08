@@ -25,6 +25,26 @@ html, body {
   }
 }
 
+/* Custom scrollbar for sidebar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(var(--heroui-primary-500), 0.3), rgba(var(--heroui-secondary-500), 0.3));
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(var(--heroui-primary-500), 0.5), rgba(var(--heroui-secondary-500), 0.5));
+}
+
 /* Custom scrollbar */
 @utility scrollbar-hidden {
   &::-webkit-scrollbar {

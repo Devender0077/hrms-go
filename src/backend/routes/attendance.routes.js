@@ -19,22 +19,20 @@ module.exports = (pool, authenticateToken) => {
 
       // Get all active employees
       const [employees] = await pool.query(
-        `SELECT u.id, u.first_name, u.last_name, e.employee_id, u.designation_id, u.department_id
-         FROM users u
-         LEFT JOIN employees e ON u.id = e.user_id
-         WHERE u.status = 'active' AND u.role != 'super_admin'`
+        `SELECT e.id, e.first_name, e.last_name, e.id as employee_id, e.designation_id, e.department_id
+         FROM employees e
+         WHERE e.status = 'active'`
       );
 
       // Fetch attendance records for the given date
       const [attendanceRecords] = await pool.query(
         `SELECT a.id, a.employee_id, a.date, a.check_in_time, a.check_out_time, a.status, a.total_hours, a.overtime_hours, a.remarks,
-                u.first_name, u.last_name, e.employee_id as employee_code,
+                e.first_name, e.last_name, e.employee_id as employee_code,
                 d.name as designation_name, dep.name as department_name
          FROM attendance a
-         JOIN users u ON a.employee_id = u.id
-         LEFT JOIN employees e ON u.id = e.user_id
-         LEFT JOIN designations d ON u.designation_id = d.id
-         LEFT JOIN departments dep ON u.department_id = dep.id
+         JOIN employees e ON a.employee_id = e.id
+         LEFT JOIN designations d ON e.designation_id = d.id
+         LEFT JOIN departments dep ON e.department_id = dep.id
          WHERE a.date = ?`,
         [date]
       );
@@ -86,12 +84,51 @@ module.exports = (pool, authenticateToken) => {
     }
   });
 
-  // Update attendance record
+  // Update or create attendance record
   router.put('/:id', authenticateToken, async (req, res) => {
     try {
       const { id } = req.params;
-      const { check_in_time, check_out_time, status, remarks } = req.body;
+      const { employee_id, date, check_in_time, check_out_time, status, remarks } = req.body;
 
+      // If id is 'null' or 'undefined', create a new record
+      if (id === 'null' || id === 'undefined' || !id) {
+        if (!employee_id || !date) {
+          return res.status(400).json({ success: false, message: 'employee_id and date are required for creating new attendance record' });
+        }
+
+        // Calculate total hours if both check_in_time and check_out_time are provided
+        let total_hours = 0;
+        let overtime_hours = 0;
+        
+        if (check_in_time && check_out_time) {
+          const checkInTime = new Date(`2000-01-01T${check_in_time}`);
+          const checkOutTime = new Date(`2000-01-01T${check_out_time}`);
+          total_hours = (checkOutTime - checkInTime) / (1000 * 60 * 60);
+          
+          // Calculate overtime (assuming 8 hours is standard)
+          if (total_hours > 8) {
+            overtime_hours = total_hours - 8;
+          }
+        }
+
+        const [result] = await pool.query(
+          `INSERT INTO attendance (employee_id, date, check_in_time, check_out_time, status, total_hours, overtime_hours, remarks)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+           ON DUPLICATE KEY UPDATE
+           check_in_time = VALUES(check_in_time),
+           check_out_time = VALUES(check_out_time),
+           status = VALUES(status),
+           total_hours = VALUES(total_hours),
+           overtime_hours = VALUES(overtime_hours),
+           remarks = VALUES(remarks),
+           updated_at = CURRENT_TIMESTAMP`,
+          [employee_id, date, check_in_time, check_out_time, status, total_hours, overtime_hours, remarks]
+        );
+
+        return res.json({ success: true, message: 'Attendance record created/updated successfully', data: { id: result.insertId } });
+      }
+
+      // Update existing record
       // Calculate total hours if both check_in_time and check_out_time are provided
       let total_hours = 0;
       let overtime_hours = 0;
@@ -236,50 +273,223 @@ module.exports = (pool, authenticateToken) => {
     }
   });
 
-  // Get attendance records for a user
-  router.get('/attendance-records', authenticateToken, async (req, res) => {
-    try {
-      const { employee_id, start_date, end_date } = req.query;
-      const userId = req.user.id;
+          // Get attendance records for a user or all users
+          router.get('/attendance-records', authenticateToken, async (req, res) => {
+            try {
+              const { employee_id, start_date, end_date } = req.query;
+              const userId = req.user.id;
 
-      let query = `
-        SELECT a.*, u.first_name, u.last_name, e.employee_id as employee_code
-        FROM attendance a
-        JOIN users u ON a.employee_id = u.id
-        LEFT JOIN employees e ON u.id = e.user_id
-        WHERE 1=1
-      `;
-      const params = [];
+              let query = `
+                SELECT a.*, e.first_name, e.last_name, e.employee_id as employee_code,
+                       d.name as designation_name, dep.name as department_name
+                FROM attendance a
+                JOIN employees e ON a.employee_id = e.id
+                LEFT JOIN designations d ON e.designation_id = d.id
+                LEFT JOIN departments dep ON e.department_id = dep.id
+                WHERE 1=1
+              `;
+              const params = [];
 
-      // If employee_id is provided, filter by it, otherwise use current user
-      if (employee_id) {
-        query += ' AND a.employee_id = ?';
-        params.push(employee_id);
-      } else {
-        query += ' AND a.employee_id = ?';
-        params.push(userId);
-      }
+              // If employee_id is provided, filter by it, otherwise use current user's employee ID
+              if (employee_id) {
+                query += ' AND a.employee_id = ?';
+                params.push(employee_id);
+              } else {
+                // Get the employee ID for the current user
+                const [userEmployee] = await pool.query(
+                  'SELECT id FROM employees WHERE user_id = ?',
+                  [userId]
+                );
+                if (userEmployee.length === 0) {
+                  return res.status(404).json({ success: false, message: 'Employee record not found for user' });
+                }
+                query += ' AND a.employee_id = ?';
+                params.push(userEmployee[0].id);
+              }
 
-      if (start_date) {
-        query += ' AND a.date >= ?';
-        params.push(start_date);
-      }
+              if (start_date) {
+                query += ' AND a.date >= ?';
+                params.push(start_date);
+              }
 
-      if (end_date) {
-        query += ' AND a.date <= ?';
-        params.push(end_date);
-      }
+              if (end_date) {
+                query += ' AND a.date <= ?';
+                params.push(end_date);
+              }
 
-      query += ' ORDER BY a.date DESC LIMIT 100';
+              query += ' ORDER BY u.first_name, u.last_name, a.date ASC';
 
-      const [records] = await pool.query(query, params);
+              const [records] = await pool.query(query, params);
 
-      res.json({ success: true, data: records });
-    } catch (error) {
-      console.error('Error fetching attendance records:', error);
-      res.status(500).json({ success: false, message: 'Error fetching attendance records' });
-    }
-  });
+              // Transform records to match the expected format
+              const transformedRecords = records.map(record => ({
+                id: record.id,
+                employee_id: record.employee_id,
+                employee_name: `${record.first_name} ${record.last_name}`,
+                employee_code: record.employee_code,
+                designation_name: record.designation_name,
+                department_name: record.department_name,
+                date: record.date,
+                check_in_time: record.check_in_time,
+                check_out_time: record.check_out_time,
+                total_hours: record.total_hours,
+                status: record.status,
+                overtime_hours: record.overtime_hours,
+                remarks: record.remarks
+              }));
+
+              res.json({ success: true, data: transformedRecords });
+            } catch (error) {
+              console.error('Error fetching attendance records:', error);
+              res.status(500).json({ success: false, message: 'Error fetching attendance records' });
+            }
+          });
+
+          // Get all employees' attendance for a month (for muster view)
+          router.get('/monthly-muster', authenticateToken, async (req, res) => {
+            try {
+              const { start_date, end_date } = req.query;
+              
+              if (!start_date || !end_date) {
+                return res.status(400).json({ success: false, message: 'start_date and end_date are required' });
+              }
+
+              // Get all active employees
+              const [employees] = await pool.query(
+                `SELECT e.id, e.first_name, e.last_name, e.employee_id as employee_code, e.designation_id, e.department_id,
+                        d.name as designation_name, dep.name as department_name
+                 FROM employees e
+                 LEFT JOIN designations d ON e.designation_id = d.id
+                 LEFT JOIN departments dep ON e.department_id = dep.id
+                 WHERE e.status = 'active'
+                 ORDER BY e.first_name, e.last_name`
+              );
+
+              // Get all attendance records for the date range
+              const [attendanceRecords] = await pool.query(
+                `SELECT a.*, e.first_name, e.last_name, e.id as employee_id,
+                        e.employee_id as employee_code, d.name as designation_name, dep.name as department_name
+                 FROM attendance a
+                 JOIN employees e ON a.employee_id = e.id
+                 LEFT JOIN designations d ON e.designation_id = d.id
+                 LEFT JOIN departments dep ON e.department_id = dep.id
+                 WHERE a.date >= ? AND a.date <= ?
+                 ORDER BY e.first_name, e.last_name, a.date ASC`,
+                [start_date, end_date]
+              );
+
+              // Get holidays for the date range (including both recurring and non-recurring)
+              const [holidaysRaw] = await pool.query(
+                `SELECT date, name, type FROM leave_holidays 
+                 WHERE date >= ? AND date <= ?
+                 ORDER BY date ASC`,
+                [start_date, end_date]
+              );
+              
+              // Format holiday dates as YYYY-MM-DD
+              const holidays = holidaysRaw.map(h => ({
+                ...h,
+                date: h.date instanceof Date ? h.date.toISOString().split('T')[0] : h.date.split('T')[0]
+              }));
+
+              // Get weekend configurations
+              const [weekendConfigs] = await pool.query(
+                `SELECT day_of_week, name FROM weekend_configs 
+                 WHERE is_active = 1 
+                 ORDER BY day_of_week`
+              );
+
+              // Create a map of attendance records by employee and date
+              const attendanceMap = new Map();
+              attendanceRecords.forEach(record => {
+                // Format date as YYYY-MM-DD to match frontend expectations
+                const formattedDate = record.date instanceof Date 
+                  ? record.date.toISOString().split('T')[0]
+                  : record.date.split('T')[0];
+                const key = `${record.employee_id}_${formattedDate}`;
+                attendanceMap.set(key, {
+                  id: record.id,
+                  employee_id: record.employee_id,
+                  employee_name: `${record.first_name} ${record.last_name}`,
+                  employee_code: record.employee_code,
+                  designation_name: record.designation_name,
+                  department_name: record.department_name,
+                  date: formattedDate,
+                  check_in_time: record.check_in_time,
+                  check_out_time: record.check_out_time,
+                  total_hours: record.total_hours,
+                  status: record.status,
+                  overtime_hours: record.overtime_hours,
+                  remarks: record.remarks
+                });
+              });
+
+              // Calculate comprehensive statistics
+              const startDate = new Date(start_date);
+              const endDate = new Date(end_date);
+              const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+              const totalPossibleRecords = employees.length * totalDays;
+
+              // Count attendance records by status
+              const statusCounts = {
+                Present: 0,
+                Absent: 0,
+                'Half Day': 0,
+                Late: 0,
+                'Early Leave': 0,
+                'On Leave': 0,
+                Holiday: 0
+              };
+
+              attendanceRecords.forEach(record => {
+                if (statusCounts.hasOwnProperty(record.status)) {
+                  statusCounts[record.status]++;
+                }
+              });
+
+              // Add holiday and weekend counts
+              const weekendDays = weekendConfigs.map(config => config.day_of_week);
+              const totalWeekendDays = weekendDays.length;
+              
+              // Calculate total weekend records for the month
+              let weekendRecords = 0;
+              for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                if (weekendDays.includes(d.getDay())) {
+                  weekendRecords += employees.length;
+                }
+              }
+
+              const stats = {
+                totalEmployees: employees.length,
+                totalDays: totalDays,
+                totalPossibleRecords: totalPossibleRecords,
+                present: statusCounts.Present,
+                absent: statusCounts.Absent,
+                halfDay: statusCounts['Half Day'],
+                late: statusCounts.Late,
+                earlyLeave: statusCounts['Early Leave'],
+                onLeave: statusCounts['On Leave'],
+                holiday: holidays.length,
+                weekend: weekendRecords,
+              };
+
+              console.log('Calculated stats:', stats);
+
+              res.json({ 
+                success: true, 
+                data: { 
+                  employees: employees,
+                  attendanceMap: Object.fromEntries(attendanceMap),
+                  holidays: holidays,
+                  weekendConfigs: weekendConfigs,
+                  stats: stats
+                }
+              });
+            } catch (error) {
+              console.error('Error fetching monthly muster:', error);
+              res.status(500).json({ success: false, message: 'Error fetching monthly muster' });
+            }
+          });
 
   // Check-in endpoint
   router.post('/check-in', authenticateToken, async (req, res) => {
@@ -289,10 +499,25 @@ module.exports = (pool, authenticateToken) => {
       const today = new Date().toISOString().split('T')[0];
       const currentTime = new Date().toTimeString().split(' ')[0];
 
+      // Get the employee ID for the current user
+      const [userEmployee] = await pool.query(
+        'SELECT id FROM employees WHERE user_id = ?',
+        [userId]
+      );
+      
+      if (userEmployee.length === 0) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Employee record not found for user' 
+        });
+      }
+      
+      const employeeId = userEmployee[0].id;
+
       // Check if user already checked in today
       const [existing] = await pool.query(
         'SELECT id FROM attendance WHERE employee_id = ? AND date = ?',
-        [userId, today]
+        [employeeId, today]
       );
 
       if (existing.length > 0) {
@@ -306,7 +531,7 @@ module.exports = (pool, authenticateToken) => {
       const [result] = await pool.query(
         `INSERT INTO attendance (employee_id, date, check_in_time, status, remarks, created_at, updated_at)
          VALUES (?, ?, ?, 'Present', ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
-        [userId, today, currentTime, `Check-in at ${location || 'Office'} - ${device_info || 'Unknown device'}`]
+        [employeeId, today, currentTime, `Check-in at ${location || 'Office'} - ${device_info || 'Unknown device'}`]
       );
 
       res.status(201).json({ 
@@ -332,10 +557,25 @@ module.exports = (pool, authenticateToken) => {
       const today = new Date().toISOString().split('T')[0];
       const currentTime = new Date().toTimeString().split(' ')[0];
 
+      // Get the employee ID for the current user
+      const [userEmployee] = await pool.query(
+        'SELECT id FROM employees WHERE user_id = ?',
+        [userId]
+      );
+      
+      if (userEmployee.length === 0) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'Employee record not found for user' 
+        });
+      }
+      
+      const employeeId = userEmployee[0].id;
+
       // Find today's attendance record
       const [records] = await pool.query(
         'SELECT id, check_in_time FROM attendance WHERE employee_id = ? AND date = ?',
-        [userId, today]
+        [employeeId, today]
       );
 
       if (records.length === 0) {

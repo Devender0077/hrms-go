@@ -13,13 +13,15 @@ module.exports = (pool, authenticateToken) => {
   router.get('/', authenticateToken, async (req, res) => {
     try {
       const [users] = await pool.query(
-        `SELECT u.id, u.name, u.email, u.role, u.status, u.profile_photo, u.phone, u.department_id, u.designation_id,
+        `SELECT u.id, u.name, u.email, u.role, u.status, u.profile_photo, u.phone,
                 u.created_at, u.last_login, u.first_name, u.last_name, u.is_email_verified, u.is_phone_verified, u.two_factor_enabled,
+                e.department_id, e.designation_id, e.employee_id,
                 d.name as department_name, des.name as designation_name,
                 COUNT(DISTINCT rp.permission_id) as permission_count
          FROM users u
-         LEFT JOIN departments d ON u.department_id = d.id
-         LEFT JOIN designations des ON u.designation_id = des.id
+         LEFT JOIN employees e ON u.id = e.user_id
+         LEFT JOIN departments d ON e.department_id = d.id
+         LEFT JOIN designations des ON e.designation_id = des.id
          LEFT JOIN roles r ON u.role = r.name
          LEFT JOIN role_permissions rp ON r.id = rp.role_id
          GROUP BY u.id
@@ -71,9 +73,9 @@ module.exports = (pool, authenticateToken) => {
 
       // Assign permissions if provided
       if (permissions && permissions.length > 0) {
-        const permissionValues = permissions.map(permissionId => [roleId, permissionId, true, new Date(), new Date()]);
+        const permissionValues = permissions.map(permissionId => [roleId, permissionId, true]);
         await pool.query(
-          'INSERT INTO role_permissions (role_id, permission_id, is_active, created_at, updated_at) VALUES ?',
+          'INSERT INTO role_permissions (role_id, permission_id, is_active) VALUES ?',
           [permissionValues]
         );
       }
@@ -196,9 +198,9 @@ module.exports = (pool, authenticateToken) => {
 
       // Add new permissions
       if (permissions && permissions.length > 0) {
-        const permissionValues = permissions.map(permissionId => [roleId, permissionId, true, new Date(), new Date()]);
+        const permissionValues = permissions.map(permissionId => [roleId, permissionId, true]);
         await pool.query(
-          'INSERT INTO role_permissions (role_id, permission_id, is_active, created_at, updated_at) VALUES ?',
+          'INSERT INTO role_permissions (role_id, permission_id, is_active) VALUES ?',
           [permissionValues]
         );
       }
@@ -227,11 +229,13 @@ module.exports = (pool, authenticateToken) => {
     try {
       const { id } = req.params;
       const [users] = await pool.query(
-        `SELECT u.*, d.name as department_name, des.name as designation_name,
+        `SELECT u.*, e.department_id, e.designation_id, e.employee_id,
+                d.name as department_name, des.name as designation_name,
                 COUNT(DISTINCT rp.permission_id) as permission_count
          FROM users u
-         LEFT JOIN departments d ON u.department_id = d.id
-         LEFT JOIN designations des ON u.designation_id = des.id
+         LEFT JOIN employees e ON u.id = e.user_id
+         LEFT JOIN departments d ON e.department_id = d.id
+         LEFT JOIN designations des ON e.designation_id = des.id
          LEFT JOIN roles r ON u.role = r.name
          LEFT JOIN role_permissions rp ON r.id = rp.role_id
          WHERE u.id = ?
@@ -262,13 +266,31 @@ module.exports = (pool, authenticateToken) => {
       
       const hashedPassword = await bcrypt.hash(password, 10);
       
+      // Create user record
       const [result] = await pool.query(
-        `INSERT INTO users (name, email, password, role, phone, department_id, designation_id, status, company_id, first_name, last_name)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [name, email, hashedPassword, role, phone, department_id, designation_id, status || 'active', req.user?.company_id || 1, first_name, last_name]
+        `INSERT INTO users (name, email, password, role, phone, status, company_id, first_name, last_name)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [name, email, hashedPassword, role, phone, status || 'active', req.user?.company_id || 1, first_name, last_name]
       );
       
-      res.status(201).json({ success: true, message: 'User created successfully', data: { id: result.insertId } });
+      const userId = result.insertId;
+      
+      // If role is not super_admin, create corresponding employee record
+      if (role !== 'super_admin') {
+        const employeeId = `EMP${String(userId).padStart(4, '0')}`;
+        
+        await pool.query(
+          `INSERT INTO employees (
+            user_id, company_id, employee_id, first_name, last_name, email, phone, 
+            department_id, designation_id, status, employment_type, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+          [userId, req.user?.company_id || 1, employeeId, first_name || name?.split(' ')[0] || 'Unknown', 
+           last_name || name?.split(' ').slice(1).join(' ') || 'Employee', email, phone, 
+           department_id, designation_id, status || 'active', 'full_time']
+        );
+      }
+      
+      res.status(201).json({ success: true, message: 'User created successfully', data: { id: userId } });
     } catch (error) {
       console.error('Error creating user:', error);
       res.status(500).json({ success: false, message: 'Error creating user' });
@@ -280,11 +302,34 @@ module.exports = (pool, authenticateToken) => {
       const { id } = req.params;
       const { name, email, role, phone, department_id, designation_id, status, first_name, last_name } = req.body;
       
+      // Update user record
       await pool.query(
-        `UPDATE users SET name = ?, email = ?, role = ?, phone = ?, department_id = ?, designation_id = ?, status = ?, first_name = ?, last_name = ?
+        `UPDATE users SET name = ?, email = ?, role = ?, phone = ?, status = ?, first_name = ?, last_name = ?
          WHERE id = ?`,
-        [name, email, role, phone, department_id, designation_id, status, first_name, last_name, id]
+        [name, email, role, phone, status, first_name, last_name, id]
       );
+      
+      // Update corresponding employee record if it exists
+      const [employeeExists] = await pool.query('SELECT id FROM employees WHERE user_id = ?', [id]);
+      if (employeeExists.length > 0) {
+        await pool.query(
+          `UPDATE employees SET department_id = ?, designation_id = ?, first_name = ?, last_name = ?, email = ?, phone = ?, status = ?
+           WHERE user_id = ?`,
+          [department_id, designation_id, first_name, last_name, email, phone, status, id]
+        );
+      } else if (role !== 'super_admin') {
+        // Create employee record if it doesn't exist and role is not super_admin
+        const employeeId = `EMP${String(id).padStart(4, '0')}`;
+        await pool.query(
+          `INSERT INTO employees (
+            user_id, company_id, employee_id, first_name, last_name, email, phone, 
+            department_id, designation_id, status, employment_type, created_at, updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
+          [id, req.user?.company_id || 1, employeeId, first_name || name?.split(' ')[0] || 'Unknown', 
+           last_name || name?.split(' ').slice(1).join(' ') || 'Employee', email, phone, 
+           department_id, designation_id, status || 'active', 'full_time']
+        );
+      }
       
       res.json({ success: true, message: 'User updated successfully' });
     } catch (error) {

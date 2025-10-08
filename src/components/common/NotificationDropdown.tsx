@@ -28,7 +28,7 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Load notifications - in a real app, this would come from an API
+  // Load notifications from localStorage only (no mock data)
   useEffect(() => {
     const loadNotifications = async () => {
       setIsLoading(true);
@@ -43,115 +43,22 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
               ...n,
               timestamp: new Date(n.timestamp)
             }));
-            setNotifications(notificationsWithDates);
-            setIsLoading(false);
-            return; // Don't load mock data if we have saved notifications
+            // Filter out old notifications (older than 7 days)
+            const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+            const recentNotifications = notificationsWithDates.filter(
+              (n: Notification) => n.timestamp.getTime() > sevenDaysAgo
+            );
+            setNotifications(recentNotifications);
           } catch (error) {
             console.error('Failed to parse saved notifications:', error);
+            setNotifications([]);
           }
+        } else {
+          // No saved notifications, start with empty array
+          setNotifications([]);
         }
-
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Generate dynamic notifications with current timestamps
-        const now = Date.now();
-        const mockNotifications: Notification[] = [
-          {
-            id: '1',
-            title: 'New Employee Joined',
-            message: 'John Smith has been added to the Engineering department',
-            type: 'success',
-            timestamp: new Date(now - 2 * 60 * 1000), // 2 minutes ago
-            isRead: false,
-            actionUrl: '/dashboard/employees',
-            icon: 'lucide:user-plus',
-            user: {
-              name: 'John Smith',
-              avatar: 'https://i.pravatar.cc/150?img=1'
-            }
-          },
-          {
-            id: '2',
-            title: 'Meeting Reminder',
-            message: 'Team standup meeting starts in 15 minutes',
-            type: 'info',
-            timestamp: new Date(now - 15 * 60 * 1000), // 15 minutes ago
-            isRead: false,
-            actionUrl: '/dashboard/calendar',
-            icon: 'lucide:calendar'
-          },
-          {
-            id: '3',
-            title: 'Leave Request',
-            message: 'Sarah Johnson has requested 3 days of vacation leave',
-            type: 'warning',
-            timestamp: new Date(now - 45 * 60 * 1000), // 45 minutes ago
-            isRead: false,
-            actionUrl: '/dashboard/leave/applications',
-            icon: 'lucide:calendar-days',
-            user: {
-              name: 'Sarah Johnson',
-              avatar: 'https://i.pravatar.cc/150?img=2'
-            }
-          },
-          {
-            id: '4',
-            title: 'Task Completed',
-            message: 'Project milestone has been completed successfully',
-            type: 'success',
-            timestamp: new Date(now - 2 * 60 * 60 * 1000), // 2 hours ago
-            isRead: true,
-            actionUrl: '/dashboard/tasks',
-            icon: 'lucide:check-circle'
-          },
-          {
-            id: '5',
-            title: 'System Update',
-            message: 'HRMS system has been updated to version 2.1.0',
-            type: 'info',
-            timestamp: new Date(now - 4 * 60 * 60 * 1000), // 4 hours ago
-            isRead: true,
-            actionUrl: '/dashboard/settings',
-            icon: 'lucide:settings'
-          },
-          {
-            id: '6',
-            title: 'Security Alert',
-            message: 'Unusual login activity detected from new location',
-            type: 'error',
-            timestamp: new Date(now - 6 * 60 * 60 * 1000), // 6 hours ago
-            isRead: false,
-            actionUrl: '/dashboard/audit-logs',
-            icon: 'lucide:shield-alert'
-          },
-          {
-            id: '7',
-            title: 'Leave Request',
-            message: 'New leave request from Sarah Johnson needs approval',
-            type: 'info',
-            timestamp: new Date(now - 8 * 60 * 60 * 1000), // 8 hours ago
-            isRead: false,
-            actionUrl: '/dashboard/leave/applications',
-            icon: 'lucide:calendar-minus'
-          },
-          {
-            id: '8',
-            title: 'Payroll Reminder',
-            message: 'Monthly payroll processing is due tomorrow',
-            type: 'warning',
-            timestamp: new Date(now - 12 * 60 * 60 * 1000), // 12 hours ago
-            isRead: true,
-            actionUrl: '/dashboard/payroll',
-            icon: 'lucide:dollar-sign'
-          }
-        ];
-        
-        setNotifications(mockNotifications);
-        // Save to localStorage
-        localStorage.setItem('hrms-notifications', JSON.stringify(mockNotifications));
       } catch (error) {
-        console.error('Failed to load notifications:', error);
+        console.error('Error loading notifications:', error);
         setNotifications([]);
       } finally {
         setIsLoading(false);
@@ -159,13 +66,6 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
     };
 
     loadNotifications();
-    
-    // Auto-refresh notifications every 30 seconds
-    const interval = setInterval(() => {
-      refreshNotifications();
-    }, 30000);
-    
-    return () => clearInterval(interval);
   }, []);
 
   // Save notifications to localStorage whenever they change
@@ -175,42 +75,21 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
     }
   }, [notifications]);
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
-
-  // Function to refresh notifications
-  const refreshNotifications = async () => {
-    setIsLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Add a new notification occasionally
-      const shouldAddNew = Math.random() > 0.7;
-      if (shouldAddNew) {
-        const newNotification: Notification = {
-          id: `new-${Date.now()}`,
-          title: 'New System Alert',
-          message: 'A new system alert has been generated',
-          type: 'info',
-          timestamp: new Date(),
-          isRead: false,
-          actionUrl: '/dashboard/alerts',
-          icon: 'lucide:alert-circle'
-        };
-        
-        setNotifications(prev => {
-          const updated = [newNotification, ...prev];
-          // Save to localStorage
-          localStorage.setItem('hrms-notifications', JSON.stringify(updated));
-          return updated;
-        });
-      }
-    } catch (error) {
-      console.error('Failed to refresh notifications:', error);
-    } finally {
-      setIsLoading(false);
-    }
+  // Remove old mock notification generation code
+  // Real notifications will be added through system events
+  const addSystemNotification = (notification: Omit<Notification, 'id' | 'timestamp'>) => {
+    const newNotification: Notification = {
+      ...notification,
+      id: Date.now().toString(),
+      timestamp: new Date(),
+    };
+    setNotifications(prev => [newNotification, ...prev].slice(0, 50)); // Keep last 50
   };
+
+  // Example: This would be called from various parts of the app
+  // addSystemNotification({ title: 'New Employee', message: '...', type: 'success', isRead: false, icon: 'lucide:user-plus' });
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const handleNotificationClick = (notification: Notification) => {
     // Close dropdown immediately
@@ -280,24 +159,14 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
       <DropdownItem key="header" className="h-auto p-0" textValue="header">
         <div className="flex items-center justify-between p-3 border-b border-divider">
           <h3 className="text-sm font-semibold text-foreground">Notifications</h3>
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="light"
-              onPress={refreshNotifications}
-              className="min-w-0 p-1"
-            >
-              <Icon icon="lucide:refresh-cw" className="text-sm" />
-            </Button>
-            <Button
-              size="sm"
-              variant="light"
-              onPress={markAllAsRead}
-              className="min-w-0 p-1"
-            >
-              Mark all as read
-            </Button>
-          </div>
+          <Button
+            size="sm"
+            variant="light"
+            onPress={markAllAsRead}
+            className="min-w-0 p-1"
+          >
+            Mark all as read
+          </Button>
         </div>
       </DropdownItem>
     );

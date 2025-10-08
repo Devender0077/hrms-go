@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Button,
@@ -10,6 +10,10 @@ import {
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/auth-context";
+import { usePermissions } from "../hooks/usePermissions";
+import { useTaskContext } from "../contexts/task-context";
+import { useSettings } from "../contexts/settings-context";
+import { navSections as sharedNavSections } from "../config/navigation";
 
 interface MobileSidebarProps {
   isOpen: boolean;
@@ -21,7 +25,7 @@ interface NavItem {
   icon: string;
   path: string;
   badge?: number;
-  roles?: string[];
+  permissions?: string[];
 }
 
 interface NavSection {
@@ -32,8 +36,29 @@ interface NavSection {
 export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const location = useLocation();
   const { user } = useAuth();
+  const { hasPermission } = usePermissions();
+  const { taskCounts } = useTaskContext();
+  const { settings } = useSettings();
 
-  const navSections: NavSection[] = [
+  // Filter navigation based on permissions (sharedNavSections imported at top)
+  const filteredNavSections = useMemo(() => {
+    return sharedNavSections
+      .map((section: NavSection) => ({
+        ...section,
+        items: section.items.filter((item: NavItem) => {
+          // If no permissions specified, show to everyone
+          if (!item.permissions || item.permissions.length === 0) {
+            return true;
+          }
+          // Check if user has at least one of the required permissions
+          return item.permissions.some(permission => hasPermission(permission));
+        })
+      }))
+      .filter((section: NavSection) => section.items.length > 0); // Remove empty sections
+  }, [hasPermission]);
+  
+  // Old hardcoded navigation (keeping as fallback)
+  const oldNavSections: NavSection[] = [
     {
       title: "Main",
       items: [
@@ -205,27 +230,32 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   ];
 
   // Filter nav items based on user role
-  const filterNavItems = (items: NavItem[]) => {
-    return items.filter((item) => {
-      if (!item.roles) return true;
-      if (!user?.role) return false;
-      return item.roles.includes(user.role);
-    });
+  // Permission filtering is now done in useMemo above
+  
+  const getSiteName = () => {
+    return settings?.general?.siteName || 'HRMS';
   };
 
   return (
     <Drawer isOpen={isOpen} onClose={onClose} placement="left">
       <DrawerContent>
-        <DrawerHeader className="flex items-center justify-center border-b border-default-100">
-          <h1 className="text-xl font-bold">
-            HRM<span className="text-primary">GO</span>
-          </h1>
+        <DrawerHeader className="flex items-center justify-center border-b border-default-100 bg-gradient-to-r from-primary-500/10 to-secondary-500/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">
+                {getSiteName().substring(0, 2).toUpperCase()}
+              </span>
+            </div>
+            <h1 className="text-xl font-bold bg-gradient-to-r from-primary-600 to-secondary-600 bg-clip-text text-transparent">
+              {getSiteName()}
+            </h1>
+          </div>
         </DrawerHeader>
         <DrawerBody className="p-0">
           <nav className="py-4">
-            {navSections.map((section, idx) => {
-              const filteredItems = filterNavItems(section.items);
-              if (filteredItems.length === 0) return null;
+            {filteredNavSections.map((section, idx) => {
+              // Items are already filtered by permissions
+              if (section.items.length === 0) return null;
 
               return (
                 <div key={idx} className="mb-6">
@@ -234,7 +264,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                   </p>
 
                   <ul>
-                    {filteredItems.map((item, itemIdx) => {
+                    {section.items.map((item, itemIdx) => {
                       const isActive = location.pathname === item.path;
 
                       return (
@@ -247,7 +277,11 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                             <Button
                               variant={isActive ? "flat" : "light"}
                               color={isActive ? "primary" : "default"}
-                              className="justify-start w-full mb-1 rounded-lg"
+                              className={`justify-start w-full mb-2 rounded-2xl transition-all duration-200 ${
+                                isActive 
+                                  ? 'shadow-lg shadow-primary-500/20' 
+                                  : 'hover:shadow-md hover:bg-default-100/50'
+                              }`}
                               startContent={
                                 <div className="relative">
                                   <Icon icon={item.icon} className="text-lg" />

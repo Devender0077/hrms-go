@@ -142,7 +142,7 @@ export default function App() {
       <VersionProvider>
         <MaintenanceMode>
           <DebugMode>
-          <Routes>
+            <Routes>
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -958,8 +958,8 @@ export default function App() {
         {/* Default Route */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </DebugMode>
+            </Routes>
+          </DebugMode>
         </MaintenanceMode>
       </VersionProvider>
     </Router>

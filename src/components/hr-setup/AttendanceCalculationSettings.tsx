@@ -22,7 +22,9 @@ const AttendanceCalculationSettings: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isViewOpen, setIsViewOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<AttendanceRule | null>(null);
+  const [viewingRule, setViewingRule] = useState<AttendanceRule | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     type: 'full_day',
@@ -87,6 +89,11 @@ const AttendanceCalculationSettings: React.FC = () => {
         color: 'danger'
       });
     }
+  };
+
+  const handleViewRule = (rule: AttendanceRule) => {
+    setViewingRule(rule);
+    setIsViewOpen(true);
   };
 
   const handleEditRule = (rule: AttendanceRule) => {
@@ -262,19 +269,32 @@ const AttendanceCalculationSettings: React.FC = () => {
                         <Button
                           size="sm"
                           variant="light"
-                          onClick={() => handleEditRule(rule)}
-                          startContent={<Icon icon="lucide:edit" className="w-3 h-3" />}
+                          color="primary"
+                          isIconOnly
+                          onClick={() => handleViewRule(rule)}
+                          title="View Details"
                         >
-                          Edit
+                          <Icon icon="lucide:eye" className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="light"
+                          color="warning"
+                          isIconOnly
+                          onClick={() => handleEditRule(rule)}
+                          title="Edit Rule"
+                        >
+                          <Icon icon="lucide:edit" className="w-4 h-4" />
                         </Button>
                         <Button
                           size="sm"
                           variant="light"
                           color="danger"
+                          isIconOnly
                           onClick={() => handleDeleteRule(rule.id)}
-                          startContent={<Icon icon="lucide:trash" className="w-3 h-3" />}
+                          title="Delete Rule"
                         >
-                          Delete
+                          <Icon icon="lucide:trash" className="w-4 h-4" />
                         </Button>
                       </div>
                     </TableCell>
@@ -465,6 +485,74 @@ const AttendanceCalculationSettings: React.FC = () => {
             </Button>
             <Button color="primary" onPress={handleUpdateRule}>
               Update Rule
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* View Modal */}
+      <Modal isOpen={isViewOpen} onClose={() => setIsViewOpen(false)} size="2xl">
+        <ModalContent>
+          <ModalHeader>View Attendance Rule</ModalHeader>
+          <ModalBody>
+            {viewingRule && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Rule Name</p>
+                    <p className="font-medium">{viewingRule.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Type</p>
+                    <Chip color="primary" variant="flat">
+                      {viewingRule.type.replace('_', ' ').toUpperCase()}
+                    </Chip>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Minimum Hours</p>
+                    <p className="font-medium">{viewingRule.min_hours}h</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Maximum Hours</p>
+                    <p className="font-medium">{viewingRule.max_hours}h</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Grace Period</p>
+                    <p className="font-medium">{viewingRule.grace_period_minutes} minutes</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Overtime Threshold</p>
+                    <p className="font-medium">{viewingRule.overtime_threshold_hours}h</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Status</p>
+                    <Chip color={viewingRule.is_active ? 'success' : 'danger'} variant="flat">
+                      {viewingRule.is_active ? 'Active' : 'Inactive'}
+                    </Chip>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500">Created At</p>
+                    <p className="font-medium">{new Date(viewingRule.created_at).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Description</p>
+                  <p className="font-medium">{viewingRule.description || 'No description provided'}</p>
+                </div>
+              </div>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="light" onPress={() => setIsViewOpen(false)}>
+              Close
+            </Button>
+            <Button color="warning" onPress={() => {
+              if (viewingRule) {
+                setIsViewOpen(false);
+                handleEditRule(viewingRule);
+              }
+            }}>
+              Edit Rule
             </Button>
           </ModalFooter>
         </ModalContent>

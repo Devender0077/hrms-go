@@ -9,11 +9,16 @@ interface LocalizationSettingsProps {
 
 export default function LocalizationSettings({ settings, onSettingsChange }: LocalizationSettingsProps) {
   const languages = [
-    { key: 'en', label: 'English' },
-    { key: 'es', label: 'Spanish' },
-    { key: 'fr', label: 'French' },
-    { key: 'de', label: 'German' },
-    { key: 'zh', label: 'Chinese' },
+    { key: 'en', label: '🇺🇸 English', flag: '🇺🇸' },
+    { key: 'hi', label: '🇮🇳 Hindi', flag: '🇮🇳' },
+    { key: 'es', label: '🇪🇸 Spanish', flag: '🇪🇸' },
+    { key: 'fr', label: '🇫🇷 French', flag: '🇫🇷' },
+    { key: 'de', label: '🇩🇪 German', flag: '🇩🇪' },
+    { key: 'zh', label: '🇨🇳 Chinese', flag: '🇨🇳' },
+    { key: 'ar', label: '🇸🇦 Arabic', flag: '🇸🇦' },
+    { key: 'pt', label: '🇵🇹 Portuguese', flag: '🇵🇹' },
+    { key: 'ru', label: '🇷🇺 Russian', flag: '🇷🇺' },
+    { key: 'ja', label: '🇯🇵 Japanese', flag: '🇯🇵' },
   ];
 
   const timezones = [
@@ -23,16 +28,24 @@ export default function LocalizationSettings({ settings, onSettingsChange }: Loc
     { key: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
     { key: 'Europe/London', label: 'London (GMT)' },
     { key: 'Europe/Paris', label: 'Paris (CET)' },
+    { key: 'Asia/Kolkata', label: 'India Standard Time (IST)' },
+    { key: 'Asia/Dubai', label: 'Dubai (GST)' },
     { key: 'Asia/Tokyo', label: 'Tokyo (JST)' },
     { key: 'Asia/Shanghai', label: 'Shanghai (CST)' },
+    { key: 'Australia/Sydney', label: 'Sydney (AEDT)' },
   ];
 
   const currencies = [
-    { key: 'USD', label: 'US Dollar ($)' },
-    { key: 'EUR', label: 'Euro (€)' },
-    { key: 'GBP', label: 'British Pound (£)' },
-    { key: 'JPY', label: 'Japanese Yen (¥)' },
-    { key: 'CNY', label: 'Chinese Yuan (¥)' },
+    { key: 'USD', label: 'US Dollar ($)', symbol: '$' },
+    { key: 'INR', label: 'Indian Rupee (₹)', symbol: '₹' },
+    { key: 'EUR', label: 'Euro (€)', symbol: '€' },
+    { key: 'GBP', label: 'British Pound (£)', symbol: '£' },
+    { key: 'JPY', label: 'Japanese Yen (¥)', symbol: '¥' },
+    { key: 'CNY', label: 'Chinese Yuan (¥)', symbol: '¥' },
+    { key: 'AED', label: 'UAE Dirham (د.إ)', symbol: 'د.إ' },
+    { key: 'AUD', label: 'Australian Dollar (A$)', symbol: 'A$' },
+    { key: 'CAD', label: 'Canadian Dollar (C$)', symbol: 'C$' },
+    { key: 'SGD', label: 'Singapore Dollar (S$)', symbol: 'S$' },
   ];
 
   return (
@@ -102,7 +115,14 @@ export default function LocalizationSettings({ settings, onSettingsChange }: Loc
             <Select
               label="Currency"
               selectedKeys={settings.currency ? [settings.currency] : ['USD']}
-              onSelectionChange={(keys) => onSettingsChange('currency', Array.from(keys)[0])}
+              onSelectionChange={(keys) => {
+                const selectedCurrency = Array.from(keys)[0] as string;
+                const currencyData = currencies.find(c => c.key === selectedCurrency);
+                onSettingsChange('currency', selectedCurrency);
+                if (currencyData) {
+                  onSettingsChange('currencySymbol', currencyData.symbol);
+                }
+              }}
               placeholder="Select currency"
               startContent={<Icon icon="lucide:dollar-sign" className="text-default-400" />}
             >
@@ -115,10 +135,11 @@ export default function LocalizationSettings({ settings, onSettingsChange }: Loc
             
             <Input
               label="Currency Symbol"
-              
+              value={settings.currencySymbol || '$'}
               onChange={(e) => onSettingsChange('currencySymbol', e.target.value)}
               placeholder="Enter currency symbol"
               startContent={<Icon icon="lucide:hash" className="text-default-400" />}
+              description="Auto-populated based on currency selection"
             />
           </div>
           
