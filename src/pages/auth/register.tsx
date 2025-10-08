@@ -28,53 +28,78 @@ export default function Register() {
   const [agreeTerms, setAgreeTerms] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleRegister = () => {
-    setIsLoading(true);
+  const handleRegister = async () => {
+  setIsLoading(true);
 
-    // Basic validation
-    if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      addToast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        color: "danger",
-      });
-      setIsLoading(false);
-      return;
-    }
+  if (!firstName || !lastName || !email || !password || !confirmPassword) {
+    addToast({
+      title: "Error",
+      description: "Please fill in all required fields",
+      color: "danger",
+    });
+    setIsLoading(false);
+    return;
+  }
 
-    if (password !== confirmPassword) {
-      addToast({
-        title: "Error",
-        description: "Passwords do not match",
-        color: "danger",
-      });
-      setIsLoading(false);
-      return;
-    }
+  if (password !== confirmPassword) {
+    addToast({
+      title: "Error",
+      description: "Passwords do not match",
+      color: "danger",
+    });
+    setIsLoading(false);
+    return;
+  }
 
-    if (!agreeTerms) {
-      addToast({
-        title: "Error",
-        description: "You must agree to the terms and conditions",
-        color: "danger",
-      });
-      setIsLoading(false);
-      return;
-    }
+  if (!agreeTerms) {
+    addToast({
+      title: "Error",
+      description: "You must agree to the terms and conditions",
+      color: "danger",
+    });
+    setIsLoading(false);
+    return;
+  }
 
-    // Simulate registration process
-    setTimeout(() => {
-      setIsLoading(false);
+  try {
+    const response = await fetch("http://localhost:8000/api/v1/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: `${firstName} ${lastName}`,
+        email,
+        password,
+        role: userType === "company_admin" ? "company_admin" : "employee",
+      }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.success) {
       addToast({
         title: "Success",
-        description:
-          "Registration successful! Please check your email for verification.",
+        description: "Registration successful! Please log in.",
         color: "success",
       });
       navigate("/login");
-    }, 1500);
-  };
-
+    } else {
+      addToast({
+        title: "Error",
+        description: data.message || "Registration failed",
+        color: "danger",
+      });
+    }
+  } catch (error) {
+    console.error("Registration error:", error);
+    addToast({
+      title: "Error",
+      description: "Failed to connect to server. Please try again.",
+      color: "danger",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
