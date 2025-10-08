@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { translations as importedTranslations } from '../locales/translations';
 
 interface TranslationContextType {
   language: string;
@@ -8,7 +9,7 @@ interface TranslationContextType {
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
-// Translation dictionaries
+// Merge imported translations with existing ones
 const translations: Record<string, Record<string, string>> = {
   en: {
     // Common
@@ -194,6 +195,13 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
 
   // Translation function
   const t = (key: string): string => {
+    // First check imported translations (simple keys like "Dashboard")
+    const importedDict = importedTranslations[language as keyof typeof importedTranslations] || importedTranslations.en;
+    if (importedDict && importedDict[key as keyof typeof importedDict]) {
+      return importedDict[key as keyof typeof importedDict];
+    }
+    
+    // Then check namespaced translations (like "common.save")
     const languageDict = translations[language] || translations.en;
     return languageDict[key] || key;
   };

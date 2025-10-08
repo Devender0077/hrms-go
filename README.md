@@ -5,8 +5,11 @@ A modern Human Resource Management System (HRMS) combining a Vite + React TypeSc
 ## ✨ Latest Updates (v2.5.0)
 
 ### **🌍 Internationalization & Localization**
-- **Multi-Language Support**: Added 10 languages (English, Hindi, Spanish, French, German, Chinese, Arabic, Portuguese, Russian, Japanese)
-- **Language Selector**: Quick language switcher in top navbar with flag icons
+- **Multi-Language Support**: Full translation support for 10 languages (English, Hindi, Spanish, French, German, Chinese, Arabic, Portuguese, Russian, Japanese)
+- **Comprehensive Translation Dictionary**: 100+ translated strings covering navigation, common actions, and UI elements
+- **Language Selector**: Quick language switcher in top navbar and settings page with flag icons
+- **Real-Time Translation**: Instant UI translation when language is changed
+- **Fallback System**: Graceful fallback to English for missing translations
 - **Currency Support**: Added Indian Rupee (₹) and 9 other currencies with auto-populated symbols
 - **Timezone Support**: Added IST (India Standard Time) and 10 other timezones
 
@@ -42,12 +45,14 @@ A modern Human Resource Management System (HRMS) combining a Vite + React TypeSc
 - **Dynamic Branding**: Mobile sidebar displays company logo and name from settings
 
 ### **🐛 Bug Fixes**
+- **Fixed Settings Page**: Settings now save immediately when changed (no more lost edits!)
+- **Fixed Translation System**: Proper translation implementation with comprehensive dictionaries
 - Fixed integration toggle switches not saving
 - Fixed holidays API 500 errors
 - Fixed weekend display showing wrong days
 - Fixed attendance data not reflecting after updates
 - Fixed server management scripts
-- Fixed translation system initialization
+- Fixed translation context initialization and fallback system
 - Fixed mobile sidebar `require()` error in ES modules
 - Improved error handling across the application
 

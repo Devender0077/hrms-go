@@ -96,12 +96,7 @@ import SettingsExportImport from "../../components/settings/SettingsExportImport
     }
   }, [accessibleCategories, activeTab]);
 
-  const handleSettingsChange = (category: string, key: string, value: any) => {
-    // Update local state only - no auto-save
-    // Settings will be saved when user clicks "Save Settings" button
-    // Note: This is a placeholder - actual implementation would update local state
-    // For now, we'll keep the existing behavior but could be modified to batch updates
-    
+  const handleSettingsChange = async (category: string, key: string, value: any) => {
     // Determine the correct type for the value
     let type = 'string';
     if (typeof value === 'boolean') {
@@ -112,9 +107,12 @@ import SettingsExportImport from "../../components/settings/SettingsExportImport
       type = 'object';
     }
     
-    // Only save when "Save Settings" button is clicked
-    // Comment out auto-save for now
-    // await updateSetting(category, key, value, type);
+    // Save immediately to backend
+    try {
+      await updateSetting(category, key, value, type);
+    } catch (error) {
+      console.error('Error saving setting:', error);
+    }
   };
 
   const handleCreateApiKey = async () => {
