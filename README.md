@@ -1,8 +1,61 @@
-# 🏢 HRMS HUI v2.5.2 (hrms-go)
+# 🏢 HRMS HUI v2.6.0 (hrms-go)
 
 A modern Human Resource Management System (HRMS) combining a Vite + React TypeScript frontend with a Node.js (Express) backend and MySQL. This repository contains the frontend HUI (v2) and a modular backend under `src/backend` with migrations and demo data.
 
-## ✨ Latest Updates (v2.5.2)
+## ✨ Latest Updates (v2.6.0)
+
+### **📡 Real-Time Integrations System**
+- **Pusher Integration**: Real-time push notifications with WebSocket support
+  - Auto-connect when enabled in settings
+  - User-specific and broadcast channels
+  - Connection status tracking
+  - Test connection functionality
+- **Slack Integration**: Team notifications via webhooks
+  - Send messages to Slack channels
+  - Test connection with actual message
+  - Configurable channel targeting
+- **Microsoft Teams Integration**: Enterprise communication
+  - Adaptive card notifications
+  - Webhook-based messaging
+  - Test connection with formatted cards
+- **Zoom Integration**: Video meeting API support
+  - API key validation
+  - Meeting creation ready
+  - Auto-create meetings option
+- **Google Calendar**: Event synchronization
+  - OAuth2 credential validation
+  - Leave request sync
+  - Meeting sync
+- **Google Drive**: File storage integration
+  - OAuth2 credential validation
+  - Folder management
+  - Document storage ready
+- **Twilio**: SMS notifications (SDK installed, ready for implementation)
+- **SendGrid**: Email service (SDK installed, ready for implementation)
+- **AWS S3**: Cloud file storage (SDK installed, ready for implementation)
+
+### **💾 Enhanced Settings Persistence**
+- **Fixed Settings Not Persisting**: All settings now save with category column
+- **Proper JSON Parsing**: Integration objects (Pusher, Teams, etc.) load correctly
+- **Real-Time Updates**: Settings apply immediately without page refresh
+- **Toast Notifications**: Visual feedback on every save ("Settings Saved" / "Save Failed")
+- **Database Optimization**: Improved query performance with proper indexing
+
+### **🎨 UI/UX Improvements**
+- **Removed Duplicate Sections**: Cleaned up duplicate Pusher and Microsoft Teams cards
+- **Test Connection Buttons**: All integrations have functional test buttons
+- **Loading States**: Spinners and loading indicators for all async operations
+- **Success/Error Messages**: Visual feedback with icons (green checkmark / red X)
+- **Cleaner Interface**: Removed unnecessary borders and shadows
+
+### **📦 Backend Enhancements**
+- **19 Modular Routes**: Expanded from 17 to 19 API modules
+- **Integration Services**: Unified service layer for all integrations
+- **Test Endpoints**: API endpoints for testing each integration
+- **Error Handling**: Comprehensive error handling with detailed logging
+- **SDK Installation**: All required SDKs installed and configured
+
+### **Previous Updates (v2.5.2)**
 
 ### **🎨 UI/UX Improvements**
 - **Cleaner Design**: Removed drop shadows and borders from sidebar and navbar for a modern, flat design
@@ -369,10 +422,11 @@ hrms_hui_v2/
 ### Timekeeping
 - `GET /api/v1/timekeeping/muster` - Get attendance muster
 - `GET /api/v1/timekeeping/monthly-muster` - Get monthly attendance data with holidays and weekends
+- `GET /api/v1/timekeeping/attendance-records` - Get attendance records with location and IP
 - `PUT /api/v1/timekeeping/:id` - Update attendance record
 - `POST /api/v1/timekeeping` - Create attendance record
-- `POST /api/v1/timekeeping/check-in` - Employee check-in
-- `POST /api/v1/timekeeping/check-out` - Employee check-out
+- `POST /api/v1/timekeeping/check-in` - Employee check-in (stores location & IP)
+- `POST /api/v1/timekeeping/check-out` - Employee check-out (stores location & IP)
 
 ### HR System Setup
 - `GET /api/v1/hr-setup/weekend-configs` - Get weekend configurations
@@ -384,20 +438,40 @@ hrms_hui_v2/
 - `PUT /api/v1/hr-setup/attendance-rules/:id` - Update attendance rule
 - `DELETE /api/v1/hr-setup/attendance-rules/:id` - Delete attendance rule
 
+### Settings
+- `GET /api/v1/settings` - Get all settings (with category grouping)
+- `PUT /api/v1/settings/:category/:key` - Update specific setting
+- `GET /api/v1/settings/export` - Export settings
+- `POST /api/v1/settings/import` - Import settings
+
+### Integrations
+- `POST /api/v1/pusher/test` - Test Pusher connection
+- `POST /api/v1/integrations/slack/test` - Test Slack webhook
+- `POST /api/v1/integrations/teams/test` - Test Microsoft Teams webhook
+- `POST /api/v1/integrations/zoom/test` - Test Zoom API credentials
+- `POST /api/v1/integrations/google-calendar/test` - Test Google Calendar OAuth
+- `POST /api/v1/integrations/google-drive/test` - Test Google Drive OAuth
+- `POST /api/v1/integrations/twilio/test` - Test Twilio SMS credentials
+- `POST /api/v1/integrations/sendgrid/test` - Test SendGrid email API
+- `POST /api/v1/integrations/s3/test` - Test AWS S3 connection
+- `POST /api/v1/integrations/notify` - Send notification to all enabled channels
+
 ### Leave Management
 - `GET /api/v1/leave/applications` - Get leave applications
 - `POST /api/v1/leave/applications` - Create leave application
 - `PUT /api/v1/leave/applications/:id` - Update leave application
+- `GET /api/v1/leave/holidays` - Get holidays by country
+- `POST /api/v1/leave/holidays` - Create holiday
+- `PUT /api/v1/leave/holidays/:id` - Update holiday
+- `DELETE /api/v1/leave/holidays/:id` - Delete holiday
 
 ### Payroll
 - `GET /api/v1/payroll/salaries` - Get salary information
 - `POST /api/v1/payroll/salaries` - Create salary record
 - `GET /api/v1/payroll/payslips` - Get payslips
 
-### HR Setup
-- `GET /api/v1/hr-setup/attendance-rules` - Get attendance calculation rules
-- `POST /api/v1/hr-setup/attendance-rules` - Create attendance rule
-- `PUT /api/v1/hr-setup/attendance-rules/:id` - Update attendance rule
+### Audit Logs
+- `GET /api/v1/audit-logs` - Get audit logs with pagination and filtering
 
 ## 🛠️ Development
 
@@ -505,6 +579,35 @@ For support and questions:
 
 ## 📝 Changelog
 
+### Version 2.6.0 (Current)
+- ✅ **Real-Time Integration System**: Pusher, Slack, Teams, Zoom, Google Calendar/Drive
+- ✅ **Fixed Settings Persistence**: All settings now save with category and persist after refresh
+- ✅ **Toast Notifications**: Visual feedback on every settings change
+- ✅ **Test Connection Buttons**: Functional test buttons for all integrations
+- ✅ **Removed Duplicates**: Cleaned up duplicate Pusher and Microsoft Teams sections
+- ✅ **Enhanced Database Queries**: Proper JSON parsing and category-based loading
+- ✅ **Attendance Location Tracking**: Check-in/check-out now stores location coordinates and IP address
+- ✅ **19 Backend Modules**: Expanded API with integration endpoints
+- ✅ **SDK Installation**: All integration SDKs installed (Slack, Teams, Twilio, SendGrid, AWS, etc.)
+
+### Version 2.5.2
+- ✅ **Fixed Attendance Records API**: Resolved 500 error with proper SQL query
+- ✅ **Fixed Audit Logs**: Registered audit-logs routes
+- ✅ **UI Cleanup**: Removed drop shadows and borders for modern flat design
+- ✅ **Check-in/Check-out Logic**: Fixed button states to reflect actual attendance status
+
+### Version 2.5.1
+- ✅ **Universal Deployment**: One-command deployment for VPS/Cloud/Docker
+- ✅ **Automated Database Setup**: Comprehensive setup-database.js with seeding
+- ✅ **PM2 Integration**: Production-ready process management
+- ✅ **Docker Support**: Complete containerization with docker-compose
+
+### Version 2.5.0
+- ✅ **Multi-Language Support**: 10 languages with comprehensive translations
+- ✅ **Holiday Management**: Country-wise holidays (India + USA)
+- ✅ **Enhanced Settings**: Logo/favicon upload, color picker, integrations
+- ✅ **Mobile Responsive**: Permission-based mobile navigation
+
 ### Version 2.4.4
 - ✅ **Fixed SQL errors** in role permissions update
 - ✅ **Added Attendance Muster** with daily tracking and status codes
@@ -535,13 +638,20 @@ For support and questions:
 
 - [x] Multi-language support (10 languages)
 - [x] Mobile responsive design
-- [x] Real-time notifications framework
+- [x] Real-time notifications framework (Pusher)
+- [x] Integration system (Slack, Teams, Zoom, Google, Twilio, SendGrid, AWS S3)
+- [x] Settings persistence and real-time updates
+- [x] Attendance tracking with location and IP logging
+- [x] Toast notifications system
 - [ ] Mobile app development (iOS/Android)
 - [ ] Advanced reporting dashboard with AI insights
 - [ ] Integration with external HR systems (ADP, Workday, etc.)
 - [ ] Advanced workflow automation
 - [ ] Biometric attendance integration
 - [ ] Advanced analytics and predictive insights
+- [ ] Complete OAuth2 flows for Google integrations
+- [ ] Payment gateway integration (Stripe, PayPal)
+- [ ] SMS and Email notification automation
 
 ---
 
