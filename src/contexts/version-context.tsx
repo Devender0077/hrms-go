@@ -21,7 +21,7 @@ interface VersionProviderProps {
 }
 
 export const VersionProvider: React.FC<VersionProviderProps> = ({ children }) => {
-  const [currentVersion, setCurrentVersion] = useState('2.4.4');
+  const [currentVersion, setCurrentVersion] = useState('2.7.0');
 
   const updateVersion = (version: string) => {
     setCurrentVersion(version);
@@ -31,8 +31,136 @@ export const VersionProvider: React.FC<VersionProviderProps> = ({ children }) =>
   const getVersionHistory = () => {
     return [
       {
+        version: '2.7.0',
+        date: '2025-01-10',
+        type: 'minor',
+        features: [
+          'Real-Time Messenger System with direct messaging',
+          'Group Messaging with 6 group types (Team Lead, Management, Accounts, HR, Department, Custom)',
+          'Pusher WebSocket integration for real-time message delivery',
+          'HR System Setup integration for messenger management',
+          '16 new API endpoints for messaging and groups',
+          'Message groups with admin-only member controls',
+          'Read receipts with double-check marks',
+          'Unread message counts and online status indicators',
+          'Message history and auto-scroll to latest'
+        ],
+        fixes: [
+          'Fixed Leave Reports API malformed calls (GET http://localhost:8000/api/v1GET 404)',
+          'Resolved messenger routes database column mapping (recipient_id, body)',
+          'Fixed null-safe filtering in messenger UI',
+          'Corrected database seeder permission_name column',
+          'Fixed settings table category column usage'
+        ],
+        improvements: [
+          'Expanded backend from 19 to 20 modular routes',
+          'Enhanced database with message_groups and message_group_members tables',
+          'Added 3 new permissions (messenger.view, groups.create, groups.manage)',
+          'Improved security with permission-based access and group membership verification',
+          'Enhanced UI with color-coded group type badges and member selection'
+        ]
+      },
+      {
+        version: '2.6.0',
+        date: '2025-01-08',
+        type: 'minor',
+        features: [
+          'Real-Time Integrations System (Pusher, Slack, Microsoft Teams, Zoom, Google Calendar/Drive)',
+          'Test connection buttons for all integrations',
+          'Integration services with unified backend layer',
+          'Enhanced settings persistence with category column',
+          'Toast notifications for settings changes',
+          'Attendance location tracking (latitude, longitude, IP address)',
+          'SDK installation for Twilio, SendGrid, AWS S3'
+        ],
+        fixes: [
+          'Fixed settings not persisting after page refresh',
+          'Resolved duplicate Pusher and Microsoft Teams sections',
+          'Fixed attendance records API 500 error',
+          'Corrected JSON parsing for integration settings',
+          'Fixed audit logs 404 errors by registering routes'
+        ],
+        improvements: [
+          'Enhanced database queries with proper JSON parsing',
+          'Improved UI with loading states and success/error messages',
+          'Added 19 backend modules with integration endpoints',
+          'Better error handling and detailed logging',
+          'Cleaner interface with removed unnecessary borders'
+        ]
+      },
+      {
+        version: '2.5.2',
+        date: '2025-01-05',
+        type: 'patch',
+        features: [],
+        fixes: [
+          'Fixed attendance records API 500 error with proper SQL query',
+          'Fixed audit logs 404 by registering audit-logs routes',
+          'Resolved check-in/check-out button states logic',
+          'Fixed role-based filtering for attendance records'
+        ],
+        improvements: [
+          'UI cleanup: Removed drop shadows and borders for modern flat design',
+          'Better visual hierarchy with focus on content',
+          'Consistent styling across all components',
+          'Improved error handling with graceful fallbacks'
+        ]
+      },
+      {
+        version: '2.5.1',
+        date: '2025-01-03',
+        type: 'patch',
+        features: [
+          'Universal deployment system with one-command setup',
+          'Automated database setup with comprehensive seeding',
+          'PM2 integration for production process management',
+          'Docker support with docker-compose configuration',
+          'Environment templates for easy configuration'
+        ],
+        fixes: [
+          'Fixed database seeding for new environments',
+          'Resolved migration tracking to prevent duplicates',
+          'Fixed default user and permission creation'
+        ],
+        improvements: [
+          'Complete deployment documentation (DEPLOYMENT.md)',
+          'Universal compatibility (Local, VPS, AWS, DigitalOcean, etc.)',
+          'Smart migration system with rollback safety',
+          'Post-setup verification for all tables and data'
+        ]
+      },
+      {
+        version: '2.5.0',
+        date: '2024-12-30',
+        type: 'minor',
+        features: [
+          'Multi-language support for 10 languages (English, Hindi, Spanish, French, German, Chinese, Arabic, Portuguese, Russian, Japanese)',
+          'Country-wise holiday management (India + USA with 24 holidays)',
+          'Logo & favicon upload functionality',
+          'Language selector in top navbar and settings',
+          'Enhanced color picker with visual swatches',
+          'Mobile responsive design with permission-based navigation'
+        ],
+        fixes: [
+          'Fixed settings page not saving changes',
+          'Resolved integration toggle switches not working',
+          'Fixed holidays API 500 errors',
+          'Corrected weekend display (Saturday & Sunday)',
+          'Fixed attendance data not reflecting after updates',
+          'Resolved mobile sidebar require() error'
+        ],
+        improvements: [
+          'Modern sidebar design with gradient backgrounds',
+          'Frosted glass effect and custom scrollbar',
+          'Enhanced navigation with rounded buttons and glow effects',
+          'Currency support with Indian Rupee and 9 other currencies',
+          'Timezone support with IST and 10 other timezones',
+          'Smart holiday grouping for duplicate holidays'
+        ]
+      },
+      {
         version: '2.4.4',
-        date: new Date().toISOString().split('T')[0],
+        date: '2024-12-28',
         type: 'minor',
         features: [
           'Created comprehensive Training Sessions management system',
@@ -146,7 +274,7 @@ export const VersionProvider: React.FC<VersionProviderProps> = ({ children }) =>
   useEffect(() => {
     // Load version from package.json or config
     // For now, we'll use the hardcoded version
-    setCurrentVersion('2.4.4');
+    setCurrentVersion('2.7.0');
   }, []);
 
   const value: VersionContextType = {

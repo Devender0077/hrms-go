@@ -1,10 +1,35 @@
-# 🏢 HRMS HUI v2.6.0 (hrms-go)
+# 🏢 HRMS HUI v2.7.0 (hrms-go)
 
 A modern Human Resource Management System (HRMS) combining a Vite + React TypeScript frontend with a Node.js (Express) backend and MySQL. This repository contains the frontend HUI (v2) and a modular backend under `src/backend` with migrations and demo data.
 
-## ✨ Latest Updates (v2.6.0)
+## ✨ Latest Updates (v2.7.0)
 
-### **📡 Real-Time Integrations System**
+### **💬 Real-Time Messenger with Group Messaging**
+- **Direct Messaging**: One-on-one conversations with real-time delivery
+  - Real-time updates via Pusher WebSocket
+  - Read receipts with double-check marks
+  - Unread message counts
+  - Message history and search
+  - Online status indicators
+  - Auto-scroll to latest messages
+- **Group Messaging**: Team-based communication
+  - 6 group types: Team Lead, Management, Accounts, HR, Department, Custom
+  - Create and manage message groups
+  - Add/remove members (admin-only controls)
+  - Group-based message visibility
+  - Real-time notifications to all group members
+  - Member count and unread tracking
+  - Color-coded group type badges
+- **HR System Setup Integration**
+  - Global enable/disable messenger toggle
+  - Create and manage groups from HR setup
+  - View group statistics and member lists
+  - Checkbox-based member selection
+  - Group type information cards
+- **16 New API Endpoints**: Complete REST API for messaging and groups
+- **Security**: Permission-based access, group membership verification, admin controls
+
+### **📡 Real-Time Integrations System (v2.6.0)**
 - **Pusher Integration**: Real-time push notifications with WebSocket support
   - Auto-connect when enabled in settings
   - User-specific and broadcast channels
@@ -49,8 +74,9 @@ A modern Human Resource Management System (HRMS) combining a Vite + React TypeSc
 - **Cleaner Interface**: Removed unnecessary borders and shadows
 
 ### **📦 Backend Enhancements**
-- **19 Modular Routes**: Expanded from 17 to 19 API modules
+- **20 Modular Routes**: Expanded from 17 to 20 API modules (including Messenger)
 - **Integration Services**: Unified service layer for all integrations
+- **Messenger Service**: Complete messaging backend with groups
 - **Test Endpoints**: API endpoints for testing each integration
 - **Error Handling**: Comprehensive error handling with detailed logging
 - **SDK Installation**: All required SDKs installed and configured
@@ -456,6 +482,24 @@ hrms_hui_v2/
 - `POST /api/v1/integrations/s3/test` - Test AWS S3 connection
 - `POST /api/v1/integrations/notify` - Send notification to all enabled channels
 
+### Messenger (NEW in v2.7.0)
+- `GET /api/v1/messenger/conversations` - List all conversations
+- `GET /api/v1/messenger/messages/:userId` - Get message history with user
+- `POST /api/v1/messenger/send` - Send direct message
+- `PUT /api/v1/messenger/read/:messageId` - Mark message as read
+- `GET /api/v1/messenger/unread-count` - Get unread count
+- `GET /api/v1/messenger/users` - Get all users for messaging
+- `DELETE /api/v1/messenger/:messageId` - Delete message
+- `GET /api/v1/messenger/groups` - List user's groups
+- `POST /api/v1/messenger/groups` - Create message group
+- `GET /api/v1/messenger/groups/:id` - Get group details
+- `PUT /api/v1/messenger/groups/:id` - Update group
+- `DELETE /api/v1/messenger/groups/:id` - Delete group
+- `POST /api/v1/messenger/groups/:id/send` - Send message to group
+- `GET /api/v1/messenger/groups/:id/messages` - Get group messages
+- `POST /api/v1/messenger/groups/:id/members` - Add group member
+- `DELETE /api/v1/messenger/groups/:id/members/:userId` - Remove group member
+
 ### Leave Management
 - `GET /api/v1/leave/applications` - Get leave applications
 - `POST /api/v1/leave/applications` - Create leave application
@@ -579,7 +623,20 @@ For support and questions:
 
 ## 📝 Changelog
 
-### Version 2.6.0 (Current)
+### Version 2.7.0 (Current)
+- ✅ **Real-Time Messenger System**: Direct messaging and group conversations
+- ✅ **Group Messaging**: 6 group types (Team Lead, Management, Accounts, HR, Department, Custom)
+- ✅ **Pusher Integration**: Real-time message delivery and notifications
+- ✅ **HR Setup Integration**: Enable/disable messenger, manage groups
+- ✅ **16 Messenger Endpoints**: Complete REST API for messaging
+- ✅ **2 New Database Tables**: message_groups, message_group_members
+- ✅ **3 New Permissions**: messenger.view, groups.create, groups.manage
+- ✅ **Group Administration**: Admin-only controls for member management
+- ✅ **Fixed Leave Reports API**: Corrected malformed API calls
+- ✅ **Updated Database Seeder**: Added messenger permissions and settings
+- ✅ **20 Backend Modules**: Expanded API with messenger module
+
+### Version 2.6.0
 - ✅ **Real-Time Integration System**: Pusher, Slack, Teams, Zoom, Google Calendar/Drive
 - ✅ **Fixed Settings Persistence**: All settings now save with category and persist after refresh
 - ✅ **Toast Notifications**: Visual feedback on every settings change
