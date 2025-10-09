@@ -334,6 +334,13 @@ async function seedPermissions(connection) {
     { name: 'messenger.view', description: 'Access and use messenger', category: 'messenger' },
     { name: 'messenger.groups.create', description: 'Create message groups', category: 'messenger' },
     { name: 'messenger.groups.manage', description: 'Manage message groups', category: 'messenger' },
+    
+    // Announcements
+    { name: 'announcements.view', description: 'View announcements', category: 'announcements' },
+    { name: 'announcements.create', description: 'Create announcements', category: 'announcements' },
+    { name: 'announcements.edit', description: 'Edit announcements', category: 'announcements' },
+    { name: 'announcements.delete', description: 'Delete announcements', category: 'announcements' },
+    { name: 'announcements.manage', description: 'Manage announcements', category: 'announcements' },
   ];
   
   for (const permission of permissions) {

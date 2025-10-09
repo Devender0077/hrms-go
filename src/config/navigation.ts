@@ -33,6 +33,12 @@ export const navSections: NavSection[] = [
         permissions: ["messenger.view"]
       },
       { 
+        title: "Announcements", 
+        icon: "lucide:megaphone", 
+        path: "/dashboard/announcements",
+        permissions: ["announcements.view"]
+      },
+      { 
         title: "Calendar", 
         icon: "lucide:calendar", 
         path: "/dashboard/calendar",
