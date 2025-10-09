@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { translations as importedTranslations } from '../locales/translations';
+import { translations as modularTranslations } from '../locales/index';
 
 interface TranslationContextType {
   language: string;
@@ -195,10 +195,10 @@ export function TranslationProvider({ children }: { children: React.ReactNode })
 
   // Translation function
   const t = (key: string): string => {
-    // First check imported translations (simple keys like "Dashboard")
-    const importedDict = importedTranslations[language as keyof typeof importedTranslations] || importedTranslations.en;
-    if (importedDict && importedDict[key as keyof typeof importedDict]) {
-      return importedDict[key as keyof typeof importedDict];
+    // First check modular translations (simple keys like "Dashboard")
+    const modularDict = modularTranslations[language as keyof typeof modularTranslations] || modularTranslations.en;
+    if (modularDict && modularDict[key as keyof typeof modularDict]) {
+      return modularDict[key as keyof typeof modularDict];
     }
     
     // Then check namespaced translations (like "common.save")
