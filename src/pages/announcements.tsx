@@ -27,6 +27,7 @@ import { usePermissions } from '../hooks/usePermissions';
 import DynamicPageTitle from '../components/common/DynamicPageTitle';
 import HeroSection from '../components/common/HeroSection';
 import { useTranslation } from '../contexts/translation-context';
+import { notificationService } from '../services/notification-service';
 
 interface Announcement {
   id: number;
@@ -112,6 +113,18 @@ export default function AnnouncementsPage() {
     
     channel.bind('new-announcement', (data: any) => {
       console.log('New announcement received via Pusher:', data);
+      
+      // Add notification for the new announcement
+      if (data && data.id) {
+        notificationService.addAnnouncementNotification({
+          id: data.id,
+          title: data.title || 'New Announcement',
+          content: data.content || '',
+          priority: data.priority || 'medium',
+          category: data.category || 'general',
+        });
+      }
+      
       loadAnnouncements(); // Reload announcements
     });
 
@@ -129,6 +142,15 @@ export default function AnnouncementsPage() {
       });
 
       if (response.success) {
+        // Add notification for the new announcement
+        notificationService.addAnnouncementNotification({
+          id: response.data?.id || Date.now(),
+          title: formData.title,
+          content: formData.content,
+          priority: formData.priority,
+          category: formData.category,
+        });
+
         onCreateClose();
         loadAnnouncements();
         setFormData({

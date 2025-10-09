@@ -26,8 +26,10 @@ import AttendanceFilters from "../../components/attendance/AttendanceFilters";
 import AttendanceViewModal from "../../components/attendance/AttendanceViewModal";
 import IPDisplay from "../../components/attendance/IPDisplay";
 import HeroSection from "../../components/common/HeroSection";
+import { useTranslation } from "../../contexts/translation-context";
 
 const AttendancePage: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const {
     attendanceRecords,
@@ -198,14 +200,14 @@ const AttendancePage: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
         {/* Hero Section */}
         <HeroSection
-          title="Attendance Management"
-          subtitle="Track & Monitor Employee Time"
-          description="Track employee attendance, check-in/out times, and work hours. Monitor productivity and ensure accurate time tracking across your organization."
+          title={t("Attendance Management")}
+          subtitle={t("Track & Monitor Employee Time")}
+          description={t("Track employee attendance, check-in/out times, and work hours. Monitor productivity and ensure accurate time tracking across your organization.")}
           icon="lucide:clock"
           illustration="attendance"
           actions={[
             {
-              label: "Export Report",
+              label: t("Export Report"),
               icon: "lucide:download",
               onPress: () => console.log("Export Report"),
               color: "primary" as const

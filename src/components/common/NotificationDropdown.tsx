@@ -2,61 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Badge, Avatar } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { useNavigate } from 'react-router-dom';
-
-interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: 'info' | 'success' | 'warning' | 'error';
-  timestamp: Date;
-  isRead: boolean;
-  actionUrl?: string;
-  icon: string;
-  user?: {
-    name: string;
-    avatar?: string;
-  };
-}
+import { notificationService, SystemNotification } from '../../services/notification-service';
+import { useTranslation } from '../../contexts/translation-context';
 
 interface NotificationDropdownProps {
   className?: string;
 }
 
 export default function NotificationDropdown({ className = '' }: NotificationDropdownProps) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const { t } = useTranslation();
+  const [notifications, setNotifications] = useState<SystemNotification[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Load notifications from localStorage only (no mock data)
+  // Load notifications from service
   useEffect(() => {
     const loadNotifications = async () => {
       setIsLoading(true);
       try {
-        // Check if we have saved notifications in localStorage
-        const savedNotifications = localStorage.getItem('hrms-notifications');
-        if (savedNotifications) {
-          try {
-            const parsed = JSON.parse(savedNotifications);
-            // Convert timestamp strings back to Date objects
-            const notificationsWithDates = parsed.map((n: any) => ({
-              ...n,
-              timestamp: new Date(n.timestamp)
-            }));
-            // Filter out old notifications (older than 7 days)
-            const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
-            const recentNotifications = notificationsWithDates.filter(
-              (n: Notification) => n.timestamp.getTime() > sevenDaysAgo
-            );
-            setNotifications(recentNotifications);
-          } catch (error) {
-            console.error('Failed to parse saved notifications:', error);
-            setNotifications([]);
-          }
-        } else {
-          // No saved notifications, start with empty array
-          setNotifications([]);
-        }
+        const allNotifications = notificationService.getNotifications();
+        setNotifications(allNotifications);
       } catch (error) {
         console.error('Error loading notifications:', error);
         setNotifications([]);
@@ -66,41 +32,28 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
     };
 
     loadNotifications();
-  }, []);
 
-  // Save notifications to localStorage whenever they change
-  useEffect(() => {
-    if (notifications.length > 0) {
-      localStorage.setItem('hrms-notifications', JSON.stringify(notifications));
-    }
-  }, [notifications]);
+    // Subscribe to notification changes
+    const unsubscribe = notificationService.subscribe((updatedNotifications) => {
+      setNotifications(updatedNotifications);
+    });
 
-  // Remove old mock notification generation code
-  // Real notifications will be added through system events
-  const addSystemNotification = (notification: Omit<Notification, 'id' | 'timestamp'>) => {
-    const newNotification: Notification = {
-      ...notification,
-      id: Date.now().toString(),
-      timestamp: new Date(),
+    // Cleanup old notifications on mount
+    notificationService.cleanupOldNotifications();
+
+    return () => {
+      unsubscribe();
     };
-    setNotifications(prev => [newNotification, ...prev].slice(0, 50)); // Keep last 50
-  };
-
-  // Example: This would be called from various parts of the app
-  // addSystemNotification({ title: 'New Employee', message: '...', type: 'success', isRead: false, icon: 'lucide:user-plus' });
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  const handleNotificationClick = (notification: Notification) => {
+  const handleNotificationClick = (notification: SystemNotification) => {
     // Close dropdown immediately
     setIsOpen(false);
     
-    // Mark as read
-    setNotifications(prev => 
-      prev.map(n => 
-        n.id === notification.id ? { ...n, isRead: true } : n
-      )
-    );
+    // Mark as read using service
+    notificationService.markAsRead(notification.id);
 
     // Navigate if action URL exists
     if (notification.actionUrl) {
@@ -112,18 +65,11 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => {
-      const updated = prev.map(n => ({ ...n, isRead: true }));
-      // Save to localStorage
-      localStorage.setItem('hrms-notifications', JSON.stringify(updated));
-      return updated;
-    });
+    notificationService.markAllAsRead();
   };
 
   const clearAllNotifications = () => {
-    setNotifications([]);
-    // Clear from localStorage
-    localStorage.removeItem('hrms-notifications');
+    notificationService.clearAll();
   };
 
   const formatTimestamp = (timestamp: Date) => {
@@ -140,7 +86,7 @@ export default function NotificationDropdown({ className = '' }: NotificationDro
     return timestamp.toLocaleDateString();
   };
 
-  const getTypeColor = (type: Notification['type']) => {
+  const getTypeColor = (type: SystemNotification['type']) => {
     switch (type) {
       case 'success': return 'success';
       case 'warning': return 'warning';

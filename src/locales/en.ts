@@ -367,5 +367,19 @@ export const en = {
   'Super Admin Dashboard': 'Super Admin Dashboard',
   'Company Admin Dashboard': 'Company Admin Dashboard',
   'Employee Dashboard': 'Employee Dashboard',
+  
+  // Attendance Page
+  'Attendance Management': 'Attendance Management',
+  'Track & Monitor Employee Time': 'Track & Monitor Employee Time',
+  'Track employee attendance, check-in/out times, and work hours. Monitor productivity and ensure accurate time tracking across your organization.': 'Track employee attendance, check-in/out times, and work hours. Monitor productivity and ensure accurate time tracking across your organization.',
+  'Export Report': 'Export Report',
+  'Check-in successful': 'Check-in successful',
+  'Check-out successful': 'Check-out successful',
+  'No attendance records found': 'No attendance records found',
+  'Attendance Records': 'Attendance Records',
+  'Check In Time': 'Check In Time',
+  'Check Out Time': 'Check Out Time',
+  'Work Hours': 'Work Hours',
+  'IP Address': 'IP Address',
 };
 

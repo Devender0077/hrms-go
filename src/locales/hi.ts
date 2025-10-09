@@ -312,5 +312,19 @@ export const hi = {
   'Super Admin Dashboard': 'सुपर एडमिन डैशबोर्ड',
   'Company Admin Dashboard': 'कंपनी एडमिन डैशबोर्ड',
   'Employee Dashboard': 'कर्मचारी डैशबोर्ड',
+  
+  // Attendance Page
+  'Attendance Management': 'उपस्थिति प्रबंधन',
+  'Track & Monitor Employee Time': 'कर्मचारी समय ट्रैक और मॉनिटर करें',
+  'Track employee attendance, check-in/out times, and work hours. Monitor productivity and ensure accurate time tracking across your organization.': 'कर्मचारी उपस्थिति, चेक-इन/आउट समय और कार्य घंटों को ट्रैक करें। उत्पादकता की निगरानी करें और अपने संगठन में सटीक समय ट्रैकिंग सुनिश्चित करें।',
+  'Export Report': 'रिपोर्ट निर्यात करें',
+  'Check-in successful': 'चेक-इन सफल',
+  'Check-out successful': 'चेक-आउट सफल',
+  'No attendance records found': 'कोई उपस्थिति रिकॉर्ड नहीं मिला',
+  'Attendance Records': 'उपस्थिति रिकॉर्ड',
+  'Check In Time': 'चेक इन समय',
+  'Check Out Time': 'चेक आउट समय',
+  'Work Hours': 'कार्य घंटे',
+  'IP Address': 'आईपी पता',
 };
 
