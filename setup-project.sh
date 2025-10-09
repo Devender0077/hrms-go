@@ -124,6 +124,12 @@ run_migrations() {
     print_status "Running comprehensive database setup..."
     if [ -f "src/backend/setup-database.js" ]; then
         cd src/backend
+        
+        # Fix migrations table structure first
+        print_status "Fixing migrations table structure..."
+        node fix-migrations-table.js
+        
+        # Then run full setup
         node setup-database.js
         if [ $? -eq 0 ]; then
             print_success "Database setup completed successfully"

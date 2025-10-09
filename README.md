@@ -1,8 +1,52 @@
-# 🏢 HRMS HUI v2.7.0 (hrms-go)
+# 🏢 HRMS HUI v2.9.0 (hrms-go)
 
 A modern Human Resource Management System (HRMS) combining a Vite + React TypeScript frontend with a Node.js (Express) backend and MySQL. This repository contains the frontend HUI (v2) and a modular backend under `src/backend` with migrations and demo data.
 
-## ✨ Latest Updates (v2.7.0)
+## ✨ Latest Updates (v2.9.0)
+
+### **🌍 Multi-Language Support - 5 LANGUAGES!**
+- **5 Languages Supported**: English, Hindi, Spanish, French, German
+  - English (en): 590+ keys (100% complete)
+  - Hindi (hi): 590+ keys (100% complete)
+  - Spanish (es): 170+ keys (30% complete)
+  - French (fr): 170+ keys (30% complete)
+  - German (de): 170+ keys (30% complete)
+- **14 Pages Fully Translated**: Dashboard, Users, Roles, Employees, Settings, Tasks, Messenger, Attendance, Announcements, and more
+- **Seamless Language Switching**: Change language from navbar or settings
+- **Translation Context**: `useTranslation()` hook for easy integration
+- **Modular Structure**: Each language in separate file for maintainability
+- **Fallback System**: Automatic fallback to English for missing keys
+- **590+ Translation Keys**: Comprehensive coverage of all UI elements
+
+### **📢 Announcements System**
+- **Full CRUD Operations**: Create, read, update, delete announcements
+- **Real-Time Updates**: Pusher integration for instant notifications
+- **Notification Integration**: Announcements appear in notification dropdown
+- **Advanced Filtering**: Filter by category, priority, status, read/unread
+- **Permission-Based Access**: Role-based announcement management
+- **Read Tracking**: Track who has read each announcement
+- **Expiration Support**: Set expiration dates for announcements
+- **Priority Levels**: Low, Medium, High, Urgent
+- **Categories**: General, HR, Finance, IT, Operations
+- **Target Audience**: All employees or specific groups
+
+### **🔔 Centralized Notification System**
+- **NotificationService**: Singleton service for managing all notifications
+- **Real-Time Updates**: Subscribe/unsubscribe pattern for live updates
+- **Auto-Cleanup**: Automatically removes notifications older than 30 days
+- **Category Support**: announcement, system, task, message, alert
+- **Priority-Based Styling**: Visual indicators for notification importance
+- **Mark as Read/Unread**: Track notification status
+- **Persistent Storage**: localStorage with cross-tab synchronization
+
+### **🔍 Enhanced Global Search**
+- **Multi-Source Search**: Search across employees, users, tasks, announcements
+- **Real API Integration**: Live data from backend APIs
+- **Translation Support**: Search works in all supported languages
+- **Quick Navigation**: Click results to navigate instantly
+- **Error Handling**: Graceful fallbacks and error messages
+
+## ✨ Previous Updates (v2.7.0)
 
 ### **💬 Real-Time Messenger with Group Messaging**
 - **Direct Messaging**: One-on-one conversations with real-time delivery

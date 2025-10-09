@@ -21,7 +21,7 @@ interface VersionProviderProps {
 }
 
 export const VersionProvider: React.FC<VersionProviderProps> = ({ children }) => {
-  const [currentVersion, setCurrentVersion] = useState('2.7.0');
+  const [currentVersion, setCurrentVersion] = useState('2.9.0');
 
   const updateVersion = (version: string) => {
     setCurrentVersion(version);

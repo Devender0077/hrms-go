@@ -14,6 +14,13 @@ async function up() {
   });
 
   try {
+    // Check if users table exists
+    const [usersTables] = await connection.query("SHOW TABLES LIKE 'users'");
+    if (usersTables.length === 0) {
+      console.log('⚠️  Users table does not exist, skipping message_groups creation');
+      return;
+    }
+
     console.log('Creating message_groups table...');
     
     // Create message_groups table
