@@ -353,5 +353,19 @@ export const en = {
   'No roles found': 'No roles found',
   'Role Name': 'Role Name',
   'Role Description': 'Role Description',
+  
+  // Dashboard
+  'Total Companies': 'Total Companies',
+  'Total Users': 'Total Users',
+  'Total Employees': 'Total Employees',
+  'Active Sessions': 'Active Sessions',
+  '+12% from last month': '+12% from last month',
+  '+8% from last month': '+8% from last month',
+  '+15% from last month': '+15% from last month',
+  'from last month': 'from last month',
+  'from last week': 'from last week',
+  'Super Admin Dashboard': 'Super Admin Dashboard',
+  'Company Admin Dashboard': 'Company Admin Dashboard',
+  'Employee Dashboard': 'Employee Dashboard',
 };
 

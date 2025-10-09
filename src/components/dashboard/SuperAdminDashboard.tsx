@@ -47,8 +47,10 @@ import {
 import { motion } from "framer-motion";
 import DocumentManager from "../documents/DocumentManager";
 import HeroSection from "../common/HeroSection";
+import { useTranslation } from "../../contexts/translation-context";
 
 export default function SuperAdminDashboard() {
+  const { t } = useTranslation();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // Super Admin specific data
@@ -282,9 +284,9 @@ export default function SuperAdminDashboard() {
               <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div className="min-w-0 flex-1">
-                    <p className="text-default-500 dark:text-default-400 text-xs sm:text-sm font-medium">Total Companies</p>
+                    <p className="text-default-500 dark:text-default-400 text-xs sm:text-sm font-medium">{t("Total Companies")}</p>
                     <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mt-1">{systemStats.totalCompanies}</p>
-                    <p className="text-success-600 dark:text-success-400 text-xs sm:text-sm mt-1">+12% from last month</p>
+                    <p className="text-success-600 dark:text-success-400 text-xs sm:text-sm mt-1">{t("+12% from last month")}</p>
                   </div>
                   <div className="p-2 sm:p-3 bg-primary-100 dark:bg-primary-900/30 rounded-xl flex-shrink-0">
                     <Icon icon="lucide:building" className="text-primary-600 dark:text-primary-400 text-lg sm:text-xl lg:text-2xl" />
@@ -303,9 +305,9 @@ export default function SuperAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Total Users</p>
+                    <p className="text-default-500 text-sm font-medium">{t("Total Users")}</p>
                     <p className="text-3xl font-bold text-foreground mt-1">{systemStats.totalUsers.toLocaleString()}</p>
-                    <p className="text-success-600 text-sm mt-1">+8% from last month</p>
+                    <p className="text-success-600 text-sm mt-1">{t("+8% from last month")}</p>
                   </div>
                   <div className="p-3 bg-success-100 rounded-xl">
                     <Icon icon="lucide:users" className="text-success-600 text-2xl" />

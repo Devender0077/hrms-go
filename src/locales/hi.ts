@@ -298,5 +298,19 @@ export const hi = {
   'No roles found': 'कोई भूमिका नहीं मिली',
   'Role Name': 'भूमिका का नाम',
   'Role Description': 'भूमिका विवरण',
+  
+  // Dashboard
+  'Total Companies': 'कुल कंपनियां',
+  'Total Users': 'कुल उपयोगकर्ता',
+  'Total Employees': 'कुल कर्मचारी',
+  'Active Sessions': 'सक्रिय सत्र',
+  '+12% from last month': 'पिछले महीने से +12%',
+  '+8% from last month': 'पिछले महीने से +8%',
+  '+15% from last month': 'पिछले महीने से +15%',
+  'from last month': 'पिछले महीने से',
+  'from last week': 'पिछले सप्ताह से',
+  'Super Admin Dashboard': 'सुपर एडमिन डैशबोर्ड',
+  'Company Admin Dashboard': 'कंपनी एडमिन डैशबोर्ड',
+  'Employee Dashboard': 'कर्मचारी डैशबोर्ड',
 };
 
