@@ -35,6 +35,7 @@ import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { useAuthenticatedAPI } from "../hooks/useAuthenticatedAPI";
 import HeroSection from "../components/common/HeroSection";
+import { useTranslation } from "../contexts/translation-context";
 
 interface User {
   id: number;
@@ -69,6 +70,7 @@ interface Designation {
 }
 
 const UsersPage: React.FC = () => {
+  const { t } = useTranslation();
   const { apiRequest } = useAuthenticatedAPI();
   const [users, setUsers] = useState<User[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -486,14 +488,14 @@ const UsersPage: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
         {/* Hero Section */}
         <HeroSection
-          title="Users Management"
-          subtitle="System Access & Permissions"
-          description="Manage system users, roles, and permissions. Control access levels, assign roles, and maintain security across your HRMS platform."
+          title={t("Users Management")}
+          subtitle={t("System Access & Permissions")}
+          description={t("Manage system users, roles, and permissions. Control access levels, assign roles, and maintain security across your HRMS platform.")}
           icon="lucide:users"
           illustration="users"
           actions={[
             {
-              label: "Add User",
+              label: t("Add User"),
               icon: "lucide:plus",
             onPress: onAddOpen,
             color: "primary" as const
@@ -697,17 +699,17 @@ const UsersPage: React.FC = () => {
                           onChange={handleSelectAll}
                           className="rounded border-gray-300"
                         />
-                        <span>USER</span>
+                        <span>{t("Name").toUpperCase()}</span>
                       </div>
                     </TableColumn>
-                    <TableColumn>ROLE</TableColumn>
-                    <TableColumn>DEPARTMENT</TableColumn>
-                    <TableColumn>STATUS</TableColumn>
-                    <TableColumn>PERMISSIONS</TableColumn>
-                    <TableColumn>LAST LOGIN</TableColumn>
-                    <TableColumn>ACTIONS</TableColumn>
+                    <TableColumn>{t("Role").toUpperCase()}</TableColumn>
+                    <TableColumn>{t("Department").toUpperCase()}</TableColumn>
+                    <TableColumn>{t("Status").toUpperCase()}</TableColumn>
+                    <TableColumn>{t("Permissions").toUpperCase()}</TableColumn>
+                    <TableColumn>{t("Last Login").toUpperCase()}</TableColumn>
+                    <TableColumn>{t("Actions").toUpperCase()}</TableColumn>
                   </TableHeader>
-                  <TableBody emptyContent="No users found">
+                  <TableBody emptyContent={t("No users found")}>
                     {paginatedUsers.map((user) => (
                       <TableRow key={user.id}>
                         <TableCell>
@@ -761,7 +763,7 @@ const UsersPage: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           <span className="text-sm text-default-600">
-                            {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Never'}
+                            {user.last_login ? new Date(user.last_login).toLocaleDateString() : t('Never')}
                           </span>
                         </TableCell>
                         <TableCell>
@@ -777,28 +779,28 @@ const UsersPage: React.FC = () => {
                                 startContent={<Icon icon="lucide:eye" />}
                                 onPress={() => handleView(user)}
                               >
-                                View
+                                {t('View')}
                               </DropdownItem>
                               <DropdownItem
                                 key="edit"
                                 startContent={<Icon icon="lucide:edit" />}
                                 onPress={() => handleEdit(user)}
                               >
-                                Edit
+                                {t('Edit')}
                               </DropdownItem>
                               <DropdownItem
                                 key="toggle-status"
                                 startContent={<Icon icon={user.status === 'active' ? 'lucide:user-x' : 'lucide:user-check'} />}
                                 onPress={() => handleToggleStatus(user)}
                               >
-                                {user.status === 'active' ? 'Disable' : 'Enable'}
+                                {user.status === 'active' ? t('Disable') : t('Enable')}
                               </DropdownItem>
                               <DropdownItem
                                 key="reset-password"
                                 startContent={<Icon icon="lucide:key" />}
                                 onPress={() => handleResetPassword(user)}
                               >
-                                Reset Password
+                                {t('Reset Password')}
                               </DropdownItem>
                               <DropdownItem
                                 key="delete"
@@ -807,7 +809,7 @@ const UsersPage: React.FC = () => {
                                 startContent={<Icon icon="lucide:trash" />}
                                 onPress={() => handleDelete(user.id)}
                               >
-                                Delete
+                                {t('Delete')}
                               </DropdownItem>
                             </DropdownMenu>
                           </Dropdown>
@@ -951,7 +953,7 @@ const UsersPage: React.FC = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>Edit User</ModalHeader>
+              <ModalHeader>{t('Edit User')}</ModalHeader>
               <ModalBody>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input
@@ -1062,7 +1064,7 @@ const UsersPage: React.FC = () => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader>User Details</ModalHeader>
+              <ModalHeader>{t('User Details')}</ModalHeader>
               <ModalBody>
                 {selectedUser && (
                   <div className="space-y-6">

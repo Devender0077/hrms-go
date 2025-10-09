@@ -222,6 +222,7 @@ export const en = {
   'No results found': 'No results found',
   'No records available': 'No records available',
   'No announcements found': 'No announcements found',
+  'No users found': 'No users found',
   'Loading...': 'Loading...',
   'Loading data...': 'Loading data...',
   'Please wait...': 'Please wait...',
@@ -324,5 +325,20 @@ export const en = {
   'Yes': 'Yes',
   'No': 'No',
   'Ok': 'Ok',
+  
+  // Users Page
+  'Users Management': 'Users Management',
+  'System Access & Permissions': 'System Access & Permissions',
+  'Manage system users, roles, and permissions. Control access levels, assign roles, and maintain security across your HRMS platform.': 'Manage system users, roles, and permissions. Control access levels, assign roles, and maintain security across your HRMS platform.',
+  'Add User': 'Add User',
+  'Edit User': 'Edit User',
+  'User Details': 'User Details',
+  'Reset Password': 'Reset Password',
+  'User Status': 'User Status',
+  'Permissions Count': 'Permissions Count',
+  'Last Active': 'Last Active',
+  'Never': 'Never',
+  'Account Active': 'Account Active',
+  'Account Inactive': 'Account Inactive',
 };
 

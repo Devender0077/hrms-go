@@ -177,6 +177,7 @@ export const hi = {
   'No data found': 'कोई डेटा नहीं मिला',
   'No results found': 'कोई परिणाम नहीं मिला',
   'No announcements found': 'कोई घोषणा नहीं मिली',
+  'No users found': 'कोई उपयोगकर्ता नहीं मिला',
   'Loading...': 'लोड हो रहा है...',
   'Loading data...': 'डेटा लोड हो रहा है...',
   'Please wait...': 'कृपया प्रतीक्षा करें...',
@@ -269,5 +270,20 @@ export const hi = {
   'Yes': 'हाँ',
   'No': 'नहीं',
   'Ok': 'ठीक है',
+  
+  // Users Page
+  'Users Management': 'उपयोगकर्ता प्रबंधन',
+  'System Access & Permissions': 'सिस्टम एक्सेस और अनुमतियां',
+  'Manage system users, roles, and permissions. Control access levels, assign roles, and maintain security across your HRMS platform.': 'सिस्टम उपयोगकर्ताओं, भूमिकाओं और अनुमतियों का प्रबंधन करें। एक्सेस स्तर नियंत्रित करें, भूमिकाएं निर्धारित करें और अपने HRMS प्लेटफ़ॉर्म में सुरक्षा बनाए रखें।',
+  'Add User': 'उपयोगकर्ता जोड़ें',
+  'Edit User': 'उपयोगकर्ता संपादित करें',
+  'User Details': 'उपयोगकर्ता विवरण',
+  'Reset Password': 'पासवर्ड रीसेट करें',
+  'User Status': 'उपयोगकर्ता स्थिति',
+  'Permissions Count': 'अनुमतियों की संख्या',
+  'Last Active': 'अंतिम सक्रिय',
+  'Never': 'कभी नहीं',
+  'Account Active': 'खाता सक्रिय',
+  'Account Inactive': 'खाता निष्क्रिय',
 };
 
