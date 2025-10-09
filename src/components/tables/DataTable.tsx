@@ -16,6 +16,7 @@ import {
 } from '@heroui/react';
 import { Icon } from '@iconify/react';
 import { useDataTable } from '../../hooks/useDataTable';
+import { useTranslation } from '../../contexts/translation-context';
 
 interface Column<T> {
   key: keyof T;
@@ -49,6 +50,7 @@ export function DataTable<T extends Record<string, any>>({
   emptyMessage = 'No data available',
   pageSize = 10
 }: DataTableProps<T>) {
+  const { t } = useTranslation();
   const {
     data: paginatedData,
     searchTerm,
@@ -101,7 +103,7 @@ export function DataTable<T extends Record<string, any>>({
           <div className="flex items-center justify-center">
             <div className="text-center">
               <Icon icon="lucide:loader-2" className="text-4xl animate-spin mx-auto mb-4" />
-              <p className="text-default-500">Loading data...</p>
+              <p className="text-default-500">{t('Loading data...')}</p>
             </div>
           </div>
         </CardBody>
@@ -124,7 +126,7 @@ export function DataTable<T extends Record<string, any>>({
                 className="max-w-sm"
               />
               <Chip color="primary" variant="flat">
-                {filteredItems} of {totalItems} items
+                {filteredItems} {t('of')} {totalItems} {t('items')}
               </Chip>
             </div>
             {actions && (

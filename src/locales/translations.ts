@@ -379,6 +379,10 @@ export const translations = {
     'Try a different search term': 'Try a different search term',
     'Search for': 'Search for',
     'Press Enter to search': 'Press Enter to search',
+    
+    // DataTable
+    'Loading data...': 'Loading data...',
+    'No data available': 'No data available',
   },
   
   hi: {
@@ -488,6 +492,10 @@ export const translations = {
     'Try a different search term': 'एक अलग खोज शब्द आज़माएं',
     'Search for': 'के लिए खोजें',
     'Press Enter to search': 'खोजने के लिए Enter दबाएं',
+    
+    // DataTable
+    'Loading data...': 'डेटा लोड हो रहा है...',
+    'No data available': 'कोई डेटा उपलब्ध नहीं',
   },
   
   es: {
