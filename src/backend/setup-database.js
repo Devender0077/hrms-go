@@ -85,7 +85,7 @@ async function setupDatabase() {
       
       // Check if migration already executed
       const [rows] = await connection.query(
-        'SELECT id FROM migrations WHERE name = ?',
+        'SELECT id FROM migrations WHERE migration_name = ?',
         [migrationName]
       );
       
@@ -107,7 +107,7 @@ async function setupDatabase() {
         
         // Mark as executed
         await connection.query(
-          'INSERT INTO migrations (name) VALUES (?)',
+          'INSERT INTO migrations (migration_name) VALUES (?)',
           [migrationName]
         );
         
