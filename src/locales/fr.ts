@@ -1,0 +1,176 @@
+/**
+ * French (Français) Translation Dictionary
+ * Language Code: fr
+ */
+
+export const fr = {
+  // Navigation
+  'Dashboard': 'Tableau de Bord',
+  'Employees': 'Employés',
+  'Attendance': 'Présence',
+  'Leave': 'Congé',
+  'Payroll': 'Paie',
+  'Reports': 'Rapports',
+  'Settings': 'Paramètres',
+  'Users': 'Utilisateurs',
+  'Roles': 'Rôles',
+  'Tasks': 'Tâches',
+  'Calendar': 'Calendrier',
+  'Messenger': 'Messagerie',
+  'Announcements': 'Annonces',
+  
+  // Common Actions
+  'Save': 'Enregistrer',
+  'Cancel': 'Annuler',
+  'Close': 'Fermer',
+  'Confirm': 'Confirmer',
+  'Yes': 'Oui',
+  'No': 'Non',
+  'OK': 'OK',
+  'Apply': 'Appliquer',
+  'Reset': 'Réinitialiser',
+  'Clear': 'Effacer',
+  'Submit': 'Soumettre',
+  'Next': 'Suivant',
+  'Previous': 'Précédent',
+  'Finish': 'Terminer',
+  'Back': 'Retour',
+  'Continue': 'Continuer',
+  'Skip': 'Passer',
+  'Edit': 'Modifier',
+  'Delete': 'Supprimer',
+  'View': 'Voir',
+  'Create': 'Créer',
+  'Update': 'Mettre à jour',
+  'Add': 'Ajouter',
+  'Remove': 'Retirer',
+  'Search': 'Rechercher',
+  'Filter': 'Filtrer',
+  'Export': 'Exporter',
+  'Import': 'Importer',
+  'Download': 'Télécharger',
+  'Upload': 'Téléverser',
+  'Print': 'Imprimer',
+  'Refresh': 'Actualiser',
+  
+  // Common Messages
+  'Success!': 'Succès!',
+  'Error!': 'Erreur!',
+  'Warning!': 'Attention!',
+  'Info': 'Information',
+  'Loading...': 'Chargement...',
+  'Please wait...': 'Veuillez patienter...',
+  'Are you sure?': 'Êtes-vous sûr?',
+  'This action cannot be undone.': 'Cette action ne peut pas être annulée.',
+  'No data available': 'Aucune donnée disponible',
+  'No results found': 'Aucun résultat trouvé',
+  'Saving...': 'Enregistrement...',
+  'Processing...': 'Traitement...',
+  'Deleting...': 'Suppression...',
+  'Updating...': 'Mise à jour...',
+  'Creating...': 'Création...',
+  
+  // Status
+  'Active': 'Actif',
+  'Inactive': 'Inactif',
+  'Pending': 'En attente',
+  'Completed': 'Terminé',
+  'In Progress': 'En cours',
+  'Cancelled': 'Annulé',
+  'Approved': 'Approuvé',
+  'Rejected': 'Rejeté',
+  'Draft': 'Brouillon',
+  'Published': 'Publié',
+  
+  // Priority
+  'Low': 'Faible',
+  'Medium': 'Moyen',
+  'High': 'Élevé',
+  'Urgent': 'Urgent',
+  
+  // Time
+  'Today': 'Aujourd\'hui',
+  'Yesterday': 'Hier',
+  'Tomorrow': 'Demain',
+  'This Week': 'Cette Semaine',
+  'Last Week': 'Semaine Dernière',
+  'This Month': 'Ce Mois',
+  'Last Month': 'Mois Dernier',
+  'This Year': 'Cette Année',
+  'Last Year': 'Année Dernière',
+  
+  // Dashboard
+  'Total Companies': 'Entreprises Totales',
+  'Total Users': 'Utilisateurs Totaux',
+  'Total Employees': 'Employés Totaux',
+  'Active Sessions': 'Sessions Actives',
+  'Super Admin Dashboard': 'Tableau de Bord Super Admin',
+  'Company Admin Dashboard': 'Tableau de Bord Admin Entreprise',
+  'Employee Dashboard': 'Tableau de Bord Employé',
+  
+  // Users Page
+  'User Management': 'Gestion des Utilisateurs',
+  'Manage system users and their access': 'Gérer les utilisateurs système et leur accès',
+  'Add User': 'Ajouter un Utilisateur',
+  'User Name': 'Nom d\'Utilisateur',
+  'Role': 'Rôle',
+  'Last Login': 'Dernière Connexion',
+  'Permissions': 'Permissions',
+  'No users found': 'Aucun utilisateur trouvé',
+  
+  // Employees Page
+  'HR Management': 'Gestion RH',
+  'Add Employee': 'Ajouter un Employé',
+  'Employee Name': 'Nom de l\'Employé',
+  'Employee ID': 'ID Employé',
+  'Department': 'Département',
+  'Designation': 'Désignation',
+  'Email': 'Email',
+  'Phone': 'Téléphone',
+  'No employees found': 'Aucun employé trouvé',
+  
+  // Settings Page
+  'System Configuration': 'Configuration Système',
+  'General Settings': 'Paramètres Généraux',
+  'Company Information': 'Informations Entreprise',
+  'Localization': 'Localisation',
+  'Email Configuration': 'Configuration Email',
+  'Notifications': 'Notifications',
+  'Integrations': 'Intégrations',
+  'Security & Privacy': 'Sécurité et Confidentialité',
+  
+  // Tasks Page
+  'Task Management': 'Gestion des Tâches',
+  'Add Task': 'Ajouter une Tâche',
+  'Task Title': 'Titre de la Tâche',
+  'Description': 'Description',
+  'Due Date': 'Date d\'Échéance',
+  'Assignee': 'Assigné à',
+  'No tasks found': 'Aucune tâche trouvée',
+  
+  // Announcements Page
+  'Stay updated with latest company news': 'Restez informé des dernières nouvelles de l\'entreprise',
+  'Create Announcement': 'Créer une Annonce',
+  'Title': 'Titre',
+  'Content': 'Contenu',
+  'Category': 'Catégorie',
+  'Priority': 'Priorité',
+  'Expires At': 'Expire le',
+  
+  // Messenger Page
+  'Team Communication': 'Communication d\'Équipe',
+  'New Message': 'Nouveau Message',
+  'Conversations': 'Conversations',
+  'Groups': 'Groupes',
+  'Online': 'En Ligne',
+  'Offline': 'Hors Ligne',
+  'Type a message...': 'Tapez un message...',
+  'Send': 'Envoyer',
+  
+  // Attendance Page
+  'Attendance Management': 'Gestion de la Présence',
+  'Check In Time': 'Heure d\'Arrivée',
+  'Check Out Time': 'Heure de Départ',
+  'Work Hours': 'Heures de Travail',
+  'No attendance records found': 'Aucun enregistrement de présence trouvé',
+};

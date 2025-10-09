@@ -31,6 +31,7 @@ import { motion } from "framer-motion";
 import HeroSection from "../components/common/HeroSection";
 import { useAuth } from "../contexts/auth-context";
 import { useTaskContext } from "../contexts/task-context";
+import { useTranslation } from "../contexts/translation-context";
 import Papa from "papaparse";
 
 interface Task {
@@ -64,6 +65,7 @@ interface Task {
 }
 
 export default function TasksPage() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { tasks, taskCounts, addTask, updateTask, deleteTask } = useTaskContext();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -305,14 +307,14 @@ export default function TasksPage() {
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
         {/* Hero Section */}
         <HeroSection
-          title="Tasks"
-          subtitle="Task Management"
-          description="Manage and track your tasks efficiently. Stay organized with our comprehensive task management system."
+          title={t("Tasks")}
+          subtitle={t("Task Management")}
+          description={t("Manage and track your tasks efficiently. Stay organized with our comprehensive task management system.")}
           icon="lucide:check-square"
           illustration="task"
           actions={[
             {
-              label: "Add Task",
+              label: t("Add Task"),
               icon: "lucide:plus",
               onPress: onOpen,
               variant: "solid"

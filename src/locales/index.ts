@@ -5,11 +5,11 @@
 
 import { en } from './en';
 import { hi } from './hi';
+import { es } from './es';
+import { fr } from './fr';
+import { de } from './de';
 
 // Import other languages (create files as needed)
-// import { es } from './es';
-// import { fr } from './fr';
-// import { de } from './de';
 // import { zh } from './zh';
 // import { ar } from './ar';
 // import { pt } from './pt';
@@ -23,10 +23,10 @@ import { hi } from './hi';
 export const translations = {
   en,
   hi,
-  // Add more languages:
-  es: en, // Fallback to English for now
-  fr: en,
-  de: en,
+  es,
+  fr,
+  de,
+  // Add more languages (fallback to English for now):
   zh: en,
   ar: en,
   pt: en,

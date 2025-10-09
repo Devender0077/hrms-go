@@ -28,6 +28,7 @@ import HeroSection from '../components/common/HeroSection';
 import { useAuth } from '../contexts/auth-context';
 import { usePusher } from '../contexts/pusher-context';
 import { useSettings } from '../contexts/settings-context';
+import { useTranslation } from '../contexts/translation-context';
 import { apiRequest } from '../services/api-service';
 
 interface User {

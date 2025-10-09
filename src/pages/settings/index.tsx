@@ -13,6 +13,7 @@ import React, { useState, useEffect } from "react";
 import DynamicPageTitle from "../../components/common/DynamicPageTitle";
 import { useSettings } from "../../contexts/settings-context";
 import { useAuth } from "../../contexts/auth-context";
+import { useTranslation } from "../../contexts/translation-context";
 import { 
   getAccessibleSettingsCategories, 
   getEditableSettingsCategories,
@@ -46,34 +47,35 @@ import CookieConsentSettings from "../../components/settings/CookieConsentSettin
 import ChatGPTSettings from "../../components/settings/ChatGPTSettings";
 import SettingsExportImport from "../../components/settings/SettingsExportImport";
     
-    // Settings tabs configuration
-    const settingsTabs = [
-  { key: "general", title: "General Settings", icon: "lucide:settings", description: "Basic system configuration" },
-  { key: "company", title: "Company Information", icon: "lucide:building", description: "Company details and branding" },
-  { key: "localization", title: "Localization", icon: "lucide:globe", description: "Language, timezone, and regional settings" },
-  { key: "email", title: "Email Configuration", icon: "lucide:mail", description: "Email server and notification settings" },
-  { key: "notification", title: "Notifications", icon: "lucide:bell", description: "Notification preferences and channels" },
-  { key: "integration", title: "Integrations", icon: "lucide:plug", description: "Third-party service integrations" },
-  { key: "security", title: "Security & Privacy", icon: "lucide:shield", description: "Security policies and access control" },
-  { key: "backup", title: "Backup & Storage", icon: "lucide:hard-drive", description: "Data backup and storage management" },
-  { key: "api", title: "API Management", icon: "lucide:code", description: "API keys and webhook configuration" },
-  { key: "workflow", title: "Workflow Settings", icon: "lucide:workflow", description: "Approval workflows and automation" },
-  { key: "reports", title: "Reports & Analytics", icon: "lucide:bar-chart", description: "Report configuration and analytics" },
-  { key: "offer-letter", title: "Offer Letter Settings", icon: "lucide:file-text", description: "Offer letter templates and automation" },
-  { key: "joining-letter", title: "Joining Letter Settings", icon: "lucide:user-plus", description: "Joining letter templates and configuration" },
-  { key: "certificate", title: "Experience Certificate", icon: "lucide:award", description: "Experience certificate templates and settings" },
-  { key: "noc", title: "NOC Settings", icon: "lucide:file-check", description: "No Objection Certificate templates and settings" },
-  { key: "google-calendar", title: "Google Calendar", icon: "lucide:calendar", description: "Google Calendar integration and sync settings" },
-  { key: "seo", title: "SEO Settings", icon: "lucide:search", description: "Search engine optimization and meta tags" },
-  { key: "cache", title: "Cache Settings", icon: "lucide:database", description: "Cache configuration and management" },
-  { key: "webhook", title: "Webhook Settings", icon: "lucide:webhook", description: "Webhook endpoints and event configuration" },
-  { key: "cookie-consent", title: "Cookie Consent", icon: "lucide:cookie", description: "Cookie consent banner and privacy settings" },
-  { key: "chatgpt", title: "ChatGPT Integration", icon: "lucide:bot", description: "AI assistant and ChatGPT integration settings" },
-  { key: "export-import", title: "Export & Import", icon: "lucide:download", description: "Export and import settings configuration" }
-    ];
-    
     export default function Settings() {
+  const { t } = useTranslation();
   const { user } = useAuth();
+  
+  // Settings tabs configuration (with translations)
+  const settingsTabs = [
+    { key: "general", title: t("General Settings"), icon: "lucide:settings", description: t("Basic system configuration") },
+    { key: "company", title: t("Company Information"), icon: "lucide:building", description: t("Company details and branding") },
+    { key: "localization", title: t("Localization"), icon: "lucide:globe", description: t("Language, timezone, and regional settings") },
+    { key: "email", title: t("Email Configuration"), icon: "lucide:mail", description: t("Email server and notification settings") },
+    { key: "notification", title: t("Notifications"), icon: "lucide:bell", description: t("Notification preferences and channels") },
+    { key: "integration", title: t("Integrations"), icon: "lucide:plug", description: t("Third-party service integrations") },
+    { key: "security", title: t("Security & Privacy"), icon: "lucide:shield", description: t("Security policies and access control") },
+    { key: "backup", title: t("Backup & Storage"), icon: "lucide:hard-drive", description: t("Data backup and storage management") },
+    { key: "api", title: t("API Management"), icon: "lucide:code", description: t("API keys and webhook configuration") },
+    { key: "workflow", title: t("Workflow Settings"), icon: "lucide:workflow", description: t("Approval workflows and automation") },
+    { key: "reports", title: t("Reports & Analytics"), icon: "lucide:bar-chart", description: t("Report configuration and analytics") },
+    { key: "offer-letter", title: t("Offer Letter Settings"), icon: "lucide:file-text", description: t("Offer letter templates and automation") },
+    { key: "joining-letter", title: t("Joining Letter Settings"), icon: "lucide:user-plus", description: t("Joining letter templates and configuration") },
+    { key: "certificate", title: t("Experience Certificate"), icon: "lucide:award", description: t("Experience certificate templates and settings") },
+    { key: "noc", title: t("NOC Settings"), icon: "lucide:file-check", description: t("No Objection Certificate templates and settings") },
+    { key: "google-calendar", title: t("Google Calendar"), icon: "lucide:calendar", description: t("Google Calendar integration and sync settings") },
+    { key: "seo", title: t("SEO Settings"), icon: "lucide:search", description: t("Search engine optimization and meta tags") },
+    { key: "cache", title: t("Cache Settings"), icon: "lucide:database", description: t("Cache configuration and management") },
+    { key: "webhook", title: t("Webhook Settings"), icon: "lucide:webhook", description: t("Webhook endpoints and event configuration") },
+    { key: "cookie-consent", title: t("Cookie Consent"), icon: "lucide:cookie", description: t("Cookie consent banner and privacy settings") },
+    { key: "chatgpt", title: t("ChatGPT Integration"), icon: "lucide:bot", description: t("AI assistant and ChatGPT integration settings") },
+    { key: "export-import", title: t("Export & Import"), icon: "lucide:download", description: t("Export and import settings configuration") }
+  ];
   const { settings, loading, saving, updateSetting, updateCategory, saveAllSettings, error } = useSettings();
   const [activeTab, setActiveTab] = useState("general");
   const [isLoading, setIsLoading] = useState(false);
@@ -382,14 +384,14 @@ import SettingsExportImport from "../../components/settings/SettingsExportImport
         <DynamicPageTitle pageName="Settings" />
         {/* Hero Section */}
         <HeroSection
-          title="System Settings"
-          subtitle="Configuration & Preferences"
-          description="Configure your HRMS system preferences, integrations, and customize the platform to meet your organization's needs."
+          title={t("Settings")}
+          subtitle={t("System Configuration")}
+          description={t("Configure your HRMS system settings, integrations, and preferences.")}
           icon="lucide:settings"
           illustration="settings"
           actions={[
             {
-              label: "Export Settings",
+              label: t("Export Settings"),
               icon: "lucide:download",
               onPress: () => console.log("Export settings"),
               variant: "bordered"
