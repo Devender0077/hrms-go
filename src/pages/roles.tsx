@@ -34,6 +34,7 @@ import { addToast } from '@heroui/react';
 import HeroSection from '../components/common/HeroSection';
 import { Icon } from '@iconify/react';
 import { motion } from 'framer-motion';
+import { useTranslation } from '../contexts/translation-context';
 
 interface Permission {
   id: number;
@@ -71,6 +72,7 @@ interface RoleFilters {
 }
 
 const RolesPage: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
@@ -408,14 +410,14 @@ const RolesPage: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
         {/* Hero Section */}
         <HeroSection
-          title="Role Management"
-          subtitle="Access Control"
-          description="Manage user roles and their permissions to control access to different parts of the system."
+          title={t("Role Management")}
+          subtitle={t("Access Control")}
+          description={t("Manage user roles and their permissions to control access to different parts of the system.")}
           icon="lucide:shield-check"
           illustration="role"
           actions={[
             {
-              label: "Create Role",
+              label: t("Create Role"),
               icon: "lucide:plus",
               onPress: onCreateOpen,
               variant: "solid",
@@ -551,11 +553,11 @@ const RolesPage: React.FC = () => {
             <CardBody className="pt-0">
               <Table aria-label="Roles table">
                 <TableHeader>
-                  <TableColumn>ROLE</TableColumn>
-                  <TableColumn>DESCRIPTION</TableColumn>
-                  <TableColumn>PERMISSIONS</TableColumn>
-                  <TableColumn>STATUS</TableColumn>
-                  <TableColumn>ACTIONS</TableColumn>
+                  <TableColumn>{t("Role").toUpperCase()}</TableColumn>
+                  <TableColumn>{t("Description").toUpperCase()}</TableColumn>
+                  <TableColumn>{t("Permissions").toUpperCase()}</TableColumn>
+                  <TableColumn>{t("Status").toUpperCase()}</TableColumn>
+                  <TableColumn>{t("Actions").toUpperCase()}</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent={
                   <div className="flex flex-col items-center justify-center py-12 px-6">

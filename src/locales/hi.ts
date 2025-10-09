@@ -285,5 +285,18 @@ export const hi = {
   'Never': 'कभी नहीं',
   'Account Active': 'खाता सक्रिय',
   'Account Inactive': 'खाता निष्क्रिय',
+  
+  // Roles Page
+  'Role Management': 'भूमिका प्रबंधन',
+  'Access Control': 'एक्सेस नियंत्रण',
+  'Manage user roles and their permissions to control access to different parts of the system.': 'सिस्टम के विभिन्न भागों तक पहुंच को नियंत्रित करने के लिए उपयोगकर्ता भूमिकाओं और उनकी अनुमतियों का प्रबंधन करें।',
+  'Create Role': 'भूमिका बनाएं',
+  'Edit Role': 'भूमिका संपादित करें',
+  'Delete Role': 'भूमिका हटाएं',
+  'Manage Permissions': 'अनुमतियां प्रबंधित करें',
+  'Assign Permissions': 'अनुमतियां निर्धारित करें',
+  'No roles found': 'कोई भूमिका नहीं मिली',
+  'Role Name': 'भूमिका का नाम',
+  'Role Description': 'भूमिका विवरण',
 };
 

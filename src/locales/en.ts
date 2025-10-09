@@ -340,5 +340,18 @@ export const en = {
   'Never': 'Never',
   'Account Active': 'Account Active',
   'Account Inactive': 'Account Inactive',
+  
+  // Roles Page
+  'Role Management': 'Role Management',
+  'Access Control': 'Access Control',
+  'Manage user roles and their permissions to control access to different parts of the system.': 'Manage user roles and their permissions to control access to different parts of the system.',
+  'Create Role': 'Create Role',
+  'Edit Role': 'Edit Role',
+  'Delete Role': 'Delete Role',
+  'Manage Permissions': 'Manage Permissions',
+  'Assign Permissions': 'Assign Permissions',
+  'No roles found': 'No roles found',
+  'Role Name': 'Role Name',
+  'Role Description': 'Role Description',
 };
 
