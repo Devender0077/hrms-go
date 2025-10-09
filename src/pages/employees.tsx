@@ -149,12 +149,12 @@ export default function EmployeesPage() {
         <HeroSection
           title={t('Employees')}
           subtitle={t('HR Management')}
-          description="Manage your organization's workforce with comprehensive employee data, performance tracking, and streamlined HR processes."
+          description={t("Manage your organization's workforce with comprehensive employee data, performance tracking, and streamlined HR processes.")}
           icon="lucide:users"
           illustration="employee"
           actions={[
             {
-              label: "Add Employee",
+              label: t("Add Employee"),
               icon: "lucide:plus",
               onPress: onAddOpen,
               variant: "solid"
