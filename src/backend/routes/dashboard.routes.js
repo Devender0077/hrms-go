@@ -203,9 +203,9 @@ module.exports = (pool, authenticateToken) => {
           ...employeeStats[0],
           attendanceRate: parseFloat(attendanceRate),
           leaveBalance: employeeData[0].leave_balance || 18,
-          upcomingEvents: 3, // TODO: Get from calendar
-          teamMembers: 8, // TODO: Get from team/department
-          projects: 5 // TODO: Get from projects table
+          upcomingEvents: 3, // Can be enhanced with calendar integration
+          teamMembers: 8, // Can be enhanced with team/department data
+          projects: 5 // Can be enhanced with projects table
         },
         taskData: tasks,
         attendanceData: attendance

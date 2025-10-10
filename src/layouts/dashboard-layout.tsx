@@ -290,7 +290,7 @@ import React, { useState, useEffect } from "react";
             <footer className="bg-content1 py-4 px-6">
               <div className="flex flex-col md:flex-row justify-between items-center text-sm text-default-600">
                 <div className="flex items-center space-x-4 mb-2 md:mb-0">
-                  <span>© 2024 HRMS GO. All rights reserved.</span>
+                  <span>© {new Date().getFullYear()} {user?.company_name || 'HRMS GO'}. All rights reserved.</span>
                 </div>
                 <div className="flex items-center space-x-4">
                   <span>Developed with ❤️ by</span>

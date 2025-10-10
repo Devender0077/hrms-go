@@ -195,7 +195,7 @@ export default function SuperAdminDashboard() {
         {/* 1. Organization Overview - Top Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" isPressable onPress={() => navigate('/dashboard/employees')}>
               <CardBody className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -212,7 +212,7 @@ export default function SuperAdminDashboard() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" isPressable onPress={() => navigate('/dashboard/organization/departments')}>
               <CardBody className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -229,7 +229,7 @@ export default function SuperAdminDashboard() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" isPressable onPress={() => navigate('/dashboard/organization/branches')}>
               <CardBody className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -246,7 +246,7 @@ export default function SuperAdminDashboard() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" isPressable onPress={() => navigate('/dashboard/timekeeping/attendance')}>
               <CardBody className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -263,7 +263,7 @@ export default function SuperAdminDashboard() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" isPressable onPress={() => navigate('/dashboard/users')}>
               <CardBody className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -280,7 +280,7 @@ export default function SuperAdminDashboard() {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
-            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+            <Card className="border-0 shadow-sm hover:shadow-md transition-shadow cursor-pointer" isPressable onPress={() => navigate('/dashboard/organization/designations')}>
               <CardBody className="p-4">
                 <div className="flex items-center justify-between">
                   <div>

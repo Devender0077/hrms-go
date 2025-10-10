@@ -314,7 +314,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           </div>
       {isOpen && (
 <div className="absolute z-50 mt-1 w-full max-w-md max-h-96 overflow-y-auto 
-                bg-black border border-divider rounded-lg shadow-lg">
+                bg-content1 dark:bg-content1 border border-divider rounded-lg shadow-lg">
 
     {isLoading ? (
   <div className="flex items-center justify-center py-4">
@@ -332,7 +332,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
     {/* "Search for..." option */}
     <div
       className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-150 ${
-        selectedIndex === 0 ? 'bg-default-100 dark:bg-default-50' : 'hover:bg-default-50 dark:hover:bg-default-100/50'
+        selectedIndex === 0 ? 'bg-primary-50 dark:bg-primary-900/20' : 'hover:bg-default-100 dark:hover:bg-default-100/50'
       }`}
       onClick={() => {
         console.log(`Searching for: ${query}`);
@@ -355,7 +355,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <div
           key={result.id}
           className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-150 ${
-            isSelected ? 'bg-default-100 dark:bg-default-50' : 'hover:bg-default-50 dark:hover:bg-default-100/50'
+            isSelected ? 'bg-primary-50 dark:bg-primary-900/20' : 'hover:bg-default-100 dark:hover:bg-default-100/50'
           }`}
           onClick={() => handleResultClick(result)}
         >

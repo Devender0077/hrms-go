@@ -71,15 +71,15 @@ exports.up = async function(connection) {
             'INSERT INTO permissions (name, permission_name, module, description) VALUES (?, ?, ?, ?)',
             [perm.name, perm.name, perm.module, perm.description]
           );
-          console.log(\`✅ Added permission: \${perm.name}\`);
+          console.log(`✅ Added permission: ${perm.name}`);
         } else {
-          console.log(\`⏭️  Permission already exists: \${perm.name}\`);
+          console.log(`⏭️  Permission already exists: ${perm.name}`);
         }
       } catch (error) {
-        console.warn(\`⚠️  Error adding permission \${perm.name}:\`, error.message);
+        console.warn(`⚠️  Error adding permission ${perm.name}:`, error.message);
       }
     }
-
+    
     console.log('✅ Missing permissions migration completed');
     return true;
   } catch (error) {
