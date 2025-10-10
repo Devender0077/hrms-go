@@ -140,7 +140,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                     size="sm"
                     className="bg-white/20 backdrop-blur-sm text-white border-white/30 hover:bg-white/30"
                     startContent={action.icon && !action.isLoading ? <Icon icon={action.icon} className="w-4 h-4" /> : null}
-                    onPress={action.onPress}
+                    onPress={() => {
+                      console.log('🔘 Button clicked:', action.label);
+                      action.onPress();
+                    }}
                     isDisabled={action.isDisabled}
                     isLoading={action.isLoading}
                   >

@@ -215,6 +215,9 @@ const reviewsRoutes = require('./routes/reviews.routes')(pool, authenticateToken
 const assetsRoutes = require('./routes/assets.routes')(pool, authenticateToken);
 const expensesRoutes = require('./routes/expenses.routes')(pool, authenticateToken, upload);
 const documentsRoutes = require('./routes/documents.routes')(pool, authenticateToken, upload);
+// Audit logs and dashboard routes (require pool and authenticateToken)
+const auditLogsModule = require('./routes/audit-logs.routes')(pool, authenticateToken);
+const dashboardModule = require('./routes/dashboard.routes')(pool, authenticateToken);
 
 // =====================================================
 // MOUNT MODULAR ROUTES
@@ -227,6 +230,8 @@ app.use('/api/v1/leave', leaveRoutes);
 app.use('/api/v1/tasks', taskRoutes);
 app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/audit-logs', auditLogsModule.router);
+app.use('/api/v1/dashboard', dashboardModule.router);
 app.use('/api/v1/roles', userRoutes); // Mount roles endpoints directly
 app.use('/api/v1/permissions', userRoutes); // Mount permissions endpoints directly
 app.use('/api/v1/timekeeping', attendanceRoutes);
@@ -239,9 +244,7 @@ app.use('/api/v1/assets', assetsRoutes);
 app.use('/api/v1/expenses', expensesRoutes);
 app.use('/api/v1/documents', documentsRoutes);
 
-// Audit logs routes
-const auditLogsModule = require('./routes/audit-logs.routes')(pool, authenticateToken);
-app.use('/api/v1/audit-logs', auditLogsModule.router);
+// Routes are already mounted above, removing duplicate
 
 // Pusher routes
 const pusherModule = require('./routes/pusher.routes')(pool, authenticateToken);

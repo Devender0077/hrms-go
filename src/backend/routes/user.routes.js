@@ -328,9 +328,12 @@ module.exports = (pool, authenticateToken) => {
     try {
       const { id } = req.params;
       
-      // ✅ Allow users to get their own data, or admin/super_admin to get anyone
-      const isAdmin = req.user.role === 'admin' || req.user.role === 'super_admin';
+      // ✅ Allow users to get their own data, or super_admin/company_admin to get anyone
+      const userRole = req.user?.role?.toLowerCase();
+      const isAdmin = userRole === 'super_admin' || userRole === 'superadmin' || userRole === 'company_admin' || userRole === 'hr_manager';
       const isOwnProfile = req.user.id === parseInt(id);
+      
+      console.log('🔍 GET /users/:id - User:', req.user.id, 'Role:', req.user.role, 'Requesting:', id, 'isAdmin:', isAdmin, 'isOwnProfile:', isOwnProfile);
       
       if (!isOwnProfile && !isAdmin) {
         console.log('❌ 403 Forbidden: User', req.user.id, 'role', req.user.role, 'tried to access user', id);
@@ -339,6 +342,8 @@ module.exports = (pool, authenticateToken) => {
           message: 'Unauthorized to access this user data'
         });
       }
+      
+      console.log('✅ Access granted to user', id);
       
       console.log('✅ Authorized: User', req.user.id, 'role', req.user.role, 'accessing user', id);
       

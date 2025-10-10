@@ -53,9 +53,6 @@ module.exports = (pool) => {
         return res.status(401).json({ success: false, message: 'Invalid credentials' });
       }
       
-      // Map super_admin to admin for frontend compatibility
-      const frontendRole = user.role === 'super_admin' ? 'admin' : user.role;
-      
       // Fetch user permissions
       const [permissions] = await pool.query(
         `SELECT p.permission_name 
@@ -68,11 +65,13 @@ module.exports = (pool) => {
       
       const userPermissions = permissions.map(p => p.permission_name);
       
+      console.log('✅ Creating JWT token with role:', user.role);
+      
       const token = jwt.sign(
         { 
           id: user.id, 
           email: user.email, 
-          role: frontendRole, 
+          role: user.role, // Use actual role from database
           company_id: 1,
           permissions: userPermissions
         },
@@ -83,6 +82,8 @@ module.exports = (pool) => {
       // Update last login
       await pool.query('UPDATE users SET last_login = NOW() WHERE id = ?', [user.id]);
       
+      console.log('✅ Login successful for user:', user.email, 'with role:', user.role);
+      
       res.json({
         success: true,
         token,
@@ -90,7 +91,7 @@ module.exports = (pool) => {
           id: user.id,
           name: `${user.first_name} ${user.last_name}`,
           email: user.email,
-          role: frontendRole, // Use mapped role for frontend
+          role: user.role, // Use actual role from database
           profile_photo: user.avatar,
           company_id: 1, // Default company ID
           permissions: userPermissions
