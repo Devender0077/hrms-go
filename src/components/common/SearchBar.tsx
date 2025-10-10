@@ -291,21 +291,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   return (
     <div className={`relative ${className}`}>
-      <Dropdown 
-        isOpen={isOpen} 
-        onOpenChange={(open) => {
-          // Only allow closing if there's no query or user explicitly closes
-          if (!open && query.trim().length === 0) {
-            setIsOpen(false);
-          } else if (open) {
-            setIsOpen(true);
-          }
-        }}
-        placement="bottom-start"
-        className="w-full max-w-md"
-      >
-        <DropdownTrigger>
-          <div>
+      <div>
             <Input
               ref={inputRef}
               value={query}
@@ -326,83 +312,67 @@ const SearchBar: React.FC<SearchBarProps> = ({
               }}
             />
           </div>
-        </DropdownTrigger>
-        
-            <DropdownMenu
-              aria-label="Search results"
-              className="w-full max-w-md max-h-96 overflow-y-auto"
-              closeOnSelect={false}
-            >
-          {isLoading ? (
-            <DropdownItem key="loading" textValue="loading">
-              <div className="flex items-center justify-center py-4">
-                <Icon icon="lucide:loader-2" className="animate-spin text-xl text-default-400" />
-                <span className="ml-2 text-sm text-default-500">{t('Searching...')}</span>
-              </div>
-            </DropdownItem>
-          ) : results.length === 0 && query.trim().length > 0 ? (
-            <DropdownItem key="no-results" textValue="no-results">
-              <div className="flex flex-col items-center justify-center py-4 text-center">
-                <Icon icon="lucide:search-x" className="text-2xl text-default-300 mb-2" />
-                <p className="text-sm text-default-500">{t('No results found')}</p>
-                <p className="text-xs text-default-400 mt-1">{t('Try a different search term')}</p>
-              </div>
-            </DropdownItem>
-          ) : (
-            <>
-              {/* Add a "Search for..." option at the top */}
-              <DropdownItem
-                key="search-for"
-                textValue={`${t('Search for')} "${query}"`}
-                onPress={() => {
-                  // Allow user to search for their exact query
-                  console.log(`Searching for: ${query}`);
-                  setIsOpen(false);
-                  setQuery('');
-                  inputRef.current?.blur();
-                }}
-                className="p-0 border-b border-divider"
-              >
-                <div className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-150 ${
-                  selectedIndex === 0 ? 'bg-default-100 dark:bg-default-50' : 'hover:bg-default-50 dark:hover:bg-default-100/50'
-                }`}>
-                  <Icon icon="lucide:search" className="text-primary text-lg" />
-                  <div className="flex flex-col">
-                    <p className="text-sm font-medium text-primary">{t('Search for')} "{query}"</p>
-                    <p className="text-xs text-default-500">{t('Press Enter to search')}</p>
-                  </div>
-                </div>
-              </DropdownItem>
-              
-              {/* Show matching results */}
-              {results.map((result, index) => {
-                const isSelected = index + 1 === selectedIndex; // +1 because of the search-for option
-                
-                return (
-                  <DropdownItem
-                    key={result.id}
-                    textValue={result.title}
-                    onPress={() => handleResultClick(result)}
-                    className={`p-0 ${isSelected ? 'bg-default-100' : ''}`}
-                  >
-                    <div
-                      className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-150 ${
-                        isSelected ? 'bg-default-100 dark:bg-default-50' : 'hover:bg-default-50 dark:hover:bg-default-100/50'
-                      }`}
-                    >
-                      <Icon icon={getIconForType(result.type)} className="text-default-500 text-lg" />
-                      <div className="flex flex-col">
-                        <p className="text-sm font-medium text-foreground">{result.title}</p>
-                        <p className="text-xs text-default-500">{result.description}</p>
-                      </div>
-                    </div>
-                  </DropdownItem>
-                );
-              })}
-            </>
-          )}
-        </DropdownMenu>
-      </Dropdown>
+      {isOpen && (
+<div className="absolute z-50 mt-1 w-full max-w-md max-h-96 overflow-y-auto 
+                bg-black border border-divider rounded-lg shadow-lg">
+
+    {isLoading ? (
+  <div className="flex items-center justify-center py-4">
+    <Icon icon="lucide:loader-2" className="animate-spin text-xl text-default-400" />
+    <span className="ml-2 text-sm text-default-500">{t('Searching...')}</span>
+  </div>
+) : results.length === 0 && query.trim().length > 0 ? (
+  <div className="flex flex-col items-center justify-center py-4 text-center">
+    <Icon icon="lucide:search-x" className="text-2xl text-default-300 mb-2" />
+    <p className="text-sm text-default-500">{t('No results found')}</p>
+    <p className="text-xs text-default-400 mt-1">{t('Try a different search term')}</p>
+  </div>
+) : (
+  <>
+    {/* "Search for..." option */}
+    <div
+      className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-150 ${
+        selectedIndex === 0 ? 'bg-default-100 dark:bg-default-50' : 'hover:bg-default-50 dark:hover:bg-default-100/50'
+      }`}
+      onClick={() => {
+        console.log(`Searching for: ${query}`);
+        setIsOpen(false);
+        setQuery('');
+        inputRef.current?.blur();
+      }}
+    >
+      <Icon icon="lucide:search" className="text-primary text-lg" />
+      <div className="flex flex-col">
+        <p className="text-sm font-medium text-primary">{t('Search for')} "{query}"</p>
+        <p className="text-xs text-default-500">{t('Press Enter to search')}</p>
+      </div>
+    </div>
+
+    {/* Results */}
+    {results.map((result, index) => {
+      const isSelected = index + 1 === selectedIndex;
+      return (
+        <div
+          key={result.id}
+          className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all duration-150 ${
+            isSelected ? 'bg-default-100 dark:bg-default-50' : 'hover:bg-default-50 dark:hover:bg-default-100/50'
+          }`}
+          onClick={() => handleResultClick(result)}
+        >
+          <Icon icon={getIconForType(result.type)} className="text-default-500 text-lg" />
+          <div className="flex flex-col">
+            <p className="text-sm font-medium text-foreground">{result.title}</p>
+            <p className="text-xs text-default-500">{result.description}</p>
+          </div>
+        </div>
+      );
+    })}
+  </>
+)}
+
+  </div>
+)}
+
     </div>
   );
 };
