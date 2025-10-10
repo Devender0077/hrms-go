@@ -132,13 +132,62 @@ import SettingsExportImport from "../../components/settings/SettingsExportImport
 
   const handleCreateApiKey = async () => {
     try {
-        setIsLoading(true);
-      // TODO: Implement API key creation
-      console.log('Creating API key:', newApiKey);
-      setIsApiModalOpen(false);
-      setNewApiKey({ name: "", description: "" });
-    } catch (error) {
+      setIsLoading(true);
+      
+      // Validate input
+      if (!newApiKey.name || newApiKey.name.trim().length === 0) {
+        addToast({
+          title: 'Validation Error',
+          description: 'API key name is required',
+          type: 'error',
+          duration: 3000
+        });
+        return;
+      }
+
+      // Call API to create key
+      const response = await fetch('http://localhost:8000/api/v1/api-keys', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          name: newApiKey.name,
+          description: newApiKey.description,
+          expiresIn: 365 // 1 year expiration
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        addToast({
+          title: 'API Key Created',
+          description: `API key "${newApiKey.name}" has been created successfully. Make sure to copy it now as it won't be shown again.`,
+          type: 'success',
+          duration: 10000
+        });
+        
+        // Show the API key in a modal or alert
+        alert(`Your new API key:\n\n${data.data.api_key}\n\nPlease copy this key now. You won't be able to see it again!`);
+        
+        setIsApiModalOpen(false);
+        setNewApiKey({ name: "", description: "" });
+        
+        // Refresh API keys list if you have one
+        // await loadApiKeys();
+      } else {
+        throw new Error(data.error || 'Failed to create API key');
+      }
+    } catch (error: any) {
       console.error('Error creating API key:', error);
+      addToast({
+        title: 'Creation Failed',
+        description: error.message || 'Failed to create API key. Please try again.',
+        type: 'error',
+        duration: 5000
+      });
     } finally {
       setIsLoading(false);
     }
@@ -147,12 +196,45 @@ import SettingsExportImport from "../../components/settings/SettingsExportImport
   const handleDeleteApiKey = async (keyId: string | number) => {
     try {
       setIsLoading(true);
-      // TODO: Implement API key deletion
-      console.log('Deleting API key:', keyId);
-    } catch (error) {
+      
+      // Confirm deletion
+      if (!confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+        return;
+      }
+
+      // Call API to delete key
+      const response = await fetch(`http://localhost:8000/api/v1/api-keys/${keyId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        addToast({
+          title: 'API Key Deleted',
+          description: 'API key has been deleted successfully',
+          type: 'success',
+          duration: 3000
+        });
+        
+        // Refresh API keys list if you have one
+        // await loadApiKeys();
+      } else {
+        throw new Error(data.error || 'Failed to delete API key');
+      }
+    } catch (error: any) {
       console.error('Error deleting API key:', error);
+      addToast({
+        title: 'Deletion Failed',
+        description: error.message || 'Failed to delete API key. Please try again.',
+        type: 'error',
+        duration: 5000
+      });
     } finally {
-          setIsLoading(false);
+      setIsLoading(false);
     }
   };
 

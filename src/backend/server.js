@@ -232,6 +232,9 @@ app.use('/api/v1/settings', settingsRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/audit-logs', auditLogsModule.router);
 app.use('/api/v1/dashboard', dashboardModule.router);
+
+const apiKeysModule = require('./routes/api-keys.routes')(pool, authenticateToken);
+app.use('/api/v1/api-keys', apiKeysModule.router);
 app.use('/api/v1/roles', userRoutes); // Mount roles endpoints directly
 app.use('/api/v1/permissions', userRoutes); // Mount permissions endpoints directly
 app.use('/api/v1/timekeeping', attendanceRoutes);
