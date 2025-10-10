@@ -15,9 +15,11 @@ import {
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
+import { useTranslation } from "../../contexts/translation-context";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [firstName, setFirstName] = React.useState("");
   const [lastName, setLastName] = React.useState("");
   const [email, setEmail] = React.useState("");

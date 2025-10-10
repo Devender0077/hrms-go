@@ -6,23 +6,26 @@ let mockFaceApi: any = null;
 
 // Face recognition service
 const FaceRecognitionService = {
+  modelsLoaded: false, // Track if models are loaded
+  
   // Initialize face-api.js models
   async loadModels() {
     try {
       // Development mode flag - set to true to use mock implementation without loading models
-      const useMockImplementation = true; // Always use mock in development
+      const useMockImplementation = false; // Real AI face recognition enabled!
 
       if (useMockImplementation) {
         console.log(
           "Using mock face recognition implementation in development mode"
         );
         this.setupMockImplementation();
+        this.modelsLoaded = true; // ✅ Mark as loaded for mock
         return true;
       }
 
       // Try multiple possible model locations with more paths
       const possiblePaths = [
-        "/models",
+        "/models", // Vite serves from public/ as root
         "./models",
         "../models",
         "/public/models",
@@ -85,10 +88,21 @@ const FaceRecognitionService = {
             );
             console.log("FaceExpressionNet model loaded successfully");
 
-            // If we reach here, all models loaded successfully
+            // ✅ Load additional models (age, gender)
+            try {
+              await loadWithTimeout(
+                faceapi.nets.ageGenderNet.loadFromUri(path)
+              );
+              console.log("AgeGenderNet model loaded successfully");
+            } catch (ageGenderError) {
+              console.warn("AgeGenderNet model not available (optional)");
+            }
+
+            // If we reach here, all core models loaded successfully
             console.log(
-              `All face recognition models loaded successfully from ${path}`
+              `✅ All face recognition models loaded successfully from ${path}`
             );
+            this.modelsLoaded = true;
             return true;
           } catch (error) {
             console.error(`Error loading models from ${path}:`, error);
@@ -105,12 +119,14 @@ const FaceRecognitionService = {
         "Could not load face-api.js models from any location. Using mock implementation."
       );
       this.setupMockImplementation();
+      this.modelsLoaded = true; // ✅ Mark as loaded even with mock
 
       // Return true to allow the app to continue with mock implementation
       return true;
     } catch (error) {
       console.error("Error in face recognition model loading:", error);
       this.setupMockImplementation();
+      this.modelsLoaded = true; // ✅ Mark as loaded even with mock
       return true; // Return true anyway to allow the app to continue
     }
   },
@@ -204,6 +220,19 @@ const FaceRecognitionService = {
   // Capture face from video stream
   async captureFace(videoElement) {
     try {
+      // ✅ CRITICAL: Ensure models are loaded before detection
+      if (!this.modelsLoaded) {
+        console.log('⏳ Models not loaded yet, loading now...');
+        await this.loadModels();
+        
+        // Wait a bit for models to fully initialize
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        if (!this.modelsLoaded) {
+          throw new Error("Failed to load face recognition models. Please try again.");
+        }
+      }
+      
       const api = this.getFaceApi();
       
       // For mock implementation, be more lenient with video ready state
@@ -218,14 +247,28 @@ const FaceRecognitionService = {
         // Simulate a delay for realistic behavior
         await new Promise(resolve => setTimeout(resolve, 1000));
         
+        // ✅ Capture image from video element (even for mock)
+        const canvas = document.createElement('canvas');
+        canvas.width = videoElement.videoWidth || 640;
+        canvas.height = videoElement.videoHeight || 480;
+        const ctx = canvas.getContext('2d');
+        
+        if (ctx) {
+          ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        }
+        
+        const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        
         // Return mock descriptor
         const mockDescriptor = new Float32Array(128).fill(0.5);
         return {
           descriptor: Array.from(mockDescriptor),
           detection: {
             descriptor: mockDescriptor,
-            detection: { box: { x: 100, y: 100, width: 200, height: 200 } }
+            detection: { box: { x: 100, y: 100, width: 200, height: 200 } },
+            score: 0.95 // Mock detection score
           },
+          image: imageDataUrl, // ✅ Return captured image for display
         };
       }
       
@@ -234,6 +277,8 @@ const FaceRecognitionService = {
         throw new Error("Video element not ready. Please ensure camera is active.");
       }
       
+      console.log('🎥 Attempting face detection with real AI models...');
+      
       // Real face-api.js implementation
       const detections = await api
         .detectSingleFace(videoElement, new api.TinyFaceDetectorOptions())
@@ -241,15 +286,40 @@ const FaceRecognitionService = {
         .withFaceDescriptor();
 
       if (!detections) {
-        throw new Error("No face detected");
+        throw new Error("No face detected. Please ensure good lighting and face the camera.");
       }
+
+      console.log('✅ Face detected successfully!');
 
       // Get face descriptor
       const descriptor = Array.from(detections.descriptor);
+      
+      // ✅ Capture image from video element as base64
+      const canvas = document.createElement('canvas');
+      canvas.width = videoElement.videoWidth;
+      canvas.height = videoElement.videoHeight;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        throw new Error("Failed to create canvas context");
+      }
+      
+      // Draw the current video frame to canvas
+      ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+      
+      // Convert canvas to base64 image
+      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      
+      // Extract detection score
+      const detectionScore = detections.detection?.score || 0.9;
 
       return {
         descriptor,
-        detection: detections,
+        detection: {
+          ...detections,
+          score: detectionScore
+        },
+        image: imageDataUrl, // ✅ Return captured image for display
       };
     } catch (error) {
       console.error("Error capturing face:", error);
@@ -276,27 +346,52 @@ const FaceRecognitionService = {
     }
   },
 
-  // Verify face against stored descriptor
-  verifyFace(capturedDescriptor, storedDescriptor, threshold = 0.6) {
+  // Verify face against stored descriptor (local comparison)
+  compareFaceDescriptors(capturedDescriptor, storedDescriptor, threshold = 0.6) {
     try {
       const api = this.getFaceApi();
-      // Convert stored descriptor to Float32Array if it's not already
-      const storedFloat32 =
-        storedDescriptor instanceof Float32Array
-          ? storedDescriptor
-          : new Float32Array(storedDescriptor);
+      // Convert to Float32Array if needed
+      const capturedFloat32 = capturedDescriptor instanceof Float32Array
+        ? capturedDescriptor
+        : new Float32Array(capturedDescriptor);
+      
+      const storedFloat32 = storedDescriptor instanceof Float32Array
+        ? storedDescriptor
+        : new Float32Array(storedDescriptor);
 
       // Calculate distance between descriptors
-      const distance = api.euclideanDistance(
-        capturedDescriptor,
-        storedFloat32
-      );
+      const distance = api.euclideanDistance(capturedFloat32, storedFloat32);
 
       // Return true if distance is below threshold (lower distance means more similar)
       return distance < threshold;
     } catch (error) {
       console.error("Error verifying face:", error);
       return false;
+    }
+  },
+
+  // Verify face via backend API (for login)
+  async verifyFaceLogin(videoElement) {
+    try {
+      // Capture face descriptor from video
+      const { descriptor } = await this.captureFace(videoElement);
+      
+      // Send descriptor to backend for verification
+      const response = await fetch('http://localhost:8000/api/v1/auth/face-login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          face_descriptor: descriptor // Only send 128 numbers, not image!
+        }),
+      });
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error in face login verification:", error);
+      throw error;
     }
   },
 

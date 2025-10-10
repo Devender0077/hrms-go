@@ -132,10 +132,10 @@ export default function EmployeesPage() {
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center max-w-md">
           <Icon icon="lucide:alert-circle" className="w-12 h-12 sm:w-16 sm:h-16 text-danger mx-auto mb-4" />
-          <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Error Loading Employees</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground mb-2">{t("Error Loading Employees")}</h2>
           <p className="text-default-500 dark:text-default-400 mb-4 text-sm sm:text-base">{error}</p>
           <Button color="primary" onPress={() => window.location.reload()} className="font-medium">
-            Try Again
+            {t("Try Again")}
           </Button>
         </div>
       </div>
@@ -160,7 +160,7 @@ export default function EmployeesPage() {
               variant: "solid"
             },
             {
-              label: "Export Data",
+              label: t("Export Data"),
               icon: "lucide:download",
               onPress: () => {},
               variant: "bordered"

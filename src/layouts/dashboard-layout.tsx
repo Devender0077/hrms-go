@@ -60,20 +60,50 @@ import React, { useState, useEffect } from "react";
         const fetchUserProfile = async () => {
           if (user?.id) {
             try {
+              console.log('🔄 DashboardLayout v2.9.9 - Role-based profile fetch');
               const userId = parseInt(user.id);
-              const response = await employeeAPI.getByUserId(userId);
-              if (response && response.data) {
-                setProfilePhoto(response.data.profile_photo);
-                setUserGender(response.data.gender || 'male');
+              
+              // ✅ Check if user is management (admin, super_admin, company_admin, hr_manager, manager)
+              const isManagement = user.role === 'admin' ||
+                                  user.role === 'super_admin' || 
+                                  user.role === 'company_admin' || 
+                                  user.role === 'hr_manager' || 
+                                  user.role === 'manager';
+              
+              console.log('👤 User role check:', { userId, role: user.role, isManagement });
+              
+              if (isManagement) {
+                // ✅ Management users - load from users table
+                const response = await fetch(`http://localhost:8000/api/v1/users/${userId}`, {
+                  headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                  }
+                }).then(res => res.json());
+                
+                if (response.success && response.data) {
+                  setProfilePhoto(response.data.profile_photo || user.profile_photo);
+                  setUserGender(response.data.gender || 'male');
+                }
+              } else {
+                // ✅ Regular employees - load from employees table
+                const response = await employeeAPI.getByUserId(userId);
+                if (response && response.data) {
+                  setProfilePhoto(response.data.profile_photo);
+                  setUserGender(response.data.gender || 'male');
+                }
               }
             } catch (error) {
               console.error('Error fetching user profile:', error);
+              // Fallback to user context data
+              if (user.profile_photo) {
+                setProfilePhoto(user.profile_photo);
+              }
             }
           }
         };
 
         fetchUserProfile();
-      }, [user?.id]);
+      }, [user?.id, user?.role]);
       
       return (
         <div className="flex h-screen bg-background">

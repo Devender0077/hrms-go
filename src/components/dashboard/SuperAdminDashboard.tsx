@@ -122,20 +122,20 @@ export default function SuperAdminDashboard() {
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         {/* Hero Section */}
         <HeroSection
-          title="Super Admin Dashboard"
-          subtitle="System Overview & Management"
-          description="Monitor performance, manage users, and track system health in real-time"
+          title={t("Super Admin Dashboard")}
+          subtitle={t("System Configuration")}
+          description={t("Manage system users, roles, and permissions. Control access levels, assign roles, and maintain security across your HRMS platform.")}
           icon="lucide:shield-check"
           illustration="dashboard"
           actions={[
             {
-              label: "Export Report",
+              label: t("Export Report"),
               icon: "lucide:download",
               onPress: () => console.log("Export Report"),
               color: "primary" as const
             },
             {
-              label: "System Settings",
+              label: t("Settings"),
               icon: "lucide:settings",
               onPress: () => console.log("System Settings"),
               variant: "bordered" as const
@@ -326,9 +326,9 @@ export default function SuperAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Total Employees</p>
+                    <p className="text-default-500 text-sm font-medium">{t("Total Employees")}</p>
                     <p className="text-3xl font-bold text-foreground mt-1">{systemStats.totalEmployees.toLocaleString()}</p>
-                    <p className="text-success-600 text-sm mt-1">+15% from last month</p>
+                    <p className="text-success-600 text-sm mt-1">{t("+15% from last month")}</p>
                   </div>
                   <div className="p-3 bg-secondary-100 rounded-xl">
                     <Icon icon="lucide:user-check" className="text-secondary-600 text-2xl" />
@@ -347,9 +347,9 @@ export default function SuperAdminDashboard() {
               <CardBody className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-sm font-medium">Monthly Revenue</p>
+                    <p className="text-default-500 text-sm font-medium">{t("Monthly Revenue")}</p>
                     <p className="text-3xl font-bold text-foreground mt-1">${systemStats.monthlyRevenue.toLocaleString()}</p>
-                    <p className="text-success-600 text-sm mt-1">+22% from last month</p>
+                    <p className="text-success-600 text-sm mt-1">+22% {t("from last month")}</p>
                   </div>
                   <div className="p-3 bg-warning-100 rounded-xl">
                     <Icon icon="lucide:dollar-sign" className="text-warning-600 text-2xl" />
@@ -372,8 +372,8 @@ export default function SuperAdminDashboard() {
                 <div className="flex items-center gap-3">
                   <Icon icon="lucide:trending-up" className="text-primary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Revenue & User Growth</h3>
-                    <p className="text-default-500 text-sm">Monthly performance metrics</p>
+                    <h3 className="text-lg font-semibold text-foreground">{t("Monthly Revenue")} & {t("Total Users")}</h3>
+                    <p className="text-default-500 text-sm">{t("Monthly performance metrics")}</p>
                   </div>
                 </div>
               </CardHeader>
@@ -416,8 +416,8 @@ export default function SuperAdminDashboard() {
                 <div className="flex items-center gap-3">
                   <Icon icon="lucide:activity" className="text-success-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">System Health</h3>
-                    <p className="text-default-500 text-sm">Current system performance</p>
+                    <h3 className="text-lg font-semibold text-foreground">{t("System Health")}</h3>
+                    <p className="text-default-500 text-sm">{t("Current system performance")}</p>
                   </div>
                 </div>
               </CardHeader>
@@ -426,7 +426,7 @@ export default function SuperAdminDashboard() {
                   {systemHealthData.map((item, index) => (
                     <div key={index} className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium text-default-700">{item.name}</span>
+                        <span className="text-sm font-medium text-default-700">{t(item.name)}</span>
                         <span className="text-sm font-semibold text-foreground">{item.value}%</span>
                       </div>
                       <Progress 
@@ -454,8 +454,8 @@ export default function SuperAdminDashboard() {
                 <div className="flex items-center gap-3">
                   <Icon icon="lucide:building-2" className="text-secondary-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Company Performance</h3>
-                    <p className="text-default-500 text-sm">Top performing companies</p>
+                    <h3 className="text-lg font-semibold text-foreground">{t("Company Overview")}</h3>
+                    <p className="text-default-500 text-sm">{t("Top performing companies")}</p>
                   </div>
                 </div>
               </CardHeader>
@@ -501,8 +501,8 @@ export default function SuperAdminDashboard() {
                 <div className="flex items-center gap-3">
                   <Icon icon="lucide:clock" className="text-warning-600 text-xl" />
                   <div>
-                    <h3 className="text-lg font-semibold text-foreground">Recent Activities</h3>
-                    <p className="text-default-500 text-sm">Latest system activities</p>
+                    <h3 className="text-lg font-semibold text-foreground">{t("Recent Activities")}</h3>
+                    <p className="text-default-500 text-sm">{t("System activity log")}</p>
                   </div>
                 </div>
               </CardHeader>

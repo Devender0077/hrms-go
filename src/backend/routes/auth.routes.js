@@ -233,80 +233,112 @@ router.post('/register', async (req, res) => {
         });
       }
 
-      // Find employees with face data
+      // ✅ Find ALL users with face data - Check BOTH tables (employees AND users)
+      // Employees table for regular employees
       const [employees] = await pool.query(
-        'SELECT e.*, u.email, u.role FROM employees e JOIN users u ON e.user_id = u.id WHERE e.face_descriptor IS NOT NULL'
+        'SELECT e.*, u.id as user_id, u.email, u.role, "employee" as source_table FROM employees e JOIN users u ON e.user_id = u.id WHERE e.face_descriptor IS NOT NULL AND e.status = "active"'
       );
+      
+      // Users table for management (super_admin, company_admin without employee records)
+      const [managementUsers] = await pool.query(
+        'SELECT id as user_id, email, role, first_name, last_name, profile_photo, face_descriptor, "user" as source_table FROM users WHERE face_descriptor IS NOT NULL AND status = "active" AND role IN ("super_admin", "company_admin")'
+      );
+      
+      // Combine both result sets
+      const allUsersWithFaces = [...employees, ...managementUsers];
 
-      if (employees.length === 0) {
+      if (allUsersWithFaces.length === 0) {
         return res.status(404).json({
           success: false,
           message: 'No users with face recognition data found. Please register first or use password login.'
         });
       }
 
-      // For demo purposes, we'll use a simple comparison
-      // In a real implementation, you would use proper face recognition algorithms
-      let bestMatch = null;
-      let bestScore = 0;
-      const threshold = 0.8; // Similarity threshold
+      console.log(`🔍 Comparing face descriptor with ${allUsersWithFaces.length} registered faces (${employees.length} employees + ${managementUsers.length} management users)...`);
 
-      for (const employee of employees) {
+      // ✅ SECURITY: Find BEST match using Euclidean distance (most accurate)
+      let bestMatch = null;
+      let bestDistance = Infinity; // Lower distance = better match
+      const threshold = 0.6; // Distance threshold (lower = stricter)
+
+      for (const userRecord of allUsersWithFaces) {
         try {
-          const storedDescriptor = JSON.parse(employee.face_descriptor);
+          // Parse stored descriptor
+          const storedData = JSON.parse(userRecord.face_descriptor);
+          const storedDescriptor = storedData.descriptor || storedData;
           
-          // Simple similarity calculation (Euclidean distance)
-          if (storedDescriptor.length === face_descriptor.length) {
-            let sum = 0;
-            for (let i = 0; i < storedDescriptor.length; i++) {
-              const diff = storedDescriptor[i] - face_descriptor[i];
-              sum += diff * diff;
-            }
-            const distance = Math.sqrt(sum);
-            const similarity = 1 / (1 + distance); // Convert distance to similarity
-            
-            if (similarity > bestScore && similarity > threshold) {
-              bestScore = similarity;
-              bestMatch = employee;
-            }
+          // ✅ CRITICAL: Ensure both arrays have same length (128)
+          if (!Array.isArray(storedDescriptor) || storedDescriptor.length !== face_descriptor.length) {
+            console.warn(`⚠️ Skipping ${userRecord.source_table} user ID ${userRecord.user_id}: Invalid descriptor length`);
+            continue;
+          }
+          
+          // Calculate Euclidean distance (industry standard)
+          let sum = 0;
+          for (let i = 0; i < face_descriptor.length; i++) {
+            const diff = storedDescriptor[i] - face_descriptor[i];
+            sum += diff * diff;
+          }
+          const distance = Math.sqrt(sum);
+          
+          const displayName = userRecord.first_name && userRecord.last_name 
+            ? `${userRecord.first_name} ${userRecord.last_name}` 
+            : userRecord.email;
+          console.log(`📊 ${userRecord.source_table === 'employee' ? 'Employee' : 'Management'} ${displayName} (User ID: ${userRecord.user_id}): distance = ${distance.toFixed(4)}`);
+          
+          // ✅ Track best match (lowest distance)
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestMatch = userRecord;
           }
         } catch (parseError) {
-          console.error('Error parsing face descriptor for employee', employee.id, parseError);
+          console.error(`❌ Error parsing face descriptor for ${userRecord.source_table} user ${userRecord.user_id}:`, parseError);
         }
       }
 
-      if (bestMatch) {
-        // Generate JWT token
-        const token = jwt.sign(
-          {
-            id: bestMatch.user_id,
-            email: bestMatch.email,
-            role: bestMatch.role,
-            company_id: bestMatch.company_id
-          },
-          process.env.JWT_SECRET || 'your-secret-key',
-          { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
-        );
-
-        res.json({
-          success: true,
-          message: 'Face recognition successful',
-          user: {
-            id: bestMatch.user_id,
-            name: `${bestMatch.first_name} ${bestMatch.last_name}`,
-            email: bestMatch.email,
-            role: bestMatch.role,
-            company_id: bestMatch.company_id
-          },
-          token,
-          similarity: bestScore
-        });
-      } else {
-        res.status(401).json({
+      // ✅ SECURITY: Verify match meets threshold before allowing login
+      if (!bestMatch || bestDistance > threshold) {
+        console.log(`❌ Face not recognized. Best distance: ${bestDistance?.toFixed(4)} (threshold: ${threshold})`);
+        return res.status(401).json({
           success: false,
           message: 'Face not recognized. Please register first or use password login.'
         });
       }
+
+      console.log(`✅ MATCH CONFIRMED! Employee: ${bestMatch.first_name} ${bestMatch.last_name} (ID: ${bestMatch.id}, User ID: ${bestMatch.user_id})`);
+      console.log(`✅ Distance: ${bestDistance.toFixed(4)} (threshold: ${threshold}) - SECURE LOGIN`);
+
+      // ✅ Generate JWT token for THE CORRECT USER
+      const token = jwt.sign(
+        {
+          id: bestMatch.user_id, // ✅ Correct user ID
+          email: bestMatch.email,
+          role: bestMatch.role,
+          company_id: bestMatch.company_id
+        },
+        process.env.JWT_SECRET || 'your-secret-key',
+        { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
+      );
+
+      // ✅ Return correct user data
+      res.json({
+        success: true,
+        message: `Face recognition successful! Welcome ${bestMatch.first_name}!`,
+        user: {
+          id: bestMatch.user_id, // ✅ Correct user ID (will load correct dashboard)
+          name: `${bestMatch.first_name} ${bestMatch.last_name}`,
+          email: bestMatch.email,
+          role: bestMatch.role,
+          company_id: bestMatch.company_id,
+          profile_photo: bestMatch.profile_photo
+        },
+        token,
+        matchQuality: {
+          distance: bestDistance,
+          threshold: threshold,
+          confidence: ((1 - (bestDistance / threshold)) * 100).toFixed(2) + '%'
+        }
+      });
 
     } catch (error) {
       console.error('Face login error:', error);

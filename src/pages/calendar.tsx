@@ -25,6 +25,7 @@ import {
 import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/auth-context";
+import { useTranslation } from "../contexts/translation-context";
 import { useCalendar } from "../hooks/useCalendar";
 import { addToast } from "@heroui/react";
 import HeroSection from "../components/common/HeroSection";
@@ -58,6 +59,7 @@ interface CalendarEvent {
 
 export default function CalendarPage() {
   const { user, loading: authLoading, isAuthenticated: authIsAuthenticated } = useAuth();
+  const { t } = useTranslation();
   const { 
     events, 
     loading, 
@@ -328,9 +330,9 @@ export default function CalendarPage() {
       <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
         {/* Hero Section */}
         <HeroSection
-          title="Calendar"
-          subtitle="Events & Scheduling"
-          description="Manage and view all company events, meetings, and important dates. Stay organized with our comprehensive calendar system."
+          title={t("Calendar")}
+          subtitle={t("Events & Scheduling")}
+          description={t("Manage and view all company events, meetings, and important dates. Stay organized with our comprehensive calendar system.")}
           icon="lucide:calendar"
           illustration="calendar"
           actions={[
@@ -538,7 +540,7 @@ export default function CalendarPage() {
                 <ModalBody>
                   <div className="space-y-4">
                     <Input
-                      label="Event Title"
+                      label={t("Event Title")}
                       placeholder="Enter event title"
                       
                       onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
@@ -548,14 +550,14 @@ export default function CalendarPage() {
                     <div className="grid grid-cols-2 gap-4">
                       <Input
                         type="date"
-                        label="Date"
+                        label={t("Date")}
                         
                         onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
                         isRequired
                       />
                       <Input
                         type="time"
-                        label="Time"
+                        label={t("Time")}
                         
                         onChange={(e) => setNewEvent({...newEvent, time: e.target.value})}
                         isRequired
@@ -564,7 +566,7 @@ export default function CalendarPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <Select
-                        label="Event Type"
+                        label={t("Event Type")}
                         placeholder="Select event type"
                         selectedKeys={newEvent.type ? [newEvent.type] : []}
                         onSelectionChange={(keys) => {
@@ -583,7 +585,7 @@ export default function CalendarPage() {
                       </Select>
 
                       <Select
-                        label="Color"
+                        label={t("Color")}
                         placeholder="Select color"
                         selectedKeys={newEvent.color ? [newEvent.color] : []}
                         onSelectionChange={(keys) => {
@@ -603,14 +605,14 @@ export default function CalendarPage() {
                     </div>
 
                     <Input
-                      label="Location"
+                      label={t("Location")}
                       placeholder="Enter event location"
                       
                       onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
                     />
 
                     <Textarea
-                      label="Description"
+                      label={t("Description")}
                       placeholder="Enter event description"
                       
                       onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}

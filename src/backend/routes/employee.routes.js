@@ -289,12 +289,13 @@ module.exports = (pool, authenticateToken, upload, profileUpload) => {
       const { id } = req.params;
       const employeeData = req.body;
       
-      // Check if this is just a face_data update
-      if (Object.keys(employeeData).length === 1 && employeeData.face_data !== undefined) {
-        // Only update face_data
+      // Check if this is just a face_descriptor update (renamed from face_data)
+      if (Object.keys(employeeData).length === 1 && (employeeData.face_data !== undefined || employeeData.face_descriptor !== undefined)) {
+        // Only update face_descriptor (unified column)
+        const faceData = employeeData.face_descriptor || employeeData.face_data;
         const [result] = await pool.query(
-          'UPDATE employees SET face_data = ? WHERE id = ?',
-          [employeeData.face_data, id]
+          'UPDATE employees SET face_descriptor = ? WHERE id = ?',
+          [faceData, id]
         );
         
         if (result.affectedRows === 0) {
@@ -314,7 +315,9 @@ module.exports = (pool, authenticateToken, upload, profileUpload) => {
           state = ?, country = ?, zip_code = ?, joining_date = ?, exit_date = ?,
           employment_type = ?, attendance_policy_id = ?, bank_name = ?,
           bank_account_number = ?, bank_routing_number = ?, bank_swift_code = ?,
-          bank_address = ?, role = ?, reports_to = ?, status = ?, face_data = ?
+          bank_address = ?, role = ?, reports_to = ?, status = ?,
+          emergency_contact_name = ?, emergency_contact_relationship = ?,
+          emergency_contact_phone = ?, emergency_contact_email = ?, emergency_contact_address = ?
          WHERE id = ?`,
         [
           employeeData.user_id, employeeData.company_id, employeeData.branch_id,
@@ -327,7 +330,11 @@ module.exports = (pool, authenticateToken, upload, profileUpload) => {
           employeeData.attendance_policy_id, employeeData.bank_name,
           employeeData.bank_account_number, employeeData.bank_routing_number,
           employeeData.bank_swift_code, employeeData.bank_address, employeeData.role,
-          employeeData.reports_to, employeeData.status, employeeData.face_data, id
+          employeeData.reports_to, employeeData.status,
+          employeeData.emergency_contact_name || null, employeeData.emergency_contact_relationship || null,
+          employeeData.emergency_contact_phone || null, employeeData.emergency_contact_email || null,
+          employeeData.emergency_contact_address || null,
+          id
         ]
       );
       

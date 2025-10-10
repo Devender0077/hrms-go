@@ -13,6 +13,11 @@ import hiTranslations from './locales/hi.json';
 import esTranslations from './locales/es.json';
 import frTranslations from './locales/fr.json';
 import deTranslations from './locales/de.json';
+import zhTranslations from './locales/zh.json';
+import arTranslations from './locales/ar.json';
+import ptTranslations from './locales/pt.json';
+import ruTranslations from './locales/ru.json';
+import jaTranslations from './locales/ja.json';
 
 // Translation resources
 const resources = {
@@ -30,6 +35,21 @@ const resources = {
   },
   de: {
     translation: deTranslations
+  },
+  zh: {
+    translation: zhTranslations
+  },
+  ar: {
+    translation: arTranslations
+  },
+  pt: {
+    translation: ptTranslations
+  },
+  ru: {
+    translation: ruTranslations
+  },
+  ja: {
+    translation: jaTranslations
   }
 };
 

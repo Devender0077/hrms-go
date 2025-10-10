@@ -36,6 +36,7 @@ import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
 import { useAuthenticatedAPI } from "../hooks/useAuthenticatedAPI";
 import HeroSection from "../components/common/HeroSection";
+import { useTranslation } from "../contexts/translation-context";
 
 // Leave request interface
 interface LeaveRequest {
@@ -132,6 +133,7 @@ const leaveTypeColors = {
 };
 
 export default function LeaveManagement() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -454,8 +456,8 @@ export default function LeaveManagement() {
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Hero Section */}
         <HeroSection
-          title="Leave Management"
-          subtitle="Employee Time Off"
+          title={t("Leave Management")}
+          subtitle={t("Employee Time Off")}
           description="Manage employee leave requests, track attendance, and maintain work-life balance. Streamline your leave approval process with comprehensive insights."
           icon="lucide:calendar-off"
           illustration="leave"

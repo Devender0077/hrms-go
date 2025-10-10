@@ -107,11 +107,13 @@ const RolesPage: React.FC = () => {
       const rolesResponse = await apiRequest('/users/roles');
       const rolesData = rolesResponse.data || [];
       
-      // Load permissions
-      const permissionsResponse = await apiRequest('/users/permissions');
+      // Load permissions - need to request ALL permissions for roles management
+      const permissionsResponse = await apiRequest('/users/permissions?all=true');
       const permissionsData = permissionsResponse.data || [];
       
-      setPermissions(permissionsData);
+      // Ensure permissionsData is an array
+      const permissionsArray = Array.isArray(permissionsData) ? permissionsData : [];
+      setPermissions(permissionsArray);
       
       // Load permission counts for each role
       const rolesWithCounts = await Promise.all(
@@ -372,24 +374,29 @@ const RolesPage: React.FC = () => {
   };
 
   const handleSelectAllInModule = (module: string) => {
+    if (!Array.isArray(permissions)) return;
     const modulePermissions = permissions.filter(p => p.module === module);
     const modulePermissionIds = modulePermissions.map(p => p.id);
     setSelectedPermissions(prev => [...new Set([...prev, ...modulePermissionIds])]);
   };
 
   const handleDeselectAllInModule = (module: string) => {
+    if (!Array.isArray(permissions)) return;
     const modulePermissions = permissions.filter(p => p.module === module);
     const modulePermissionIds = modulePermissions.map(p => p.id);
     setSelectedPermissions(prev => prev.filter(id => !modulePermissionIds.includes(id)));
   };
 
-  const groupedPermissions = permissions.reduce((acc, permission) => {
-    if (!acc[permission.module]) {
-      acc[permission.module] = [];
-    }
-    acc[permission.module].push(permission);
-    return acc;
-  }, {} as { [key: string]: Permission[] });
+  // ✅ Safely group permissions with array check
+  const groupedPermissions = Array.isArray(permissions) 
+    ? permissions.reduce((acc, permission) => {
+        if (!acc[permission.module]) {
+          acc[permission.module] = [];
+        }
+        acc[permission.module].push(permission);
+        return acc;
+      }, {} as { [key: string]: Permission[] })
+    : {};
 
   const canManageRoles = user?.role === 'admin' || user?.role === 'super_admin';
 

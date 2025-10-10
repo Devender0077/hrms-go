@@ -34,6 +34,7 @@ import React, { useState, useMemo } from "react";
     import { motion } from "framer-motion";
 import { addToast } from "@heroui/react";
 import { PayrollHeroSection } from "../components/common/HeroSection";
+import { useTranslation } from "../contexts/translation-context";
 
 // Enhanced payroll interface
 interface PayrollRecord {
@@ -259,6 +260,7 @@ const paymentMethods = [
 ];
     
     export default function Payroll() {
+  const { t } = useTranslation();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const { isOpen: isPaymentOpen, onOpen: onPaymentOpen, onOpenChange: onPaymentOpenChange } = useDisclosure();
   const [page, setPage] = useState(1);

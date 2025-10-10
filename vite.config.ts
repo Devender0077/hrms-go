@@ -9,6 +9,10 @@ export default defineConfig({
   plugins: [react(), vitePluginInjectDataLocator(), tailwindcss()],
   server: {
     allowedHosts: true,
+    // ✅ Disable caching to prevent old code issues
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
@@ -16,5 +20,13 @@ export default defineConfig({
         secure: false,
       },
     },
+    hmr: {
+      overlay: true
+    },
+    watch: {
+      usePolling: true
+    }
   },
+  // ✅ Disable build cache
+  cacheDir: false,
 });

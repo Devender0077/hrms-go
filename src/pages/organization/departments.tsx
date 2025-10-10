@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Button, Card, CardBody, CardHeader, Spinner, useDisclosure } from "@heroui/react";
     import { Icon } from "@iconify/react";
+import { useTranslation } from "../../contexts/translation-context";
 import { useDepartments, Department } from "../../hooks/useDepartments";
 import DepartmentStats from "../../components/departments/DepartmentStats";
 import DepartmentFilters from "../../components/departments/DepartmentFilters";
@@ -8,6 +9,7 @@ import DepartmentTable from "../../components/departments/DepartmentTable";
 import DepartmentModals from "../../components/departments/DepartmentModals";
     
     export default function Departments() {
+  const { t } = useTranslation();
   const {
     departments,
     filteredDepartments,
@@ -113,7 +115,7 @@ import DepartmentModals from "../../components/departments/DepartmentModals";
       <div className="min-h-screen bg-content1/50 flex items-center justify-center">
         <div className="text-center">
           <Spinner size="lg" />
-          <p className="text-default-600 mt-4">Loading departments...</p>
+          <p className="text-default-600 mt-4">{t("Loading data...")}</p>
         </div>
       </div>
     );
@@ -127,7 +129,7 @@ import DepartmentModals from "../../components/departments/DepartmentModals";
           <h2 className="text-xl font-semibold text-foreground mb-2">Error Loading Departments</h2>
           <p className="text-default-600 mb-4">{error}</p>
           <Button color="primary" onPress={() => window.location.reload()}>
-            Try Again
+            {t("Try Again")}
           </Button>
         </div>
       </div>
@@ -144,8 +146,8 @@ import DepartmentModals from "../../components/departments/DepartmentModals";
               <Icon icon="lucide:building" className="text-foreground text-2xl" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Departments</h1>
-              <p className="text-default-600 mt-1">Manage company departments and teams</p>
+              <h1 className="text-3xl font-bold text-foreground">{t("Departments")}</h1>
+              <p className="text-default-600 mt-1">{t("Manage company departments and teams")}</p>
             </div>
           </div>
                   </div>
@@ -173,8 +175,8 @@ import DepartmentModals from "../../components/departments/DepartmentModals";
             <div className="flex items-center gap-3">
               <Icon icon="lucide:table" className="text-primary-600 text-xl" />
                   <div>
-                <h3 className="text-lg font-semibold text-foreground">Department Directory</h3>
-                <p className="text-default-500 text-sm">Click on actions to view, edit, or manage departments</p>
+                <h3 className="text-lg font-semibold text-foreground">{t("Department")} {t("Directory")}</h3>
+                <p className="text-default-500 text-sm">{t("Click on actions to view, edit, or manage departments")}</p>
                   </div>
           </div>
             </CardHeader>

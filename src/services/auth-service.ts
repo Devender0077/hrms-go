@@ -21,6 +21,13 @@ export interface User {
   permissions: string[];
   name?: string;
   avatar?: string;
+  // ✅ Additional user properties for profile and face recognition
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  profile_photo?: string;
+  status?: string;
+  face_descriptor?: string; // JSON string with face data
 }
 
 // Login credentials interface
@@ -62,10 +69,16 @@ const AuthService = {
 
         // Fetch user permissions after successful login
         try {
-          const permissionsResponse = await apiRequest('/users/roles/' + user.role + '/permissions');
-          user.permissions = permissionsResponse.data
-            .filter((p: any) => p.role_has_permission === 1)
-            .map((p: any) => p.permission_name); // Use permission_name for the key
+          // ✅ Use correct permissions endpoint
+          const permissionsResponse = await apiRequest('/users/permissions');
+          
+          if (permissionsResponse.success && permissionsResponse.data) {
+            // Extract permissions from the response
+            const permsData = permissionsResponse.data.permissions || {};
+            user.permissions = Object.keys(permsData).filter(key => permsData[key] === true);
+          } else {
+            user.permissions = [];
+          }
         } catch (permError) {
           console.warn('Failed to fetch permissions:', permError);
           user.permissions = [];

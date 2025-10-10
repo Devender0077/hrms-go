@@ -60,8 +60,10 @@ interface EmployeeProfile {
   emergency_contact_name?: string;
   emergency_contact_relationship?: string;
   emergency_contact_phone?: string;
+  emergency_contact_email?: string;
+  emergency_contact_address?: string;
   // Face recognition
-  face_data?: string;
+  face_descriptor?: string; // ✅ Changed from face_data to face_descriptor
   // Computed fields
   department?: string;
   designation?: string;
@@ -69,6 +71,9 @@ interface EmployeeProfile {
 }
 
 export default function ProfilePage() {
+  // 🔄 VERSION: 2.9.9 - Role-based profile loading (FORCE REBUILD)
+  console.log('🔄 ProfilePage loaded - Version 2.9.9 with role-based logic');
+  
   const { user } = useAuth();
   const [profile, setProfile] = useState<EmployeeProfile | null>(null);
   const [editMode, setEditMode] = useState(false);
@@ -98,6 +103,28 @@ export default function ProfilePage() {
     loadProfile();
   }, []);
 
+  // ✅ NEW: Auto-start camera when face modal opens
+  useEffect(() => {
+    if (faceModalOpen && !cameraStream && !showConfirmation) {
+      console.log('🎥 Face modal opened, auto-starting camera...');
+      // Add a small delay to ensure modal is fully rendered
+      setTimeout(() => {
+        startCamera().catch(err => {
+          console.error('❌ Auto-start camera failed:', err);
+          setError('Failed to start camera. Please check permissions and try again.');
+        });
+      }, 100);
+    }
+    // Cleanup: stop camera when modal closes
+    return () => {
+      if (cameraStream && !faceModalOpen) {
+        console.log('🎥 Modal closed, stopping camera...');
+        cameraStream.getTracks().forEach(track => track.stop());
+        setCameraStream(null);
+      }
+    };
+  }, [faceModalOpen, cameraStream, showConfirmation]);
+
   // Debug effect to track state changes
   useEffect(() => {
     console.log('State changes:', {
@@ -126,6 +153,61 @@ export default function ProfilePage() {
         throw new Error('User not authenticated');
       }
 
+      // ✅ Check if user is management (admin, super_admin, company_admin, hr_manager, manager)
+      const isManagement = user.role === 'admin' ||
+                          user.role === 'super_admin' || 
+                          user.role === 'company_admin' || 
+                          user.role === 'hr_manager' || 
+                          user.role === 'manager';
+      
+      console.log('🔍 Role check result:', { role: user.role, isManagement });
+
+      if (isManagement) {
+        // ✅ Management users ALWAYS use users table
+        console.log('👤 Management user detected - loading from users table');
+        
+        // Fetch user data with face_descriptor from users table
+        const userResponse = await fetch(`http://localhost:8000/api/v1/users/${user.id}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        }).then(res => res.json());
+
+        const userData = userResponse.data || user;
+        
+        const managementProfile: EmployeeProfile = {
+          id: 0, // No employee ID for management
+          first_name: userData.first_name || user.name?.split(' ')[0] || '',
+          last_name: userData.last_name || user.name?.split(' ').slice(1).join(' ') || '',
+          email: userData.email || user.email || '',
+          phone: userData.phone || user.phone || '',
+          date_of_birth: userData.date_of_birth || '',
+          gender: userData.gender || 'other',
+          address: userData.address || '',
+          city: userData.city || '',
+          state: userData.state || '',
+          country: userData.country || '',
+          zip_code: userData.zip_code || '',
+          joining_date: userData.created_at || '',
+          profile_photo: userData.profile_photo || user.profile_photo || '',
+          department_name: 'Management',
+          designation_name: user.role === 'super_admin' ? 'Super Administrator' : 
+                           user.role === 'company_admin' ? 'Company Administrator' :
+                           user.role === 'hr_manager' ? 'HR Manager' :
+                           user.role === 'manager' ? 'Team Manager' : 'Administrator',
+          branch_name: 'Head Office',
+          face_descriptor: userData.face_descriptor, // ✅ From users table
+          status: userData.status || user.status || 'active'
+        };
+        setProfile(managementProfile);
+        console.log('✅ Loaded management profile from users table:', {
+          name: `${managementProfile.first_name} ${managementProfile.last_name}`,
+          role: user.role,
+          face_descriptor: !!managementProfile.face_descriptor ? 'SET' : 'NULL'
+        });
+      } else {
+        // ✅ Regular employees use employees table
+        console.log('👷 Employee user detected - loading from employees table');
       const response = await employeeAPI.getByUserId(user.id);
       
       if (response.success && response.data) {
@@ -133,11 +215,23 @@ export default function ProfilePage() {
           ...response.data,
           department: response.data.department_name,
           designation: response.data.designation_name,
-          branch: response.data.branch_name
+            branch: response.data.branch_name || 'N/A',
+            department_name: response.data.department_name,
+            designation_name: response.data.designation_name,
+            branch_name: response.data.branch_name || 'N/A'
         };
         setProfile(profileData);
+          console.log('✅ Loaded employee profile from employees table:', {
+            id: profileData.id,
+            name: `${profileData.first_name} ${profileData.last_name}`,
+            designation: profileData.designation_name,
+            branch: profileData.branch_name,
+            department: profileData.department_name,
+            face_descriptor: !!profileData.face_descriptor ? 'SET' : 'NULL'
+          });
       } else {
-        throw new Error(response.message || 'Failed to load profile');
+          throw new Error('Employee record not found');
+        }
       }
     } catch (err) {
       console.error('Error loading profile:', err);
@@ -197,6 +291,95 @@ export default function ProfilePage() {
     }
   };
 
+  // ✅ NEW: Separate function to just start the camera (no capture)
+  const startCamera = async () => {
+    if (cameraStream) {
+      console.log('🎥 Camera already running, skipping start');
+      return; // Don't start if already started
+    }
+
+    try {
+      setError(null);
+      console.log('🎥 Starting camera...');
+      
+      // Check if video element exists
+      if (!videoRef.current) {
+        throw new Error('Video element not found. Please refresh the page.');
+      }
+      
+      // Request camera access with more permissive constraints
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: {
+          width: { ideal: 640, min: 320 },
+          height: { ideal: 480, min: 240 },
+          facingMode: 'user',
+          frameRate: { ideal: 30, min: 15 }
+        } 
+      });
+      
+      setCameraStream(stream);
+      console.log('✅ Camera stream obtained');
+      
+      // Set up the video element
+      videoRef.current.srcObject = stream;
+      console.log('✅ Video srcObject set');
+      
+      // Wait for video to be ready with improved logic
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          console.warn('⏰ Video initialization timeout');
+          reject(new Error('Camera initialization timeout. Please try again.'));
+        }, 10000); // Increased timeout
+        
+        const checkVideoReady = () => {
+          if (!videoRef.current) {
+            clearTimeout(timeout);
+            reject(new Error('Video element lost'));
+            return;
+          }
+          
+          if (videoRef.current.readyState >= 2 && !videoRef.current.paused) {
+            clearTimeout(timeout);
+            console.log('✅ Video is ready and playing');
+            resolve();
+            return;
+          }
+          
+          // Try to play if not playing
+          if (videoRef.current.readyState >= 1 && videoRef.current.paused) {
+            videoRef.current.play()
+              .then(() => {
+                console.log('▶️ Video started playing');
+                setTimeout(checkVideoReady, 100); // Check again after play
+              })
+              .catch(err => {
+                console.error('Video play error:', err);
+                setTimeout(checkVideoReady, 100); // Continue checking
+              });
+          } else {
+            setTimeout(checkVideoReady, 100); // Continue checking
+          }
+        };
+        
+        // Start checking
+        checkVideoReady();
+        
+        // Also listen for metadata loaded
+        videoRef.current.onloadedmetadata = () => {
+          console.log('📹 Video metadata loaded');
+          checkVideoReady();
+        };
+      });
+      
+      console.log('✅ Camera fully initialized and ready');
+      
+    } catch (err) {
+      console.error('Error starting camera:', err);
+      setError(err instanceof Error ? err.message : 'Failed to start camera');
+      throw err; // Re-throw so caller can handle
+    }
+  };
+
   const handleFaceCapture = async () => {
     if (!profile) return;
 
@@ -204,190 +387,73 @@ export default function ProfilePage() {
       setIsCapturing(true);
       setError(null);
       
-      // Request camera access
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: {
-          width: 640, 
-          height: 480,
-          facingMode: 'user'
-        } 
-      });
-      
-      setCameraStream(stream);
-      
-      // Set up the video element
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        
-        // Wait for video to be ready
-        await new Promise((resolve) => {
-          if (videoRef.current) {
-            videoRef.current.onloadedmetadata = () => {
-              videoRef.current?.play().then(() => resolve(true)).catch(() => resolve(true));
-            };
-            // Fallback timeout
-            setTimeout(() => resolve(true), 2000);
-          } else {
-            resolve(true);
-          }
-        });
-      }
-      
-      // Wait for user to position themselves
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Capture the image
-      if (videoRef.current) {
-        const canvas = document.createElement('canvas');
-        const video = videoRef.current;
-        
-        // Use actual video dimensions if available
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
-        
-        console.log('Video dimensions:', video.videoWidth, 'x', video.videoHeight);
-        console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
-        console.log('Video ready state:', video.readyState);
-        console.log('Video current time:', video.currentTime);
-        
-        const context = canvas.getContext('2d');
-        
-        if (context) {
-          let finalImageUrl = '';
-          
-          // Try to capture the actual camera image first
-          console.log('Attempting to capture real camera image...');
-          let realImageCaptured = false;
-          
-          try {
-            // Draw video frame to canvas
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            console.log('✅ Video frame drawn to canvas successfully');
-            
-            // Convert to image
-            const imageDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-            console.log('✅ Real camera image captured, length:', imageDataUrl.length);
-            
-            // Check if image is valid (not black/empty)
-            if (imageDataUrl.length > 10000) {
-              finalImageUrl = imageDataUrl;
-              setCapturedImage(imageDataUrl);
-              realImageCaptured = true;
-              console.log('✅ REAL CAMERA IMAGE SET! Length:', imageDataUrl.length);
-            } else {
-              console.log('⚠️ Captured image seems too small, creating fallback');
-            }
-          } catch (drawError) {
-            console.error('❌ Error capturing real camera image:', drawError);
-          }
-          
-          // If real capture failed, create a fallback with face indication
-          if (!realImageCaptured) {
-            console.log('Creating fallback image with face indication...');
-            
-            const fallbackCanvas = document.createElement('canvas');
-            fallbackCanvas.width = 400;
-            fallbackCanvas.height = 400;
-            const fallbackContext = fallbackCanvas.getContext('2d');
-            
-            if (fallbackContext) {
-              // Create a subtle background
-              const gradient = fallbackContext.createLinearGradient(0, 0, 400, 400);
-              gradient.addColorStop(0, '#E3F2FD');
-              gradient.addColorStop(1, '#BBDEFB');
-              
-              fallbackContext.fillStyle = gradient;
-              fallbackContext.fillRect(0, 0, 400, 400);
-              
-              // Add a face silhouette
-              fallbackContext.fillStyle = 'rgba(33, 150, 243, 0.3)';
-              fallbackContext.beginPath();
-              fallbackContext.arc(200, 160, 70, 0, Math.PI * 2);
-              fallbackContext.fill();
-              
-              // Add eyes
-              fallbackContext.fillStyle = 'rgba(33, 150, 243, 0.6)';
-              fallbackContext.beginPath();
-              fallbackContext.arc(180, 140, 8, 0, Math.PI * 2);
-              fallbackContext.fill();
-              fallbackContext.beginPath();
-              fallbackContext.arc(220, 140, 8, 0, Math.PI * 2);
-              fallbackContext.fill();
-              
-              // Add smile
-              fallbackContext.strokeStyle = 'rgba(33, 150, 243, 0.6)';
-              fallbackContext.lineWidth = 4;
-              fallbackContext.beginPath();
-              fallbackContext.arc(200, 160, 40, 0, Math.PI);
-              fallbackContext.stroke();
-              
-              // Add status text
-              fallbackContext.fillStyle = '#1976D2';
-              fallbackContext.font = 'bold 24px Arial';
-              fallbackContext.textAlign = 'center';
-              fallbackContext.fillText('📷 Face Data Captured', 200, 280);
-              
-              fallbackContext.font = '16px Arial';
-              fallbackContext.fillText('Click Confirm to Save', 200, 310);
-              
-              // Add border
-              fallbackContext.strokeStyle = '#1976D2';
-              fallbackContext.lineWidth = 4;
-              fallbackContext.strokeRect(20, 20, 360, 360);
-              
-              const fallbackImageUrl = fallbackCanvas.toDataURL('image/png');
-              finalImageUrl = fallbackImageUrl;
-              setCapturedImage(fallbackImageUrl);
-              console.log('✅ Fallback image created');
-            }
-          }
-          
-          // Create face data
-          const faceData = {
-            descriptor: Array.from({ length: 128 }, () => Math.random()),
-            detection: {
-              score: 0.95,
-              box: { x: 100, y: 100, width: 200, height: 200 }
-            },
-            image: finalImageUrl
-          };
-          
-          // Validate face data
-          if (validateFaceData(faceData)) {
-            console.log('✅ Face data validated successfully');
-            
-            // Encrypt face data for secure storage
-            try {
-              const encryptedFaceData = encryptFaceData(faceData);
-              setCapturedFaceData(JSON.stringify(encryptedFaceData));
-              console.log('✅ Face data encrypted and stored');
-            } catch (encryptError) {
-              console.error('❌ Failed to encrypt face data:', encryptError);
-              setCapturedFaceData(JSON.stringify(faceData));
-            }
-          } else {
-            console.error('❌ Face data validation failed');
-            setCapturedFaceData(JSON.stringify(faceData));
-          }
-          
-          // Stop camera
-          stream.getTracks().forEach(track => track.stop());
-          setCameraStream(null);
-          
-          if (videoRef.current) {
-            videoRef.current.srcObject = null;
-          }
-          
-          // Show confirmation
-          setShowConfirmation(true);
+      // ✅ Make sure camera is started and ready
+      if (!cameraStream) {
+        console.log('🎥 No camera stream, starting camera...');
+        await startCamera(); // This will ensure camera is fully ready
+      } else {
+        // Camera stream exists, but verify it's still working
+        if (!videoRef.current || videoRef.current.readyState < 2 || videoRef.current.paused) {
+          console.log('🎥 Camera stream exists but not ready, restarting...');
+          await startCamera();
         }
       }
       
+      // Final verification
+      if (!videoRef.current || videoRef.current.readyState < 2) {
+        console.error('❌ Video not ready after camera start:', videoRef.current?.readyState);
+        throw new Error('Camera initialization failed. Please refresh the page and try again.');
+      }
+        
+        console.log('✅ Video ready for capture:', {
+          readyState: videoRef.current.readyState,
+          videoWidth: videoRef.current.videoWidth,
+          videoHeight: videoRef.current.videoHeight,
+          currentTime: videoRef.current.currentTime,
+          paused: videoRef.current.paused
+        });
+        
+        // ✅ CRITICAL: Use REAL AI to capture face (NO MOCK DATA!)
+        console.log('📸 Capturing REAL face using AI...');
+        const { image, descriptor, detection } = await FaceRecognitionService.captureFace(videoRef.current);
+        
+        console.log('✅ REAL AI Face captured:', {
+          descriptorLength: descriptor.length,
+          detectionScore: detection.score,
+          imageLength: image.length
+        });
+        
+        // ✅ Display the REAL captured image to user for review
+        setCapturedImage(image);
+        console.log('✅ Real captured image set for user review');
+        
+        // ✅ Store only descriptor and score (NOT image) for database
+        const faceDataForDB = {
+          descriptor: Array.from(descriptor), // Convert Float32Array to regular array
+          detection_score: detection.score
+        };
+        
+        // Validate face data quality
+      if (faceDataForDB.descriptor.length === 128 && faceDataForDB.detection_score > 0.7) {
+        console.log('✅ Face data validated - High quality detection');
+        setCapturedFaceData(JSON.stringify(faceDataForDB));
+      } else {
+        throw new Error(`Face detection quality too low (${(detection.score * 100).toFixed(1)}%). Please try again in good lighting.`);
+      }
+      
+      // Show confirmation with real captured image
+      setShowConfirmation(true);
+      console.log('✅ Face capture complete, showing confirmation screen');
+      
     } catch (err) {
-      console.error('Error capturing face:', err);
-      setError(err instanceof Error ? err.message : 'Failed to capture face');
+      console.error('❌ Error capturing face:', err);
+      setError(err instanceof Error ? err.message : 'Failed to capture face. Please ensure your face is clearly visible.');
       
       // Clean up on error
+      setCapturedImage(null);
+      setCapturedFaceData(null);
+      setShowConfirmation(false);
+      
       if (cameraStream) {
         cameraStream.getTracks().forEach(track => track.stop());
         setCameraStream(null);
@@ -398,27 +464,96 @@ export default function ProfilePage() {
   };
 
   const handleCloseFaceModal = () => {
+    console.log('🎥 Closing face modal, stopping camera...');
     setFaceModalOpen(false);
     setShowConfirmation(false);
     setCapturedImage(null);
     setCapturedFaceData(null);
     if (cameraStream) {
-      cameraStream.getTracks().forEach(track => track.stop());
+      cameraStream.getTracks().forEach(track => {
+        track.stop();
+        console.log('📷 Camera track stopped');
+      });
       setCameraStream(null);
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
   };
 
+  // ✅ Cleanup camera when component unmounts
+  React.useEffect(() => {
+    return () => {
+      console.log('🎥 Component unmounting, cleaning up camera...');
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [cameraStream]);
+
   const handleConfirmFaceCapture = async () => {
     try {
-      if (!capturedFaceData || !profile?.id) {
+      if (!capturedFaceData) {
         throw new Error('No face data to save');
       }
 
-      // Save face data to backend
-      const response = await employeeAPI.update(profile.id, { face_data: capturedFaceData });
+      // Parse face data
+      const faceData = JSON.parse(capturedFaceData);
+      
+      // ✅ IMPORTANT: Only send descriptor (128 numbers), NOT the image!
+      const faceDataToSend = {
+        descriptor: faceData.descriptor,
+        detection_score: faceData.detection_score || 0.95
+      };
+
+      console.log('📤 Saving face descriptor:', {
+        descriptorLength: faceDataToSend.descriptor.length,
+        score: faceDataToSend.detection_score,
+        estimatedSize: `${(JSON.stringify(faceDataToSend).length / 1024).toFixed(2)} KB`,
+        userId: user?.id,
+        isEmployee: !!profile?.id
+      });
+
+      // ✅ CRITICAL: Save to correct table based on user role
+      let response;
+      const isManagement = user?.role === 'admin' ||
+                          user?.role === 'super_admin' || 
+                          user?.role === 'company_admin' || 
+                          user?.role === 'hr_manager' || 
+                          user?.role === 'manager';
+      
+      if (isManagement) {
+        // ✅ Management users ALWAYS save to users table
+        console.log('💾 Saving to users table (user ID:', user.id, ') - Management user:', user.role);
+        response = await fetch(`http://localhost:8000/api/v1/users/${user.id}/face`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({ face_descriptor: JSON.stringify(faceDataToSend) })
+        }).then(res => res.json());
+      } else if (profile?.id) {
+        // ✅ Regular employees save to employees table
+        console.log('💾 Saving to employees table (employee ID:', profile.id, ') - Employee');
+        response = await employeeAPI.update(profile.id, { 
+          face_descriptor: JSON.stringify(faceDataToSend) 
+        });
+      } else {
+        throw new Error('No user or employee ID available');
+      }
       
       if (response.success) {
-        await loadProfile(); // Reload to get updated face data
+        console.log('✅ Face data saved successfully!');
+        
+        // ✅ Update profile state with new face_descriptor
+        const updatedProfile = {
+          ...profile!,
+          face_descriptor: JSON.stringify(faceDataToSend)
+        };
+        setProfile(updatedProfile);
+        console.log('✅ Updated profile state with face_descriptor');
+        
         setFaceModalOpen(false);
         setShowConfirmation(false);
         setCapturedImage(null);
@@ -441,7 +576,7 @@ export default function ProfilePage() {
   };
 
   const handleFaceTest = async () => {
-    if (!profile?.face_data) return;
+    if (!profile?.face_descriptor) return;
 
     try {
       setIsTesting(true);
@@ -672,6 +807,9 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-2">
                     <Icon icon="lucide:phone" className="text-red-500 w-5 h-5" />
                     <h3 className="text-lg font-semibold text-default-800">Emergency Contact</h3>
+                    <Chip size="sm" variant="flat" color="primary">
+                      Edit via "Edit Profile" button above
+                    </Chip>
                       </div>
                 </CardHeader>
                 <CardBody className="pt-0">
@@ -694,6 +832,18 @@ export default function ProfilePage() {
                         {profile.emergency_contact_phone || 'Not provided'}
                       </p>
                     </div>
+                    <div>
+                      <label className="text-xs text-default-500 uppercase tracking-wide">Email</label>
+                      <p className="text-sm font-medium text-default-800">
+                        {profile.emergency_contact_email || 'Not provided'}
+                      </p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-xs text-default-500 uppercase tracking-wide">Address</label>
+                      <p className="text-sm font-medium text-default-800">
+                        {profile.emergency_contact_address || 'Not provided'}
+                      </p>
+                    </div>
                   </div>
                 </CardBody>
               </Card>
@@ -712,10 +862,10 @@ export default function ProfilePage() {
                       <span className="text-sm text-default-600">Status</span>
                       <Chip 
                         size="sm" 
-                        color={profile.face_data ? "success" : "warning"}
+                        color={profile.face_descriptor ? "success" : "warning"}
                         variant="flat"
                       >
-                        {profile.face_data ? "Configured" : "Not Set"}
+                        {profile.face_descriptor ? "Configured" : "Not Set"}
                       </Chip>
                     </div>
                     <div className="flex gap-2">
@@ -726,9 +876,9 @@ export default function ProfilePage() {
                         onPress={() => setFaceModalOpen(true)}
                         startContent={<Icon icon="lucide:camera" className="w-4 h-4" />}
                       >
-                        {profile.face_data ? 'Update' : 'Setup'}
+                        {profile.face_descriptor ? 'Update' : 'Setup'}
                       </Button>
-                      {profile.face_data && (
+                      {profile.face_descriptor && (
                         <Button
                           size="sm"
                           color="default"
@@ -834,6 +984,57 @@ export default function ProfilePage() {
                         startContent={<Icon icon="lucide:map-pin" className="text-default-400" />}
                       />
                     </div>
+
+                    {/* Emergency Contact Fields (Edit Mode) */}
+                    {editMode && (
+                      <>
+                        <div className="md:col-span-2 mt-6 mb-2">
+                          <div className="flex items-center gap-2">
+                            <Icon icon="lucide:phone" className="text-red-500 w-5 h-5" />
+                            <h4 className="text-md font-semibold text-default-800">Emergency Contact</h4>
+                          </div>
+                          <Divider className="mt-2" />
+                        </div>
+                        <Input
+                          label="Emergency Contact Name"
+                          placeholder="Enter emergency contact name"
+                          value={profile.emergency_contact_name || ''}
+                          onChange={(e) => handleInputChange('emergency_contact_name', e.target.value)}
+                          startContent={<Icon icon="lucide:user" className="text-default-400" />}
+                        />
+                        <Input
+                          label="Relationship"
+                          placeholder="e.g., Spouse, Parent, Sibling"
+                          value={profile.emergency_contact_relationship || ''}
+                          onChange={(e) => handleInputChange('emergency_contact_relationship', e.target.value)}
+                          startContent={<Icon icon="lucide:users" className="text-default-400" />}
+                        />
+                        <Input
+                          label="Emergency Phone"
+                          placeholder="Enter emergency contact phone"
+                          value={profile.emergency_contact_phone || ''}
+                          onChange={(e) => handleInputChange('emergency_contact_phone', e.target.value)}
+                          startContent={<Icon icon="lucide:phone" className="text-default-400" />}
+                        />
+                        <Input
+                          label="Emergency Email (Optional)"
+                          type="email"
+                          placeholder="Enter emergency contact email"
+                          value={profile.emergency_contact_email || ''}
+                          onChange={(e) => handleInputChange('emergency_contact_email', e.target.value)}
+                          startContent={<Icon icon="lucide:mail" className="text-default-400" />}
+                        />
+                        <div className="md:col-span-2">
+                          <Input
+                            label="Emergency Address (Optional)"
+                            placeholder="Enter emergency contact address"
+                            value={profile.emergency_contact_address || ''}
+                            onChange={(e) => handleInputChange('emergency_contact_address', e.target.value)}
+                            startContent={<Icon icon="lucide:map-pin" className="text-default-400" />}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </CardBody>
               </Card>
@@ -1078,7 +1279,7 @@ export default function ProfilePage() {
                 <p className="text-sm text-default-500">
                   {showConfirmation 
                     ? 'Review your captured photo and confirm to save' 
-                    : profile.face_data 
+                    : profile.face_descriptor 
                       ? 'Update your face recognition data' 
                       : 'Set up face recognition for secure login'
                   }

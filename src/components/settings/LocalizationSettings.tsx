@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardBody, CardHeader, Input, Select, SelectItem, Switch } from '@heroui/react';
 import { Icon } from '@iconify/react';
+import { useTranslation } from '../../contexts/translation-context';
 
 interface LocalizationSettingsProps {
   settings: Record<string, any>;
@@ -8,6 +9,8 @@ interface LocalizationSettingsProps {
 }
 
 export default function LocalizationSettings({ settings, onSettingsChange }: LocalizationSettingsProps) {
+  const { setLanguage, language: currentLanguage } = useTranslation();
+
   const languages = [
     { key: 'en', label: '🇺🇸 English', flag: '🇺🇸' },
     { key: 'hi', label: '🇮🇳 Hindi', flag: '🇮🇳' },
@@ -20,6 +23,13 @@ export default function LocalizationSettings({ settings, onSettingsChange }: Loc
     { key: 'ru', label: '🇷🇺 Russian', flag: '🇷🇺' },
     { key: 'ja', label: '🇯🇵 Japanese', flag: '🇯🇵' },
   ];
+
+  // Sync i18next language with settings on mount
+  useEffect(() => {
+    if (settings.defaultLanguage && settings.defaultLanguage !== currentLanguage) {
+      setLanguage(settings.defaultLanguage);
+    }
+  }, [settings.defaultLanguage]);
 
   const timezones = [
     { key: 'America/New_York', label: 'Eastern Time (ET)' },
@@ -62,10 +72,18 @@ export default function LocalizationSettings({ settings, onSettingsChange }: Loc
         <CardBody className="space-y-4 sm:space-y-6">
           <Select
             label="Default Language"
-            selectedKeys={settings.defaultLanguage ? [settings.defaultLanguage] : ['en']}
-            onSelectionChange={(keys) => onSettingsChange('defaultLanguage', Array.from(keys)[0])}
+            selectedKeys={settings.defaultLanguage ? [settings.defaultLanguage] : [currentLanguage || 'en']}
+            onSelectionChange={(keys) => {
+              const selectedLang = Array.from(keys)[0] as string;
+              console.log('🔄 Language changed from settings:', selectedLang);
+              // Change i18next language immediately
+              setLanguage(selectedLang);
+              // Also save to database
+              onSettingsChange('defaultLanguage', selectedLang);
+            }}
             placeholder="Select default language"
             startContent={<Icon icon="lucide:languages" className="text-default-400" />}
+            description="Changes will apply immediately"
           >
             {languages.map((lang) => (
               <SelectItem key={lang.key}>

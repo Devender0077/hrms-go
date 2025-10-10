@@ -21,20 +21,61 @@ const app = express();
 // Trust proxy for better IP detection
 app.set('trust proxy', true);
 
-// Middleware
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176', 'http://localhost:5177', 'http://localhost:3000'],
+// ✅ Dynamic CORS Configuration (Secure)
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman, server-to-server)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // ✅ DEVELOPMENT: Allow any localhost port for development flexibility
+    if (process.env.NODE_ENV !== 'production') {
+      const localhostPattern = /^http:\/\/localhost:\d+$/;
+      if (localhostPattern.test(origin)) {
+        console.log('✅ CORS allowed (dev):', origin);
+        return callback(null, true);
+      }
+    }
+
+    // ✅ PRODUCTION: Only allow specific domains (configure these for your production domain)
+    const allowedOrigins = [
+      'https://your-domain.com',
+      'https://www.your-domain.com',
+      'https://app.your-domain.com',
+      // Add your production domains here
+    ];
+
+    if (process.env.NODE_ENV === 'production' && allowedOrigins.includes(origin)) {
+      console.log('✅ CORS allowed (prod):', origin);
+      return callback(null, true);
+    }
+
+    // ✅ For development, if not localhost pattern, check specific origins
+    const devOrigins = ['http://localhost:3000'];
+    if (devOrigins.includes(origin)) {
+      console.log('✅ CORS allowed (dev-specific):', origin);
+      return callback(null, true);
+    }
+
+    // ❌ Reject all other origins
+    console.warn('❌ CORS blocked:', origin);
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+};
+
+app.use(cors(corsOptions));
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" }
 }));
 app.use(compression());
 app.use(morgan('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+// ✅ Increase limit for face recognition data (descriptors are small ~1KB but being safe)
+app.use(bodyParser.json({ limit: '2mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }));
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static('uploads'));

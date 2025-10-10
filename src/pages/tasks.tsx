@@ -320,7 +320,7 @@ export default function TasksPage() {
               variant: "solid"
             },
             {
-              label: "Export Tasks",
+              label: t("Export Tasks"),
               icon: "lucide:download",
               onPress: handleExportTasks,
               variant: "bordered"
@@ -354,7 +354,7 @@ export default function TasksPage() {
                 placeholder="Priority"
                 selectedKeys={[priorityFilter]}
                 onSelectionChange={(keys) => setPriorityFilter(Array.from(keys)[0] as string)}
-                items={[{ key: "all", label: "All Priorities" }, ...priorityOptions]}
+                items={[{ key: "all", label: t("All Priorities") }, ...priorityOptions.map(p => ({...p, label: t(p.label)}))]}
               >
                 {(item) => (
                   <SelectItem key={item.key}>
@@ -366,7 +366,7 @@ export default function TasksPage() {
                 placeholder="Assignee"
                 selectedKeys={[assigneeFilter]}
                 onSelectionChange={(keys) => setAssigneeFilter(Array.from(keys)[0] as string)}
-                items={[{ key: "all", label: "All Assignees" }, ...assignees]}
+                items={[{ key: "all", label: t("All Assignees") }, ...assignees]}
               >
                 {(item) => (
                   <SelectItem key={item.key}>
@@ -378,7 +378,7 @@ export default function TasksPage() {
                 placeholder="Status"
                 selectedKeys={[statusFilter]}
                 onSelectionChange={(keys) => setStatusFilter(Array.from(keys)[0] as string)}
-                items={[{ key: "all", label: "All Status" }, ...statusOptions]}
+                items={[{ key: "all", label: t("All Status") }, ...statusOptions.map(s => ({...s, label: t(s.label)}))]}
               >
                 {(item) => (
                   <SelectItem key={item.key}>

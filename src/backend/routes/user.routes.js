@@ -1,375 +1,375 @@
 /**
- * User Management Routes  
- * User CRUD, roles, permissions, password management
+ * User Routes - Face Recognition for Management Users
+ * Handles face descriptor updates for users (especially management) 
+ * who may not have employee records
  */
 
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcrypt');
-
 module.exports = (pool, authenticateToken) => {
-  
-  // Get all users
-  router.get('/', authenticateToken, async (req, res) => {
-    try {
-      const [users] = await pool.query(
-        `SELECT u.id, u.name, u.email, u.role, u.status, u.profile_photo, u.phone,
-                u.created_at, u.last_login, u.first_name, u.last_name, u.is_email_verified, u.is_phone_verified, u.two_factor_enabled,
-                e.department_id, e.designation_id, e.employee_id,
-                d.name as department_name, des.name as designation_name,
-                COUNT(DISTINCT rp.permission_id) as permission_count
-         FROM users u
-         LEFT JOIN employees e ON u.id = e.user_id
-         LEFT JOIN departments d ON e.department_id = d.id
-         LEFT JOIN designations des ON e.designation_id = des.id
-         LEFT JOIN roles r ON u.role = r.name
-         LEFT JOIN role_permissions rp ON r.id = rp.role_id
-         GROUP BY u.id
-         ORDER BY u.created_at DESC`
-      );
-      res.json({ success: true, data: users });
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      res.status(500).json({ success: false, message: 'Error fetching users' });
-    }
-  });
+  const express = require('express');
+  const router = express.Router();
 
-  // =====================================================
-  // ROLES & PERMISSIONS (must be before /:id route)
-  // =====================================================
-  
+  /**
+   * Get all roles with permissions
+   * GET /api/v1/users/roles
+   */
   router.get('/roles', authenticateToken, async (req, res) => {
     try {
-      const [roles] = await pool.query('SELECT * FROM roles ORDER BY created_at DESC');
-      res.json({ success: true, data: roles });
+      // Fetch all roles with their permissions
+      const [roles] = await pool.query(`
+        SELECT 
+          r.id,
+          r.company_id,
+          r.name,
+          r.description,
+          r.is_active,
+          r.created_at,
+          r.updated_at
+        FROM roles r
+        ORDER BY 
+          CASE 
+            WHEN r.name = 'super_admin' THEN 1
+            WHEN r.name = 'company_admin' THEN 2
+            WHEN r.name = 'hr_manager' THEN 3
+            WHEN r.name = 'manager' THEN 4
+            WHEN r.name = 'employee' THEN 5
+            ELSE 6
+          END,
+          r.id
+      `);
+
+      // Fetch permissions for each role
+      for (let role of roles) {
+        const [permissions] = await pool.query(`
+          SELECT 
+            p.id,
+            p.permission_name,
+            p.name,
+            p.description,
+            p.module,
+            rp.role_id,
+            1 as role_has_permission
+          FROM permissions p
+          INNER JOIN role_permissions rp ON p.id = rp.permission_id
+          WHERE rp.role_id = ?
+        `, [role.id]);
+        
+        role.permissions = permissions;
+      }
+
+      res.json({
+        success: true,
+        data: roles
+      });
     } catch (error) {
-      console.error('Error fetching roles:', error);
-      res.status(500).json({ success: false, message: 'Error fetching roles' });
+      console.error('❌ Error fetching roles:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
     }
   });
 
-  // Create a new role
-  router.post('/roles', authenticateToken, async (req, res) => {
+  /**
+   * Get permissions for a specific role
+   * GET /api/v1/users/roles/:roleName/permissions
+   */
+  router.get('/roles/:roleName/permissions', authenticateToken, async (req, res) => {
     try {
-      const { name, description, permissions } = req.body;
+      const { roleName } = req.params;
       
-      if (!name) {
-        return res.status(400).json({ success: false, message: 'Role name is required' });
-      }
-
-      // Check if role already exists
-      const [existingRoles] = await pool.query('SELECT id FROM roles WHERE name = ?', [name]);
-      if (existingRoles.length > 0) {
-        return res.status(400).json({ success: false, message: 'Role already exists' });
-      }
-
-      // Create the role
-      const [result] = await pool.query(
-        'INSERT INTO roles (name, description, company_id) VALUES (?, ?, ?)',
-        [name, description || '', 1]
-      );
-
-      const roleId = result.insertId;
-
-      // Assign permissions if provided
-      if (permissions && permissions.length > 0) {
-        const permissionValues = permissions.map(permissionId => [roleId, permissionId, true]);
-        await pool.query(
-          'INSERT INTO role_permissions (role_id, permission_id, is_active) VALUES ?',
-          [permissionValues]
-        );
-      }
-
-      res.json({ success: true, message: 'Role created successfully', data: { id: roleId, name } });
-    } catch (error) {
-      console.error('Error creating role:', error);
-      res.status(500).json({ success: false, message: 'Error creating role' });
-    }
-  });
-
-  // Update a role
-  router.put('/roles/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { name, description } = req.body;
+      // Get role by name
+      const [roles] = await pool.query('SELECT id FROM roles WHERE name = ?', [roleName]);
       
-      if (!name) {
-        return res.status(400).json({ success: false, message: 'Role name is required' });
-      }
-
-      // Check if role exists
-      const [existingRoles] = await pool.query('SELECT id FROM roles WHERE id = ?', [id]);
-      if (existingRoles.length === 0) {
-        return res.status(404).json({ success: false, message: 'Role not found' });
-      }
-
-      // Update the role
-      await pool.query(
-        'UPDATE roles SET name = ?, description = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-        [name, description || '', id]
-      );
-
-      res.json({ success: true, message: 'Role updated successfully' });
-    } catch (error) {
-      console.error('Error updating role:', error);
-      res.status(500).json({ success: false, message: 'Error updating role' });
-    }
-  });
-
-  // Delete a role
-  router.delete('/roles/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      
-      // Check if role exists
-      const [existingRoles] = await pool.query('SELECT id, name FROM roles WHERE id = ?', [id]);
-      if (existingRoles.length === 0) {
-        return res.status(404).json({ success: false, message: 'Role not found' });
-      }
-
-      const roleName = existingRoles[0].name;
-
-      // Check if role is being used by any users
-      const [users] = await pool.query('SELECT COUNT(*) as count FROM users WHERE role = ?', [roleName]);
-      if (users[0].count > 0) {
-        return res.status(400).json({ success: false, message: 'Cannot delete role that is assigned to users' });
-      }
-
-      // Delete role permissions first
-      await pool.query('DELETE FROM role_permissions WHERE role_id = ?', [id]);
-      
-      // Delete the role
-      await pool.query('DELETE FROM roles WHERE id = ?', [id]);
-
-      res.json({ success: true, message: 'Role deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting role:', error);
-      res.status(500).json({ success: false, message: 'Error deleting role' });
-    }
-  });
-
-  // Get permissions for a specific role
-  router.get('/roles/:role/permissions', authenticateToken, async (req, res) => {
-    try {
-      const { role } = req.params;
-      
-      if (!role) {
-        return res.status(400).json({ success: false, message: 'Role is required' });
-      }
-
-      const [permissions] = await pool.query(
-        `SELECT DISTINCT p.*, 
-                CASE WHEN rp.permission_id IS NOT NULL AND rp.is_active = 1 AND r.name = ? THEN 1 ELSE 0 END as role_has_permission
-         FROM permissions p
-         LEFT JOIN role_permissions rp ON p.id = rp.permission_id 
-         LEFT JOIN roles r ON rp.role_id = r.id
-         WHERE p.is_active = true
-         ORDER BY p.module, p.name`,
-        [role]
-      );
-      
-      res.json({ success: true, data: permissions });
-    } catch (error) {
-      console.error('Error fetching role permissions:', error);
-      res.status(500).json({ success: false, message: 'Error fetching role permissions' });
-    }
-  });
-
-  // Update permissions for a role
-  router.put('/roles/:role/permissions', authenticateToken, async (req, res) => {
-    try {
-      const { role } = req.params;
-      const { permissions } = req.body;
-      
-      if (!role) {
-        return res.status(400).json({ success: false, message: 'Role is required' });
-      }
-
-      // Get role ID
-      const [roles] = await pool.query('SELECT id FROM roles WHERE name = ?', [role]);
       if (roles.length === 0) {
-        return res.status(404).json({ success: false, message: 'Role not found' });
+        return res.status(404).json({
+          success: false,
+          message: 'Role not found'
+        });
+      }
+      
+      const roleId = roles[0].id;
+      
+      // Fetch permissions for this role
+      const [permissions] = await pool.query(`
+        SELECT 
+          p.id,
+          p.permission_name,
+          p.name,
+          p.module,
+          p.description,
+          rp.role_id,
+          1 as role_has_permission
+         FROM permissions p
+        INNER JOIN role_permissions rp ON p.id = rp.permission_id
+        WHERE rp.role_id = ?
+      `, [roleId]);
+      
+      res.json({
+        success: true,
+        data: permissions
+      });
+    } catch (error) {
+      console.error('❌ Error fetching role permissions:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  });
+
+  /**
+   * Update permissions for a specific role
+   * PUT /api/v1/users/roles/:roleName/permissions
+   */
+  router.put('/roles/:roleName/permissions', authenticateToken, async (req, res) => {
+    try {
+      const { roleName } = req.params;
+      const { permissions: permissionIds } = req.body;
+      
+      // Get role by name
+      const [roles] = await pool.query('SELECT id FROM roles WHERE name = ?', [roleName]);
+      
+      if (roles.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Role not found'
+        });
       }
       
       const roleId = roles[0].id;
 
-      // Clear existing permissions for this role
+      // Delete existing permissions
       await pool.query('DELETE FROM role_permissions WHERE role_id = ?', [roleId]);
 
-      // Add new permissions
-      if (permissions && permissions.length > 0) {
-        const permissionValues = permissions.map(permissionId => [roleId, permissionId, true]);
+      // Insert new permissions
+      if (permissionIds && permissionIds.length > 0) {
+        const values = permissionIds.map((permId) => [roleId, permId]);
         await pool.query(
-          'INSERT INTO role_permissions (role_id, permission_id, is_active) VALUES ?',
-          [permissionValues]
+          'INSERT INTO role_permissions (role_id, permission_id) VALUES ?',
+          [values]
         );
       }
 
-      res.json({ success: true, message: 'Role permissions updated successfully' });
+      res.json({
+        success: true,
+        message: 'Permissions updated successfully'
+      });
     } catch (error) {
-      console.error('Error updating role permissions:', error);
-      res.status(500).json({ success: false, message: 'Error updating role permissions' });
+      console.error('❌ Error updating role permissions:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
     }
   });
 
-  // Get all permissions
+  /**
+   * Get all permissions (for roles page)
+   * GET /api/v1/users/permissions
+   * NOTE: Can return list of all permissions OR user's permissions depending on query
+   */
   router.get('/permissions', authenticateToken, async (req, res) => {
     try {
-      const [permissions] = await pool.query(
-        'SELECT * FROM permissions WHERE is_active = true ORDER BY module, name'
+      // Check if this is a request for all permissions (from roles page)
+      // or user's own permissions (from auth)
+      const { all } = req.query;
+      
+      if (all === 'true') {
+        // Return all available permissions for roles management
+        const [permissions] = await pool.query(`
+          SELECT 
+            id,
+            name,
+            module,
+            description,
+            created_at
+          FROM permissions
+          ORDER BY module, name
+        `);
+        
+        return res.json({
+          success: true,
+          data: permissions
+        });
+      }
+      
+      // Return user's own permissions
+      const userId = req.user.id;
+      
+      // Get user with permissions
+      const [users] = await pool.query(
+        'SELECT id, role, permissions FROM users WHERE id = ?',
+        [userId]
       );
-      res.json({ success: true, data: permissions });
+
+      if (users.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
+      }
+
+      const user = users[0];
+      
+      // Parse permissions JSON if exists
+      let permissions = {};
+      if (user.permissions) {
+        try {
+          permissions = typeof user.permissions === 'string' 
+            ? JSON.parse(user.permissions) 
+            : user.permissions;
+        } catch (err) {
+          console.error('Error parsing permissions:', err);
+        }
+      }
+
+      res.json({
+        success: true,
+        data: {
+          role: user.role,
+          permissions: permissions
+        }
+      });
+
     } catch (error) {
-      console.error('Error fetching permissions:', error);
-      res.status(500).json({ success: false, message: 'Error fetching permissions' });
+      console.error('❌ Error fetching permissions:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
     }
   });
 
-  router.get('/:id', authenticateToken, async (req, res) => {
+  /**
+   * Update user's face descriptor
+   * PUT /api/v1/users/:id/face
+   * 
+   * This route is for management users who don't have employee records
+   * Regular employees use the employee route instead
+   */
+  router.put('/:id/face', authenticateToken, async (req, res) => {
     try {
       const { id } = req.params;
+      const { face_descriptor } = req.body;
+
+      console.log(`💾 Updating face descriptor for user ID: ${id} (Management user)`);
+
+      if (!face_descriptor) {
+        return res.status(400).json({
+          success: false,
+          message: 'Face descriptor is required'
+        });
+      }
+
+      // Verify user exists and requester has permission
       const [users] = await pool.query(
-        `SELECT u.*, e.department_id, e.designation_id, e.employee_id,
-                d.name as department_name, des.name as designation_name,
-                COUNT(DISTINCT rp.permission_id) as permission_count
-         FROM users u
-         LEFT JOIN employees e ON u.id = e.user_id
-         LEFT JOIN departments d ON e.department_id = d.id
-         LEFT JOIN designations des ON e.designation_id = des.id
-         LEFT JOIN roles r ON u.role = r.name
-         LEFT JOIN role_permissions rp ON r.id = rp.role_id
-         WHERE u.id = ?
-         GROUP BY u.id`,
+        'SELECT id, role FROM users WHERE id = ?',
         [id]
       );
       
       if (users.length === 0) {
-        return res.status(404).json({ success: false, message: 'User not found' });
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
       }
-      
-      res.json({ success: true, data: users[0] });
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      res.status(500).json({ success: false, message: 'Error fetching user' });
-    }
-  });
 
-  router.post('/', authenticateToken, async (req, res) => {
-    try {
-      const { name, email, password, role, phone, department_id, designation_id, status, first_name, last_name } = req.body;
+      // ✅ Allow users to update their own face, or admin/super_admin to update anyone
+      const isAdmin = req.user.role === 'admin' || req.user.role === 'super_admin';
+      const isOwnProfile = req.user.id === parseInt(id);
       
-      // Check if email exists
-      const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
-      if (existing.length > 0) {
-        return res.status(400).json({ success: false, message: 'Email already exists' });
+      if (!isOwnProfile && !isAdmin) {
+        return res.status(403).json({
+          success: false,
+          message: 'Unauthorized to update this user'
+        });
       }
-      
-      const hashedPassword = await bcrypt.hash(password, 10);
-      
-      // Create user record
+
+      // Update face_descriptor in users table
       const [result] = await pool.query(
-        `INSERT INTO users (name, email, password, role, phone, status, company_id, first_name, last_name)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [name, email, hashedPassword, role, phone, status || 'active', req.user?.company_id || 1, first_name, last_name]
+        'UPDATE users SET face_descriptor = ? WHERE id = ?',
+        [face_descriptor, id]
+      );
+
+      if (result.affectedRows === 0) {
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to update face descriptor'
+        });
+      }
+
+      console.log(`✅ Face descriptor updated for user ${id} in users table`);
+
+      res.json({
+        success: true,
+        message: 'Face descriptor saved successfully'
+      });
+
+    } catch (error) {
+      console.error('❌ Error updating user face descriptor:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
+    }
+  });
+
+  /**
+   * Get user by ID
+   * GET /api/v1/users/:id
+   * NOTE: Must come AFTER all specific routes (permissions, :id/face, etc.)
+   */
+  router.get('/:id', authenticateToken, async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      // ✅ Allow users to get their own data, or admin/super_admin to get anyone
+      const isAdmin = req.user.role === 'admin' || req.user.role === 'super_admin';
+      const isOwnProfile = req.user.id === parseInt(id);
+      
+      if (!isOwnProfile && !isAdmin) {
+        console.log('❌ 403 Forbidden: User', req.user.id, 'role', req.user.role, 'tried to access user', id);
+        return res.status(403).json({
+          success: false,
+          message: 'Unauthorized to access this user data'
+        });
+      }
+      
+      console.log('✅ Authorized: User', req.user.id, 'role', req.user.role, 'accessing user', id);
+      
+      const [users] = await pool.query(
+        'SELECT id, email, role, first_name, last_name, phone, profile_photo, status, face_descriptor, created_at FROM users WHERE id = ?',
+        [id]
       );
       
-      const userId = result.insertId;
-      
-      // If role is not super_admin, create corresponding employee record
-      if (role !== 'super_admin') {
-        const employeeId = `EMP${String(userId).padStart(4, '0')}`;
-        
-        await pool.query(
-          `INSERT INTO employees (
-            user_id, company_id, employee_id, first_name, last_name, email, phone, 
-            department_id, designation_id, status, employment_type, created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-          [userId, req.user?.company_id || 1, employeeId, first_name || name?.split(' ')[0] || 'Unknown', 
-           last_name || name?.split(' ').slice(1).join(' ') || 'Employee', email, phone, 
-           department_id, designation_id, status || 'active', 'full_time']
-        );
+      if (users.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'User not found'
+        });
       }
       
-      res.status(201).json({ success: true, message: 'User created successfully', data: { id: userId } });
+      console.log(`✅ Fetched user ${id} from users table, face_descriptor:`, users[0].face_descriptor ? 'SET' : 'NULL');
+      
+      res.json({
+        success: true,
+        data: users[0]
+      });
+      
     } catch (error) {
-      console.error('Error creating user:', error);
-      res.status(500).json({ success: false, message: 'Error creating user' });
-    }
-  });
-
-  router.put('/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { name, email, role, phone, department_id, designation_id, status, first_name, last_name } = req.body;
-      
-      // Update user record
-      await pool.query(
-        `UPDATE users SET name = ?, email = ?, role = ?, phone = ?, status = ?, first_name = ?, last_name = ?
-         WHERE id = ?`,
-        [name, email, role, phone, status, first_name, last_name, id]
-      );
-      
-      // Update corresponding employee record if it exists
-      const [employeeExists] = await pool.query('SELECT id FROM employees WHERE user_id = ?', [id]);
-      if (employeeExists.length > 0) {
-        await pool.query(
-          `UPDATE employees SET department_id = ?, designation_id = ?, first_name = ?, last_name = ?, email = ?, phone = ?, status = ?
-           WHERE user_id = ?`,
-          [department_id, designation_id, first_name, last_name, email, phone, status, id]
-        );
-      } else if (role !== 'super_admin') {
-        // Create employee record if it doesn't exist and role is not super_admin
-        const employeeId = `EMP${String(id).padStart(4, '0')}`;
-        await pool.query(
-          `INSERT INTO employees (
-            user_id, company_id, employee_id, first_name, last_name, email, phone, 
-            department_id, designation_id, status, employment_type, created_at, updated_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())`,
-          [id, req.user?.company_id || 1, employeeId, first_name || name?.split(' ')[0] || 'Unknown', 
-           last_name || name?.split(' ').slice(1).join(' ') || 'Employee', email, phone, 
-           department_id, designation_id, status || 'active', 'full_time']
-        );
-      }
-      
-      res.json({ success: true, message: 'User updated successfully' });
-    } catch (error) {
-      console.error('Error updating user:', error);
-      res.status(500).json({ success: false, message: 'Error updating user' });
-    }
-  });
-
-  router.delete('/:id', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      
-      // Don't allow deleting own account
-      if (req.user.id === parseInt(id)) {
-        return res.status(400).json({ success: false, message: 'Cannot delete your own account' });
-      }
-      
-      await pool.query('DELETE FROM users WHERE id = ?', [id]);
-      res.json({ success: true, message: 'User deleted successfully' });
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      res.status(500).json({ success: false, message: 'Error deleting user' });
-    }
-  });
-
-  router.post('/:id/reset-password', authenticateToken, async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { newPassword } = req.body;
-      
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      await pool.query('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, id]);
-      
-      res.json({ success: true, message: 'Password reset successfully' });
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      res.status(500).json({ success: false, message: 'Error resetting password' });
+      console.error('❌ Error fetching user:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Internal server error',
+        error: error.message
+      });
     }
   });
   
   return router;
 };
-

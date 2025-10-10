@@ -8,6 +8,7 @@ import { useTaskContext } from "../contexts/task-context";
 import { usePermissions } from "../hooks/usePermissions";
 import { useSettings } from "../contexts/settings-context";
 import { useVersion } from "../contexts/version-context";
+import { useTranslation } from "../contexts/translation-context";
     
     interface SidebarProps {
       isOpen: boolean;
@@ -503,6 +504,7 @@ const navSections: NavSection[] = [
 export default function Sidebar({ isOpen }: SidebarProps) {
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { taskCounts } = useTaskContext();
   const { hasAnyPermission, loading: permissionsLoading } = usePermissions();
   const { getSiteName, getCompanyName, loading: settingsLoading } = useSettings();
@@ -583,7 +585,7 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                     <div className="px-3 mb-3">
                       <p className="text-xs font-semibold text-default-600 uppercase tracking-wider flex items-center gap-2">
                         <span className="w-8 h-0.5 bg-gradient-to-r from-primary-500/50 to-transparent rounded-full"></span>
-                        {section.title}
+                        {t(section.title)}
                       </p>
                     </div>
                   )}
@@ -616,26 +618,26 @@ export default function Sidebar({ isOpen }: SidebarProps) {
                                   {item.badge > 99 ? "99+" : item.badge}
                                       </span>
                                     )}
-                                  </div>
-                                }
-                              >
-                                {item.title}
-                              </Button>
-                            </Link>
-                          ) : (
-                            <Tooltip content={item.title} placement="right">
-                              <Link to={item.path}>
-                                <Button
-                                  isIconOnly
-                            variant={isActiveItem ? "flat" : "light"}
-                            color={isActiveItem ? "primary" : "default"}
-                                  className={`w-full mb-2 rounded-2xl transition-all duration-200 ${
-                                    isActiveItem 
-                                      ? 'shadow-lg shadow-primary-500/20 scale-[1.05]' 
-                                      : 'hover:shadow-md hover:scale-[1.02] hover:bg-default-100/50'
-                                  }`}
-                                  aria-label={item.title}
-                                >
+                              </div>
+                            }
+                          >
+                            {t(item.title)}
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Tooltip content={t(item.title)} placement="right">
+                          <Link to={item.path}>
+                            <Button
+                              isIconOnly
+                        variant={isActiveItem ? "flat" : "light"}
+                        color={isActiveItem ? "primary" : "default"}
+                              className={`w-full mb-2 rounded-2xl transition-all duration-200 ${
+                                isActiveItem 
+                                  ? 'shadow-lg shadow-primary-500/20 scale-[1.05]' 
+                                  : 'hover:shadow-md hover:scale-[1.02] hover:bg-default-100/50'
+                              }`}
+                              aria-label={t(item.title)}
+                            >
                                   <div className="relative">
                                     <Icon icon={item.icon} className="text-lg" />
                               {item.badge && item.badge > 0 && (

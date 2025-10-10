@@ -213,7 +213,7 @@ const AttendancePage: React.FC = () => {
               color: "primary" as const
             },
             {
-              label: "View Calendar",
+              label: t("View Calendar"),
               icon: "lucide:calendar",
               onPress: () => console.log("View Calendar"),
               variant: "bordered" as const

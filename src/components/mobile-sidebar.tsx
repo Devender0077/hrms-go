@@ -13,6 +13,7 @@ import { useAuth } from "../contexts/auth-context";
 import { usePermissions } from "../hooks/usePermissions";
 import { useTaskContext } from "../contexts/task-context";
 import { useSettings } from "../contexts/settings-context";
+import { useTranslation } from "../contexts/translation-context";
 import { navSections as sharedNavSections } from "../config/navigation";
 
 interface MobileSidebarProps {
@@ -36,6 +37,7 @@ interface NavSection {
 export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
   const location = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { hasPermission } = usePermissions();
   const { taskCounts } = useTaskContext();
   const { settings } = useSettings();
@@ -260,7 +262,7 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
               return (
                 <div key={idx} className="mb-6">
                   <p className="px-4 text-xs font-medium text-default-500 uppercase tracking-wider mb-2">
-                    {section.title}
+                    {t(section.title)}
                   </p>
 
                   <ul>
@@ -290,13 +292,13 @@ export default function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
                                       {item.badge}
                                     </span>
                                   )}
-                                </div>
-                              }
-                            >
-                              {item.title}
-                            </Button>
-                          </Link>
-                        </motion.li>
+                              </div>
+                            }
+                          >
+                            {t(item.title)}
+                          </Button>
+                        </Link>
+                      </motion.li>
                       );
                     })}
                   </ul>

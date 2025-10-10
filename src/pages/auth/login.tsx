@@ -24,10 +24,12 @@ import { Icon } from "@iconify/react";
 import { motion } from "framer-motion";
 import { useAuth } from "../../contexts/auth-context";
 import { useTheme } from "../../contexts/theme-context";
+import { useTranslation } from "../../contexts/translation-context";
 import FaceRecognitionService from "../../services/face-recognition-service";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [rememberMe, setRememberMe] = React.useState(false);
@@ -64,8 +66,12 @@ export default function Login() {
   // Cleanup camera stream on component unmount and page changes
   React.useEffect(() => {
     const cleanup = () => {
+      console.log('🎥 Cleaning up camera stream...');
       if (stream) {
-        stream.getTracks().forEach((track) => track.stop());
+        stream.getTracks().forEach((track) => {
+          track.stop();
+          console.log('📷 Camera track stopped');
+        });
         setStream(null);
       }
       if (videoRef.current) {
@@ -75,7 +81,10 @@ export default function Login() {
 
     const handleBeforeUnload = () => cleanup();
     const handleVisibilityChange = () => {
-      if (document.hidden) cleanup();
+      if (document.hidden) {
+        console.log('👁️ Page hidden, stopping camera for privacy');
+        cleanup();
+      }
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -87,6 +96,19 @@ export default function Login() {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [stream]);
+
+  // ✅ Cleanup camera when modal closes
+  React.useEffect(() => {
+    if (!isOpen && stream) {
+      console.log('🎥 Modal closed, stopping camera for security...');
+      stream.getTracks().forEach((track) => track.stop());
+      setStream(null);
+      setFaceVerificationStep(0);
+      setFaceDetected(false);
+      setFaceVerified(false);
+      setVideoReady(false);
+    }
+  }, [isOpen]);
 
   // Handle face verification error with better UX
   const handleFaceVerificationError = (errorMessage?: string) => {
@@ -142,24 +164,11 @@ export default function Login() {
 
         setTimeout(async () => {
           try {
-            console.log("Capturing face for login...");
+            console.log("Capturing face descriptor for login...");
 
-            let faceImage = '';
-            if (videoRef.current) {
-              const canvas = document.createElement('canvas');
-              canvas.width = 640;
-              canvas.height = 480;
-              const context = canvas.getContext('2d');
-
-              if (context) {
-                context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-                faceImage = canvas.toDataURL('image/jpeg', 0.8);
-                console.log("Face image captured for login");
-              }
-            }
-
-            // ✅ Call real backend face verification API
-            const verificationResult = await FaceRecognitionService.verifyFace(faceImage);
+            // ✅ Call real backend face verification API with video element
+            // This extracts face descriptor (128 numbers) and sends to backend
+            const verificationResult = await FaceRecognitionService.verifyFaceLogin(videoRef.current);
 
             if (verificationResult.success) {
               setFaceVerified(true);
