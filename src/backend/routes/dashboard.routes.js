@@ -48,35 +48,78 @@ module.exports = (pool, authenticateToken) => {
   // Company Admin Dashboard Statistics
   router.get('/company-admin', authenticateToken, async (req, res) => {
     try {
-      const companyId = req.user.company_id;
+      const userRole = req.user.role;
       
-      const [stats] = await pool.query(`
+      // Check if user is company admin
+      if (userRole !== 'company_admin' && userRole !== 'super_admin' && userRole !== 'superadmin') {
+        return res.status(403).json({ 
+          error: 'Access denied. Company admin role required.',
+          currentRole: userRole 
+        });
+      }
+
+      // Get company statistics
+      const [companyStats] = await pool.query(`
         SELECT 
-          COUNT(DISTINCT e.id) as totalEmployees,
-          COUNT(DISTINCT d.id) as totalDepartments,
-          COUNT(DISTINCT a.id) as todayAttendance
-        FROM employees e
-        LEFT JOIN departments d ON e.department_id = d.id
-        LEFT JOIN attendance a ON e.id = a.employee_id AND DATE(a.check_in_time) = CURDATE()
-        WHERE e.company_id = ? AND e.status = 'active'
-      `, [companyId]);
+          (SELECT COUNT(*) FROM employees WHERE status = 'active') as totalEmployees,
+          (SELECT COUNT(*) FROM employees WHERE status = 'active') as activeEmployees,
+          (SELECT COUNT(*) FROM employees WHERE MONTH(hire_date) = MONTH(CURRENT_DATE()) AND YEAR(hire_date) = YEAR(CURRENT_DATE())) as newHires,
+          (SELECT COUNT(*) FROM employees WHERE status = 'inactive' AND MONTH(updated_at) = MONTH(CURRENT_DATE())) as departures,
+          (SELECT COUNT(DISTINCT employee_id) FROM attendance WHERE DATE(check_in) = CURRENT_DATE()) as todayPresent,
+          (SELECT COUNT(*) FROM employees WHERE status = 'active') - (SELECT COUNT(DISTINCT employee_id) FROM attendance WHERE DATE(check_in) = CURRENT_DATE()) as todayAbsent,
+          (SELECT COUNT(*) FROM leave_requests WHERE status = 'pending') as leaveRequests,
+          (SELECT COUNT(DISTINCT department_id) FROM employees WHERE department_id IS NOT NULL) as departmentCount
+      `);
+
+      // Get department data
+      const [departments] = await pool.query(`
+        SELECT 
+          d.name,
+          COUNT(e.id) as employees,
+          COALESCE(AVG(CASE WHEN a.check_in IS NOT NULL THEN 1 ELSE 0 END) * 100, 0) as utilization
+        FROM departments d
+        LEFT JOIN employees e ON d.id = e.department_id AND e.status = 'active'
+        LEFT JOIN attendance a ON e.id = a.employee_id AND DATE(a.check_in) >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
+        GROUP BY d.id, d.name
+        ORDER BY employees DESC
+        LIMIT 10
+      `);
+
+      // Get attendance trend (last 6 months)
+      const [attendanceTrend] = await pool.query(`
+        SELECT 
+          DATE_FORMAT(check_in, '%b') as month,
+          COUNT(DISTINCT CASE WHEN check_in IS NOT NULL THEN employee_id END) as present,
+          (SELECT COUNT(*) FROM employees WHERE status = 'active') - COUNT(DISTINCT CASE WHEN check_in IS NOT NULL THEN employee_id END) as absent,
+          COUNT(DISTINCT CASE WHEN TIME(check_in) > '09:15:00' THEN employee_id END) as late
+        FROM attendance
+        WHERE check_in >= DATE_SUB(CURRENT_DATE(), INTERVAL 6 MONTH)
+        GROUP BY MONTH(check_in), DATE_FORMAT(check_in, '%b')
+        ORDER BY MONTH(check_in)
+      `);
+
+      // Calculate attendance rate
+      const attendanceRate = companyStats[0].todayPresent > 0 
+        ? ((companyStats[0].todayPresent / companyStats[0].totalEmployees) * 100).toFixed(1)
+        : 0;
 
       res.json({
         success: true,
-        data: {
-          totalEmployees: stats[0].totalEmployees,
-          totalDepartments: stats[0].totalDepartments,
-          todayAttendance: stats[0].todayAttendance,
-          pendingTasks: 15,
-          upcomingEvents: 8
-        }
+        companyStats: {
+          ...companyStats[0],
+          attendanceRate: parseFloat(attendanceRate),
+          pendingApprovals: companyStats[0].leaveRequests
+        },
+        departmentData: departments,
+        attendanceTrend
       });
+
     } catch (error) {
-      console.error('Error fetching company admin stats:', error);
-      res.status(500).json({
+      console.error('Error fetching company admin dashboard data:', error);
+      res.status(500).json({ 
         success: false,
-        message: 'Failed to fetch company admin statistics',
-        error: error.message
+        error: 'Failed to fetch company admin dashboard data',
+        details: error.message 
       });
     }
   });
@@ -84,33 +127,96 @@ module.exports = (pool, authenticateToken) => {
   // Employee Dashboard Statistics
   router.get('/employee', authenticateToken, async (req, res) => {
     try {
-      const employeeId = req.user.id;
+      const userId = req.user.id;
       
-      const [stats] = await pool.query(`
+      // Get employee ID from user
+      const [employeeData] = await pool.query(
+        'SELECT id, first_name, last_name, department_id, leave_balance FROM employees WHERE user_id = ? LIMIT 1',
+        [userId]
+      );
+
+      if (!employeeData || employeeData.length === 0) {
+        return res.status(404).json({ 
+          success: false,
+          error: 'Employee record not found' 
+        });
+      }
+
+      const employeeId = employeeData[0].id;
+
+      // Get employee statistics
+      const [employeeStats] = await pool.query(`
         SELECT 
-          COUNT(*) as completedTasks,
-          (SELECT COUNT(*) FROM attendance WHERE employee_id = ? AND DATE(check_in_time) = CURDATE()) as todayAttendance,
-          (SELECT COUNT(*) FROM leaves WHERE employee_id = ? AND status = 'pending') as pendingLeaves
-        FROM tasks t
-        WHERE t.assigned_to = ? AND t.status = 'completed'
-      `, [employeeId, employeeId, employeeId]);
+          (SELECT COUNT(*) FROM tasks WHERE assigned_to = ? AND status != 'completed') as totalTasks,
+          (SELECT COUNT(*) FROM tasks WHERE assigned_to = ? AND status = 'completed') as completedTasks,
+          (SELECT COUNT(*) FROM tasks WHERE assigned_to = ? AND status = 'pending') as pendingTasks,
+          (SELECT COUNT(DISTINCT DATE(check_in)) FROM attendance WHERE employee_id = ? AND MONTH(check_in) = MONTH(CURRENT_DATE())) as daysPresent
+      `, [employeeId, employeeId, employeeId, employeeId]);
+
+      // Get recent tasks
+      const [tasks] = await pool.query(`
+        SELECT 
+          id,
+          title,
+          priority,
+          due_date as dueDate,
+          status,
+          COALESCE(progress, 0) as progress
+        FROM tasks
+        WHERE assigned_to = ?
+        ORDER BY 
+          CASE priority 
+            WHEN 'high' THEN 1 
+            WHEN 'medium' THEN 2 
+            WHEN 'low' THEN 3 
+          END,
+          due_date ASC
+        LIMIT 10
+      `, [employeeId]);
+
+      // Get recent attendance
+      const [attendance] = await pool.query(`
+        SELECT 
+          DATE(check_in) as date,
+          TIME(check_in) as checkIn,
+          TIME(check_out) as checkOut,
+          TIMESTAMPDIFF(HOUR, check_in, check_out) as hours,
+          CASE 
+            WHEN TIME(check_in) > '09:15:00' THEN 'late'
+            ELSE 'present'
+          END as status
+        FROM attendance
+        WHERE employee_id = ?
+        ORDER BY check_in DESC
+        LIMIT 10
+      `, [employeeId]);
+
+      // Calculate attendance rate
+      const workingDays = 22; // Average working days per month
+      const attendanceRate = employeeStats[0].daysPresent > 0 
+        ? ((employeeStats[0].daysPresent / workingDays) * 100).toFixed(1)
+        : 0;
 
       res.json({
         success: true,
-        data: {
-          completedTasks: stats[0].completedTasks,
-          todayAttendance: stats[0].todayAttendance,
-          pendingLeaves: stats[0].pendingLeaves,
-          upcomingDeadlines: 3,
-          teamMembers: 8
-        }
+        employeeStats: {
+          ...employeeStats[0],
+          attendanceRate: parseFloat(attendanceRate),
+          leaveBalance: employeeData[0].leave_balance || 18,
+          upcomingEvents: 3, // TODO: Get from calendar
+          teamMembers: 8, // TODO: Get from team/department
+          projects: 5 // TODO: Get from projects table
+        },
+        taskData: tasks,
+        attendanceData: attendance
       });
+
     } catch (error) {
-      console.error('Error fetching employee stats:', error);
-      res.status(500).json({
+      console.error('Error fetching employee dashboard data:', error);
+      res.status(500).json({ 
         success: false,
-        message: 'Failed to fetch employee statistics',
-        error: error.message
+        error: 'Failed to fetch employee dashboard data',
+        details: error.message 
       });
     }
   });

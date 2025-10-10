@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Card, 
   CardBody, 
@@ -22,9 +22,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  useDisclosure
+  useDisclosure,
+  Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { useNavigate } from "react-router-dom";
 import HeroSection from "../common/HeroSection";
 import {
   AreaChart,
@@ -46,37 +48,73 @@ import {
   ComposedChart
 } from "recharts";
 import { motion } from "framer-motion";
+import { dashboardService } from "../../services/dashboard-service";
+import { useTranslation } from "../../contexts/translation-context";
 
 export default function EmployeeDashboard() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [employeeStats, setEmployeeStats] = useState<any>(null);
+  const [taskData, setTaskData] = useState<any[]>([]);
+  const [attendanceData, setAttendanceData] = useState<any[]>([]);
 
-  // Employee specific data
-  const employeeStats = {
-    totalTasks: 12,
-    completedTasks: 8,
-    pendingTasks: 4,
-    attendanceRate: 95.5,
-    leaveBalance: 18,
-    upcomingEvents: 3,
-    teamMembers: 8,
-    projects: 5
+  // Load dashboard data
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await dashboardService.getEmployeeStats();
+      
+      if (response.success) {
+        setEmployeeStats(response.employeeStats);
+        setTaskData(response.taskData || []);
+        setAttendanceData(response.attendanceData || []);
+      }
+    } catch (err: any) {
+      console.error('Error loading dashboard data:', err);
+      setError(err.message || 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const taskData = [
-    { id: 1, title: "Complete project proposal", priority: "high", dueDate: "2024-01-20", status: "in-progress", progress: 75 },
-    { id: 2, title: "Review team performance", priority: "medium", dueDate: "2024-01-22", status: "pending", progress: 0 },
-    { id: 3, title: "Update documentation", priority: "low", dueDate: "2024-01-25", status: "completed", progress: 100 },
-    { id: 4, title: "Client meeting preparation", priority: "high", dueDate: "2024-01-18", status: "in-progress", progress: 60 },
-    { id: 5, title: "Code review", priority: "medium", dueDate: "2024-01-21", status: "pending", progress: 0 }
-  ];
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background p-4 sm:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="mt-4 text-default-500">{t('common.loading')}</p>
+        </div>
+      </div>
+    );
+  }
 
-  const attendanceData = [
-    { date: "2024-01-15", checkIn: "09:00", checkOut: "18:00", hours: 8, status: "present" },
-    { date: "2024-01-16", checkIn: "09:15", checkOut: "17:45", hours: 7.5, status: "present" },
-    { date: "2024-01-17", checkIn: "08:45", checkOut: "18:30", hours: 8.75, status: "present" },
-    { date: "2024-01-18", checkIn: "09:30", checkOut: "17:00", hours: 7, status: "late" },
-    { date: "2024-01-19", checkIn: "09:00", checkOut: "18:00", hours: 8, status: "present" }
-  ];
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background p-4 sm:p-6 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardBody className="text-center p-6">
+            <Icon icon="lucide:alert-circle" className="text-danger text-4xl mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">{t('common.error')}</h3>
+            <p className="text-default-500 mb-4">{error}</p>
+            <Button color="primary" onClick={loadDashboardData}>
+              {t('common.retry')}
+            </Button>
+          </CardBody>
+        </Card>
+      </div>
+    );
+  }
 
   const upcomingEvents = [
     { id: 1, title: "Team Meeting", date: "2024-01-20", time: "10:00 AM", type: "meeting" },

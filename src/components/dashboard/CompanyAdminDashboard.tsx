@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Card, 
   CardBody, 
@@ -22,9 +22,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  useDisclosure
+  useDisclosure,
+  Spinner
 } from "@heroui/react";
 import { Icon } from "@iconify/react";
+import { useNavigate } from "react-router-dom";
 import HeroSection from "../common/HeroSection";
 import {
   AreaChart,
@@ -46,39 +48,43 @@ import {
   ComposedChart
 } from "recharts";
 import { motion } from "framer-motion";
+import { dashboardService } from "../../services/dashboard-service";
+import { useTranslation } from "../../contexts/translation-context";
 
 export default function CompanyAdminDashboard() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [companyStats, setCompanyStats] = useState<any>(null);
+  const [departmentData, setDepartmentData] = useState<any[]>([]);
+  const [attendanceData, setAttendanceData] = useState<any[]>([]);
 
-  // Company Admin specific data
-  const companyStats = {
-    totalEmployees: 245,
-    activeEmployees: 230,
-    newHires: 12,
-    departures: 3,
-    attendanceRate: 94.5,
-    leaveRequests: 8,
-    pendingApprovals: 15,
-    departmentCount: 8
+  // Load dashboard data
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await dashboardService.getCompanyAdminStats();
+      
+      if (response.success) {
+        setCompanyStats(response.companyStats);
+        setDepartmentData(response.departmentData || []);
+        setAttendanceData(response.attendanceTrend || []);
+      }
+    } catch (err: any) {
+      console.error('Error loading dashboard data:', err);
+      setError(err.message || 'Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const departmentData = [
-    { name: "Engineering", employees: 85, budget: 1200000, utilization: 92 },
-    { name: "Marketing", employees: 32, budget: 450000, utilization: 88 },
-    { name: "Sales", employees: 45, budget: 600000, utilization: 95 },
-    { name: "HR", employees: 18, budget: 280000, utilization: 85 },
-    { name: "Finance", employees: 25, budget: 350000, utilization: 90 },
-    { name: "Operations", employees: 40, budget: 500000, utilization: 87 }
-  ];
-
-  const attendanceData = [
-    { month: "Jan", present: 220, absent: 25, late: 15 },
-    { month: "Feb", present: 225, absent: 20, late: 12 },
-    { month: "Mar", present: 230, absent: 15, late: 10 },
-    { month: "Apr", present: 235, absent: 10, late: 8 },
-    { month: "May", present: 230, absent: 15, late: 12 },
-    { month: "Jun", present: 240, absent: 5, late: 5 }
-  ];
 
   const pendingApprovals = [
     { id: 1, type: "leave", employee: "John Doe", department: "Engineering", days: 3, status: "pending" },
@@ -113,25 +119,55 @@ export default function CompanyAdminDashboard() {
     }
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background p-4 sm:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <Spinner size="lg" />
+          <p className="mt-4 text-default-500">{t('common.loading')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background p-4 sm:p-6 flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardBody className="text-center p-6">
+            <Icon icon="lucide:alert-circle" className="text-danger text-4xl mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">{t('common.error')}</h3>
+            <p className="text-default-500 mb-4">{error}</p>
+            <Button color="primary" onClick={loadDashboardData}>
+              {t('common.retry')}
+            </Button>
+          </CardBody>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background p-4 sm:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Hero Section */}
         <HeroSection
-          title="Company Admin Dashboard"
-          subtitle="Manage Your Organization"
+          title={t('companyAdmin.dashboard')}
+          subtitle={t('companyAdmin.companyOverview')}
           description="Monitor your company's HR operations, track performance metrics, and oversee employee activities from this comprehensive dashboard."
           icon="lucide:building-2"
           illustration="dashboard"
           actions={[
             {
-              label: "Quick Reports",
+              label: t('companyAdmin.quickReports'),
               icon: "lucide:bar-chart-3",
-              onPress: () => console.log("Quick reports"),
+              onPress: () => navigate('/dashboard/reports'),
               variant: "bordered"
             },
             {
-              label: "Export Data",
+              label: t('companyAdmin.exportData'),
               icon: "lucide:download",
               onPress: () => console.log("Export data"),
               variant: "flat"
@@ -150,9 +186,9 @@ export default function CompanyAdminDashboard() {
               <CardBody className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-default-500 text-xs sm:text-sm font-medium">Total Employees</p>
-                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{companyStats.totalEmployees}</p>
-                    <p className="text-success-600 text-xs sm:text-sm mt-1">+{companyStats.newHires} new hires</p>
+                    <p className="text-default-500 text-xs sm:text-sm font-medium">{t('companyAdmin.totalEmployees')}</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-foreground mt-1">{companyStats?.totalEmployees || 0}</p>
+                    <p className="text-success-600 text-xs sm:text-sm mt-1">+{companyStats?.newHires || 0} {t('companyAdmin.newHires')}</p>
                   </div>
                   <div className="p-2 sm:p-3 bg-primary-100 dark:bg-primary-900/30 rounded-xl">
                     <Icon icon="lucide:users" className="text-primary-600 text-xl sm:text-2xl" />
